@@ -11,7 +11,7 @@ WebLaruex es una aplicación de servicios del Laboratorio de Radiactividad Ambie
 Sigue estos pasos para instalar Weblaruex en tu entorno local:
 
 1. **Clonar el repositorio:**
-git clone ![URL del repositorio]https://github.com/Alerta2/AppsLaruex.git
+git clone https://github.com/Alerta2/AppsLaruex.git
 2. **Acceder al directorio:**
 cd weblaruex
 3. **Crear un entorno virtual:**
