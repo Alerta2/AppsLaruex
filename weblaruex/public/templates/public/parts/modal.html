@@ -1,0 +1,40 @@
+{% load static %}
+<div class="modal fade" id="ModalInforme" tabindex="-1" role="dialog" aria-labelledby="ModalInformeLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Solicitud de informe</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="/consultaInforme/" method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="informe_numero" class="col-form-label">Informe:</label>
+            <input id="informe_numero" class="form-control" type="text" name="informe_numero">
+          </div>
+          <div class="form-group">
+            <label for="informe_password" class="col-form-label">Clave:</label>
+            <input id="informe_password" class="form-control" type="password" name="informe_password">
+          </div>
+            <div class="modal-footer">
+            <input type="submit" class="btn btn-info" value="OK">
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+$('#ModalInforme').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var informe = $('#inputInforme').val();
+  var modal = $(this)
+  modal.find('#informe_numero').val(informe)
+})
+
+</script>

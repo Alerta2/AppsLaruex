@@ -1,0 +1,71 @@
+/* Linea divisoria del titulo */   
+hr {
+    opacity: 1;
+    color: #fff;
+}
+
+hr.linea-hr {
+    width: 50%;
+    border: none;
+    border-top: 1px solid #fff;
+    margin-left: 25% !important;
+    margin-right: 25% !important;
+    margin-top: 50px;
+    margin-bottom: 20px
+}
+hr.linea-hr:after {
+    content: url('../../../static/img/spd/logos/logo_alerta2_transparente.png');
+    position: absolute;
+    transform: translateY(-60%) translateX(-50%) scale(.1);
+    background: transparent;
+}
+
+/*Estilo tabla negra bootstraptable*/
+.table-dark {
+    background-color: #1B1C1C;
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: rgba(27, 28, 28, 0.1);
+    --bs-table-striped-color: #fff;
+    --bs-table-active-bg: rgba(27, 28, 28, 0.1);
+    --bs-table-active-color: #fff;
+    --bs-table-hover-bg: rgba(27, 28, 28, 0.1);
+    --bs-table-hover-color: #fff;
+    color: #fff;
+    border-color: rgba(27, 28, 28, 0.1);
+}
+
+/*Colores de la numeracion de paginas*/
+.page-item.active .page-link {
+    z-index: 1;
+    color: #1B1C1C;
+    background-color: aquamarine;
+    border-color: #dee2e6;;
+}
+.page-link {
+    color: aquamarine;
+    background-color: #1B1C1C;
+    border: #95999c;
+}
+
+@media (min-width: 650px) {
+    Todas las columnas del bootstrap table con el mismo ancho
+    table {
+        table-layout: fixed;
+    }
+}
+
+/*Estilo boton aceptar (sustitucion/cambio)*/
+.button-aceptar {
+    background-color: lightgreen;
+    border-color: lightgreen;
+    color: #333333;
+    margin-bottom: 3px;
+}
+
+/*Estilo boton rechazar (sustitucion/cambio)*/
+.button-rechazar {
+    background-color: darkred;
+    border-color: darkred;
+    color: #fff;
+    margin-bottom: 3px;
+}

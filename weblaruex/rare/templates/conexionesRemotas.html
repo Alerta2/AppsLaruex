@@ -1,0 +1,82 @@
+{% extends "base/base_mapa.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    Conexiones Remotas
+{% endblock %}
+
+{% block imports %}
+
+{% endblock %}
+{% block css %}
+main { padding-top: 70px; }
+{% endblock %}
+
+{% block content %}
+
+    <section class="">
+        <div class="row border border-primary my-4 mx-1 p-2">
+            <h3 class="col-12">Información del usuario para conexiones remotas VNC</h3>
+            <div class="col-md-auto">Usuario VNC: <input type="text" class="form-control" value="{{ usuario }}" readonly></div>
+            <div class="col-md-auto">Password VNC: <input type="password" class="form-control" value="{{ password.pass_vnc_plana }}" id="passwordVNC" readonly><div class="form-check"><input type="checkbox" class="form-check-input" onclick="mostrasPass('passwordVNC')" id="mostrarPassVNC"><label class="form-check-label" for="mostrarPassVNC">Mostrar</label></div></div>
+            <div class="col-12 my-4">Si tienes una cuenta de Teamviewer solicita acceder al grupo de LARUEX <a href="https://login.teamviewer.com/cmd/joincompany"><button type="button" class="btn btn-outline-info">aquí</button></a>, de lo contrario habla con Juan para crear una cuenta agregada al grupo de LARUEX.</div>
+
+            {% if user.is_superuser %}
+                <div class="col-12">
+                    <a href="/private/laruex/conexionesPorUsuario/"><button type="button" class="btn btn-outline-info">Conexiones por Usuario</button></a>
+                    <a href="/private/laruex/conexionesPorEquipo/"><button type="button" class="btn btn-outline-info">Conexiones por Equipo</button></a>
+                </div>
+            {% endif %}
+        </div>
+        <div class="row border border-primary my-2 mx-1 p-2">
+            <div class="col-sm-2 col-6">
+                EQUIPO
+            </div>
+            <div class="col-sm-2 col-6">
+                IP
+            </div>
+            <div class="col-sm-2 col-6">
+                PUERTO VNC
+            </div>
+            <div class="col-sm-2 col-6">
+                USUARIO-PASS PC
+            </div>
+            <div class="col-sm-2 col-6 text-right">
+                ACCIONES
+            </div>
+        </div>
+        {% for conexion in conexiones %}
+            <div class="row border border-primary my-2 mx-1 p-2">
+                <div class="col-sm-2 col-6">
+                    {{ conexion.id_ordenador.equipo }}
+                </div>
+                <div class="col-sm-2 col-6">
+                    {{ conexion.id_ordenador.ip }}
+                </div>
+                <div class="col-sm-2 col-6">
+                    {{ conexion.id_ordenador.puerto_vnc }}
+                </div>
+                <div class="col-sm-2 col-6">
+                    <input type="text" class="form-control" value="{{ conexion.id_ordenador.usuario }}" readonly>
+                    <input type="password" class="form-control" value="{{ conexion.id_ordenador.password }}" id="password{{ conexion.id_ordenador.id }}" readonly><div class="form-check"><input type="checkbox" class="form-check-input" onclick="mostrasPass('password{{ conexion.id_ordenador.id }}')" id="mostrarPass{{ conexion.id_ordenador.id }}"><label class="form-check-label" for="mostrarPass{{ conexion.id_ordenador.id }}">Mostrar</label></div>
+                </div>
+                <div class="col-sm-2 col-6 text-right">
+                    <a href="/private/laruex/devolverConexionVNC/{{ conexion.id_ordenador.id }}/" data-toggle="tooltip" data-placement="bottom" title="Descargar conexion VNC para importar en VNC Address Book" download><i class="btn btn-info fa-light fa-house-laptop fa-2x"></i></a>
+                </div>
+            </div>
+        {% endfor %}
+    </section>
+        
+    
+
+    <script type="text/javascript">
+        function mostrasPass(id) {
+            var x = document.getElementById(id);
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+    </script>
+{% endblock %}

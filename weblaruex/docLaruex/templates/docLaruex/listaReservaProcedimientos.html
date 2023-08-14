@@ -1,0 +1,315 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    ul.pagination li .page-link {
+        background-color: rgb(255, 255, 255) !important;
+        color: rgb(41, 68, 87);
+
+    }
+
+    ul.pagination li.active .page-link {
+        background-color: rgb(41, 68, 87) !important;
+        border-color: rgb(41, 68, 87) !important;
+    }
+
+    ul.pagination li .page-link:hover {
+        filter: brightness(85%);
+
+    }
+
+    ul.pagination li.active .page-link:hover {
+        filter: brightness(120%);
+
+    }
+
+    .btn-light {
+        color: rgb(41, 68, 87);
+    }
+
+    th {
+        color: rgb(41, 68, 87);
+    }
+
+    .addFicheroEditable {
+        color: rgb(9, 58, 65);
+    }
+
+    .addFicheroEditable:hover {
+        color: rgb(133, 198, 228);
+    }
+
+    /* estilo añadirFichero PDF*/
+    .addFicheroPDF {
+        color: rgb(161, 16, 32);
+    }
+
+    .addFicheroPDF:hover {
+        color: rgb(99, 10, 20);
+    }
+
+    .file-upload {
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+    }
+
+    .add:hover {
+        color: #ce8312;
+    }
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+    <h5 class="card-title">Lista de Procedimientos Reservados</h5>
+    <nav>
+        <ol class="breadcrumb" style="background-color:#fff !important">
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                        class="bi bi-house-door"></i></a></li>
+            <li class="breadcrumb-item active" style="font-size: large;">Lista de Procedimientos Reservados</li>
+        </ol>
+    </nav>
+</div>
+
+
+<!-- ============= Modal Eliminar ====================-->
+
+<div id="modalEliminarReservaProcedimiento" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarReservaProcedimiento"><strong>¿Estas seguro que deseas eliminar el objeto?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarReservaProcedimiento" action="/private/docLaruex/eliminarObjeto/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarObjeto" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarObjeto" name="cancel" onclick="crearAviso('eliminarObjetoCancelar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarObjetoGuardar', 'Objeto  eliminado', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+{% if administrador %}
+    <div id="toolbar">
+        <button type="button" class="btn reservar" type="button" data-toggle="modal" data-target="#modalReservar" style="background-color: #eba43d; border-color:#eba43d; color: #fff;  font-weight: bold;">Reservar</button>
+    </div>
+{% endif %}
+<table id="tabla_reservas_procedimientos" data-toggle="table" data-search="true" data-show-columns="true"
+    data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+    data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+    data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+</table>
+
+
+<!-- formulario añadir archivo  -->
+<div id="modalReservar" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="TituloModal">Reservar Procedimiento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formularioReservarModal" 
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div id="opcionFormulario">
+                        <!-- formulario de procedimiento -->
+                        <div id="formularioReservaProcedimiento" class="divFormularios">
+                            <div class="row ">
+                                
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="tituloProcedimiento" class="col-md-auto">Código del Procedimiento</label>
+                                        <input type="text" class="form-control col-md-auto" id="procedimientoReservado"
+                                            name="procedimientoReservado" data-rule="required" readonly/>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="tipoProcedimiento">Tipo de Procedimiento</label>
+                                        <select class="form-select" data-rule="required" id="codigo"
+                                            name="codigo" onclick="BuscarCodigoProcedimiento()">
+                                            <option value="OD">OD
+                                            </option>
+                                            <option value="MC">MC
+                                            </option>
+                                            <option value="PGC">PGC
+                                            </option>
+                                            <option value="PL">PL
+                                            </option>
+                                            <option value="PR">PR
+                                            </option>
+                                            <option value="PS">PS
+                                            </option>
+                                            
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="form-group">
+                                        <label for="tituloProcedimiento" class="col-md-auto">Titulo del
+                                            Procedimiento</label>
+                                        <input type="text" class="form-control col-md-auto" id="tituloProcedimiento"
+                                            name="tituloProcedimiento" data-rule="required"
+                                            pattern="[a-zA-Z\w\s]{1,255}"
+                                            title="No permite guiones ni otros caracteres que no sean espacios" />
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="responsable">Responsable</label>
+                                        <select class="form-select" data-rule="required" id="responsable"
+                                            name="responsable">
+                                            {% for responsable in responsables %}
+                                            <option value="{{responsable.id}}">
+                                                {{responsable.first_name}} {{responsable.last_name}}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cerrar
+                            </button>
+                            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+                            </button>
+                            <button type="submit" value="submit" class="btn btn-primary">
+                                Guardar
+                            </button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script type="text/javascript">
+
+    $('#tabla_reservas_procedimientos').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/reservaProcedimientosDatos",
+        cache: false,
+        columns: [ {
+            title: 'Procedimiento',
+            field: 'procedimiento_reservado',
+            align: "center",
+            sortable: "true",
+        }, {
+            title: 'Título',
+            field: 'titulo',
+            align: "center"
+        },{
+            title: 'Fecha',
+            field: 'fecha',
+            align: 'center',
+        }, {
+            title: 'Propietario',
+            field: 'responsable',
+            align: "center",
+            formatter: function (value, row) {
+                return (
+                    row.responsable__first_name + " " + row.responsable__last_name
+                );
+            },
+        },{
+            title: '',
+            field: 'action',
+            align: "center",
+              formatter: function (value, row) {
+                var EliminarReservaProcedimiento = '<a href="/private/docLaruex/eliminarReservaProcedimiento/' + row.id + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarReservaProcedimiento" onclick="$('+"'#formularioModalEliminarReservaProcedimiento').attr('action', '/private/docLaruex/eliminarReservaProcedimiento/"+ row.id +"/');"+'" ><i class="fa-solid fa-x" style="color:#AE2012"></i></a>';
+
+                var admin = '{{administrador}}'; 
+                if (admin == 'True'){
+                  return (EliminarReservaProcedimiento);
+                }
+
+            },
+        },   
+        ],
+        locale: "es-ES",
+        search: true,
+        sortOrder: 'desc',
+
+    });
+
+
+
+    // cambiamos la funcionalidad del boton submit del formulario
+    $("#formularioReservarModal").submit(function (e) {
+        // cancelamos el funcionamiento por defecto del boton submit
+        e.preventDefault();
+        // capturamos la información del formulario 
+        var data = new FormData(this);
+        // ejecuta una url/action con la capacidad de gestionar la salida
+        $.ajax({
+            url: "/private/docLaruex/agregarReservaProcedimiento/",
+            type: "POST",
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            // gestiono el return del view
+            success: function () {
+                crearAviso('objetoGuardar', 'Archivo guardado con éxito', 'alert-success', 2000)
+                $(".divFormularios").remove();
+                $("#reset").trigger("click");
+                $('#tabla_objetos').bootstrapTable('refresh');
+                $('#cerrar').trigger('click');
+                $("#modalFormulario").trigger('reset');
+                location.reload(true);
+            }
+        });
+    });
+
+    function BuscarCodigoProcedimiento() {
+        var codigo = $("#codigo").val();
+        $.ajax({
+            url: "/private/docLaruex/buscarProcedimiento/" + codigo,
+            type: "GET",
+            success: function (data) {
+                $("#procedimientoReservado").val(data.codigoProcedimiento);
+            }
+        });
+    }
+
+    
+
+
+
+
+</script>
+{% endblock %}

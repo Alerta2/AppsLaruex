@@ -1,0 +1,146 @@
+{% extends "base/base2.html" %}
+{% load static %}
+
+{% block content %}
+<div class="wrapper bg-lighter h-75">
+    <div class="row h-50">
+        <div class="col-sm-12 bg-lighter text-dark">
+            <h1 >Verificar valores VRAEX</h1>
+        </div>
+        <div class="col-sm-12 bg-lighter text-dark">
+            <div id="fichero" class="col-md-12 col-xs-12">
+                <div class="col-md-12 col-xs-12">
+                    <h3 align="center">Insertar ficheros VRAEX</h3>
+                </div>
+
+                <div class="col-md-12 col-xs-12">
+                    <form action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <input type="submit" class="btn btn-primary" onClick="$('.loader-wrapper').show();" value="Cargar">
+                    </form>
+                    <hr>
+                    <h5>Pulse para normalizar la base de datos, se corregirán los amd conforme a la acreditación del laboratorio de medida y se detectarán inconsistencias en la base de datos.</h5>
+                    <input type="submit" class="btn btn-primary" onClick="actualizarDB();" value="Normalizar">
+                    <hr>
+                    <h5>Inserción de valores de producción de la Central Nuclear de Almaraz.</h5>
+                    <div class="row col-md-12 col-xs-12">
+                        <div class="col-md-3 col-xs-3">
+                            <h5>Módulo 1</h5>
+                            <input class="form-control col-md-12 col-xs-12" type="text" placeholder="xxx.xxx" id="energia_modulo1">
+                        </div>
+                        <div class="col-md-3 col-xs-3">
+                            <h5>Módulo 2</h5>
+                            <input class="form-control col-md-12 col-xs-12" type="text" placeholder="xxx.xxx" id="energia_modulo2">
+                        </div>
+                        <div class="col-md-3 col-xs-3">
+                            <h5>Mes</h5>
+                            <input class="form-control col-md-12 col-xs-12" type="month" id="mes_produccion">
+                        </div>
+                        <div class="col-md-3 col-xs-3">
+                            <input type="submit" class="btn btn-primary col-md-12 col-xs-12" onClick="insertarProduccion();" value="Insertar Producción">
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+                {% if mensaje_resumen%}
+                    <div class="col-md-12 col-xs-12">
+                        <h3>Carga correcta</h3>
+                    </div>
+                    <div class="col-md-12 col-xs-12">
+                        {{ mensaje_resumen|safe }}
+                    </div>
+                {%endif%}
+            </div>
+
+        </div>
+        <div class="col-sm-12 bg-lighter text-dark">
+            {% if mensaje_error or mensaje_correcto%}
+                <div id="fichero_salida" class="col-md-12 col-xs-12">
+                    {% if mensaje_error%}
+                        <div class="col-md-12 col-xs-12">
+                            <div  align="center">
+                                <h3>Mensaje Salida</h3>
+                            </div>
+                            <div>
+                                {{ mensaje_error|safe }}
+                            </div>
+                        </div>
+                    {%endif%}
+                    {% if mensaje_correcto%}
+                        <div class="col-md-12 col-xs-12" style="height: 50%;">
+                            <div>
+                                <h3>Valores Nuevos</h3>
+                            </div>
+                            <div>
+                                {{ mensaje_correcto|safe }}
+                            </div>
+                        </div>
+                    {%endif%}
+                </div>
+            {%endif%}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+    $('.btnright').hide();
+    $('.btnleft').hide();
+    function insertarProduccion(){
+        $(".loader-wrapper").show();
+        var produccionModulo1 = document.getElementById("energia_modulo1").value;
+        var produccionModulo2 = document.getElementById("energia_modulo2").value;
+        var mes = document.getElementById("mes_produccion").value;
+        var fecha = "01-"+mes.split("-")[1]+"-"+mes.split("-")[0]
+        alert(produccionModulo1);
+        alert(produccionModulo2);
+        alert(fecha);
+        var url='/private/vraex/insertar_produccion/'+produccionModulo12+"/"+produccionModulo+"/"+fecha+"/"
+        $.ajax({
+              url: url,
+              dataType: 'text',
+              success: function(data) {
+                if(data==0){
+                  alert("Insertado correctamente");
+                }else{
+                  alert("error");
+                }
+              }
+        });
+        $(".loader-wrapper").fadeOut("slow");
+    }
+    function actualizarDB(){
+        $(".loader-wrapper").show();
+          var url='/private/vraex/actualizarDB'
+          $.ajax({
+                  url: url,
+                  dataType: 'text',
+                  success: function(data) {
+                    alert("Base de datos normalizada");
+                  }
+            });
+        $(".loader-wrapper").fadeOut("slow");
+    }
+    function enviar(motivo_muestreo_codmuestreo,fecha_recogida_inicial,fecha_recogida_final,fecha_analisis,instalacion_codinstalacion,laboratorio_codlaboratorio,muestra_codmuestra,isotopo_codisotopo,isotopo_analisis_codanalisis,estacion_codprocedencia,masa,metaestable,actividad_medida,error_actividad_medida,lid_medida,linea){
+    $(".loader-wrapper").show();
+        var url='/private/vraex/enviar_muestra/'+motivo_muestreo_codmuestreo+"/"+fecha_recogida_inicial+"/"+fecha_recogida_final+"/"+fecha_analisis+"/"+instalacion_codinstalacion+"/"+laboratorio_codlaboratorio+"/"+muestra_codmuestra+"/"+isotopo_codisotopo+"/"+isotopo_analisis_codanalisis+"/"+estacion_codprocedencia+"/"+masa+"/"+metaestable+"/"+actividad_medida.replace('.','-')+"/"+error_actividad_medida.replace('.','-')+"/"+lid_medida.replace('.','-')+"/";
+
+        url = url.split('/ /').join('/-1/');
+        url = url.split('/ /').join('/-1/');
+        url = url.split(' ').join('');
+        $.ajax({
+              url: url,
+              dataType: 'text',
+              success: function(data) {
+                if(data==0){
+                  crearAviso("avisoInsercion", "Subida correcta");
+                }else{
+                    crearAviso("avisoInsercion", "Subida incorrecta");
+                }
+              }
+        });
+    $(".loader-wrapper").fadeOut("slow");
+    }
+
+{% endblock %}

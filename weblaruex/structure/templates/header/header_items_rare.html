@@ -1,0 +1,47 @@
+{% load static %}
+{% if perms.auth.red_live %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'structure:servicios' %}">HOME</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'rare:rarexPortada' %}">RAREx</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'rare:rarexMapaEstado' %}">Mapa Rarex Live</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'rare:rarexMapaMedia' %}">Mapa Rarex Media</a>
+    </li>
+    {% if perms.auth.graficas %}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="" id="dropdownGraficasRarex" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >Graficas</a>
+            <div class="dropdown-menu" aria-labelledby="dropdownGraficasRarex">
+              {% if perms.auth.guardia_rarex %}<a class="dropdown-item" href="{% url 'rare:rarexGuardiaRare' %}">Guardia Rare</a>{% endif %}
+              {% if perms.auth.consulta_rarex %}<a class="dropdown-item" href="{% url 'rare:rarexConsultaRare' %}">Consulta Rare</a>{% endif %}
+              {% if perms.auth.guardia_rarex %}<a class="dropdown-item" href="{% url 'rare:rarexGuardiaCSN' %}">Guardia CSN</a>{% endif %}
+              {% if perms.auth.consulta_csn %}<a class="dropdown-item" href="{% url 'rare:rarexConsultaCSN' %}">Consulta CSN</a>{% endif %}
+              {% if perms.auth.consulta_csn %}<a class="dropdown-item" href="{% url 'rare:rarexInfoGuardias' %}">Historico</a>{% endif %}
+              {% if perms.auth.guardia_rarex %}<a class="dropdown-item" href="{% url 'rare:rarexSimulacrosRealizados' %}">Simulacros realizados</a>{% endif %}
+              {% if perms.auth.guardia_rarex %}<a class="dropdown-item" href="{% url 'rare:consultarImagenPapel' %}">Cámaras papel</a>{% endif %}
+            </div>
+        </li>
+    {% endif %}
+    {% if perms.auth.rarex_drone %}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="" id="dropdownMedidasMovil" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >Dispositivos Móviles</a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMedidasMovil">
+                <a class="dropdown-item" href="{% url 'rare:rarexSesionesMedidaMovil' %}">Sesiones medida</a>
+                <a class="dropdown-item" href="{% url 'rare:proyectosMedida' %}">Proyectos medida</a>
+            </div>
+        </li>
+    {% endif %}
+    {% if user.is_superuser %}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="" id="dropdownGraficasRarex" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >Tools</a>
+            <div class="dropdown-menu" aria-labelledby="dropdownGraficasRarex">
+                <a class="dropdown-item" href="{% url 'rare:rarexInformeCSN' %}">Informes CSN</a>
+                <a class="dropdown-item" href="{% url 'rare:rarexMonitoriza' %}">Monitoriza</a>
+            </div>
+        </li>
+    {% endif %}
+{% endif %}

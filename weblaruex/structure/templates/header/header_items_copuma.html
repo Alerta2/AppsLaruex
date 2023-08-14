@@ -1,0 +1,30 @@
+{% load static %}
+{% if perms.auth.muestras_vraex %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'structure:servicios' %}">HOME</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'copuma:vraexPortada' %}">VRAEX</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'copuma:vraexMapaPublico' %}">Mapa VRAEX publico</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'copuma:vraexMapaPrivado' %}">Mapa VRAEX privado</a>
+    </li>
+    {% if perms.auth.vision_no_verificado %}
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="" id="dropdownVRAEX" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Otras opciones</a>
+            <div class="dropdown-menu" aria-labelledby="dropdownVRAEX">
+                <a class="dropdown-item" href="{% url 'copuma:vraexVerificacion' %}">Verificación</a>
+              {% if perms.auth.verificacion_vraex %}
+                <a class="dropdown-item" href="{% url 'copuma:vraexLimitesMaximos' %}">Límites máximos</a>
+                <a class="dropdown-item" href="{% url 'copuma:vraexSinLimitesMaximos' %}">Sin Límites máximos</a>
+              {% endif %}
+              {% if perms.auth.subida_vraex %}
+                <a class="dropdown-item" href="{% url 'copuma:vraexSubidaDatos' %}">Subir archivo VRAEX</a>
+              {% endif %}
+            </div>
+        </li>
+    {% endif %}
+{% endif %}

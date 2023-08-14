@@ -1,0 +1,609 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  .nav-tabs-bordered .nav-link {
+    margin-bottom: -2px;
+    border: none;
+    color: #2c384e;
+}
+  .nav-tabs-bordered .nav-link.active {
+    background-color: #fff;
+    color: #4154f1;
+    border-bottom: 2px solid #4154f1;
+}
+.nav-tabs {
+    --bs-nav-tabs-border-color: #dee2e6;
+    --bs-nav-tabs-border-radius: 0.375rem;
+    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
+    --bs-nav-tabs-link-active-color: #495057;
+    --bs-nav-tabs-link-active-bg: #fff;
+    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+}
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <nav>
+      <h5 class="card-title">{{usuario.first_name}} {{usuario.last_name}}</h5>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/usuarios">Usuarios</a>
+      </li>
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/verUsuario/{{usuario.id}}">{{usuario.first_name}} {{usuario.last_name}}</a>
+      </li>
+    </ol>
+  </nav>
+</div>
+
+
+
+
+
+<!-- =================== Información de Contactos =================== -->
+<section class="section profile">
+  <div class="row">
+    <div class="col-xl-4">
+
+      <div class="card">
+        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+          
+          <img src="{{ user.profile.image.url }}" alt="Profile" class="rounded-circle" >
+             
+          <div class="text-center">
+            {% if usuario.is_active == 1 %}
+              <h3><span class="badge text-white"
+                style="background-color: #21b563;">Activo</span></h3>
+            {% else %}
+              <span class="badge text-white"
+                  style="background-color: #b52121;">Inactivo</span>
+            {% endif %} 
+  
+            <h2>{{usuario.first_name}} {{usuario.last_name}}</h2>
+            <h3>{{contactoUsuario.id_contacto__puesto}}</h3>
+          </div> 
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-xl-8">
+
+      <div class="card">
+        <div class="card-body pt-3">
+          <!-- Bordered Tabs -->
+          <ul class="nav nav-tabs nav-tabs-bordered">
+
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Información de contacto</button>
+            </li>
+
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-habilitaciones">Habilitaciones</button>
+            </li>
+            
+            
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar datos de Contacto</button>
+            </li>
+            {% if administrador %}
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit-usuario">Editar Usuario</button>
+            </li>
+            
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-eliminar">Inhabilitar Usuario</button>
+            </li>
+            {% endif %}
+
+          </ul>
+          <!-- End Bordered Tabs -->
+
+          <div class="tab-content pt-2">
+            <!-- Información del Contacto-->
+            <div class="tab-pane fade show active profile-overview" id="profile-overview">
+              {% if contactoUsuario.id_contacto__nombre %}
+              <h5 class="card-title">Información de {{contactoUsuario.id_contacto__nombre}}</h5>
+              {% else %}
+              <h5 class="card-title">Información de {{usuario.first_name}} {{usuario.last_name}}</h5>
+              {% endif %}
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Nombre de Usuario</div>
+                <div class="col-lg-9 col-md-8">{{usuario.username}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Nombre Completo</div>
+                <div class="col-lg-9 col-md-8">{{usuario.first_name}} {{usuario.last_name}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Puesto</div>
+                {% if contactoUsuario.id_contacto__puesto %}
+                <div class="col-lg-9 col-md-8">{{contactoUsuario.id_contacto__puesto}}</div>
+                {% else %}
+                <div class="col-lg-9 col-md-8">{{contactoUserNombre.puesto}}</div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Empresa</div>
+                {% if contactoUsuario.id_contacto__empresa %}
+                <div class="col-lg-9 col-md-8">{{contactoUsuario.id_contacto__empresa}}</div>
+                {% else %}
+                <div class="col-lg-9 col-md-8">{{contactoUserNombre.empresa}}</div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Dirección</div>
+                {% if contactoUsuario.id_contacto__direccion %}
+                <div class="col-lg-9 col-md-8">{{contactoUsuario.id_contacto__direccion}}</div>
+                {% else %}
+                <div class="col-lg-9 col-md-8">{{contactoUserNombre.direccion}}</div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Teléfono</div>
+
+                  {% if contactoUsuario.id_contacto__telefono %}
+                  <div class="col-lg-9 col-md-8">{{contactoUsuario.id_contacto__telefono|slice:"0:3" }} {{contactoUsuario.id_contacto__telefono|slice:"3:18" }}</div>
+                  
+                  {% elif contactoUserNombre.telefono %}
+                  <div class="col-lg-9 col-md-8">{{contactoUserNombre.telefono|slice:"0:3" }} {{contactoUserNombre.telefono|slice:"3:18" }}</div>
+                  {% else %}
+                  <div class="col-lg-9 col-md-8">-</div>
+                  {% endif %}
+                </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Teléfono 2</div>
+
+                {% if contactoUsuario.id_contacto__telefono_fijo %}
+                <div class="col-lg-9 col-md-8">{{contactoUsuario.id_contacto__telefono_fijo|slice:"0:3" }} {{contactoUsuario.id_contacto__telefono_fijo|slice:"3:18" }}</div>
+                {% elif contactoUserNombre.telefono_fijo %}
+                <div class="col-lg-9 col-md-8">{{contactoUserNombre.telefono_fijo|slice:"0:3" }} {{contactoUserNombre.telefono_fijo|slice:"3:18" }}</div>
+                {% else %}
+                <div class="col-lg-9 col-md-8">-</div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Extensión</div>
+                {% if contactoUsuario.id_contacto__extension %}
+                <div class="col-lg-9 col-md-8">{{contactoUsuario.id_contacto__extension}}</div>
+                {% elif contactoUserNombre.extension %}
+                <div class="col-lg-9 col-md-8">{{contactoUserNombre.extension}}</div>
+                {% else %}
+                <div class="col-lg-9 col-md-8">-</div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                
+                
+                  <div class="col-lg-3 col-md-4 label">Email</div>
+                  {% if contactoUsuario.id_contacto__email%}
+                    {% if contactoUsuario.id_contacto__email == usuario.email %}
+                      <div class="col-lg-9 col-md-8">{{contactoUsuario.id_contacto__email|urlize}}</div>
+                    {% else %}
+                      <div class="col-lg-9 col-md-8">{{contactoUsuario.id_contacto__email|urlize}}</div>
+                      <div class="col-lg-3 col-md-4 label"></div>
+                      <div class="col-lg-9 col-md-8">{{usuario.email|urlize}}</div>
+                    {% endif %}
+                  {% else %}
+                    {% if contactoUserNombre.email == usuario.email %}
+                    <div class="col-lg-9 col-md-8">{{contactoUserNombre.email|urlize}}</div>
+                    {% else %}
+                    <div class="col-lg-9 col-md-8">{{contactoUserNombre.email|urlize}}</div>
+                    <div class="col-lg-3 col-md-4 label"></div>
+                    <div class="col-lg-9 col-md-8">{{usuario.email|urlize}}</div>
+                    {% endif %}
+                  {% endif %}
+              </div>
+
+              <h5 class="card-title">Información Adicional</h5>
+              
+              {% if contactoUsuario.id_contacto__info_adicional %}
+              <p class="small fst-italic" style="white-space: pre-line;">{{contactoUsuario.id_contacto__info_adicional}}</p>
+              {% elif contactoUserNombre.info_adicional %}
+              <p class="small fst-italic" style="white-space: pre-line;">{{contactoUserNombre.info_adicional}}</p>
+              {% else %}
+              <p class="small fst-italic" style="white-space: pre-line;"></p>
+              {% endif %}
+            </div>
+
+            <!-- Consultar Habilitaciones -->
+            <div class="tab-pane fade profile-habilitaciones pt-3" id="profile-habilitaciones">
+              
+              {% if contactoUsuario.id_contacto__nombre %}
+              <h5 class="card-title">Habilitaciones de {{contactoUsuario.id_contacto__nombre}}</h5>
+              {% else %}
+              <h5 class="card-title">Habilitaciones de {{usuario.first_name}} {{usuario.last_name}}</h5>
+              {% endif %}
+
+              <table class="table table-sm" style="margin-left: auto; margin-right: auto;" >
+                <thead >
+                  <tr>
+                    <th scope="col"  class="text-center  profile profile-overview label"  style="color: rgba(1, 41, 112, 0.6);font-weight: 600;">Habilitación</th>
+                    <th scope="col"  class="text-center  profile profile-overview label"  style="color: rgba(1, 41, 112, 0.6);font-weight: 600;">Cargo</th>
+                    <th scope="col"  class="text-center  profile profile-overview label"  style="color: rgba(1, 41, 112, 0.6);font-weight: 600;">Desde</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for habilitacion in habilitacionesUsuario %}
+                  <tr>
+                    <td class="text-center">{{ habilitacion.id_habilitacion__titulo }}</td>
+                    <td class="text-center">{{ habilitacion.tipo }}</td> 
+                    <td class="text-center">{{ habilitacion.fecha|date }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+            </div>
+
+
+            <!-- Editar Datos de Contacto -->
+            <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+              <!-- Edit Form -->
+              <form id="formularioEditarContacto"  method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="row mb-3">
+                <label for="nuevoNombreContacto" class="col-md-4 col-lg-3 col-form-label">Nombre</label>
+                <div class="col-md-8 col-lg-9">
+                  {%if contactoUsuario.id_contacto__nombre  %}
+                  <input name="nuevoNombreContacto" type="text" class="form-control" id="nuevoNombreContacto" value="{{contactoUsuario.id_contacto__nombre}}">
+                  {% else %}
+                  <input name="nuevoNombreContacto" type="text" class="form-control" id="nuevoNombreContacto" value="{{contactoUserNombre.nombre}}">
+                  {% endif %}
+                </div>
+              </div>
+              
+              <div class="row mb-3" hidden >
+                <label for="nuevaEmpresaContacto" class="col-md-4 col-lg-3 col-form-label">Empresa</label>
+                <div class="col-md-8 col-lg-9">
+                  <input name="nuevaEmpresaContacto" type="text" class="form-control" id="nuevaEmpresaContacto" value="Laruex">
+                </div>
+              </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoPuestoContacto" class="col-md-4 col-lg-3 col-form-label">Puesto</label>
+                  <div class="col-md-8 col-lg-9">
+                    
+                  {%if contactoUsuario.id_contacto__puesto %}
+                  <input name="nuevoPuestoContacto" type="text" class="form-control" id="nuevoPuestoContacto" value="{{contactoUsuario.id_contacto__puesto}}">
+                  {% else %}
+                  <input name="nuevoPuestoContacto" type="text" class="form-control" id="nuevoPuestoContacto" value="{{contactoUserNombre.puesto}}">
+                  {% endif %}
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaDireccionContacto" class="col-md-4 col-lg-3 col-form-label">Dirección</label>
+                  <div class="col-md-8 col-lg-9">
+                    
+                  {%if contactoUsuario.id_contacto__direccion %}
+                    <input name="nuevaDireccionContacto" type="text" class="form-control" id="nuevaDireccionContacto" value="{{contactoUsuario.id_contacto__direccion}}">
+                  {% else %}
+                  <input name="nuevaDireccionContacto" type="text" class="form-control" id="nuevaDireccionContacto" value="{{contactoUserNombre.direccion}}">
+                  {% endif %}
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoTelefono" class="col-md-4 col-lg-3 col-form-label">Teléfono</label>
+                  
+                  {% if contactoUsuario.id_contacto__telefono == null%}
+                  
+                    {%if contactoUserNombre.telefono %}
+                      <div class="col-md-2 col-lg-2">
+                        <input name="nuevoPrefijoTelefono" type="text" class="form-control" id="nuevoPrefijoTelefono" value="{{contactoUserNombre.telefono|slice:'0:3'}}" >
+                      </div>
+                      <div class="col-md-6 col-lg-7">
+                        <input name="nuevoTelefono" type="text" class="form-control" id="nuevoTelefono" value="{{contactoUserNombre.telefono|slice:'3:18'}}">
+                      </div>
+                    {% else %}
+                      <div class="col-md-2 col-lg-2">
+                        <input name="nuevoPrefijoTelefono" type="text" class="form-control" id="nuevoPrefijoTelefono|slice:'3:18'">
+                      </div>
+                      <div class="col-md-6 col-lg-7">
+                        <input name="nuevoTelefono" type="text" class="form-control" id="nuevoTelefono">
+                      </div>
+                    {% endif %}
+                  {% else %}
+                    <div class="col-md-2 col-lg-2">
+                      <input name="nuevoPrefijoTelefono" type="text" class="form-control" id="nuevoPrefijoTelefono" value="{{contactoUsuario.id_contacto__telefono|slice:'0:3'}}" >
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                      <input name="nuevoTelefono" type="text" class="form-control" id="nuevoTelefono" value="{{contactoUsuario.id_contacto__telefono|slice:'3:18'}}">
+                    </div>
+                  {% endif %}
+
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoTelefonoFijo" class="col-md-4 col-lg-3 col-form-label">Teléfono 2</label>
+                  {% if contactoUsuario.id_contacto__telefono_fijo == null%}
+                  
+                    {%if contactoUserNombre.telefono_fijo %}
+                      <div class="col-md-2 col-lg-2">
+                        <input name="nuevoPrefijoTelefonoFijo" type="text" class="form-control" id="nuevoPrefijoTelefonoFijo"value="{{contactoUserNombre.telefono_fijo|slice:'0:3'}}" >
+                      </div>
+                      <div class="col-md-6 col-lg-7">
+                        <input name="nuevoTelefonoFijo" type="text" class="form-control" id="nuevoTelefonoFijo" value="{{contactoUserNombre.telefono_fijo|slice:'3:18'}}">
+                      </div>
+                    {% else %}
+                      <div class="col-md-2 col-lg-2">
+                        <input name="nuevoPrefijoTelefonoFijo" type="text" class="form-control" id="nuevoPrefijoTelefonoFijo|slice:'3:18'">
+                      </div>
+                      <div class="col-md-6 col-lg-7">
+                        <input name="nuevoTelefonoFijo" type="text" class="form-control" id="nuevoTelefonoFijo">
+                      </div>
+                    {% endif %}
+                  {% else %}
+                    <div class="col-md-2 col-lg-2">
+                      <input name="nuevoPrefijoTelefonoFijo" type="text" class="form-control" id="nuevoPrefijoTelefonoFijo" value="{{contactoUsuario.id_contacto__telefono_fijo|slice:'0:3'}}" >
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                      <input name="nuevoTelefonoFijo" type="text" class="form-control" id="nuevoTelefonoFijo" value="{{contactoUsuario.id_contacto__telefono_fijo|slice:'3:18'}}">
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaExtension" class="col-md-4 col-lg-3 col-form-label">Extension</label>
+                  <div class="col-md-6 col-lg-7">
+                  {%if contactoUsuario.id_contacto__extension %}
+                    <input name="nuevaExtension" type="text" class="form-control" id="nuevaExtension" value="{{contactoUsuario.id_contacto__extension}}">
+                  {% else %}
+                    <input name="nuevaExtension" type="text" class="form-control" id="nuevaExtension" value="{{contactoUserNombre.extension}}">
+                  {% endif %}
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoEmailContacto" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                  <div class="col-md-8 col-lg-9">
+                    {%if contactoUsuario.id_contacto__email %}
+                      <input name="nuevoEmailContacto" type="text" class="form-control" id="nuevoEmailContacto" value="{{contactoUsuario.id_contacto__email}}">
+                    {% else %}
+                      <input name="nuevoEmailContacto" type="text" class="form-control" id="nuevoEmailContacto" value="{{contactoUserNombre.email}}">
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaInfoAdicionalContacto" class="col-md-4 col-lg-3 col-form-label">Información Adicional</label>
+                  <div class="col-md-8 col-lg-9">
+                    {%if contactoUsuario.id_contacto__info_adicional %}
+                      <textarea name="nuevaInfoAdicionalContacto" class="form-control" id="nuevaInfoAdicionalContacto" style="height: 100px">{{contactoUsuario.id_contacto__info_adicional}}</textarea>
+                    {% else %}
+                      <textarea name="nuevaInfoAdicionalContacto" class="form-control" id="nuevaInfoAdicionalContacto" style="height: 100px">{{ontactoUserNombre.info_adicional}}</textarea>
+                    {% endif %}
+                    
+                  </div>
+                </div>
+
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+            <!-- Editar Datos de Usuario -->
+            <div class="tab-pane fade profile-edit-usuario pt-3" id="profile-edit-usuario">
+
+              <!-- Edit Form -->
+              <form id="formularioEditarUsuario"  action="/private/docLaruex/editarUsuario/{{usuario.id}}/" method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="row mb-3">
+                <label for="nuevoUsername" class="col-md-4 col-lg-3 col-form-label">Username</label>
+                <div class="col-md-8 col-lg-9">
+                  <input type="text" name="nuevoUsername" type="text" class="form-control" id="nuevoUsername" value="{{usuario.username}}">
+                </div>
+              </div>
+              
+              <div class="row mb-3" >
+                <label for="nuevoNombreUsuario" class="col-md-4 col-lg-3 col-form-label">Nombre</label>
+                <div class="col-md-8 col-lg-9">
+                  <input type="text" name="nuevoNombreUsuario" type="text" class="form-control" id="nuevoNombreUsuario" value="{{usuario.first_name}}">
+                </div>
+              </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoApellidoUsuario" class="col-md-4 col-lg-3 col-form-label">Apellidos</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input type="text" name="nuevoApellidoUsuario" type="text" class="form-control" id="nuevoApellidoUsuario" value="{{usuario.last_name}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoEmail" class="col-md-4 col-lg-3 col-form-label">Mail</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input type="text" id="nuevoEmail" name="nuevoEmail" class="form-control" value="{{ usuario.email }}" />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoSuperUser" class="col-md-4 col-lg-3 col-form-label">¿Es superusuario?</label>
+                    <div class="col-md-2 col-lg-2">
+                      <select class="form-control" id="nuevoSuperUser" name="nuevoSuperUser">
+                        <option value="{{usuario.is_superuser}}" selected hidden>
+                        </option>
+                        <option value="0">No
+                        </option>
+                        <option value="1">Si
+                        </option>
+                      </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoStaff" class="col-md-4 col-lg-3 col-form-label">¿Es Staff?</label>
+                    <div class="col-md-2 col-lg-2"><select class="form-control" id="nuevoStaff" name="nuevoStaff">
+                      <option value="{{usuario.is_staff}}" selected hidden>
+                      </option>
+                      <option value="0">No
+                      </option>
+                      <option value="1">Si
+                      </option>
+                    </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoActive" class="col-md-4 col-lg-3 col-form-label">¿Está activo?</label>
+                    <div class="col-md-2 col-lg-2">
+                      <select class="form-control" id="nuevoActive" name="nuevoActive">
+                      <option value="{{usuario.is_active}}" selected hidden>
+                      </option>
+                      <option value="0">No
+                      </option>
+                      <option value="1">Si
+                      </option>
+                    </select>
+                    </div>
+                </div>
+
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+            <!-- Inhabilitar Usuario -->
+            <div class="tab-pane fade profile-eliminar pt-3" id="profile-eliminar">
+
+              <!-- Inhabilitar Usuario Form -->
+              <form form id="fomularioInhabilitarUsuario" action="/private/docLaruex/inhabilitarUsuario/{{ usuario.id }}/"
+              method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label class="text-center">¿Estás seguro de inhabilitar al usuario {{usuario.first_name}} {{usuario.last_name}}?</label>
+                </div>
+                <div class="text-center">
+                  <button id="inhabilitarUsuario type="submit" class="btn btn-danger" onclick="crearAviso('guardarInhabilitarUsuario', 'Contacto {{usuario.first_name}} {{usuario.last_name}} inhabilitado con éxito', 'alert-success', 3000)">Inhabilitar</button>
+
+                  <button  id="canclearEliminar" type="reset" class="btn btn-secondary" onclick="crearAviso('cerrarInhabilitarUsuario', 'No se ha podido inhabilitar al usuario {{usuario.first_name}} {{usuario.last_name}}', 'alert-warning', 3000); location.reload()">Cancelar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+          </div><!-- End Bordered Tabs -->
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+<script type="text/javascript">
+
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioEditarContacto").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+
+    var contacto = '{{contactoUsuario.id_contacto__id}}';
+    if (contacto == ''){
+      contacto = '{{contactoUserNombre.id}}';
+    }
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarContacto/" + contacto +"/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Contacto modificado con éxito', 'alert-success', 2000);
+        $('#modalFormularioContacto').trigger('reset');
+        $('#cerrarContacto').trigger('click');
+        location.reload(true);
+
+      }
+    });
+  });
+
+
+  
+      // cambiamos la funcionalidad del boton submit del formulario
+      $("#formularioEditarUsuario").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarUsuario/{{ usuario.id }}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+        
+      success: function () {
+        crearAviso('objetoGuardar', 'Usuario modificado con éxito', 'alert-success', 2000);
+        setTimeout(function () {
+          window.location.href = "/private/docLaruex/verUsuario/{{usuario.id}}/";
+        }, 1000);
+      }
+
+      
+    });
+  });
+
+
+  $("#fomularioInhabilitarUsuario").submit(function (e){
+    e.preventDefault();
+    var data = new FormData(this);
+    $.ajax({
+      url: "/private/docLaruex/inhabilitarUsuario/{{ usuario.id }}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        // redireccionar a la pagina de inicio
+        var url = "/private/docLaruex/usuarios";
+        $(location).attr('href',url);
+
+
+
+
+      }
+    });
+  });
+
+  </script>
+{% endblock %}

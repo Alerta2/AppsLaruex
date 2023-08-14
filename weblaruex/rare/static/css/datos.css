@@ -1,0 +1,568 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+#map {
+    height: 100%;
+    z-index: 1;
+    width: 101%;
+
+}
+
+#map img {
+    max-width: none !important;
+}
+
+#flotante
+{
+  position:absolute;
+  bottom:5%;  
+  right: 15%;  /* adjust value accordingly */
+  height: 30%;
+  z-index: 2;
+  border-radius: 25px;
+  border: 2px solid #000000;
+  padding: 20px;
+  width: 300px;
+  height: 150px;
+}
+#info_flotante
+{
+  position:absolute;
+  top:10%;  
+  right: 15%;  /* adjust value accordingly */
+  height: 30%;
+  z-index: 2;
+  background: #ffffff;    
+  border-radius: 25px;
+  border: 2px solid #000000;
+  padding: 20px;
+}
+
+#divleyendas
+{
+   background-color: white; 
+  z-index: 2;
+  position: absolute;
+  top: 10%;  
+  left: 0px;
+  max-width: 250px;
+  min-width: 100px;
+
+}
+
+/*
+#leyenda{
+
+display: inline-block;
+width: 100%;
+}
+*/
+
+#leyenda2
+{
+display: inline-block;
+width: 100%;
+}
+
+#leyenda3
+{
+ display: inline-block; 
+ width: 100%;
+}
+/*
+#leyenda
+{
+  display: inline-block;
+  border-radius: 25px;
+  border: 2px solid #337AB7;
+  font-size: 1em;
+  line-height: 18px;
+  font-weight: 400;
+  color: red;
+  position:relative;
+  top:10%;  
+  left: 50px;  
+  z-index: 2;
+  background: #ffffff;    
+  padding: 1%;
+  width: 20%;
+  min-width: 200px;
+  
+}
+
+
+#leyenda2
+{
+  display: inline-block;
+  margin-top: 8%;
+  font-size: 90%;
+  line-height: 18px;
+  font-weight: 400;
+  position:relative;
+  z-index: 2;
+  top:40%; 
+  left: 50px; 
+ 
+  
+  border-radius: 25px;
+  border: 2px solid #337AB7;
+  background: #ffffff;    
+  padding: 1%;
+  width: 20%;
+}
+
+#leyenda3
+{
+  display: inline-block;
+  margin-top: 10%;
+  font-size: 90%;
+  line-height: 18px;
+  font-weight: 400;
+  position:relative;
+  top:60%; 
+  left: 50px;  
+  
+  z-index: 2;
+  border-radius: 25px;
+  border: 2px solid #337AB7;
+  background: #ffffff;    
+  padding: 1%;
+  width: 20%;
+}
+
+*/
+#leyenda4
+{
+  margin-top: 5%;
+  font-size: 90%;
+  line-height: 18px;
+  font-weight: 400;
+  position:absolute;
+  top:0%; 
+  left: 30%;  /* adjust value accordingly */
+  /*height: 30%;*/
+  z-index: 2;
+  border-radius: 25px;
+  border: 2px solid #337AB7;
+  background: #ffffff;    
+  padding: 1%;
+  width: 35%;
+  height: 20%;
+}
+
+#ocultaleyendas
+{
+  /*
+  background-image: url('img/binfo.png');
+  background-repeat: no-repeat;*/
+  position: absolute;
+  top: 10%;
+  left: 0px;
+  z-index: 2;
+  display: none;
+
+}
+
+h2{
+  background: #0088dd;
+  color: #ffffff;
+  font: normal normal normal 20px/1 Helvetica, arial, sans-serif;
+  border-bottom: 2px solid #0000ff;
+}
+
+#header {
+  background-color:gray;
+  color:white;
+  text-align:left;
+  padding:5px;
+}
+/* Para quitar los margenes */
+.gm-style-iw {
+   width: 350px !important;
+   top: 15 !important;
+   left: 0 !important;
+   background-color: #fff;
+   box-shadow: 0 1px 6px rgba(178, 178, 178, 0.6);
+   border: 3px solid #00994c;
+   border-radius: 2px 2px 10px 10px;
+}
+#iw-container {
+  margin-bottom: 10px;
+} 
+.iw-title {
+   font-family: 'Open Sans Condensed', sans-serif;
+   font-size: 22px;
+   font-weight: 400;
+   padding: 10px;
+   background-color: #00994c; /*48b5e9 */
+   color: white;
+   margin: 0;
+   border-radius: 2px 2px 0 0; /* In accordance with the rounding of the default infowindow corners. */
+}
+.iw-content {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  margin-right: 1px;
+  padding: 15px 5px 20px 15px;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.iw-content img {
+  float: right;
+  margin: 0 5px 5px 10px; 
+}
+.iw-subTitle {
+  font-size: 16px;
+  font-weight: 700;
+  padding: 5px 0;
+}
+.iw-bottom-gradient {
+  position: absolute;
+  width: 326px;
+  height: 25px;
+  bottom: 10px;
+  right: 18px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+  background: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+  background: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+  background: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+}
+#floating-panel {
+  position: absolute;
+  top: 50px;
+  /* left: 90%; */
+  z-index: 5;
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+  text-align: center;
+  font-family: 'Roboto','sans-serif';
+  line-height: 30px;
+  padding-left: 10px;
+}
+
+
+
+.morris-hover{position:absolute;z-index:1000}.morris-hover.morris-default-style{border-radius:10px;padding:6px;color:#666;background:rgba(255,255,255,0.8);border:solid 2px rgba(230,230,230,0.8);font-family:sans-serif;font-size:12px;text-align:center}.morris-hover.morris-default-style .morris-hover-row-label{font-weight:bold;margin:0.25em 0}
+.morris-hover.morris-default-style .morris-hover-point{white-space:nowrap;margin:0.1em 0}
+body{
+  -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none; 
+}
+.effect9 { 
+  -webkit-box-shadow: 0 10px 6px -6px #777;
+-moz-box-shadow: 0 10px 6px -6px #777;
+box-shadow: 0 10px 6px -6px #777;}
+}
+
+h3 {
+  font-weight: bold;
+  font-family: "Arial";
+  text-shadow: 0 1px 0 #ccc, 
+               0 2px 0 #c9c9c9,
+               0 3px 0 #bbb,
+               0 4px 0 #b9b9b9,
+               0 5px 0 #aaa,
+               0 6px 1px rgba(0,0,0,.1),
+               0 0 5px rgba(0,0,0,.1),
+               0 1px 3px rgba(0,0,0,.3),
+               0 3px 5px rgba(0,0,0,.2),
+               0 5px 10px rgba(0,0,0,.25),
+               0 10px 10px rgba(0,0,0,.2),
+               0 20px 20px rgba(0,0,0,.15);
+  color: #000;
+  text-align: center;
+}
+h3 small{
+  margin-left: 1%;
+  color: #000;
+  text-shadow:0 6px 1px rgba(0,0,0,.1),
+               0 0 5px rgba(0,0,0,.1),
+               0 1px 3px rgba(0,0,0,.3),
+               0 3px 5px rgba(0,0,0,.2),
+               0 5px 10px rgba(0,0,0,.25),
+               0 10px 10px rgba(0,0,0,.2),
+               0 20px 20px rgba(0,0,0,.15);
+
+}
+.btn {
+  padding:10px;
+  position:relative;
+  font-family: 'Open Sans', sans-serif;
+  font-size:80%;
+  text-decoration:none;
+  color:#fff;
+  background-image: linear-gradient(bottom, rgb(100,170,30) 0%, rgb(129,212,51) 100%);
+  border-radius: 5px;
+}
+.btn.btn-success{
+  box-shadow: inset 0px 1px 0px #b2f17f, 0px 6px 0px #3d6f0d;
+}
+.btn.btn-danger{
+  box-shadow: inset 0px 1px 0px #b2f17f, 0px 6px 0px #C9302C;
+}
+.btn:active {
+  top:7px;
+  background-image: linear-gradient(bottom, rgb(100,170,30) 100%, rgb(129,212,51) 0%);
+  box-shadow: inset 0px 1px 0px #b2f17f, inset 0px -1px 0px #3d6f0d;
+  color: #156785;
+  text-shadow: 0px 1px 1px rgba(255,255,255,0.3);
+  background: rgb(44,160,202);
+}
+
+
+#map{
+  min-width: 600px;
+  min-height: 1000px;
+}
+
+#dosis{
+  min-width: 550px;
+  min-height: 200px;
+}
+
+#meteo{
+  min-width: 500px;
+  min-height: 300px;
+
+}
+
+#detectores_isotopos{
+  min-width: 500px;
+  min-height: 300px;
+
+}
+
+#grafica_isotopos{
+  min-width: 500px;
+  min-height: 300px;
+
+}
+
+#detectores_particulas{
+  min-width: 500px;
+  min-height: 300px;
+
+}
+
+#grafica_particulas{
+  min-width: 500px;
+  min-height: 300px;
+
+}
+
+#detectores_monocanal{
+  min-width: 500px;
+  min-height: 300px;
+
+}
+
+#grafica_monocanal{
+  min-width: 500px;
+  min-height: 300px;
+
+}
+
+h7 {
+font-size: 120%;
+}
+
+h4 {
+font-size: 120%;
+}
+/* 
+
+#container_leyenda{
+  display: none;
+}
+*/
+
+@media only screen and (max-width : 1024px) {
+  #dosis #tasa_dosis_mensaje_h1{
+    font-size: 1.17em;
+   
+    }
+ 
+
+  #meteo #col_meteo{
+    width: 100%;
+    }
+  #detectores_isotopos h7{
+    font-size: 1.0em;
+  }  
+ 
+  }
+
+@media (max-device-width: 970px) {
+    #container_principal{
+        width: 100%;
+        margin-top:10%;
+    }
+    #dosis{
+        width: 100%;
+    }
+    #meteo{
+        width: 100%;
+    }
+    #detectores_isotopos{
+       width: 100%;
+    }
+    #grafica_isotopos{
+       width: 100%;
+    }
+
+    #detectores_particulas{
+       width: 100%;
+    }
+    #grafica_particulas{
+       width: 100%;
+    }
+    #detectores_monocanal{
+       width: 100%;
+    }
+    #grafica_monocanal{
+       width: 100%;
+    }
+    #leyenda {
+      display:none;
+    }
+    #rosa_viento{
+      display:none;
+    }
+}
+
+@media (min-device-width: 970px) {
+    #container_principal{
+        width: 70%;
+        margin-top:0%;
+    }
+    
+    #dosis{
+        width: 70%;
+    }
+    #meteo{
+        width: 65%;
+    }
+    #detectores_isotopos{
+       width: 70%;
+    }
+     #grafica_isotopos{
+       width: 70%;
+    }
+    #detectores_particulas{
+       width: 70%;
+    }
+    #grafica_particulas{
+       width: 70%;
+    }
+    #detectores_monocanal{
+       width: 70%;
+    }
+    #grafica_monocanal{
+       width: 70%;
+    }
+}
+
+@media only screen and (max-width : 800px) {
+ 
+ #container_leyenda{
+  display: none;
+  
+ }
+
+ #dosis #tasa_dosis_mensaje_h1{
+    font-size: 1.17em;
+   
+  }
+
+ #meteo img{
+    width: 100%;
+    
+  }
+  #detectores_isotopos h7{
+    font-size: 0.9em;
+  }
+}
+
+@media only screen and (max-width : 600px) {
+  #divleyendas
+  {
+    display: none;
+    top: 45%;
+  }
+  #ocultaleyendas{
+    display: block;
+    top:30%;
+  }
+
+ #container_leyenda{
+  display: none;
+ }
+
+  h3{
+    font-size: 1em;
+    
+  }
+ #dosis #tasa_dosis_mensaje_h1{
+    font-size: 1.17em;
+    
+  } 
+   #meteo img{
+    width: 100%;
+    
+  }
+  #detectores_isotopos h7{
+    font-size: 0.9em;
+  }
+  }
+
+@media only screen and (max-width : 480px) {
+  #divleyendas
+  {
+    display: none;
+    top: 25%;
+  }
+  #ocultaleyendas{
+    top: 10%;
+    display: block;
+    
+  }
+  #container_leyenda{
+  display: none;
+ }
+
+  h3{
+    font-size: 1em;
+    
+  }
+ #dosis #tasa_dosis_mensaje_h1{
+    font-size: 1.17em;
+   
+  }
+  #meteo b{
+    font-size: 0.7em;
+  }
+  #meteo img{
+    width: 100%;
+    
+  }
+
+  #detectores_isotopos h7{
+    font-size: 0.9em;
+  }
+  
+  #detectores_particulas h7{
+    font-size: 0.9em;
+  }
+  
+  #detectores_particulas h4{
+    font-size: 1.0em;
+  }
+  
+}

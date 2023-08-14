@@ -1,0 +1,459 @@
+{% extends "base/base2.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+    <script type="text/javascript" src="{% static 'js/jsonmuestras.js' %}"></script>
+    <!-- scripts de grafica -->
+    <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+    <script src="https://www.amcharts.com/lib/3/serial.js"></script>
+    <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+    <script src="https://www.amcharts.com/lib/4/core.js"></script>
+    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+    <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
+
+{% block modal %}
+{% include "modal/modal_grafica_verificacion.html" %}
+{% endblock %}
+
+{% block content %}
+<div id="consulta" hidden></div>
+<div class="wrapper">
+    <div class="row">
+        <div class="col-sm-12 my-auto p-3 mb-2 bg-lighter text-dark">
+            <div class="lead text-center mb-5">Verificación de muestras de VRAEX. Pulse en una muestra y si la gráfica está correcta pulse en verificar para aceptar el valor e incluirlo en la base de datos pública.</div>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">MUESTRA</th>
+                        <th scope="col">ANALISIS</th>
+                        <th scope="col">PROCEDENCIA</th>
+                        <th scope="col">FECHA RECOGIDA</th>
+                        <th scope="col">FECHA ANALISIS</th>
+                        <th scope="col">FECHA SUBIDA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dato in datos %}
+                        <tr onClick="consultarGrafica('{{dato.codmuestra}}','{{dato.codisotopo}}','{{dato.codanalisis}}','{{dato.codprocedencia}}');">
+                            <th scope="col">{{dato.codmuestra}}</th>
+                            <th scope="col">{{dato.codanalisis}}</th>
+                            <th scope="col">{{dato.codprocedencia}}</th>
+                            <th scope="col">{{dato.fecharecogida}}</th>
+                            <th scope="col">{{dato.fechaanalisis}}</th>
+                            <th scope="col">{{dato.fechasubida}}</th>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function verificar(){
+        valores = document.getElementById('consulta').innerHTML.split("#");
+        window.location.href = '/private/vraex/verificada/'+valores[0]+'/'+valores[1]+'/'+valores[2]+'/';
+        document.getElementById("cerrar").click();
+    }
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+    function consultarGrafica(codmuestra, codisotopo, codanalisis, codprocedencia){
+        codanalisis = codanalisis.replace(' ','');
+        $(".loader-wrapper").show();
+        $.ajax({
+            url: '/private/vraex/getgrafica/'+codmuestra+'/'+codanalisis+'/'+codprocedencia+'/',
+            dataType: 'text',
+            success: function(data) {
+                aux=data.split("##");
+                if (aux[5].startsWith("Ac228"))
+                    document.getElementById("leyenda_isotopos").style.visibility = "visible";
+                else
+                    document.getElementById("leyenda_isotopos").style.visibility = "hidden";
+                document.getElementById('consulta').innerHTML=codmuestra + "#" + codanalisis + "#" + codprocedencia;
+                pintar_grafica(aux[0], aux[2], aux[3], aux[4], aux[6], aux[7], aux[1], aux[5], aux[5], aux[5]);
+            }
+        });
+    }
+
+    function createAxisAndSeriesError(chart, name, axis) {
+      var series = chart.series.push(new am4charts.ColumnSeries());
+      series.dataFields.valueY = "errorAE";
+      series.dataFields.dateX = "date";
+      series.name = "Error";
+      series.yAxis = axis;
+      series.hidden = true;
+      series.visible = false;
+    }
+    function createAxisAndSeriesBarra(chart, field, name, opposite, axis, error, hidden) {
+      var series = chart.series.push(new am4charts.ColumnSeries());
+      series.dataFields.valueY = field;
+      series.dataFields.dateX = "date";
+      series.yAxis = axis;
+      series.hidden = hidden;
+      series.name = name;
+      series.columns.template.width = 10;
+      series.columns.template.strokeWidth = 2;
+      series.columns.template.strokeOpacity = 1;
+
+      var bullet = series.bullets.push(new am4charts.CircleBullet());
+      bullet.size = 5;
+      if (error){
+        bullet.tooltipText = "{name}: [bold]{valueY}+-{errorAE}[/]";
+        chart.scrollbarX = new am4charts.XYChartScrollbar();
+        chart.scrollbarX.series.push(series);
+      }
+      else
+        bullet.tooltipText = "{name}: [bold]{valueY}[/]";
+      /**
+      if (error){
+        series.tooltipText = "{name}: [bold]{valueY}+-{errorAE}[/]";
+      }
+      else
+        series.tooltipText = "{name}: [bold]{valueY}[/]";
+      **/
+      series.fillOpacity = 0.8;
+    }
+    function createAxisAndSeriesArea(chart, field, name, axis, error, hidden, scroll, decimales) {
+      var series = chart.series.push(new am4charts.LineSeries());
+      series.dataFields.valueY = field;
+      series.dataFields.dateX = "date";
+      series.strokeWidth = 2;
+      series.yAxis = axis;
+      series.hidden = hidden;
+      series.name = name;
+      if (decimales){
+          chart.numberFormatter.numberFormat = "#.000000";
+      }
+
+      var bullet = series.bullets.push(new am4charts.CircleBullet());
+      if (error){
+        bullet.tooltipText = "{name}: [bold]{valueY}+-{errorAE}[/]";
+        chart.scrollbarX = new am4charts.XYChartScrollbar();
+        chart.scrollbarX.series.push(series);
+      }
+      else
+        bullet.tooltipText = "{name}: [bold]{valueY}[/]";
+      series.tensionX = 1;
+      series.tensionY = 1;
+      series.fillOpacity = 0.5;
+      if (scroll){
+        chart.scrollbarX = new am4charts.XYChartScrollbar();
+        chart.scrollbarX.series.push(series);
+        //chart.scrollbarY = new am4core.Scrollbar();
+      }
+    }
+    function createAxisAndSeriesLinea(chart, field, name, opposite, axis, hidden) {
+      var series = chart.series.push(new am4charts.LineSeries());
+      series.dataFields.valueY = field;
+      series.dataFields.dateX = "date";
+      series.strokeWidth = 2;
+      series.yAxis = axis;
+      series.hidden = hidden;
+      series.name = name;
+      series.tooltipText = "{name}: [bold]{valueY}[/]";
+      series.tensionX = 0.8;
+    }
+
+    var isotopos_artificiales = ["Ce144","Co58","Co60","Cs134","Cs137","Fe59","Mn54","Sb124","Zn65","Zn65"];
+    function pintar_grafica(unidad,data_in,produccion,csn,isotopos,lat,lng, enac, procedencia, nombre_estacion){
+              var ajuste = 1;
+              var textoUnidad = unidad;
+              if(data_in.includes("e-06")){
+                ajuste = 1000000.0;
+                textoUnidad = "/ 1000000 " + textoUnidad;
+              }
+              chartData = [];
+              procedencia_actual = procedencia;
+              isotopos_chart = [];
+              isotopos_ocultos = ["Ba140","Cr51","I 131","La140","Nb95","Ru103","Zr95"];
+              isotopos_chart_data = [];
+              isotopos_chart_dates = [];
+              if (csn == 1) tiene_csn = 1;
+              else tiene_csn = 0;
+              if (tiene_csn == 1)
+                document.getElementById('check_csn').style.display = "block";
+              else
+                document.getElementById('check_csn').style.display = "none";
+
+              document.getElementById('menu_isotopos').innerHTML="";
+
+              isotopos_chart=isotopos.split("$");
+
+
+              if (enac == 0){
+                document.getElementById("logo_enac").style.display="none";
+              }
+              else{
+                document.getElementById("logo_enac").style.display="block";
+              }
+
+              ultimaFecha = null;
+
+              for(var i=0;i<isotopos_chart.length;i++){
+                var aux = [];
+                isotopos_chart_data.push(aux);
+                if(isotopos_artificiales.indexOf(isotopos_chart[i].trim()) > -1){
+                    document.getElementById('menu_isotopos').innerHTML=document.getElementById('menu_isotopos').innerHTML+"<option data-toggle='tooltip' data-placement='bottom' title='Elemento producido de forma artificial' class='text-danger' value=\""+i+"\"><h3 ><p>"+isotopos_chart[i]+" (Artificial)</p></h3></option>";
+                }
+                else{
+                    document.getElementById('menu_isotopos').innerHTML=document.getElementById('menu_isotopos').innerHTML+"<option data-toggle='tooltip' data-placement='bottom' title='Elemento producido de forma natural' value=\""+i+"\"><h3 ><p>"+isotopos_chart[i]+" </p></h3></option>";
+                }
+
+                datos = data_in.split("@");
+                var mes;
+                var date;
+                for(var j=0;j<datos.length;j++){
+                  info = datos[j].split("%");
+                  var ae = parseFloat(info[5*i+1]) * ajuste;
+                  var lid = parseFloat(info[5*i+2]) * ajuste;
+                  var error = parseFloat(info[5*i+3]) * ajuste;
+                  var limite = parseFloat(info[5*i+4]) * ajuste;
+                  var csn = parseInt(info[5*i+5]) * ajuste;
+                  if((i == 0 )&&(csn == 0)){
+                    mes = parseInt(info[5*i].split(",")[1]) - 1;
+                    date = new Date(info[5*i].split(",")[0],mes,info[0].split(",")[2],info[0].split(",")[3],info[0].split(",")[4],0,0);
+                    isotopos_chart_dates.push(date);
+                  }
+                  if((i == 0 )&&(csn == 1)){
+                    mes = parseInt(info[5*i].split(",")[1]) - 1;
+                    date = new Date(info[5*i].split(",")[0],mes,info[0].split(",")[2],info[0].split(",")[3],info[0].split(",")[4],12,0);
+                    isotopos_chart_dates.push(date);
+                  }
+                  //alert(j + ":" + i + " -- " + ae + " -- " + lid + " -- " + error + " -- " + csn );
+                  //alert(datos[j]);
+                  if (csn == 0){
+                    if(ae > lid){
+                      isotopos_chart_data[i].push( {
+                        date: isotopos_chart_dates[j],
+                        ae: ae,
+                        lid: lid,
+                        errorAE: error,
+                        maximo: limite,
+                        aeCSN: null,
+                        lidCSN: null,
+                        energiamod1: null,
+                        energiamod2: null
+                      } );
+                    }
+                    else{
+                      isotopos_chart_data[i].push( {
+                        date: isotopos_chart_dates[j],
+                        ae: null,
+                        lid: lid,
+                        errorAE: null,
+                        maximo: limite,
+                        aeCSN: null,
+                        lidCSN: null,
+                        energiamod1: null,
+                        energiamod2: null
+                      } );
+                    }
+                  }
+                  else{
+                    if (ae == 0)
+                      ae = null;
+                    if (lid == 0)
+                      lid = null;
+                    isotopos_chart_data[i].push( {
+                      date: isotopos_chart_dates[j],
+                      ae: null,
+                      lid: null,
+                      errorAE: null,
+                      maximo: null,
+                      aeCSN: ae,
+                      lidCSN: lid,
+                      energiamod1: null,
+                      energiamod2: null
+                    } );
+                  }
+                }
+              }
+              for (x=0; x<isotopos_chart_data.length;x++){
+                prod = produccion.split("@");
+                for(var k=0;k<prod.length;k++){
+                  valor = prod[k].split("%");
+                  fecha = valor[0].split("-");
+                  mes = parseInt(fecha[1]) - 1;
+                  dia = new Date(fecha[0],mes,fecha[2],0,0,0,0);
+                  //alert("Inserto en " + x + " --  " + dia + " -- " + valor[1] + " -- " + valor[2]);
+                  isotopos_chart_data[x].push({
+                    date: dia,
+                    ae: null,
+                    lid: null,
+                    errorAE: null,
+                    maximo: null,
+                    aeCSN: null,
+                    lidCSN: null,
+                    energiamod1: valor[1],
+                    energiamod2: valor[2]
+                  } );
+                }
+                primera = false;
+                isotopos_chart_data[x].sort(function(a, b) {
+                  var dateA = new Date(a.date), dateB = new Date(b.date);
+                  return dateA - dateB;
+                });
+              }
+
+              var auxVector = isotopos_chart_data[0];
+              for (var z=0; z<auxVector.length; z++){
+                //alert("Inserto " + auxVector[z].date + " -- " + auxVector[z].ae + " -- " + auxVector[z].energiamod1);
+                chartData.push(auxVector[z]);
+              }
+
+              /*var actividad = "Actividad (" + unidad + ")";
+              var lid = "LID (" + unidad + ")";*/
+              document.getElementById('actividad_grafica').innerHTML="Actividad (" + unidad + ") = ";
+              document.getElementById('actividad_maxima').innerHTML=textoUnidad;
+              document.getElementById('lid_grafica').innerHTML="LID (" + unidad + ") = ";
+              document.getElementById('unidad_grafica').innerHTML=textoUnidad;
+              document.getElementById('titulo_grafica_h1').innerHTML = "Estación - " + nombre_estacion;
+              var maximo = "Máximo Legal";
+              var valueMaximo = "maximo";
+              if(auxVector[0].maximo == 99){
+                maximo = "Máximo legal no establecido";
+                valueMaximo = "";
+                document.getElementById('label_maximo_legal').innerHTML="Máximo Legal<br>No Definido";
+              }
+              else{
+                document.getElementById('label_maximo_legal').innerHTML='Máximo Legal: <br>'+auxVector[0].maximo+' ' +document.getElementById('actividad_maxima').innerHTML;
+              }
+
+              am4core.ready(function() {
+              am4core.useTheme(am4themes_animated);
+
+                // Create chart instance
+                var chart = am4core.create("datos_grafica", am4charts.XYChart);
+                var title = chart.titles.create();
+                title.text = document.getElementById('titulo_grafica_h1').innerHTML;
+                // Increase contrast by taking evey second color
+                chart.colors.step = 2;
+                // Add data
+                chart.data = chartData;
+
+                chart.exporting.menu = new am4core.ExportMenu();
+                chart.exporting.menu.items = [{
+                  "label": "...",
+                  "menu": [
+                    { "type": "png", "label": "PNG" },
+                    { "label": "Print", "type": "print" }
+                  ]
+                }];
+                var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+                dateAxis.tooltipDateFormat = "dd/MM/yy";
+                var valueAxisIzquierda = chart.yAxes.push(new am4charts.ValueAxis());
+                valueAxisIzquierda.title.text = textoUnidad;
+                valueAxisIzquierda.logarithmic = true;
+                valueAxisIzquierda.numberFormatter.numberformat = "#.000000"
+                var valueAxisDerecha = chart.yAxes.push(new am4charts.ValueAxis());
+                valueAxisDerecha.title.text = "kWh";
+                valueAxisDerecha.renderer.opposite = true;
+                valueAxisIzquierda.logarithmic = false;
+
+
+                createAxisAndSeriesBarra(chart, "ae", "Actividad", false, valueAxisIzquierda, true, false, true);
+                createAxisAndSeriesError(chart, "Error", valueAxisIzquierda);
+                createAxisAndSeriesArea(chart, "lid", "LID", valueAxisIzquierda, false, false, true, false);
+                if(document.getElementById("checkbox_comparar").checked && (tiene_csn==1)){
+                  createAxisAndSeriesBarra(chart, "aeCSN", "Actividad CSN", false, valueAxisIzquierda, false, true, false);
+                  createAxisAndSeriesArea(chart, "lidCSN", "LID CSN", valueAxisIzquierda, false, true, false, false);
+                }
+                if(document.getElementById("checkbox_maximo").checked){
+                  createAxisAndSeriesLinea(valueMaximo, maximo, false, valueAxisIzquierda, false);
+                }
+                if(procedencia_actual<90){
+                  createAxisAndSeriesLinea(chart, "energiamod1", "Energía módulo 1", true, valueAxisDerecha, true);
+                  createAxisAndSeriesLinea(chart, "energiamod2", "Energía módulo 2", true, valueAxisDerecha, true);
+                }
+
+                chart.cursor = new am4charts.XYCursor();
+                chart.cursor.behavior = "panX";
+                chart.cursor.lineX.disabled = true;
+                chart.cursor.lineY.disabled = true;
+                chart.legend = new am4charts.Legend();
+            });
+                document.getElementById('activador_model').click();
+                $(".loader-wrapper").fadeOut("slow");
+    }
+    function CargarGraficas(){
+        SelectOption(document.getElementById("menu_isotopos"));
+    }
+
+    function SelectOption(element){
+          chartData = [];
+          var auxVector = isotopos_chart_data[element.selectedIndex];
+          for (var z = 0; z < auxVector.length; z++){
+            chartData.push(auxVector[z]);
+          }
+
+          var maximo = "Máximo Legal";
+          var valueMaximo = "maximo";
+          if(auxVector[0].maximo == 99){
+            maximo = "Máximo legal no establecido";
+            valueMaximo = "";
+            document.getElementById('label_maximo_legal').innerHTML="Máximo Legal<br>No Definido";
+          }
+          else{
+            document.getElementById('label_maximo_legal').innerHTML='Máximo Legal: <br>'+auxVector[0].maximo+' ' +document.getElementById('actividad_maxima').innerHTML;
+          }
+          am4core.ready(function() {
+
+            // Themes begin
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+
+            // Create chart instance
+            var chart = am4core.create("datos_grafica", am4charts.XYChart);
+            var title = chart.titles.create();
+            title.text = document.getElementById('titulo_grafica_h1').innerHTML;
+            // Increase contrast by taking evey second color
+            chart.colors.step = 2;
+            // Add data
+            chart.data = chartData;
+
+            chart.exporting.menu = new am4core.ExportMenu();
+            chart.exporting.menu.items = [{
+              "label": "...",
+              "menu": [
+                { "type": "png", "label": "PNG" },
+                { "label": "Print", "type": "print" }
+              ]
+            }];
+            var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+            dateAxis.tooltipDateFormat = "dd/MM/yy";
+            var valueAxisIzquierda = chart.yAxes.push(new am4charts.ValueAxis());
+            valueAxisIzquierda.title.text = document.getElementById('unidad_grafica').innerHTML;
+            valueAxisIzquierda.logarithmic = true;
+            var valueAxisDerecha = chart.yAxes.push(new am4charts.ValueAxis());
+            valueAxisDerecha.title.text = "kWh";
+            valueAxisDerecha.renderer.opposite = true;
+            valueAxisIzquierda.logarithmic = true;
+
+            createAxisAndSeriesBarra(chart, "ae", "Actividad", false, valueAxisIzquierda, true, false, true);
+            createAxisAndSeriesError(chart, "Error", valueAxisIzquierda);
+            createAxisAndSeriesArea(chart, "lid", "LID", valueAxisIzquierda, false, false, true, false);
+            if(document.getElementById("checkbox_comparar").checked && (tiene_csn==1)){
+              createAxisAndSeriesBarra(chart, "aeCSN", "Actividad CSN", false, valueAxisIzquierda, false, true, false);
+              createAxisAndSeriesArea(chart, "lidCSN", "LID CSN", valueAxisIzquierda, false, true, false, false);
+            }
+            if(document.getElementById("checkbox_maximo").checked){
+              createAxisAndSeriesLinea(chart, valueMaximo, maximo, false, valueAxisIzquierda, false);
+            }
+            if(procedencia_actual<90){
+              createAxisAndSeriesLinea(chart, "energiamod1", "Energía módulo 1", true, valueAxisDerecha, true);
+              createAxisAndSeriesLinea(chart, "energiamod2", "Energía módulo 2", true, valueAxisDerecha, true);
+            }
+            chart.cursor = new am4charts.XYCursor();
+            chart.cursor.behavior = "panX";
+            chart.legend = new am4charts.Legend();
+        });
+
+    }
+</script>
+{% endblock %}
+{% block js %}
+    $('.btnright').hide();
+    $('.btnleft').hide();
+{% endblock %}

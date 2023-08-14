@@ -1,0 +1,28 @@
+{% extends "public/template.html" %}
+
+{% block meta %}
+  <title>Laboratorios - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+{% include "public/parts/hero.html" %}
+
+  <main id="main">
+    
+    {% include "public/parts/capacidades-laboratorio-section.html" %}
+
+    {% include "public/parts/map-section-laboratorios.html" %}
+
+
+    {% include "public/parts/certification-laboratorios-section.html" %}
+
+    {% include "public/parts/vraex-section.html" %}
+
+    {% include "public/parts/idi-section.html" %}
+
+  </main><!-- End #main -->
+
+{% endblock %}

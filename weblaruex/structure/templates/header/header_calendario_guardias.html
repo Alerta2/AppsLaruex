@@ -1,0 +1,140 @@
+{% load static %}
+
+
+<input id="hamburger" class="hamburger" type="checkbox" />
+<label for="hamburger" class="hamburger">
+    <i></i>
+    <text>
+        <close>cerrar</close>
+        <open>menu</open>
+    </text>
+</label>
+<nav class="primnav" id="primnav">
+    <ul>
+        <li>
+            <a href="{% url 'calendario_guardias:VisorCalendarioGuardias' %}" class="menu">
+                <i class="fa-solid fa-calendar-lines fa-lg iconMenu"></i> Calendario de guardias
+                <span class="tooltip-menu">CALENDARIO DE GUARDIAS</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'calendario_guardias:MiTablonGuardias' %}" class="menu">
+                <i class="fa-regular fa-id-card-clip fa-lg iconMenu"></i> Mi tablón
+                <span class="tooltip-menu">MI TABLÓN</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'calendario_guardias:VisorOperatividadApps' %}" class="menu">
+                <i class="fa-solid fa-a fa-lg iconMenu"></i> Estado Apps
+                <span class="tooltip-menu">ESTADO APPS</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'calendario_guardias:PersonalCalendarioGuardias' %}" class="menu">
+                <i class="fa-solid fa-users fa-lg iconMenu"></i> Personal
+                <span class="tooltip-menu">PERSONAL</span>
+            </a>
+        </li>
+        {% if user.is_authenticated %}
+        <!-- Si el usuario esta logeado ... -->
+        {% if perms.auth.calendario_guardias_nuevo %}
+        <!-- Si el usuario tiene permisos de acceso para creacion/modificacion de calendarios ... -->
+        <li>
+            <a href="{% url 'calendario_guardias:NuevoCalendarioGuardias' %}" class="menu">
+                <i class="fa-regular fa-calendar-plus fa-lg iconMenu"></i> Crear calendario anual
+                <span class="tooltip-menu">CREAR CALENDARIO ANUAL</span>
+            </a>
+        </li>
+        {% endif %}
+        {% if perms.auth.calendario_guardias_supervisor %}
+        <!-- Si el usuario tiene permisos de acceso para la supervision de las sustituciones/cambios propuestos por los analistas ... -->
+        <li>
+            <a href="{% url 'calendario_guardias:SupervisionGuardias' %}" class="menu_bank" target="_blank">
+                <i class="fa-solid fa-bell-exclamation fa-lg iconMenu"></i> Notificaciones
+                <span class="tooltip-menu">NOTIFICACIONES</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'calendario_guardias:HistoricoCambiosGuardia' %}" class="menu_bank">
+                <i class="fa-solid fa-list-timeline fa-lg iconMenu"></i> Histórico
+                <span class="tooltip-menu">HISTÓRICO</span>
+            </a>
+        </li>
+        {% endif %}
+        {% endif %}
+        <li>
+            {% if user.is_authenticated %}
+            <a href="{% url 'structure:logout' %}?next={% url 'calendario_guardias:LoginCalendarioGuardias' %}?next={% url 'calendario_guardias:VisorCalendarioGuardias' %}"
+                class="menu">
+                <i class="fas fa-power-off fa-lg iconAcces color-animate"></i> Cerrar sesión
+                <span class="tooltip-menu">Cerrar sesión</span>
+            </a>
+            {% else %}
+            <a href="{% url 'calendario_guardias:LoginCalendarioGuardias' %}?next={% url 'calendario_guardias:VisorCalendarioGuardias' %}"
+                class="menu">
+                <i class="fas fa-user fa-lg iconAcces color-animate"></i> Iniciar sesión
+                <span class="tooltip-menu">Iniciar sesión</span>
+            </a>
+            {% endif %}
+        </li>
+    </ul>
+</nav>
+
+
+<nav class="navbar navbar-expand-custom navbar-dark encabezado" style="background-color: #1B1C1C;">
+    <a class="navbar-brand" href="#">GUARDIAS</a> {% if user.is_authenticated %}
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-user-cog"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <user>
+            <section>
+                <img id="ImageUser" src="../../../../media/profile/default.png" />
+                <section style="padding-right: 5px;">
+                    <name>{{user.get_full_name}}</name>
+                    <actions><a href="{% url 'calendario_guardias:PerfilUsuario' %}"><i class="fas fa-cog"
+                                style="padding-right: 4px;"></i>Configuración</a> |
+                        <a
+                            href="{% url 'structure:logout' %}?next={% url 'calendario_guardias:LoginCalendarioGuardias' %}?next={% url 'calendario_guardias:VisorCalendarioGuardias' %}"><i
+                                class="fas fa-power-off" style="padding-right: 4px;"></i>Cerrar sesión </a>
+                    </actions>
+                </section>
+            </section>
+        </user>
+    </div>
+    {% endif %}
+</nav>
+
+
+<script>
+    var photoavatar = "{{ user.profile.image.url }}" //Foto
+    if (photoavatar != "") {
+        $('#ImageUser').attr("src", photoavatar);
+    }
+</script>
+
+
+<script type="text/javascript">
+    $(".primnav li a.submenu").on("click", function () {
+        showPreloaderAlerta2();
+        $(this).parent().parent().parent().find('a[class="menu"]').addClass('active')
+    });
+
+    $(".primnav li a.menu").on("click", function () {
+        showPreloaderAlerta2();
+        $(this).addClass('active');
+    });
+    $(".primnav li a.menu_bank").on("click", function () {
+        $(this).addClass('active');
+    });
+
+    $(document).ready(function () {
+        if ($('.primnav li a[href$="' + location.pathname + '"]').hasClass('menu')) {
+            $('.primnav li a[href$="' + location.pathname + '"]').addClass('active');
+        } else if ($('.primnav li a[href$="' + location.pathname + '"]').hasClass('submenu')) {
+            $('.primnav li a[href$="' + location.pathname + '"]').parent().parent().parent().find('a[class="menu"]').addClass("active")
+        }
+    });
+</script>

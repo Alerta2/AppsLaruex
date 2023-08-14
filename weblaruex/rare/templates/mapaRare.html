@@ -1,0 +1,264 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+    <link rel="stylesheet" href="{% static 'js/ol/ol.css' %}" type="text/css">
+    <script src="{% static 'js/ol/ol.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jsonmuestras.js' %}"></script>
+    <!-- scripts de grafica -->
+    <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+    <script src="https://www.amcharts.com/lib/3/serial.js"></script>
+    <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+    <script src="https://www.amcharts.com/lib/4/core.js"></script>
+    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+    <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
+    <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+{% endblock %}
+{% block css %}
+        /* Zoom In #1 */
+        .hoverZoomIn figure img {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            -webkit-transition: .3s ease-in-out;
+            transition: .3s ease-in-out;
+        }
+        .hoverZoomIn figure:hover img {
+            -webkit-transform: scale(1.3);
+            transform: scale(1.3);
+        }
+{% endblock %}
+
+
+{% block modal %}
+<!-- ventana modal pantalla completa -->
+<!-- {% include "modal/modal_grafica_avanzado.html" %} -->
+{% endblock %}
+
+{% block map %}
+    {% include "map/map.html" %}
+{% endblock %}
+
+
+{% block sidebar1 %}
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div id="captionheaderl" class="card-header card-captionheader d-flex">
+                <h4><span><i id="card-headerbuttonl" class="fas fa-eye-slash col-md-3"></i></span></h4>
+                <h4 class="card-title col-md-8">Titulo caption left</h4>
+            </div>
+            <!-- Card content -->
+            <div id="captionbodyl" class="card-body card-captionbody">
+                {% for est in estaciones %}
+                    <div class="row">
+                        <div class="row">
+                            <div class="col-sm">{{ est.nombre }}</div>
+                            <div class="col-sm"> TIPO: {{ est.tipo }}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm">FONDO: {{ est.fondo }}</div>
+                            <div class="col-sm">ULT.VALOR: {{ est.valor }} {{ est.unidad }}</div>
+                            <div class="col-sm">{{ est.fecha }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </nav>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#sidebar").mCustomScrollbar({
+                theme: "minimal"
+            });
+
+            $('#captionheaderl, .overlay').on('click', function () {
+                $('#sidebar').removeClass('active');
+                $('.overlay').removeClass('active');
+                $('.btnleft').show();
+            });
+
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').addClass('active');
+                $('.overlay').addClass('active');
+                $('.collapse.in').toggleClass('in');
+                $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+                $('.btnleft').hide();
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block sidebar2 %}
+<nav id="sidebar2" class="sidebar">
+    <div class="sidebar-header">
+        <div id="captionheaderr" class="card-header card-captionheader d-flex">
+            <h4><span><i id="card-headerbuttonr" class="fas fa-eye-slash col-md-3"></i></span></h4>
+            <h4 id="cardtitler" class="card-title col-md-8">Titulo caption right</h4>
+        </div>
+
+        <!-- Card content -->
+        <div id="captionbodyr" class="card-body card-captionbody text-white">
+            Texto caption right
+        </div>
+    </div>
+</nav>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#sidebar2").mCustomScrollbar({
+            theme: "minimal"
+        });
+
+        $('#captionheaderr, .overlay').on('click', function () {
+            $('#sidebar2').removeClass('active');
+            $('.overlay').removeClass('active');
+            $('.btnright').show();
+        });
+
+        $('#sidebar2Collapse').on('click', function () {
+            $('#sidebar2').addClass('active');
+            $('.overlay').addClass('active');
+            $('.collapse.in').toggleClass('in');
+            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+            $('.btnright').hide();
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+
+    <script type="text/javascript">
+
+        function isMobile(){
+            if( window.innerWidth > 1024)
+                return false;
+            else
+                return true;
+        }
+
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        $(document).ready(function() {
+
+            $("#modalinfo").on("show.bs.modal", function(event) {
+
+            });
+            $('#modalinfo').on('hide.bs.modal', function () {
+                //alert("cierro");
+            });
+
+
+            if(!isMobile()){
+                $('#sidebarCollapse').click();
+                $('#sidebar2Collapse').click();
+            }
+            else{
+                $('#sidebarCollapse').click();
+            }
+
+        })
+
+        var vectorSource = new ol.source.Vector({});
+        /* Estilo para los marcadores*/
+        var markers = new ol.layer.Vector({
+            source: vectorSource,
+            style: function (feature) {
+                var rutaimagen='{% static img %}'+'img/rare/estacion.png';
+                var nombre = feature.get('nombre') + "\n" + feature.get('valor') + feature.get('unidad');
+                var color = '#FFF';
+                if(feature.get('retraso') == 1)
+                    color = '#F00';
+                style = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        opacity: 1,
+                        src: rutaimagen,
+                        scale: 0.5
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: [0, 0, 0, 1.0],
+                        width: 4,
+                        lineDash: [1, 5, 3, 5]
+                    }),
+                    text: new ol.style.Text({
+                        text: nombre,
+                        scale: 1,
+                        offsetY: 20,
+                        padding: [1, 0, 0, 3],
+                        fill: new ol.style.Fill({
+                            color: '#000000'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: color,
+                            width: 1
+                        })
+                    })
+                });
+                return style;
+            }
+        });
+
+        var map = new ol.Map({
+            controls: [],
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                markers,
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([-6.3460114,39.4787914]),
+                zoom: 8
+            }),
+        });
+
+        map.addControl(new ol.control.Zoom({
+            className: 'custom-zoom'
+        }));
+        /** EVENTO FEATURE ACCION MARKER **/
+        map.on('singleclick', function(e){
+            document.getElementById("captionbodyr").innerHTML = "<p>En esta web puedes consultar las medidas en el plan de vigilancia radiológica ambiental de la Junta de Extremadura. Pulsa en un elemento del cuadro de la izquierda y se mostrarán las ubicaciones de medida. Al pulsar en una estación verás en este cuadro los análisis realizados, selecciona una determinación en el desplagable y consulta la gráfica</p>";
+            map.forEachFeatureAtPixel(e.pixel, function (f) {
+                if(isMobile()){
+                    $('#sidebar2Collapse').click();
+                }
+                document.getElementById("captionbodyr").innerHTML = "<p>Selecciona el análisis deseado en el desplegable y accede a la gráfica correspondiente.</p>";
+                selected = f;
+                document.getElementById("captionbodyr").innerHTML = document.getElementById("captionbodyr").innerHTML + selected.get('description');
+                document.getElementById('titulo_grafica_h1').innerHTML = selected.getId();
+            });
+        });
+
+        /** EVENTO ZOOM CAMBIADO **/
+        var currZoom = map.getView().getZoom();
+        map.on('moveend', function(e) {
+            var newZoom = map.getView().getZoom();
+            if (currZoom != newZoom) {
+                //alert('zoom end, new zoom: ' + newZoom);
+                currZoom = newZoom;
+            }
+        });
+
+        /* Recorro la lista de estaciones pasada desde el view creando los marcadores */
+        var listaEstaciones = {{ json_estaciones|safe }};
+        for (let i = 0; i < listaEstaciones.length; i++) {
+            var estacion = listaEstaciones[i];
+            //alert(estacion.nombre + estacion.fecha);
+            var marker = new ol.Feature({
+                geometry: new ol.geom.Point(ol.proj.fromLonLat([parseFloat(estacion.lon),parseFloat(estacion.lat)]))
+            });
+            marker.setId(estacion.id);
+            marker.setProperties({'nombre':estacion.nombre, 'lat':estacion.lat, 'lon':estacion.lon, 'fondo': estacion.fondo, 'valor': estacion.valor, 'fecha':estacion.fecha, 'unidad':estacion.unidad, 'tipo':estacion.tipo, 'retraso':estacion.retraso});
+            vectorSource.addFeature(marker);
+        }
+
+
+
+        
+    </script>
+{% endblock %}

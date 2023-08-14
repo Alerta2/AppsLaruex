@@ -1,0 +1,396 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+  .nav-tabs-bordered .nav-link {
+    margin-bottom: -2px;
+    border: none;
+    color: #2c384e;
+}
+  .nav-tabs-bordered .nav-link.active {
+    background-color: #fff;
+    color: #4154f1;
+    border-bottom: 2px solid #4154f1;
+}
+.nav-tabs {
+    --bs-nav-tabs-border-color: #dee2e6;
+    --bs-nav-tabs-border-radius: 0.375rem;
+    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
+    --bs-nav-tabs-link-active-color: #495057;
+    --bs-nav-tabs-link-active-bg: #fff;
+    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+}
+
+      /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: rgb(16, 108, 161);
+  }
+
+  .addImagen:hover {
+    color: rgb(10, 59, 99);
+  }
+</style>
+
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <nav>
+      <h5 class="card-title">Contactos</h5>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/contactos">Contactos</a>
+      </li>
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/contacto/{{contacto.id}}">{{contacto.nombre}}</a>
+      </li>
+    </ol>
+  </nav>
+</div>
+
+
+
+
+
+<!-- =================== Información de Contactos =================== -->
+
+<section class="section profile">
+  <div class="row">
+    <div class="col-xl-4">
+      {% if contacto.img %}
+      <div class="card">
+        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+          
+          <img src="{% get_media_prefix %}/archivos/Contacto/{{ contacto.img }}" alt="Profile" class="rounded-circle" style=" max-width: 200px; " >
+          <h2>{{contacto.nombre}}</h2>
+          <h3>{{contacto.puesto}}</h3>
+        </div>
+      </div>
+
+      {% else %}
+      <div class="card">
+        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+          
+          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+            style="background-color: #41c9ef52;">
+            <i class="fa-solid fa-user-headset  fa-4x" style="color: #18414b; "></i>
+          </div>
+          <h2>{{contacto.nombre}}</h2>
+          <h3>{{contacto.puesto}}</h3>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <div class="col-xl-8">
+
+      <div class="card">
+        <div class="card-body pt-3">
+          <!-- Bordered Tabs -->
+          <ul class="nav nav-tabs nav-tabs-bordered">
+
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Información</button>
+            </li>
+            
+            {% if administrador %}
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar</button>
+            </li>
+            
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-eliminar">Eliminar</button>
+            </li>
+            {% endif %}
+
+          </ul>
+          <div class="tab-content pt-2">
+            <!-- Información del Contacto-->
+            <div class="tab-pane fade show active profile-overview" id="profile-overview">
+              <h5 class="card-title">Información de {{contacto.nombre}}</h5>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Nombre Completo</div>
+                <div class="col-lg-9 col-md-8">{{contacto.nombre}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Puesto</div>
+                <div class="col-lg-9 col-md-8">{{contacto.puesto}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Empresa</div>
+                <div class="col-lg-9 col-md-8">{{contacto.empresa}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Dirección</div>
+                <div class="col-lg-9 col-md-8">{{contacto.direccion}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Teléfono</div>
+                {% if contacto.telefono == null %}
+                  <div class="col-lg-9 col-md-8">-</div>
+
+                {% else %}
+                  <div class="col-lg-9 col-md-8">{{contacto.telefono|slice:"0:3" }} {{contacto.telefono|slice:"3:18" }}</div>
+                {% endif %}
+                </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Teléfono 2</div>
+                {% if contacto.telefono_fijo == null %}
+                  <div class="col-lg-9 col-md-8">-</div>
+                {% else %}
+                <div class="col-lg-9 col-md-8">{{contacto.telefono_fijo|slice:"0:3" }} {{contacto.telefono_fijo|slice:"3:18" }} </div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Extensión</div>
+                <div class="col-lg-9 col-md-8">{{contacto.extension}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Email</div>
+                <div class="col-lg-9 col-md-8">{{contacto.email|urlize}}</div>
+              </div>
+              {% if direccion or administrador %}
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">DNI</div>
+                <div class="col-lg-9 col-md-8">{{contacto.dni}}</div>
+              </div>
+              {% endif %}
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Fecha de Nacimiento</div>
+                <div class="col-lg-9 col-md-8">{{contacto.fecha_nacimiento}}</div>
+              </div>
+
+              <h5 class="card-title">Información Adicional</h5>
+              <p class="small fst-italic" style="white-space: pre-line;">{{contacto.info_adicional}}</p>
+            </div>
+
+
+            <!-- Editar Contacto -->
+            <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+              <!-- Edit Form -->
+              <form id="formularioEditarContacto"  action="/private/docLaruex/editarContacto/{{contacto.id}}/" method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label for="nuevoNombreContacto" class="col-md-4 col-lg-3 col-form-label">Nombre</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevoNombreContacto" type="text" class="form-control" id="nuevoNombreContacto" value="{{contacto.nombre}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoPuestoContacto" class="col-md-4 col-lg-3 col-form-label">Puesto</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevoPuestoContacto" type="text" class="form-control" id="nuevoPuestoContacto" value="{{contacto.puesto}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaEmpresaContacto" class="col-md-4 col-lg-3 col-form-label">Empresa</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevaEmpresaContacto" type="text" class="form-control" id="nuevaEmpresaContacto" value="{{contacto.empresa}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaDireccionContacto" class="col-md-4 col-lg-3 col-form-label">Dirección</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevaDireccionContacto" type="text" class="form-control" id="nuevaDireccionContacto" value="{{contacto.direccion}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoTelefono" class="col-md-4 col-lg-3 col-form-label">Teléfono</label>
+                  {% if contacto.telefono == null%}
+                    <div class="col-md-2 col-lg-2">
+                      <input name="nuevoPrefijoTelefono" type="text" class="form-control" id="nuevoPrefijoTelefono" value="" >
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                      <input name="nuevoTelefono" type="text" class="form-control" id="nuevoTelefono" value="">
+                    </div>
+                  {% else %}
+                  <div class="col-md-2 col-lg-2">
+                    <input name="nuevoPrefijoTelefono" type="text" class="form-control" id="nuevoPrefijoTelefono" value="{{contacto.telefono|slice:'0:3'}}" >
+                  </div>
+                  <div class="col-md-6 col-lg-7">
+                    <input name="nuevoTelefono" type="text" class="form-control" id="nuevoTelefono" value="{{contacto.telefono|slice:'3:18'}}">
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoTelefonoFijo" class="col-md-4 col-lg-3 col-form-label">Teléfono 2</label>
+                  {% if contacto.telefono_fijo == null%}
+                    <div class="col-md-2 col-lg-2">
+                      <input name="nuevoPrefijoTelefonoFijo" type="text" class="form-control" id="nuevoPrefijoTelefonoFijo">
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                      <input name="nuevoTelefonoFijo" type="text" class="form-control" id="nuevoTelefonoFijo">
+                    </div>
+                  {% else %}
+                    <div class="col-md-2 col-lg-2">
+                      <input name="nuevoPrefijoTelefonoFijo" type="text" class="form-control" id="nuevoPrefijoTelefonoFijo" value="{{contacto.telefono_fijo|slice:'0:3'}}" >
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                      <input name="nuevoTelefonoFijo" type="text" class="form-control" id="nuevoTelefonoFijo" value="{{contacto.telefono_fijo|slice:'3:18'}}">
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaExtension" class="col-md-4 col-lg-3 col-form-label">Extension</label>
+                  <div class="col-md-6 col-lg-7">
+                    <input name="nuevaExtension" type="text" class="form-control" id="nuevaExtension" value="{{contacto.extension}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoEmailContacto" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevoEmailContacto" type="nuevoEmailContacto" class="form-control" id="Email" value="{{contacto.email}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoDNI" class="col-md-4 col-lg-3 col-form-label">DNI</label>
+                  <div class="col-md-4 col-lg-5">
+                    {% if contacto.dni %}
+                    <input name="nuevoDNI" type="text" class="form-control" id="nuevoDNI" value="{{contacto.dni}}"  pattern="[0-9]{8}-[A-Z]{1}">
+                    {% else %}
+                    <input name="nuevoDNI" type="text" class="form-control" id="nuevoDNI" pattern="[0-9]{8}-[A-Z]{1}" data-rule-required="false">
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaFechaNacimiento" class="col-md-4 col-lg-3 col-form-label">Fecha de Nacimiento</label>
+                  <div class="col-md-4 col-lg-5">
+                    {% if contacto.fecha_nacimiento %}
+                      <input name="nuevaFechaNacimiento" type="date" class="form-control" id="nuevaFechaNacimiento" value="{{contacto.fecha_nacimiento|date:'Y-m-d'}}">
+                    {% else %}
+                      <input name="nuevaFechaNacimiento" type="date" class="form-control" id="nuevaFechaNacimiento">
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaInfoAdicionalContacto" class="col-md-4 col-lg-3 col-form-label">Información Adicional</label>
+                  <div class="col-md-8 col-lg-9">
+                    <textarea name="nuevaInfoAdicionalContacto" class="form-control" id="nuevaInfoAdicionalContacto" style="height: 100px">{{contacto.info_adicional}}</textarea>
+                  </div>
+                </div>
+
+                <div class="row mb-3 ">
+                  <div class="col">
+                  <div class="form-group d-flex justify-content-center">
+                    <label for="nuevaImagenContacto">
+                      <i class="fa-duotone fa-image fa-4x addImagen"></i>
+                    </label>
+                    <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                      id="nuevaImagenContacto" name="nuevaImagenContacto"
+                      onchange="mostrarNombreImagen(this.value)" />
+                  </div>
+                  
+                  <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+                    <spam id="imagen-name"></spam>
+                  </div>
+                </div>
+              </div>
+
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+
+            <!-- Eliminar Contacto -->
+            <div class="tab-pane fade profile-edit pt-3" id="profile-eliminar">
+
+              <!-- Edit Form -->
+              <form form id="fomularioEliminarContacto" action="/private/docLaruex/eliminarContacto/{{ contacto.id }}/"
+              method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label class="text-center">¿Estás seguro de eliminar el contacto de {{contacto.nombre}}?</label>
+                </div>
+                <div class="text-center">
+                  <button id="eliminarContacto" type="submit" class="btn btn-danger" onclick="crearAviso('guardarEliminarContacto', 'Contacto {{ contacto.nombre }} eliminado con éxito', 'alert-success', 3000)">Eliminar</button>
+
+                  <button  id="canclearEliminar" type="reset" class="btn btn-secondary" onclick="crearAviso('cerrarEliminarContacto', 'No se ha podido eliminar el contacto {{ contacto.nombre }}', 'alert-warning', 3000); location.reload()">Cancelar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+          </div><!-- End Bordered Tabs -->
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+<script type="text/javascript">
+
+
+  $("#fomularioEliminarContacto").submit(function (e){
+    e.preventDefault();
+    var data = new FormData(this);
+    $.ajax({
+      url: "/private/docLaruex/eliminarContacto/{{ contacto.id }}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        // redireccionar a la pagina de inicio
+        var url = "/private/docLaruex/contactos";
+        $(location).attr('href',url);
+
+
+
+
+      }
+    });
+  });
+
+
+    // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+    function mostrarNombreImagen(value) {
+
+    document.getElementById('imagen-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreImagen').style.display = 'none';
+    }
+
+  </script>
+{% endblock %}

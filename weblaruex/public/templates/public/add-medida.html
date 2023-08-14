@@ -1,0 +1,96 @@
+{% extends "public/template.html" %}
+
+{% block meta %}
+  <title>Agregar Medida - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+  <main id="main">
+    <!-- ===================== Separacón ===================== -->
+    <div class="section-title ">
+      <div class="container breadcrumbs">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="text-center">
+              <div class="content my-2">
+                <br>
+                <h2 class="fw-bold">Nueva medida</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include "public/parts/form-medida.html" %}
+
+  </main><!-- End #main -->
+
+  <div class="modal fade" id="modalInfoKeywordsMedidas" tabindex="-1" role="dialog" aria-labelledby="modalInfoKeywords" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalInfoKeywordsMedidasTitulo"><strong>¿Qué son los keywords y como se usan?</strong></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Los keywords o palabras clave son palabras que describen el contenido de una página web. Son palabras que un usuario podría usar para buscar una página web o para describir el contenido de una página web. 
+          </p>
+          <p class="font-italic">
+            Ejemplo:  
+          </p>       
+          <p class="font-italic text-success">
+            laboratorio, análisis clínicos, investigación científica, diagnóstico médico, pruebas de laboratorio, química, microbiología, biología molecular
+          </p>
+          <p >
+            <i class="fa-sharp fa-solid fa-circle-exclamation" style="color: #ea1313;"></i> Deben estar <strong>separados por comas y no repetirse</strong>.
+          </p>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalInfoMetaDescriptionMedidas" tabindex="-1" role="dialog" aria-labelledby="modalInfoMetaDescription" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalInfoMetaDescriptionMedidasTitulo"><strong>¿Qué son las meta description y para que se usan?</strong></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+          La meta description es un fragmento de texto que se muestra en los resultados de búsqueda de Google y que sirve para describir el contenido de una página web.
+          </p>
+          <p class="font-italic">
+            Ejemplo:  
+          </p>       
+          <p class="font-italic text-success">
+            Laboratorio Clinico X: análisis clínicos, diagnóstico médico y pruebas de laboratorio confiables en química, microbiología y biología molecular. ¡Resultados precisos garantizados!
+          </p>
+          <p>
+            <i class="fa-sharp fa-solid fa-circle-exclamation" style="color: #ea1313;"></i> Deben estar tener una longitud máxima de <strong>150 caracteres</strong>.
+          </p>
+          <p>
+            <i class="fa-sharp fa-solid fa-circle-exclamation" style="color: #ea1313;"></i> También es recomendable incluir al final frases como <strong>Descubre más u Obtén información</strong>.
+          </p>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}

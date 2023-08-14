@@ -1,0 +1,95 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <table class="table"
+            id="table"
+            data-toggle="table"
+            data-pagination="true"
+            data-page-size="25"
+            data-height="800"
+            data-search="true"
+            data-show-columns="true"
+            data-show-refresh="true"
+            data-show-columns-toggle-all="true"
+            data-show-fullscreen="true"
+            data-buttons="buttons"
+            data-buttons-class="light"
+            data-show-export="true"
+            data-url="/private/gestionmuestras/listadoChurrosDatos">
+            <thead>
+                <tr>
+                    <th data-field="memoria__memoria" data-sortable="true">MEMORIA</th>
+                    <th data-field="muestra__nombre" data-sortable="true">MUESTRA</th>
+                    <th data-field="analisis__descripcion" data-sortable="true">ANALISIS</th>
+                    <th data-field="isotopo__descripcion" data-sortable="true">ISOTOPO</th>
+                    <th data-field="f_rec_ini" data-sortable="true" data-formatter="dateFormat">FECHA RECOGIDA INI</th>
+                    <th data-field="f_rec_fin" data-sortable="true" data-formatter="dateFormat">FECHA RECOGIDA FIN</th>
+                    <th data-field="dias" data-sortable="true">DIAS</th>
+                    <th data-field="f_analisis" data-sortable="true" data-formatter="dateFormat">FECHA ANALISIS</th>
+                    <th data-field="muestra_compartida" data-sortable="true">COMPARTIDA</th>
+                    <th data-field="actividad" data-sortable="true">ACTIVIDAD</th>
+                    <th data-field="error" data-sortable="true">ERROR</th>
+                    <th data-field="lid" data-sortable="true">LID</th>
+                    <th data-field="submuestras" data-sortable="true">MEMORIA</th>
+                    <th data-field="tiempo_medida" data-sortable="true">TIEMPO MEDIDA</th>
+                    <th data-field="cantidad_muestra_recogida" data-sortable="true">CANTIDAD RECOGIDA</th>
+                    <th data-field="cantidad_muestra_analizada" data-sortable="true">CANTIDAD ANALIZADA</th>
+                    <th data-field="rendimiento" data-sortable="true">RENDIMIENTO</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+<script>
+    $('#table').bootstrapTable({
+        onClickRow: function (row, $element) {
+            alert(row.memoria__memoria)
+        },
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+    })
+
+    function dateFormat(value, row, index) {
+        return moment(value).format('DD/MM/YYYY HH:mm');
+    }
+
+    function buttons () {
+        return {
+          btnAdd: {
+            text: 'Add new row',
+            icon: 'fa-plus',
+            event: function () {
+              alert('Do some stuff to e.g. add a new row')
+            },
+            attributes: {
+              title: 'Add a new row to the table'
+            }
+          }
+        }
+    }
+    
+</script>>
+{% endblock %}

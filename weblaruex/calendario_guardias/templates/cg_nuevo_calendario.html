@@ -1,0 +1,423 @@
+{% extends "base/base_calendario_guardias.html" %}
+{% load static %}
+{% block imports %}
+
+<!-- Custom css nuevo calendario -->
+<link rel="stylesheet" href="{% static 'css/calendario_guardias/nuevo_calendario.css' %}" />
+
+<!-- FullCalendar 5.10.1 -->
+<!-- https://fullcalendar.io/docs/initialize-globals -->
+<link rel="stylesheet" href="{% static 'css/calendario_guardias/fullcalendar.css' %}" />
+<script src="{% static 'js/calendario_guardias/fullcalendar.js' %}"></script>
+<script src="{% static 'js/calendario_guardias/fullcalendar_es.js' %}"></script>
+
+<!-- Tooltip eventos calendario -->
+<!-- https://popper.js.org/ -->
+<script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+<script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js"></script>
+
+<!-- Rolldate -->
+<!-- https://www.cssscript.com/mobile-ios-date-picker-rolldate/ -->
+<script type="text/javascript" src="{% static 'js/calendario_guardias/rolldate.js' %}"></script>
+
+<!-- flatpickr -->
+<!-- https://flatpickr.js.org/ -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+
+{% endblock %}
+{% block content %}
+
+<!-- Contenido que voy a añadir en funcion de la informacion introducida en el formulario previo -->
+<div id="Contenido" class="container">
+
+    <!-- Espacio reservado para añadir contenido para la generación del nuevo calendario de guardias  -->
+
+</div> <!-- END Contenido que voy a añadir en funcion de la informacion introducida en el formulario previo -->
+
+<!-- Boton Comenzar Creacion Nuevo Calendario de Guardias -->
+<div id="btnComenzar" class="btn-container">
+    <button class="btn btn-lg" id="Comenzar">Comenzar</button>
+</div> <!-- END Boton Comenzar Creacion Nuevo Calendario de Guardias -->
+
+
+
+
+<script type="text/javascript">
+
+    var area, year, turno, personal = undefined //Varibales globales 
+
+    $("#Comenzar").on('click', async function () {
+        const steps = ['1', '2', '3', '4']
+        const Queue = Swal.mixin({
+            showCancelButton: true,
+            confirmButtonText: 'Siguiente <i class="fa-solid fa-circle-arrow-right"></i>',
+            cancelButtonText: '<i class="fa-solid fa-circle-left"></i> Atrás',
+            reverseButtons: true,
+            progressSteps: steps,
+            inputAttributes: {
+                required: true
+            },
+            validationMessage: 'Este campo es requerido!'
+        })
+
+        const values = []
+        let currentStep
+
+        for (currentStep = 0; currentStep < steps.length;) {
+            var result = null
+
+            switch (currentStep) {
+                case 0:
+                    result = await Queue.fire({ //Selecciono el año en el que deseo calcular el nuevo calendario de guardias
+                        title: 'Selecciona el año',
+                        html: '<input class="form-control" type="text" id="input-year" name="year" placeholder="Selecciona el año">',
+                        showCancelButton: currentStep > 0,
+                        currentProgressStep: 0,
+                        inputValue: values[currentStep],
+                        didOpen: () => {
+                            new Rolldate({
+                                el: '#input-year',
+                                format: 'YYYY',
+                                beginYear: new Date().getFullYear(),
+                                endYear: new Date().getFullYear() + 1,
+                                value: new Date().getFullYear(),
+                                lang: {
+                                    title: 'Año',
+                                    cancel: 'Cancelar',
+                                    confirm: 'Confirmar'
+                                }
+                            })
+                        },
+                    });
+                    break;
+                case 1:
+                    result = await Queue.fire({ //Selecciono el area de trabajo para la que deseo calcular el nuevo calendario de guardias
+                        title: 'Selecciona el Área de trabajo',
+                        input: 'select',
+                        inputOptions: new Promise(function (resolve) {
+                            $.getJSON("{% url 'calendario_guardias:getAreas' %}", function (data) {
+                                resolve(JSON.parse(data))
+                            });
+                        }),
+                        inputPlaceholder: 'Selecciona el área',
+                        showCancelButton: currentStep > 0,
+                        currentProgressStep: 1,
+                        inputValue: values[currentStep],
+                    });
+                    break;
+                case 2:
+                    result = await Queue.fire({ //Selecciono el turno de trabajo vinculado con el area de trabajo seleccionada
+                        title: 'Seleccione el turno de trabajo',
+                        input: 'select',
+                        inputOptions: new Promise(function (resolve) {
+                            $.getJSON("{% url 'calendario_guardias:getTurnosArea' %}?a=" + values[1], function (data) {
+                                resolve(JSON.parse(data))
+                            });
+                        }),
+                        inputPlaceholder: 'Selecciona el turno de permanencia',
+                        showCancelButton: currentStep > 0,
+                        currentProgressStep: 2,
+                        inputValue: values[currentStep],
+                    })
+                    break;
+                case 3:
+                    result = await Queue.fire({ //Informo del personal analista que esta dado de alta para realizar las guardias en el area y tuno especificado anteriormente
+                        title: 'Analistas',
+                        html: '<div id=UsuariosArea> </div>',
+                        footer: '<a href="{% url "calendario_guardias:PersonalCalendarioGuardias" %}" style="text-size:12px">Modificar el personal</a>',
+                        didOpen: () => {
+                            Swal.showLoading();
+
+                            //Al terminar recopilo toda la infomacion introducida en los formularios mostrados
+                            $.getJSON("{% url 'calendario_guardias:getPersonalArea' %}?a=" + values[1], function (data) {
+                                area = data['area'] //info del area de trabajo
+                                personal = data['personal'] //listado de personal dado de alta para la realizacion de guardias en el area especificada
+                                year = values[0] //año en el que deseo calcular el nuevo calendario de guardias
+                                turno = values[2] //turno de trabajo que deseo asignar al personal dado de alta
+
+                                var contentHtmlSwall = ''
+                                contentHtmlSwall = contentHtmlSwall +
+                                    '<p style="font-size:15px"><i class="fa-solid fa-info fa-beat" style="--fa-beat-scale: 1.4;"></i> ' +
+                                    'El personal que está dado de alta para la realización de las guardias en el área de <b>' +
+                                    '<i class="' + area[0].icono + '"></i> ' + area[0].nombre + '</b> es el nombrado a continuación</p>'
+                                for (var usuario of personal) {
+                                    contentHtmlSwall = contentHtmlSwall + '<p style="font-size:14px"><img class="userArea" src="' + usuario.avatar + '" alt="" />   ' + usuario.nombre + '</p>'
+                                }
+                                $("#UsuariosArea").html(contentHtmlSwall);
+                                Swal.hideLoading();
+                            });
+                        },
+                        showCancelButton: currentStep > 0,
+                        currentProgressStep: 3,
+                        inputValue: values[currentStep],
+                    })
+                    break;
+            }
+
+
+
+            if (result.value) {
+                switch (currentStep) {
+                    case 0:
+                        values[currentStep] = $('#input-year').val() //año
+                        break;
+                    default:
+                        values[currentStep] = result.value //id_area
+                        break;
+                }
+                currentStep++
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                currentStep--
+            } else {
+                break
+            }
+        }
+
+        if (currentStep === steps.length) {
+
+            $.ajax({
+                type: 'get',
+                url: "{% url 'calendario_guardias:getGuardiasYearArea' %}?y=" + year + "&a=" + area[0].id_area,
+                dataType: "json",
+                cache: false,
+                success: function (data) {
+                    showPreloaderAlerta2();
+
+                    if (data.length > 0) {
+                        Swal.fire({
+                            title: '¿Estas seguro?',
+                            html: '<p style="font-size:15px"><i class="fa-solid fa-info fa-beat" style="--fa-beat-scale: 1.4;"></i>' +
+                                ' Hay guardias registradas en la base de datos para el año <b>' + year + '</b> perteneciente al área de <b>' +
+                                '<i class="' + area[0].icono + '"></i>&nbsp' + area[0].nombre + '</b>.' +
+                                ' Si deseas continuar dichos registros serán eliminados para implantar el nuevo Calendario de Guardias que podrás elaborar a continuación.</p>',
+                            icon: 'question',
+                            showCancelButton: true,
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Continuar',
+                            cancelButtonText: 'Cancelar',
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                setTimeout(function () {
+                                    //Finalmente añado nuevo contenido al template en funcion de la informacion introducida en los formularios
+                                    $("<link/>", {//Agrego el fichero css del nuevo contenido html
+                                        rel: "stylesheet",
+                                        type: "text/css",
+                                        href: '../../../../static/css/calendario_guardias/' + area[0].css_calendar
+                                    }).appendTo("head");
+
+                                    $('#Contenido').load('../../../../static/html/calendario_guardias/' + area[0].html_calendar); //Agrego el nuevo contenido html
+                                    $.getScript('../../../../static/js/calendario_guardias/' + area[0].js_calendar); //Agrego el js con las funciones que debe realizar el nuevo contenido html
+                                    $('#btnComenzar').fadeOut();
+                                }, 1000);
+                            }
+                            else {
+                                showPreloaderAlerta2();
+                            }
+                        })
+                    }
+                    else {
+                        setTimeout(function () {
+                            //Finalmente añado nuevo contenido al template en funcion de la informacion introducida en los formularios
+                            $("<link/>", {//Agrego el fichero css del nuevo contenido html
+                                rel: "stylesheet",
+                                type: "text/css",
+                                href: '../../../../static/css/calendario_guardias/' + area[0].css_calendar
+                            }).appendTo("head");
+
+                            $('#Contenido').load('../../../../static/html/calendario_guardias/' + area[0].html_calendar); //Agrego el nuevo contenido html
+                            $.getScript('../../../../static/js/calendario_guardias/' + area[0].js_calendar); //Agrego el js con las funciones que debe realizar el nuevo contenido html
+                            $('#btnComenzar').fadeOut();
+                        }, 1000);
+                    }
+                }
+            })
+
+
+
+        }
+    })
+</script>
+
+<!-- Necesario para draggable Fullcalendar (Arrastrar eventos al calendario)-->
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+
+<!-- Funciones comunes a todos los calendarios de guardia -->
+<script type="text/javascript">
+
+    /*FUNCION Cambio el titulo del calendario por el nombre del Area + Año */
+    function TitleCalendario() {
+        $('.fc-toolbar-title').each(function () {
+            $(this).html('<span class="cursive-brush" style="font-size:50px;">' + area[0].nombre + ' ' + year + '</span>');
+        });
+    }
+
+    /* FUNCION que valida si todos los dias del año dado para generar el calendario poseen un 
+    analista de guardia. Devuelve true si todo es correcto y false si el calendario no es valido*/
+    function ValidarDiasCalendario() {
+        var eventos = calendar.getEvents()
+        var guardias = eventos.filter(function (item) {
+            return item.extendedProps.group == "guardias";
+        })
+        var fecha = moment(fechaLimitStart, "YYYY-MM-DD");
+        var result = true;
+
+        while (fecha <= moment(fechaLimitEnd, "YYYY-MM-DD").subtract(1, 'days')) {
+            var eventsCount = 0;
+            guardias.forEach(function (event) {
+                var start = moment(event.start).format("YYYY-MM-DD");
+                var end = moment(event.end).subtract(1, 'days').format("YYYY-MM-DD");
+
+                if (fecha >= moment(start) && fecha <= moment(end)) {
+                    eventsCount++;
+                }
+            });
+            if (eventsCount == 0 || eventsCount > 1) {
+                result = false
+                break;
+            }
+            fecha = fecha.add(1, 'days');
+        }
+        return result;
+    }
+
+    /* FUNCION que valida si los festivos añadidos al calendario son validos, 
+    es decir como máximo en un día puede haber un festivo */
+    function ValidarFestivosCalendario() {
+        var eventos = calendar.getEvents()
+        var festivos = eventos.filter(function (item) {
+            return item.extendedProps.group == "festivos";
+        })
+        var fecha = moment(fechaLimitStart, "YYYY-MM-DD");
+        var result = true;
+
+        while (fecha <= moment(fechaLimitEnd, "YYYY-MM-DD").subtract(1, 'days')) {
+            var eventsCount = 0;
+            festivos.forEach(function (event) {
+                var start = moment(event.start).format("YYYY-MM-DD");
+
+                if (fecha == moment(start)) {
+                    eventsCount++;
+                }
+            });
+            if (eventsCount > 1) {
+                result = false
+                break;
+            }
+            console.log(moment(fecha).format("YYYY-MM-DD"), eventsCount);
+            fecha = fecha.add(1, 'days');
+        }
+        return result;
+    }
+
+    /* FUNCION que permite añadir una nueva guardia al calendario en funcion del area especificada */
+    async function AddGuardia(info) {
+        const steps = ['1', '2']
+        const Queue = Swal.mixin({
+            showCancelButton: true,
+            confirmButtonText: 'Siguiente <i class="fa-solid fa-circle-arrow-right"></i>',
+            cancelButtonText: '<i class="fa-solid fa-circle-left"></i> Atrás',
+            stopKeydownPropagation: false,
+            reverseButtons: true,
+            progressSteps: steps,
+            inputAttributes: {
+                required: true
+            },
+            validationMessage: 'Este campo es requerido!'
+        })
+        const values = []
+        let currentStep
+
+        for (currentStep = 0; currentStep < steps.length;) {
+            var result = null
+
+            switch (currentStep) {
+                case 0: //selecciono el intervalo de fecha
+                    result = await Queue.fire({ //Selecciono el año en el que deseo calcular el nuevo calendario de guardias
+                        title: 'Selecciona la duración de la guardia',
+                        html: '<input class="swal2-input" id="range-date" style="display:none">',
+                        showCancelButton: currentStep > 0,
+                        currentProgressStep: 0,
+                        inputValue: values[currentStep],
+                        preConfirm: () => {
+                            if (fechaLimitStart <= flatpickrInstance.selectedDates[0] && fechaLimitEnd >= flatpickrInstance.selectedDates[1]) {
+                                Swal.showValidationMessage('Fuera de los limites del calendario anual ' + year)
+                            }
+                            if (flatpickrInstance.selectedDates[1] == undefined) {
+                                Swal.showValidationMessage('Es obligatorio fijar el día en el que concluye la guardia')
+                            }
+                        },
+                        willOpen: () => {
+                            flatpickrInstance = flatpickr(
+                                Swal.getPopup().querySelector('#range-date'), {
+                                defaultDate: [moment(info.dateStr).format('YYYY-MM-DD'), undefined],
+                                minDate: moment(info.dateStr).format('YYYY-MM-DD'),
+                                maxDate: fechaLimitEnd,
+                                mode: "range",
+                                inline: true,
+                                "locale": "es",
+                            })
+                        }
+                    });
+                    break;
+                case 1: //selecciono la persona que va a realizar la sustitución
+                    result = await Queue.fire({
+                        title: 'Selecciona el analista',
+                        input: 'select',
+                        inputOptions: new Promise(function (resolve) {
+                            $.getJSON("../../../../private/calendario/guardias/datos/area/analistas/?a=" + area[0].id_area, function (data) {
+                                resolve(JSON.parse(data))
+                            });
+                        }),
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return 'Necesitas seleccionar a un analista'
+                            }
+                        },
+                        inputPlaceholder: 'Selecciona el analista',
+                        showCancelButton: currentStep > 0,
+                        currentProgressStep: 1,
+                        inputValue: values[currentStep],
+                    });
+                    break;
+            }
+
+            if (result.value) {
+                if (currentStep == 0) {
+                    values[currentStep] = [moment(flatpickrInstance.selectedDates[0]).format('YYYY-MM-DD'), moment(flatpickrInstance.selectedDates[1]).format('YYYY-MM-DD')]
+                } else {
+                    values[currentStep] = result.value
+                }
+                currentStep++
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                currentStep--
+            } else {
+                break
+            }
+
+            if (currentStep === steps.length) {
+                showPreloaderAlerta2();
+                $.ajax({
+                    type: 'get',
+                    url: "../../../../private/calendario/guardias/nuevo/create/nueva/guardia/?u=" + values[1] + "&s=" + values[0][0] + "&e=" + values[0][1],
+                    dataType: "json",
+                    cache: false,
+                    success: function (answ) {
+                        showPreloaderAlerta2();
+                        if (answ.length > 0) { //Si se ha generado la guardia de forma correcta
+                            calendar.addEventSource({ events: answ, borderColor: '#fff', textColor: '#fff' });
+                            createAlert(' Calendario ' + year + ', ' + area[0].nombre, 'Nueva guardia', 'Se ha añadido una nueva guardia al calendario.', 'info', true, true, 'pageMessages');
+                        }
+                        else { //Si no se ha generado la guardia de forma correcta
+                            createAlert(' Opps! ...', '', 'No ha sido posible generar la nueva guardia. Vuelvelo a intentar en unos minutos.', 'warning', true, false, 'pageMessages')
+                        }
+                    }
+                })
+            }
+        }
+    }
+</script>
+
+{% endblock %}

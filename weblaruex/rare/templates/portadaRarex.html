@@ -1,0 +1,30 @@
+{% extends "base/base_mapa.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block css %}
+    background-image: url('https://cdn.pixabay.com/photo/2016/04/04/10/15/meander-1306617_960_720.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+{% endblock %}
+{% block content %}
+<div class="wrapper">
+        <div class="col-sm-12 texto-centrado text-center">
+            <p><img class="mt-3" src="{% static 'img/logos/logo_rarex.png' %}" alt="Logo RAREX" title="Logo Red de Alerta Radiológica de Extremadura" width="168"/></p>
+            <h6 class="mt-3">Es obligatorio tener un conocimiento preciso del impacto radiológico que una central nuclear puede producir sobre su entorno. Para ello, se implantan en los mismos Planes de Vigilancia Radiológicos Ambientales o PVRAs, así como redes de alerta radiológicas o RVRAs. Ambos sistemas son complementarios. La ejecución de los planes de vigilancia radiológicos suponen la toma periódica de muy diferentes tipos de muestras y el posterior análisis de su contenido radiactivo. La información que se obtiene de los mismos es muy precisa sobre cualquier alteración que pueda producirse, pero la obtención de los resultados puede dilatarse significativamente frente al momento en que se recolectaron las citadas muestras. Las redes de alerta radiológicas, tienen menos capacidad de detectar tan pequeñas alteraciones radiológicas en el ambiente, pero los valores que obtienen están disponibles prácticamente en el mismo momento en que son detectados, conociendo inmediatamente que se ha producido una alteración significativa.</h6>
+            <h6>La realización de ambos sistemas de control medioambiental, son promovidos por los propietarios de las centrales o instalaciones nucleares y radiactivas. por las Comunidades Autónomas y por el Consejo de Seguridad Nuclear. Además y como consecuencia de la incorporación de España a la Unión Europea y la firma entre otros, del tratado EURATOM, inspectores de dicho Organismo supervisan periódicamente el cumplimiento por parte de los Países miembros entre otros aspectos, los artículos: 35 <em><b>“Cada Estado miembro creará las instalaciones necesarias a fin de controlar de modo permanente el índice de radiactividad de la atmósfera, de las aguas y del suelo, así como la observancia de las normas básicas. La Comisión tendrá derecho de acceso a estas instalaciones de control; podrá verificar su funciona­miento y eficacia”</b></em> y 36 <em><b>“La información relativa a los controles mencionados en el artículo 35 será comunicada regularmente por las autoridades competentes a la Comisión, a fin de tenerla al corriente del índice de radiactividad que pudiere afectar a la población”</b></em>.</h6>
+            <h6>En esta página web se muestran los valores medios diarios de la tasa de dosis ambiental registrada por las estaciones de la Red de Alerta Radiológica de Extremadura, RAREx. Estas estaciones se encuentran distribuidas por tres zonas de interés. Por un lado el entorno de la central nuclear de Almaraz, en las distintas direcciones de los vientos, por otro lado, en diferentes puntos de Badajoz y mas concretamente, en las proximidades de la instalación nuclear de El Cabril, y por último, la región del Alentejo portugués. Las medias mostradas se obtienen mediante detectores que realizan medidas cada 10 minutos, que son monitorizados de forma continua por el Laboratorio de Radiactividad Ambiental de la Universidad de Extremadura LARUEX. Su funcionamiento es posible gracias a la financiación recibida de la Junta de Extremadura a través de su Consejería de Transición Ecológica y Sostenibilidad y del Consejo de Seguridad Nuclear.</h6>
+            {% if 'juntaex' in request.path %}
+                <p class="text-center mt-5"><a href="{% url 'rare:juntaexMapMediaRarex' %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Acceder</a></p>
+            {% else %}
+                <p class="text-center mt-5"><a href="{% url 'rare:rarexMapaMedia' %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Acceder</a></p>
+            {% endif %}
+        </div>
+</div>
+{% endblock %}
+{% block js %}
+    $('.btnright').hide();
+    $('.btnleft').hide();
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "base/base_mapa.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    Conexiones Remotas
+{% endblock %}
+
+{% block imports %}
+
+{% endblock %}
+{% block css %}
+main { padding-top: 70px; }
+{% endblock %}
+
+{% block content %}
+    {% regroup conexiones by id_ordenador.id as pcs_por_equipo %}
+    <div class="row border border-primary my-4 mx-1 p-2">
+        <h3 class="col-12">Acciones</h3>
+        <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#modalAgregarRelacion">
+            Agregar relación
+        </button>
+    </div>
+    <div class="row">
+        {% for equipo in pcs_por_equipo %}
+            <section class="border border-info m-2 col-xs-3 col-6">
+                <div class="row border border-primary my-4 mx-1 p-2">
+                    <h3 class="col-12">{{ equipo.list.0.id_ordenador.equipo }}</h3>
+                </div>
+                <div id="heading{{ equipo.grouper }}" class="row border border-primary bg-primary text-white my-2 mx-1 p-2 collapsed" data-toggle="collapse" aria-expanded="false" data-target="#collapse{{ equipo.grouper }}">
+                    Usuarios
+                </div>
+                <div id="collapse{{ equipo.grouper }}" class="collapse row border border-primary m-1 p-2" aria-labelledby="heading{{ equipo.grouper }}">
+                    {% for usuario in equipo.list %}
+                        <div class="col-sm-2 col-4">
+                            {{ usuario.usuario.username }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endfor %}
+    </div>
+    <div class="modal fade" id="modalAgregarRelacion" tabindex="-1" role="dialog" aria-labelledby="modalAgregarRelacionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalAgregarRelacionLabel">Agregar relación</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="formAgregarRelacion">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="selectEquipo">Selección de equipo</label>
+                        <select class="form-control" id="selectEquipo" name="selectEquipo">
+                          {% for ordenador in ordenadores %}
+                            <option>{{ordenador}}</option>
+                          {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row mx-4">
+                        {% for usuario in usuarios %}
+                            <div class="col-sm-3 col-4">
+                                <input class="form-check-input" type="checkbox" value="{{usuario}}" id="checkUsuario{{usuario}}" name="checkUsuario{{usuario}}">
+                                <label class="form-check-label" for="checkUsuario{{usuario}}">
+                                    {{usuario}}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="submit" value="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </form>
+          </div>
+        </div>
+    </div>   
+    
+
+    <script type="text/javascript">
+        function mostrasPass(id) {
+            var x = document.getElementById(id);
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+        $( "#formAgregarRelacion" ).on( "submit", function(e) {
+            var dataString = $(this).serialize();        
+            $.ajax({
+                type: "POST",
+                url: "/private/laruex/nuevaRelacionEquiposRemotosParaEquipo/",
+                data: dataString,
+                success: function () {
+                    crearAviso("avisoInsercion", "Información insertada correctamente en la base de datos, actualice la página para visualizarla");
+                }
+            });
+            e.preventDefault();
+          });
+    </script>
+{% endblock %}

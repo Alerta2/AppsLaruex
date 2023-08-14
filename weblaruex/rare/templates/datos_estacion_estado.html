@@ -1,0 +1,245 @@
+{% load static %}
+{% load i18n %}
+{% if estado %}
+    <section class="p-3">
+        <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 d-flex justify-content-center text-center h5 text-dark">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Fecha últimos valores" %}</div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ ultimo_valor.fecha }}</div>
+                </div>
+            </div>
+            {% if ultimo_valor.retraso == 0 %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 center rounded">
+                            <img src="{% static 'img/logos/' %}/logo_enac.jpg" width="128px" data-toggle="tooltip" data-placement="bottom"/>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 center rounded">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Tasa de dosis" %}</div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ ultimo_valor.ultimoValor|stringformat:".2f" }} &#181;Sv/h</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3 bg-danger">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 center rounded">
+                            <img src="{% static 'img/logos/' %}/logo_enac.jpg" width="128px" data-toggle="tooltip" data-placement="bottom"/>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 center rounded">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Tasa de dosis" %}</div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ ultimo_valor.ultimoValor|stringformat:".2f" }} &#181;Sv/h</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if estado.caudalV %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Caudal" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.caudalV}}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.caudalU}}</div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if estado.temperaturaV and estado.temperaturaFueraV %}
+                {% if estado.temperaturaV > 35 %}
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rounded border border-dark p-3 bg-danger">
+                {% elif estado.temperaturaV > 25 %}
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rounded border border-dark p-3 bg-warning">
+                {% else %}
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rounded border border-dark p-3">
+                {% endif%}
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <img src="{% static 'img/rare' %}/termometer.png" width="64px"/>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Temperatura dentro" %} | {% translate "Temperatura fuera" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.temperaturaV}} {{ estado.temperaturaU}} | {{ estado.temperaturaFueraV}} {{ estado.temperaturaFueraU}}</div>
+                    </div>
+                </div>
+            {% elif estado.temperaturaV %}
+                {% if estado.temperaturaV > 25 %}
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3 bg-danger">
+                {% else %}
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                {% endif%}
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <img src="{% static 'img/rare' %}/termometer.png" width="64px"/>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Temperatura dentro" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.temperaturaV}} {{ estado.temperaturaU}}</div>
+                    </div>
+                </div>
+            {% elif estado.temperaturaFueraV %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <img src="{% static 'img/rare' %}/termometer.png" width="64px"/>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Temperatura fuera" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.temperaturaFueraV}} {{ estado.temperaturaFueraU}}</div>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                {% if estado.lluviaV == 0 %}
+                    <img src="{% static 'img/rare/iconomet' %}/sol.png" width="64px" data-toggle="tooltip" data-placement="bottom" title="Sin lluvias"/>
+                {% elif  estado.lluviaV < 10 %}
+                    <img src="{% static 'img/rare/iconomet' %}/llovizna.png" width="64px" data-toggle="tooltip" data-placement="bottom" title="Lluvias leves. {{ estado.lluviaV }}{{ estado.lluviaU }}"/>
+                {% else %}
+                    <img src="{% static 'img/rare/iconomet' %}/lluvia.png" width="64px" data-toggle="tooltip" data-placement="bottom" title="Lluvias intensas {{ estado.lluviaV }}{{ estado.lluviaU }}"/>
+                {% endif %}
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Precipitaciones" %}</div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.lluviaV}} {{ estado.lluviaU}}</div>
+            </div>
+            {% if estado.dirVientoV %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class=""col-lg-6 col-md-6 col-sm-6 col-xs-6 w-100 h-100" data-toggle="tooltip" data-placement="bottom" title="Dirección actual del viento {{ estado.dirVientoV }}{{ estado.dirVientoU }} y del riesgo {{ estado.dirVientoRiesgo }}{{ estado.dirVientoU }}">
+                            <i class="fas fa-arrow-up fa-3x" style="color: coral; position:relative; top:10px; left:60px; transform: rotate({{ estado.dirVientoRiesgo }}deg);"></i>
+                            <i class="fas fa-arrow-up fa-3x" style="position:relative; top: 10px; left:2px; transform: rotate({{ estado.dirVientoV }}deg);"></i>
+                            <!-- 
+                            
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                {% if estado.dirVientoRiesgoMin %}
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Dirección riesgo" %}</div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.dirVientoRiesgoMin}}{{ estado.dirVientoU}} a {{ estado.dirVientoRiesgoMax}}{{ estado.dirVientoU}}</div>
+                                {% endif %}                                
+                            </div>
+                            
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Dirección viento" %}</div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.dirVientoV}}{{ estado.dirVientoU}}</div>
+                            
+                            -->
+                        </div>
+                        <div class=""col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Dirección riesgo" %}</div>
+                            {% if tiempo %}
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" data-toggle="tooltip" data-placement="bottom" title='{% translate "Tiempo calculado en función del a distancia de la central a la ubicación de interés y la velocidad del viento en la última medida recogida" %}({{ estado.velVientoV}} {{ estado.velVientoU}}).'>{% translate "Distancia" %}: {{ tiempo}} min</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if estado.humedadV %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Humedad relativa" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.humedadV}}{{ estado.humedadU}}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Presión" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.presionV}}</div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if estado.radiacionSolarV %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Radiación solar" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.radiacionSolarV}}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.radiacionSolarU}}</div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if estado.flowV %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <img src="{% static 'img/rare' %}/flow.png" width="64px"/>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Caudal" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.flowV}} {{ estado.flowU}}</div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if estado.bateriaV %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <img src="{% static 'img/rare' %}/battery.png" width="64px"/>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Bateria" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.bateriaV}} {{ estado.bateriaU}}</div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if estado.tensionEntradaV %}
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div>
+                                <img src="{% static 'img/rare' %}/voltage.png" width="64px"/>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Voltaje Entrada" %}</div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.tensionEntradaV}} {{ estado.tensionEntradaU}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Voltaje Salida" %}</div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.tensionSalidaV}} {{ estado.tensionSalidaU}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if estado.cargaSaiV %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <img src="{% static 'img/rare' %}/battery_sai.png" width="64px"/>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Carga SAI" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.cargaSaiV}} {{ estado.cargaSaiU}}</div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if estado.temperaturaAguaV %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Temperatura Agua" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.temperaturaAguaV}}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.temperaturaAguaU}}</div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if estado.temperaturaGenitronV or estado.temperaturaDetectorV %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <img src="{% static 'img/rare' %}/termometer2.png" width="64px"/>
+                        </div>
+                        {% if estado.temperaturaGenitronV %}
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">Temperatura interna monitor de tasa de dosis {{ estado.temperaturaGenitronV}} {{ estado.temperaturaGenitronU}}</div>
+                        {% endif %}
+                        {% if estado.temperaturaDetectorV %}
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">Temperatura interna detector {{ estado.temperaturaDetectorV}} {{ estado.temperaturaDetectorU}}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            {% if estado.caudalCartuchoV %}
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{% translate "Caudal Cartucho" %}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.caudalCartuchoV}}</div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">{{ estado.caudalCartuchoU}}</div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endif %}

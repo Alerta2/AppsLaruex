@@ -1,0 +1,359 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+    .add:hover {
+    color: #ce8312;
+  }
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Proveedores</h5>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Proveedores</li>
+    </ol>
+  </nav>
+</div>
+
+{% if administrador %}
+<div id="toolbar">
+  <!-- boton que permite añadir un nuevo Proveedor -->
+  <a href="" class="mx-1" title="Agregar un nuevo proveedor" data-toggle="modal" data-target="#modalFormularioProveedor" style="color: #eba43d"><i
+      class="fa-solid fa-square-plus fa-2x add"></i></a>
+</div>
+{% endif %}
+
+
+<!--- modalFormularioProveedor que los proveedores-->
+<div id="modalFormularioProveedor" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Proveedor</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioProveedor" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="row" >
+            <div class="col-md-auto">
+              <div class="form-group" >
+                <label for="titulo">Nombre</label>
+              </div>
+            </div>
+            
+            <div class="col">
+              <div class="form-group">
+                <input type="text" class="form-control" id="nombre" name="nombre" data-rule="required" pattern="[a-zA-Z\w\s]{1,255}" title="No permite guiones ni otros caracteres que no sean espacios" required/>
+              </div>
+            </div>
+          </div>
+          <div class="row" >
+            <div class="col-md-auto">
+              <div class="form-group" >
+                <label for="direccion">Dirección</label>
+              </div>
+            </div>
+            
+            <div class="col">
+              <div class="form-group">
+                <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Calle Prueba 12, 10004 Cáceres" />
+              </div>
+            </div>
+          </div>
+          
+          <div class="row" >
+            <div class="col-md-auto">
+              <div class="form-group" >
+                <label for="cif">CIF</label>
+              </div>
+            </div>
+            
+            <div class="col">
+              <div class="form-group">
+                <input type="text" class="form-control" id="cif" name="cif" placeholder="B10566584" pattern="[A-B]{1}[0-9]{8}"/>
+              </div>
+            </div>
+            <div class="col-md-auto my-auto">
+              <div class="form-group" >
+                <label for="fax">Fax</label>
+              </div>
+            </div>
+            <div class="col my-auto">
+              <div class="form-group">
+                <div class="row">
+                    <div class="col-4">
+                      <input type="text" id="prefijoFax" name="prefijoFax" class="form-control"  value="+34"/>
+                    </div>
+                    <div class="col-8">
+                    <input type="text" id="fax" name="fax" class="form-control" />
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" >
+            <div class="col-md-auto my-auto">
+              <div class="form-group" >
+                <label for="telefono">Teléfono</label>
+              </div>
+            </div>
+            <div class="col my-auto">
+              <div class="form-group">
+                <div class="row">
+                    <div class="col-4">
+                      <input type="text" id="prefijoTelefono" name="prefijoTelefono" class="form-control"  value="+34"/>
+                    </div>
+                    <div class="col-8">
+                    <input type="text" id="telefono" name="telefono" class="form-control" />
+                    </div>
+                </div>
+              </div>
+            </div>          
+          
+            
+            <div class="col-md-auto  my-auto">
+              <div class="form-group" >
+                <label for="telefono2">Teléfono 2</label>
+              </div>
+            </div>
+            <div class="col  my-auto">
+              <div class="form-group">
+                <div class="row">
+                    <div class="col-4">
+                      <input type="text" id="prefijoTelefono2" name="prefijoTelefono2" class="form-control"  value="+34"/>
+                    </div>
+                    <div class="col-8">
+                    <input type="text" id="telefono2" name="telefono2" class="form-control"/>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+                    
+          <div class="row" >
+            <div class="col-md-auto">
+              <div class="form-group" >
+                <label for="correo">Email</label>
+              </div>
+            </div>
+            
+            <div class="col">
+              <div class="form-group">
+                <input type="email" class="form-control" id="correo" name="correo" placeholder="name@example.com"/>
+              </div>
+            </div>
+          </div>          
+          
+          <div class="row" >
+            <div class="col-md-auto">
+              <div class="form-group" >
+                <label for="correo2">Email 2</label>
+              </div>
+            </div>
+            
+            <div class="col">
+              <div class="form-group">
+                <input type="email" class="form-control" id="correo2" name="correo2" placeholder="name@example.com"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" >
+            <div class="col-md-auto">
+              <div class="form-group" >
+                <label for="web">Web</label>
+              </div>
+            </div>
+            
+            <div class="col">
+              <div class="form-group">
+                <input type="url" class="form-control" id="web" name="web" placeholder="https://www.google.com"/>
+              </div>
+            </div>
+          </div>
+
+
+
+          
+          <div class="row">
+            <div class="col">
+              <label for="comentarios" class="form-label">Comentarios</label>
+              <div class="form-group">
+                  <textarea class="form-control" name="comentarios" id="comentarios" rows="5" 
+                      placeholder="Añade aquí los comentarios" ></textarea>
+          </div>
+        </div>
+
+          <div class="modal-footer">
+            <button id="cerrarProveedor" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+</form>
+</div> <!-- END ModalAsociarHabilitacion -->
+
+<!-- ============= Tablas ============= -->
+
+<!-- Tabla con lista de proveedores -->
+
+    <table id="tabla_proveedores" data-toggle="table" data-search="true" data-show-columns="true"
+      data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+      data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+      data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+    </table>
+
+
+<script type="text/javascript">
+
+
+  $('#tabla_proveedores').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/proveedoresDatos",
+    cache: false,
+    columns: [{
+      title: 'Nombre',
+      field: 'nombre',
+      align: "center",
+      sortable: true
+    },{
+      title: 'CIF',
+      field: 'cif',
+      align: "center"
+    },{
+      title: 'Dirección',
+      field: 'direccion',
+      align: "center"
+    },{
+      title: 'Teléfono',
+      field: 'telefono',
+      align: "center"
+    },{
+      title: 'Correo',
+      field: 'correo',
+      align: "center"
+    },{
+      title: 'Comentarios',
+      field: 'comentarios',
+      align: "center",
+    },{
+      title: "Acciones",
+      field: "action",
+      align: "center",
+      formatter: function (value, row) {
+        var admin = '{{administrador}}';
+        var botonVerProveedor = '<a href="/private/docLaruex/verProveedor/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+        if (admin == 'True') { 
+          var botonEditarProveedor = '<a href="/private/docLaruex/editarProveedor/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#9768b2"></i></a>';
+          return (botonVerProveedor + botonEditarProveedor);
+        } else {
+          return (botonVerProveedor);
+        }
+      },
+  },
+    ],
+    locale: "es-ES",
+    search: true,
+    sortName: 'id',
+    sortOrder: 'desc',
+
+  });
+
+/*$("#tabla_proveedores").on("click-row.bs.table", function (e, row, $element) {
+    window.location.href = "/private/docLaruex/verProveedor/" + row.id + "/";
+  });*/
+  
+
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
+  function addZero(i) {
+    if (i < 10) { i = "0" + i }
+    return i;
+  }
+
+
+
+  
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioProveedor").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarProveedor/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Proveedor guardado con éxito', 'alert-success', 2000);
+        document.getElementById('formularioProveedor').reset();
+        $('#tabla_proveedores').bootstrapTable('refresh');
+        $('#cerrarProveedor').trigger('click');
+
+      }
+    });
+  });
+
+
+
+
+</script>
+{% endblock %}

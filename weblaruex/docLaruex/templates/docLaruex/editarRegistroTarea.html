@@ -1,0 +1,141 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Editar Registro de Tarea {{contacto.nombre}}</h5>
+    
+              <!-- Edit Form -->
+              <form id="formularioEditarRegistroTarea"  action="/private/docLaruex/editarRegistroTarea/{{registroTareaProgramada.id}}/" method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="nuevoEmpleado">Empleado</label>
+                      <select class="form-select" id="nuevoEmpleado" name="nuevoEmpleado">
+                        <option value="{{registroTareaProgramada.empleado.id}}" selected hidden>
+                          {{registroTareaProgramada.empleado.first_name}} {{registroTareaProgramada.empleado.last_name}}
+                        </option>
+                        {% for empleado in empleados %}
+                        <option value="{{empleado.id}}">
+                          {{empleado.first_name}} {{empleado.last_name}}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <label for="nuevaFechaUltimoMantenimiento">Fecha último mantenimiento</label>
+                      <input name="nuevaFechaUltimoMantenimiento" type="datetime-local" class="form-control" id="nuevaFechaUltimoMantenimiento" value="{{ registroTareaProgramada.fecha|date:'Y-m-d\TH:i' }}" >
+                  </div>
+                  
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="nuevoConforme">Conforme</label>
+                      <select class="form-select" id="nuevoConforme" name="nuevoConforme">
+                        <option value="{{registroTareaProgramada.conforme}}" selected hidden>
+                          {% if registroTareaProgramada.conforme == 1 %}
+                          Si
+                          {% else %}
+                          No
+                          {% endif  %}
+                        </option>
+                        <option value="1">Si</option>
+                        <option value="0">No</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-group">
+                      <label for="nuevoEstado">Estado</label>
+                      <select class="form-select" id="nuevoEstado" name="nuevoEstado">
+                        <option value="{{registroTareaProgramada.estado.id}}" selected hidden>
+                          {{registroTareaProgramada.estado.nombre}}
+                        </option>
+                        {% for estado in estados %}
+                        <option value="{{estado.id}}">
+                          {{estado.nombre}}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col">
+                    <label for="nuevosDatos">Datos</label>
+                      <textarea name="nuevosDatos" class="form-control" id="nuevosDatos" style="height: 100px">{{registroTareaProgramada.datos}}</textarea>
+
+                  </div>
+                </div>
+                
+                <div class="row mb-3">
+                  <div class="col">
+                    <label for="nuevasObservaciones">Observaciones</label>
+                      <textarea name="nuevasObservaciones" class="form-control" id="nuevasObservaciones" style="height: 100px">{{registroTareaProgramada.observaciones}}</textarea>
+                  </div>
+                </div>
+
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+
+  </div>
+</div>
+
+<script>
+ // cambiamos la funcionalidad del boton submit del formulario
+ $("#formularioEditarRegistroTarea").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    if (comprobarJSON('nuevosDatos') == true){
+      $.ajax({
+        url: "/private/docLaruex/editarRegistroTarea/{{registroTareaProgramada.id}}/",
+        type: "POST",
+        data: data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        // gestiono el return del view
+        success: function () {
+          var registro = '{{registroTareaProgramada.id}}'
+          crearAviso('eventoGuardar', 'Evento guardado con éxito', 'alert-success', 2000);
+          console.log(registro);
+          location.href = "{% url 'docLaruex:docLaruexReportRegistroTarea' id=registroTareaProgramada.id %}";
+        }
+      });
+    }
+  });
+
+  function comprobarJSON(value) {
+    var nombreJSON = String(value);
+    var bool = false;
+    try {
+        var ugly = document.getElementById(nombreJSON).value;
+        var obj = JSON.parse(ugly);
+        var pretty = JSON.stringify(obj, undefined, 4);
+        document.getElementById(nombreJSON).value = pretty;
+        alert("Esto esta bien, envia");
+        bool = true;
+        }
+    catch(err) {
+      
+      document.getElementById(nombreJSON).classList.add('is-invalid')
+      alert("Esto esta mal");
+    }
+    return bool;
+}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "public/template.html" %}
+{% load crispy_forms_tags %}
+
+ {% block meta %}
+<title xmlns="http://www.w3.org/1999/html">Contacto - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs" data-aos="fade-in">
+      <div class="container">
+        <h2>Encuesta LARUEX</h2>
+        <form method="post" action="/encuesta/">
+          {% csrf_token %}
+          <input class="form-control" type="text" placeholder="Empresa" name="Empresa">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="respuesta1" id="respuesta1_1" value="1">
+            <label class="form-check-label" for="respuesta1_1">1</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="respuesta1" id="respuesta1_2" value="2">
+            <label class="form-check-label" for="respuesta1_2">2</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="respuesta1" id="respuesta1_3" value="3">
+            <label class="form-check-label" for="respuesta1_3">3</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="respuesta1" id="respuesta1_4" value="4">
+            <label class="form-check-label" for="respuesta1_4">3</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="respuesta1" id="respuesta1_5" value="5">
+            <label class="form-check-label" for="respuesta1_5">3</label>
+          </div>
+          <button type="submit" name="enviar">Enviar</button>
+        </form>
+      </div>
+    </div><!-- End Breadcrumbs -->
+
+
+  </main><!-- End #main -->
+
+{% endblock %}

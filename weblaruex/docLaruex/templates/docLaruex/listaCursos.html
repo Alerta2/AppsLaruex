@@ -1,0 +1,639 @@
+{% extends "base/base_docLaruex.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<head>
+  <style>
+
+     /*--------------------------------------------------------------
+    # Añadir Imagen
+    --------------------------------------------------------------*/
+    .addImagen {
+      color: rgb(16, 108, 161);
+    }
+
+    .addImagen:hover {
+      color: rgb(10, 59, 99);
+    }
+
+    .imagen-upload {
+      border: 1px solid #ccc;
+      display: inline-block;
+      padding: 6px 12px;
+      cursor: pointer;
+    }     
+    
+    /*--------------------------------------------------------------
+    # Añadir Fichero PDF
+    --------------------------------------------------------------*/
+    .addFicheroPDF {
+      color: rgb(161, 16, 32);
+    }
+
+    .addFicheroPDF:hover {
+      color: rgb(99, 10, 20);
+    }
+
+    .file-upload {
+      border: 1px solid #ccc;
+      display: inline-block;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+  /*--------------------------------------------------------------
+    # Sections General
+    --------------------------------------------------------------*/
+    section {
+      padding: 60px 0;
+      overflow: hidden;
+      }
+  
+      .section-title {
+      text-align: center;
+      padding-bottom: 30px;
+      }
+      .section-title h2 {
+      font-size: 32px;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      position: relative;
+      color: #37517e;
+      }
+      .section-title h2::before {
+      content: "";
+      position: absolute;
+      display: block;
+      width: 120px;
+      height: 1px;
+      background: #ddd;
+      bottom: 1px;
+      left: calc(50% - 60px);
+      }
+      .section-title h2::after {
+      content: "";
+      position: absolute;
+      display: block;
+      width: 40px;
+      height: 3px;
+      background: #47b2e4;
+      bottom: 0;
+      left: calc(50% - 20px);
+      }
+      .section-title p {
+      margin-bottom: 0;
+      }
+
+    /*--------------------------------------------------------------
+    # Card Cursos
+    --------------------------------------------------------------*/
+    .card-cursos {
+    width: 190px;
+    height: 254px;
+    border-radius: 20px;
+    background: #f5f5f5;
+    position: relative;
+    padding: 1.8rem;
+    border: 2px solid #c3c6ce;
+    transition: 0.5s ease-out;
+    overflow: visible;
+    }
+
+    .card-cursos-details {
+    color: rgba(31, 92, 154, 0.796);
+    height: 100%;
+    gap: .5em;
+    display: grid;
+    place-content: center;
+    }
+
+    .card-cursos-button {
+    transform: translate(-50%, 125%);
+    width: 60%;
+    border-radius: 1rem;
+    border: none;
+    background-color: #008bf8;
+    color: #fff;
+    font-size: 1rem;
+    padding: .5rem 1rem;
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    opacity: 0;
+    transition: 0.3s ease-out;
+    }
+
+    .text-body {
+    color: rgb(21, 83, 104) !important;
+    }
+
+    /*Text*/
+    .text-title {
+    font-size: 0.9em;
+    font-weight: bold;
+    }
+
+    /*Hover*/
+    .card-cursos:hover {
+    border-color: #008bf8;
+    box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.25);
+    }
+
+    .card-cursos:hover .card-cursos-button {
+    transform: translate(-50%, 50%);
+    opacity: 1;
+    }
+
+    /*--------------------------------------------------------------
+    # Descargar Certificado
+    --------------------------------------------------------------*/
+    .cta {
+    position: relative;
+    margin: auto;
+    padding: 12px 18px;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    }
+
+    .cta:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    border-radius: 50px;
+    background: #b1dae7;
+    width: 45px;
+    height: 45px;
+    transition: all 0.3s ease;
+    }
+
+    .cta span {
+    position: relative;
+    font-family: "Ubuntu", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #234567;
+    }
+
+    .cta svg {
+    position: relative;
+    top: 0;
+    margin-left: 10px;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke: #234567;
+    stroke-width: 2;
+    transform: translateX(-5px);
+    transition: all 0.3s ease;
+    }
+
+    .cta:hover:before {
+    width: 100%;
+    background: #b1dae7;
+    }
+
+    .cta:hover svg {
+    transform: translateX(0);
+    }
+
+    .cta:active {
+    transform: scale(0.95);
+    }
+
+    .separador {
+      height: 10px;
+      width: 20%;
+      margin: auto;
+      background-color: rgb(5, 215, 243);
+      color: rgb(5, 215, 243);
+    }
+
+    .addZip:hover{
+      color:#234567;
+    }
+
+  </style>
+</head>
+
+
+<!-- ======= Formación interna ======= -->
+<section id="formacionInterna" class="services section-bg">
+  <div class="row mb-4">
+    <button class="col-3 cta " id="addCurso"  title="añadir Equipo" data-toggle="modal" data-target="#modalFormularioCurso">
+      <span>Añadir curso</span>
+      <svg viewBox="0 0 13 10" height="10px" width="15px">
+        <path d="M1,5 L11,5"></path>
+        <polyline points="8 1 12 5 8 9"></polyline>
+      </svg>
+    </button>
+    {% if administrador %}
+    <button class="col-3 cta" id="descargaCertificado" onclick="window.location='/private/docLaruex/generarCertificadoCurso'">
+      <span>Descargar diploma</span>
+      <svg viewBox="0 0 13 10" height="10px" width="15px">
+        <path d="M1,5 L11,5"></path>
+        <polyline points="8 1 12 5 8 9"></polyline>
+      </svg>
+    </button>
+    
+  {% endif %}
+  
+  </div>
+  
+<!-- formulario añadir curso  -->
+<div id="modalFormularioCurso" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="TituloModal">Añadir Curso</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="formularioModalCurso" action="/private/docLaruex/agregarArchivo/" method="POST"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+          <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+            value="Curso" style="display: none;" />
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label for="habilitacion">Habilitación</label>
+              <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                {% for habilitacion in habilitaciones %}
+                <option value="{{habilitacion.id}}">
+                  {{habilitacion.titulo}}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label for="nombreObjeto">Nombre</label>
+              <input required type="text" class="form-control" id="nombreObjeto"  name="nombreObjeto"
+                data-rule="required"/>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label for="fechaInicioCurso">Fecha de Inicio</label>
+              <input type="date" id="fechaInicioCurso" name="fechaInicioCurso" class="form-control" required />
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label for="fechaFinCurso">Fecha de Fin</label>
+              <input type="date" id="fechaFinCurso" name="fechaFinCurso" class="form-control" required />
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label for="horas">Horas</label>
+              <input required type="number" step="0.01" class="form-control" id="horas" name="horas"
+                data-rule="required" />
+            </div>
+          </div>
+        </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="tipoCurso">Tipo de Curso</label>
+                <select class="form-select" data-rule="required" id="tipoCurso" name="tipoCurso">
+                  {% for tipoCurso in tipoCursos %}
+                  <option value="{{tipoCurso.id}}">
+                    {{tipoCurso.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="patrocinador">Patrocinador</label>
+                <select class="form-select" data-rule="required" id="patrocinador" name="patrocinador">
+                  {% for patrocinador in patrocinadores %}
+                  <option value="{{patrocinador.id}}">
+                    {{patrocinador.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="resumenCurso">Resumen</label>
+                <textarea type="text" class="form-control" id="resumenCurso"
+                  name="resumenCurso" data-rule="required"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="descripcionCurso">Descripcion del Curso</label>
+                <textarea type="text" class="form-control" id="descripcionCurso"
+                  name="descripcionCurso" data-rule="required" rows="6"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center" style="text-align: center;">
+            <div class="col-4">
+              <div class="form-group">
+                <label for="ficheroAdjuntoCurso">
+                  <i class="fa-solid fa-file-pdf fa-4x addFicheroPDF"></i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="ficheroAdjuntoCurso" name="ficheroAdjuntoCurso"
+                  onchange="mostrarNombreArchivo(this.value)" />
+                <div class="text-center"><strong id="mostrarNombreArchivo"><br></strong>
+                  <spam id="file-name"></spam>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label for="imagenCurso">
+                  <i class="fa-duotone fa-image fa-4x addImagen"></i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="imagenCurso" name="imagenCurso"
+                  onchange="mostrarNombreImagen(this.value)" />
+                <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+                  <spam id="imagen-name"></spam>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div><!-- END formulario añadir curso  -->
+
+<!-- ============= Tablas ============= -->
+
+<!-- Tabla con lista de proyectos -->
+<!-- ============= COLLAPSE Tabla con todos los cursos ============= -->
+<!--collapse con historico de versiones de los formatos -->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Tabla con todos los cursos</h6>
+      <!-- Accordion without outline borders -->
+      <div class="accordion accordion-flush" id="accordionFlushReferencias">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingReferencias">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseReferencias" aria-expanded="false"
+              aria-controls="flush-collapseReferencias">Listado completo de cursos
+            </button>
+          </h2>
+          <div id="flush-collapseReferencias" class="accordion-collapse collapse"
+            aria-labelledby="flush-headingReferencias" data-bs-parent="#accordionFlushReferencias">
+            <div class="accordion-body">
+              <table id="tabla_cursos" data-toggle="table" data-search="true" data-show-columns="true"
+              data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+              data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+              data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+              </table>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Accordion without outline borders -->
+    </div>
+  </div>
+</section>
+
+
+<!-- ======= Formación Interna ======= -->
+<section id="services" class="services section-bg">
+  <div class="row section-title">
+    
+    <h2>Formación Interna</h2>
+  </div>
+  <div class="row mx-auto">
+  {% for curso in cursos %}
+    {% if curso.tipo_curso__id == 1 %}
+    <div class="card-cursos mx-auto">
+      <div class="card-cursos-details">
+        <img src="{% static 'niceAdminAssets' %}/img/Curso/{{ curso.imagen }}" alt="Profile"
+                class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+
+        <p class="text-title text-center">{{ curso.id__nombre }}</p>
+      </div>
+      <button type="button" class="card-cursos-button" target="_blank" onclick="javascript:window.open('http://alerta2.es/private/docLaruex/verObjeto/{{curso.id}}/', '_blank');">Acceder</button>
+    </div>
+    {% endif %}
+  {% endfor %}
+  </div>
+</section>
+
+<!-- ======= Formación Externa ======= -->
+<section id="services" class="services section-bg">
+  <div class="row section-title">
+    
+    <h2>Formación Externa</h2>
+  </div>
+  <div class="row mx-auto">
+  {% for curso in cursos %}
+    {% if curso.tipo_curso__id == 2 %}
+    <div class="card-cursos mx-auto">
+      <div class="card-cursos-details">
+        <img src="{% static 'niceAdminAssets' %}/img/Curso/{{ curso.imagen }}" alt="Profile"
+                class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+        <p class="text-title text-center">{{ curso.id__nombre }}</p>
+      </div>
+      <button class="card-cursos-button" onclick="javascript:window.open('http://alerta2.es/private/docLaruex/verObjeto/{{curso.id}}/', '_blank');">Acceder</button>
+    </div>
+    {% endif %}
+  {% endfor %}
+  </div>
+</section>
+<script type="text/javascript">
+
+  // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreArchivo(value) {
+
+    document.getElementById('file-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreArchivo').style.display = 'none';
+  }
+
+    // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+
+    document.getElementById('imagen-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreImagen').style.display = 'none';
+  }
+
+    // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+    function mostrarNombreZip(value, i) {
+      console.log("He entrado");
+      
+      console.log(typeof(i));
+      nombreArchivoZip = 'zip-name' + i;
+      
+      mostrarNombreArchivoZip = 'mostrarNombreZip' + i;
+      document.getElementById('zip-name' + i).innerHTML = value;
+
+      document.getElementById('mostrarNombreZip' + i).style.display = 'none';
+      }
+
+
+    // cambiamos la funcionalidad del boton submit del formulario
+    $("#formularioModalCurso").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Curso guardado con éxito', 'alert-success', 2000)
+
+        $(".modalFormularioCurso").remove();
+        $("#reset").trigger("click");
+        $('#modalFormularioCurso').modal('toggle');
+        $('#cerrar').trigger('click');
+        
+        location.reload(true);
+        
+      }
+    });
+    
+  });
+
+  $('#tabla_cursos').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/cursosDatos",
+    cache: false,
+    columns: [{
+      title: 'Nombre',
+      field: 'id__nombre',
+      align: "center"
+    },{
+      title: 'Desde',
+      field: 'fecha_inicio',
+      align: 'center',
+      sortable: 'true',
+      formatter: function (value, row) {
+          var fecha = new Date(row.fecha_inicio);
+          return $.datepicker.formatDate('dd-mm-yy', fecha);
+      }
+    },{
+      title: 'Hasta',
+      field: 'fecha_fin',
+      align: 'center',
+      sortable: 'true',
+      formatter: function (value, row) {
+          var fecha = new Date(row.fecha_fin);
+          return $.datepicker.formatDate('dd-mm-yy', fecha);
+      }
+    },{
+      title: 'Estado',
+      field: 'id__id__nombre',
+      align: "center",
+        formatter: function (value, row) {
+          var defecto = '<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+          switch (row.id__id_estado__id) {
+            case 1:
+              estado = '<span class="badge badge-success" style="background-color: #21b563;">Operativo</span>';
+              return estado;
+              break;
+            case 2:
+              estado = '<span class="badge" style="background-color: #21b563;">En Vigor</span>';
+              return estado;
+              break;
+
+            case 3:
+              estado = '<span class="badge" style="background-color: #EB8E34;">En Mantenimiento</span>';
+              return estado;
+              break;
+            case 4:
+              estado = '<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+              return estado;
+              break;
+            case 5:
+              estado = '<span class="badge" style="background-color: #524e4e;">Obsoleto</span>';
+              return estado;
+              break;
+            case 6:
+              estado = '<span class="badge" style="background-color: #b52121;">No operativo</span>';
+              return estado;
+              break;
+            case 7:
+              estado = '<span class="badge" style="background-color: #b52121;">Baja</span>';
+              return estado;
+              break;
+
+            default:
+              console.log("No se ha encontrado el estado", row.id__id_estado__id)
+              return defecto;
+
+          }
+        },
+    },{
+      title: "Acciones",
+      field: "action",
+      align: "center",
+      formatter: function (value, row) {
+        
+        var botonVerCurso = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+        var botonModificarCurso = '<a href="/private/docLaruex/editarObjeto/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#9768b2"></i></a>';
+
+        var admin = '{{administrador}}';
+        if (admin == 'True') { 
+            return (botonVerCurso + botonModificarCurso);
+        }else{
+          
+          return (botonVerCurso);
+        }
+      },
+  },
+    ],
+    locale: "es-ES",
+    search: true,
+    sortName: 'id',
+    sortOrder: 'desc',
+
+  });
+
+</script>
+{% endblock %}

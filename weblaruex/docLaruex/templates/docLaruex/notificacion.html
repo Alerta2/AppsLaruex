@@ -1,0 +1,448 @@
+{% extends "base/base_docLaruex.html" %} {% load static %}
+{% block content %}
+
+<style>
+  /* ===============================
+  *  Estilo del las pestañas
+  =================================*/
+  
+  .nav-tabs-bordered .nav-link {
+    margin-bottom: -2px;
+    border: none;
+    color: #2c384e;
+}
+  .nav-tabs-bordered .nav-link.active {
+    background-color: #fff;
+    color: #4154f1;
+    border-bottom: 2px solid #4154f1;
+}
+.nav-tabs {
+    --bs-nav-tabs-border-color: #dee2e6;
+    --bs-nav-tabs-border-radius: 0.375rem;
+    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
+    --bs-nav-tabs-link-active-color: #495057;
+    --bs-nav-tabs-link-active-bg: #fff;
+    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+}
+
+  /*===========================
+    Otros CSS
+  ===========================*/
+  
+  hr {
+    height: 10px;
+    width: 20%;
+    margin: auto;
+    background-color: rgb(5, 215, 243);
+    color: rgb(5, 215, 243);
+  }
+
+    /*----------------------
+  Enviar Notificaciones
+  -----------------------*/
+    .enviarNotificacion:hover {
+    color: #064061;
+  }
+
+  /*----------------------
+  Descarga de archivos
+  -----------------------*/
+
+  .descargaWord:hover {
+    color: #064061;
+  }
+
+  .modificarObjeto:hover {
+    color: #bb3e03;
+  }
+
+
+  .descargaPDF:hover {
+    color: #ce8312;
+  }
+    
+  .enviarNotificacion:hover {
+    color: #064061;
+  }
+
+
+</style>
+
+<!-- ============= breadcrumb ============= -->
+<div class="card-body">
+  <h5 class="card-title">{{ notificacion.titulo}}</h5>
+  <nav>
+    <div class="row">
+      <div class="col-8">
+        <ol class="breadcrumb" style="background-color:#fff !important">
+          <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                class="bi bi-house-door"></i></a></li>
+          <li class="breadcrumb-item" style="font-size: large;"><a
+              href="\private/docLaruex/notificaciones">Listado de notificaciones</a>
+          </li>
+          <li class="breadcrumb-item active" style="font-size: large;">{{ notificacion.titulo}}
+          </li>
+        </ol>
+      </div>
+
+    </div>
+  </nav>
+</div>
+
+
+
+<!-- ========== Modal Cambiar Estado ================= -->
+<div id="modalFormularioCambiarEstado" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalCambiarEstado">Cambiar estado de la notificación del{{notificacion.id_doc.nombre}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioCambiarEstado" action="/private/docLaruex/editarEstadoNotificacion/{{notificacion.id}}/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <input type="text" class="form-control" id="id" name="id" data-rule="required" 
+                  value="{{ acta.id.id }}" hidden />
+              </div>
+            </div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            <div class="form-group">
+              <label>Estado actual</label>
+              <input type="text" value ="{{notificacion.estado_notificacion.nombre}}" class="form-control" disabled>
+            
+            </div>
+          </div>
+          <div class="col-8">
+            <div class="form-group">
+              <label for="nuevoEstadoNotificacion">Nuevo estado</label>
+               <select class="form-select my-auto" id="nuevoEstadoNotificacion" name="nuevoEstadoNotificacion" >
+                {% for estado in estados %}
+                  <option value="{{estado.id}}">
+                    {{estado.nombre}}
+                  </option>
+                {% endfor %}
+                </select>
+            </div>
+          </div>
+        </div>
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" >
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- =================== Información de Notificación =================== -->
+
+<section class="section profile">
+  <div class="row">
+    <div class="col-xl-4">
+
+      <div class="card">
+        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+          
+          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+            style="background-color: #41c9ef52;">
+            <i class="fa-solid fa-messages fa-4x" style="color: #18414b; "></i>
+          </div>
+          <div class="my-2">
+            
+          {% if notificacion.estado_notificacion.id == 1 %}
+            <span class="badge text-white" style="background-color: #524e4e; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+          {% elif notificacion.estado_notificacion.id == 2 %}
+          <span class="badge text-white" style="background-color: #EB8E34; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+          {% elif notificacion.estado_notificacion.id == 3 %}
+            <span class="badge text-white" style="background-color: #21b563; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+          {% elif notificacion.estado_notificacion.id == 4 %}
+            <span class="badge text-white" style="background-color: #2186b5; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+          {% elif notificacion.estado_notificacion.id == 5 %}
+            <span class="badge text-white" style="background-color: #b52121; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+          {% else %}
+            <span class="badge text-white" style="background-color: #b52121; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+          {% endif %} 
+          </div>    
+           
+          <h2 class="my-2 text-center">
+            {{notificacion.titulo}}
+          </h2>
+
+          <h6 class="d-flex justify-content-end">
+            {% if habilitacionNecesaria in habilitacionesUsuario or administrador %}
+
+              <a class="mx-1" title="cambiar estado" data-target="#modalFormularioCambiarEstado" data-toggle="modal"
+              style="color: #001219; align-items: md-center"><i class="fa-duotone fa-sign-hanging fa-2x enviarNotificacion"></i></a>   
+            {% endif %}
+            </h6>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-xl-8">
+
+      <div class="card">
+        <div class="card-body pt-3">
+          <!-- Bordered Tabs -->
+          <ul class="nav nav-tabs nav-tabs-bordered">
+
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Información</button>
+            </li>
+            {% if administrador %}
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar</button>
+            </li>
+            
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-delete">Eliminar</button>
+            </li>
+            {% endif %}
+
+          </ul>
+          <div class="tab-content pt-2">
+            
+            <!-- Información de la Notificación-->
+            <div class="tab-pane fade show active profile-overview" id="profile-overview">
+              <h5 class="card-title">Información</h5>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Título</div>
+                <div class="col-lg-9 col-md-8 font-weight-bold" style="color: #a6914e;">{{ notificacion.titulo }}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Estado</div>
+                <div class="col-lg-9 col-md-8 font-weight-bold" style="color: #a6914e;">          
+                {% if notificacion.estado_notificacion.id == 1 %}
+                  <span class="badge text-white" style="background-color: #524e4e; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+                {% elif notificacion.estado_notificacion.id == 2 %}
+                  <span class="badge text-white" style="background-color: #EB8E34; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+                {% elif notificacion.estado_notificacion.id == 3 %}
+                  <span class="badge text-white" style="background-color: #21b563; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+                {% elif notificacion.estado_notificacion.id == 4 %}
+                  <span class="badge text-white" style="background-color: #2186b5; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+                {% elif notificacion.estado_notificacion.id == 5 %}
+                  <span class="badge text-white" style="background-color: #b52121; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+                {% else %}
+                  <span class="badge text-white" style="background-color: #b52121; vertical-align:middle">{{notificacion.estado_notificacion.nombre}}</span>
+                {% endif %} 
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Fecha</div>
+                <div class="col-lg-9 col-md-8">{{ notificacion.fecha|date }}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Creador</div>
+                <div class="col-lg-9 col-md-8 font-weight-bold" style="color: #a6914e;">{{ notificacion.creador.first_name}} {{ notificacion.creador.last_name}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Archivo asociado</div>
+                <div class="col-lg-9 col-md-8"><a href="\private/docLaruex/verObjeto/{{notificacion.id_doc.id}}">{{ notificacion.id_doc.nombre}}</a></div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Resumen</div>
+                <div class="col-lg-9 col-md-8" style="white-space: pre-line;">{{ notificacion.resumen }}</div>
+              </div>
+            </div>
+            
+            <!-- Editar Notificación -->
+            <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+              <!-- Edit Form -->
+              <form id="formularioEditarNotificacion"  action="/private/docLaruex/editarNotificacion/{{notificacion.id}}/" method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label for="nuevoTitulo" class="col-md-3 col-lg-3 col-form-label">Titulo</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input type="text" id="nuevoTitulo" name="nuevoTitulo" class="form-control" value="{{notificacion.titulo}}" />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoResumen" class="col-md-3 col-lg-3 col-form-label">Resumen</label>
+                  <div class="col-md-8 col-lg-9">
+                    <textarea type="text" class="form-control" name="nuevoResumen" id="nuevoResumen" rows="5" style="white-space: pre-line;">{{notificacion.resumen}}</textarea>
+                  </div>
+                </div>
+     
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+            <!-- Inhabilitar Usuario -->
+            <div class="tab-pane fade profile-delete pt-3" id="profile-delete">
+
+              <!-- Inhabilitar Usuario Form -->
+              <form form id="fomularioEliminarNotificacion" action="/private/docLaruex/eliminarNotificacion/{{ notificacion.id }}/"
+              method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label class="text-center">¿Estás seguro de eliminar la notificación nº{{notificacion.id}} {{notificacion.titulo}} asociada al objeto {{notificacion.id_doc.nombre}}?</label>
+                </div>
+                <div class="text-center">
+                  <button id="eliminarNotificacion" type="submit" class="btn btn-danger" onclick="crearAviso('guardarEliminarNotificacion', 'Notificación nº {{notificacion.id}} {{notificacion.titulo}} eliminada con éxito', 'alert-success', 3000)">Eliminar</button>
+
+                  <button  id="canclearEliminarNotificacion" type="reset" class="btn btn-secondary" onclick="crearAviso('cerrarInhabilitarUsuario', 'No se ha podido eliminar la notificación nº {{notificacion.id}} {{notificacion.titulo}}', 'alert-warning', 3000); location.reload()">Cancelar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+            
+          </div><!-- End Bordered Tabs -->
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<script  type="text/javascript">
+
+  // ===================== Tabla con lista de notificaciones =====================
+  $("#tabla_notificaciones").bootstrapTable({
+    method: "get",
+    url: "/private/docLaruex/notificacionesDatos/{{ acta.id.id }}/",
+    cache: false,
+    locale: navigator.language,
+    columns: [
+      {
+        title: "Fecha",
+        field: "fecha",
+        sortable: "true",
+        align: "center",
+        formatter: function (value, row) {
+          var fecha = new Date(row.fecha);
+          return (
+            $.datepicker.formatDate("dd-mm-yy", fecha)
+          );
+        },
+      },
+      {
+        title: "Título",
+        field: "titulo",
+        align: "center",
+      },
+      {
+        title: "Resumen",
+        field: "resumen",
+        align: "center",
+      },
+      {
+        title: "Creador",
+        field: "creador",
+        align: "center",
+        formatter: function (value, row) {
+          return row.creador__first_name + " " + row.creador__last_name;
+        },
+      },
+      {
+        title: "Estado",
+        field: "estado_notificacion__nombre",
+        align: "center",
+        formatter: function (value, row) {
+          var defecto = '<span class="badge" style="background-color: #524e4e;">Enviada</span>';
+          switch (row.estado_notificacion__id) {
+            case 1:
+              estado = '<span class="badge badge-success" style="background-color: #524e4e;">Enviada</span>';
+              return estado;
+              break;
+            case 2:
+              estado = '<span class="badge" style="background-color: #0A9396;">Recibida</span>';
+              return estado;
+              break;
+
+            case 3:
+              estado = '<span class="badge" style="background-color: #EB8E34;">En tramite</span>';
+              return estado;
+              break;
+            case 4:
+              estado = '<span class="badge" style="background-color: #21b563;">Cerrada</span>';
+              return estado;
+              break;
+            case 5:
+              estado = '<span class="badge" style="background-color: #b52121;">No atendida</span>';
+              return estado;
+              break;
+
+            default:
+              return defecto;
+
+          }
+        },
+      },
+    ],
+    search: true,
+    sortName: "fecha",
+    sortOrder: "desc",
+  });
+
+
+  // ===================== Formularios =====================
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioEditarNotificacion").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarNotificacion/{{notificacion.id}}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Notificacion modificada con éxito', 'alert-success', 2000);
+        location.reload(true);
+
+      }
+    });
+  });
+
+
+</script>
+
+
+
+
+{% endblock%}

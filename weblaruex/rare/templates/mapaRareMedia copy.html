@@ -1,0 +1,642 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+    <link rel="stylesheet" href="{% static 'js/ol/ol.css' %}" type="text/css">
+    <script src="{% static 'js/ol/ol.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jsonmuestras.js' %}"></script>
+    <!-- scripts de grafica -->
+    <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+    <script src="https://www.amcharts.com/lib/3/serial.js"></script>
+    <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+    <script src="https://www.amcharts.com/lib/4/core.js"></script>
+    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+    <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
+    <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+
+    <script src="https://unpkg.com/elm-pep"></script>
+{% endblock %}
+{% block css %}
+        /* Zoom In #1 */
+        .hoverZoomIn figure img {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            -webkit-transition: .3s ease-in-out;
+            transition: .3s ease-in-out;
+        }
+        .hoverZoomIn figure:hover img {
+            -webkit-transform: scale(1.3);
+            transform: scale(1.3);
+        }
+        #info{
+            z-index: 99;
+            position: absolute;
+            top: 120px;
+            left: 30px;
+        }
+        #info i {
+            display: block;
+            font-size: 60px;
+            text-align: center;
+            margin-right: 20px;
+            padding-right: 20px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        #barra_dosis{
+            position: absolute;
+            top: 120px;
+            right: 80px;
+            z-index: 99;
+        }
+        #media{
+            position: relative;
+            top: 0px;
+            right: 68px;
+            color: #028;
+        }
+        #TAC{
+            position: absolute;
+            top: 52px;
+            left: 20px;
+            width: 80px;
+        }
+        #limitePublico{
+            position: absolute;
+            top: 140px;
+            left: 20px;
+            width: 80px;
+        }
+        #radiografia{
+            position: absolute;
+            top: 198px;
+            left: 20px;
+            width: 80px;
+        }
+        #tokioNYork{
+            position: absolute;
+            top: 260px;
+            left: 20px;
+            width: 80px;
+        }
+        #estacion{
+            position: absolute;
+            bottom: 0px;
+            background-color: rgba(255,255,255,0.75);
+            z-index: 100;
+        }
+        #salvapantallas{
+            position: absolute;
+            top: 50px;
+            font-size: 30px;
+            left: 45%;
+            color: rgba(255, 255, 255, 0.9);
+            z-index: 9700;
+        }
+        #cargando{
+            position: absolute;
+            top: 50px;
+            font-size: 30px;
+            left: 45%;
+            color: rgba(255, 255, 255, 0.9);
+            z-index: 9700;
+        }
+        .ol-popup {
+            position: absolute;
+            background-color: white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #cccccc;
+            bottom: 12px;
+            left: -50px;
+            min-width: 280px;
+        }
+        .ol-popup:after, .ol-popup:before {
+            top: 100%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+        .ol-popup:after {
+            border-top-color: white;
+            border-width: 10px;
+            left: 48px;
+            margin-left: -10px;
+        }
+        .ol-popup:before {
+            border-top-color: #cccccc;
+            border-width: 11px;
+            left: 48px;
+            margin-left: -11px;
+        }
+        .ol-popup-closer {
+            text-decoration: none;
+            position: absolute;
+            top: 2px;
+            right: 8px;
+        }
+        .ol-popup-closer:after {
+            content: "✖";
+        }
+        #close_station{
+            position: relative;
+            top: 2px;
+            right: 10px;
+            z-index: 9800;
+        }
+        .btn-circle {
+            width: 30px;
+            height: 30px;
+            padding: 6px 0px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 12px;
+            line-height: 1.42857;
+        }
+        #media_chart{
+            min-height:200px
+        }
+        @media only screen and (max-width : 800px) {
+            #barra_dosis{
+                right: 15px;
+            }
+            #info{
+                max-width: 200px;
+            }
+            #cargando{
+                position: absolute;
+                top: 50px;
+                font-size: 30px;
+                left: 10%;
+                color: rgba(255, 255, 255, 0.9);
+                z-index: 9700;
+            }
+        }
+        @media only screen and (max-width : 600px) {
+                #media_chart{
+                    min-height:120px
+                }
+        }
+
+{% endblock %}
+
+
+{% block modal %}
+<!-- ventana modal pantalla completa -->
+{% endblock %}
+
+{% block map %}
+    {% include "map/map.html" %}
+{% endblock %}
+
+{% block content %}
+    <div id="estacion" class="w-100 justify-content-center pb-3 pl-3 pr-3" style="overflow:scroll">
+        <div id="close_station"><button type="button" class="btn btn-dark btn-circle" onclick="$('#estacion').fadeOut();"><i class="fa fa-times"></i></button></div>
+        <div class="row mt-2 mb-2">
+          <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 p-1">
+            <div class="w-100 h-100 green-bg p-2">
+                <div class="row">
+                    <div class="col-3">
+                        <i class="fas fa-compass fa-2x"></i>
+                    </div>
+                    <div class="col-9">
+                        <div id="station_name" class="count">Estación</div>
+                        <div class="title">{% translate 'Estación' %}</div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 p-1">
+            <div class="w-100 h-100 blue-bg p-2">
+                <div class="row">
+                    <div class="col-6">
+                        <img src="{% static 'img/logos/logo_enac.jpg' %}" alt="Logo" height="25" data-toggle="tooltip" data-placement="bottom" title="Valores acreditados por ENAC por la norma UNE-EN ISO/IEC 17025:2017 del Laboratorio de Radiactividad Ambiental de la Universidad de Extremadura (LARUEX)"/>
+                    </div>
+                    <div class="col-6">
+                        <div id="station_dose"  class="count">0.00&mu;Sv/h</div>
+                        <div class="title">{% translate 'Último valor media diaria' %}</div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 p-1">
+            <div class="w-100 h-100 blue-bg p-2">
+                <div class="row">
+                    <div class="col-3">
+                        <i class="fas fa-database fa-2x"></i>
+                    </div>
+                    <div class="col-9">
+                        <div id="station_avg"  class="count">0.00&mu;Sv/h</div>
+                        <div class="title">{% translate 'Fondo radiológico ambiental histórico' %}</div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-2 col-sm-12 col-xs-1 p-1">
+            <div class="w-100 h-100 green-bg p-2">
+                <div class="row">
+                    <div class="col-3">
+                        <i class="far fa-clock fa-2x"></i>
+                    </div>
+                    <div class="col-9">
+                        <div  id="station_date" class="count">01/01/21</div>
+                        <div class="title">{% translate 'Fecha último valor' %}</div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 p-1">
+            <div class="w-100 h-100 green-bg p-2">
+                <div class="row">
+                    <div class="col-3">
+                        <i class="fas fa-cogs fa-2x"></i>
+                    </div>
+                    <div class="col-9">
+                        <div  id="station_operativity" class="count">100%</div>
+                        <div class="title">{% translate 'Operatividad' %}</div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 px-1">
+                <div id="media_chart" class="info-box2 teal-bg">
+                    <canvas id="chLine" width="100%" height="100%"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="salvapantallas">
+        <div class="row rounded bg-info p-1 progress-bar progress-bar-striped progress-bar-animated text-center">
+            <h3><strong>{% translate "Salvapantallas activo" %}</strong></h3>
+        </div>
+    </div>
+    <div id="cargando">
+        <div class="row rounded bg-info p-1 progress-bar progress-bar-striped progress-bar-animated text-center">
+            <h3><strong>{% translate "Cargando estaciones..." %}</strong></h3>
+        </div>
+    </div>
+    <div id="info">
+        <i class="fas fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="Explicación de los valores mostrados en esta web. El valor mostrado es el último valor de media diaria verificado en la ubicación indicada. Si el valor es del día anterior al actual se mostrará el texto en negro, en caso de existir un retraso de información se mostrará subrayado en rojo. Pulsando en la estación podrá ver la fecha así como el valor de fondo de cada estación, es decir, el valor medio debido a la radiación natural de la ubicación. La operatividad es el porcentaje de valores recibidos correctamente en el día anterior para un total de 144 valores diarios (1 valor cada 10 minutos)." ></i>
+    </div>
+    <div id="barra_dosis">
+        <img src="{% static 'img/rare/barra_actividad.png' %}" alt="barra_actividad" height="300px">
+        <div id="ejemplos">
+            <div id="media" data-toggle="tooltip" data-placement="bottom" title="Dosis recibida si el valor de la estación de mayor tasa de dosis se mantuviese durante un año una vez descontado el fondo histórico de la misma. Este valor podría ser cero en el caso de que la tasa de dosis mayor medida esté por debajo del fondo histórico." ><strong>{{ media }} &mu;Sv---------</strong></div>
+            <div id="TAC"><strong>---------</strong><img src="{% static 'img/rare/resonance.png' %}" alt="resonance" data-toggle="tooltip" data-placement="bottom" title="6900&mu;Sv. Prueba médica TAC. Esta prueba no computará para el límite de exposición legal al tratarse de una prueba médica."  height="32px"></div>
+            <div id="limitePublico"><strong>---------</strong><img src="{% static 'img/rare/alert.png' %}" alt="alert" data-toggle="tooltip" data-placement="bottom" title="1000&mu;Sv. Límite legal de exposición de personal público anual." height="32px"></div>
+            <div id="radiografia"><strong>---------</strong><img src="{% static 'img/rare/x-rays.png' %}" alt="x-rays" data-toggle="tooltip" data-placement="bottom" title="600&mu;Sv. Prueba médica radiografía torácica. Esta prueba no computará para el límite de exposición legal al tratarse de una prueba médica." %}  height="32px"></div>
+            <div id="tokioNYork"><strong>---------</strong><img src="{% static 'img/rare/plane.png' %}" alt="plane" data-toggle="tooltip" data-placement="bottom" title="190&mu;Sv. Vuelo en avión desde Tokio hasta Nueva York."  height="32px"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        var chart;
+        // ocultar los botones para mostrar las barras laterales
+        $('.btnright').hide();
+        $('.btnleft').hide();
+        $('#estacion').hide();
+        $('#salvapantallas').hide();
+        // activación del tooltiptext de bootstrap
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+
+
+        var vectorSource = new ol.source.Vector({});
+        var vectorSourceUI = new ol.source.Vector({});
+        /* Estilo para los marcadores*/
+        var markers = new ol.layer.Vector({
+            source: vectorSource,
+            style: function (feature) {
+                var color = '#000';
+                var rutaimagen = "";
+                var nombre = "";
+                var iconScale = 0.08;
+                var offsetY = 35;
+                switch (feature.get('tipo')) {
+                    case 'RARE':
+                        rutaimagen='{% static img %}'+'img/rare/station.png';
+                        console.log(feature.get('actualizado'));
+                        if(feature.get('actualizado') == 1) {
+                            color = '#000';
+                            nombre = feature.get('nombre') + "\n" + feature.get('valor') + feature.get('unidad');
+                        }
+                        else{
+                            color = '#867700';
+                            nombre = feature.get('nombre');
+                        }
+                        iconScale = 0.1;
+                        offsetY = 35;
+                        break;
+                }
+                style = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        opacity: 1,
+                        src: rutaimagen,
+                        scale: iconScale
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: [0, 0, 0, 1.0],
+                        width: 4,
+                        lineDash: [1, 5, 3, 5]
+                    }),
+                    text: new ol.style.Text({
+                        text: nombre,
+                        scale: 1,
+                        offsetY: offsetY,
+                        padding: [1, 0, 0, 10],
+                        fill: new ol.style.Fill({
+                            color: '#000000'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: color,
+                            width: 1
+                        })
+                    })
+                });
+                return style;
+            }
+        });
+        var markersUI = new ol.layer.Vector({
+            source: vectorSourceUI,
+            style: function (feature) {
+                var color = '#000';
+                var rutaimagen = "";
+                var nombre = "";
+                var iconScale = 0.08;
+                var offsetY = 35;
+                switch (feature.get('tipo')) {
+                    case 'Central':
+                        rutaimagen='{% static img %}'+'img/rare/nuclear-plant.png';
+                        nombre = feature.get('nombre');
+                        iconScale = 0.15;
+                        offsetY = 45;
+                        break;
+                    case 'Almacenamiento':
+                        rutaimagen='{% static img %}'+'img/rare/container.png';
+                        nombre = feature.get('nombre');
+                        iconScale = 0.08;
+                        offsetY = 25;
+                        break;
+                }
+                style = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        opacity: 1,
+                        src: rutaimagen,
+                        scale: iconScale
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: [0, 0, 0, 1.0],
+                        width: 4,
+                        lineDash: [1, 5, 3, 5]
+                    }),
+                    text: new ol.style.Text({
+                        text: nombre,
+                        scale: 1,
+                        offsetY: offsetY,
+                        padding: [1, 0, 0, 10],
+                        fill: new ol.style.Fill({
+                            color: '#000000'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: color,
+                            width: 1
+                        })
+                    })
+                });
+                return style;
+            }
+        });
+
+        /** overlay para ventana al pulsar **/
+
+        var view = new ol.View({
+                center: ol.proj.fromLonLat([-6.3460114,39.4787914]),
+                zoom: 8
+            });
+        var map = new ol.Map({
+            controls: [],
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.Stamen({
+                        layer: 'terrain',
+                    }),
+                }),
+                markers,
+                markersUI,
+            ],
+            view: view
+            ,
+        });
+
+        map.addControl(new ol.control.Zoom({
+            className: 'custom-zoom'
+        }));
+        /** EVENTO FEATURE ACCION MARKER **/
+
+        map.on('singleclick', function(e){
+            var showed = false;
+            map.forEachFeatureAtPixel(e.pixel, function (f) {
+                if(!showed){
+                    selected = f;
+                    cargarEstacion(f);
+                    showed = true;
+                }
+            });
+            if(!showed) $('#estacion').fadeOut();
+        });
+
+        function cargarEstacion(f){
+            if (f.get('tipo') == "RARE"){
+                $('#estacion').fadeIn();
+                document.getElementById("station_name").innerHTML=f.get('nombre');
+                if (f.get('valor') == null)
+                    document.getElementById("station_dose").innerHTML="Sin valor últimas 24h";
+                else
+                    document.getElementById("station_dose").innerHTML=f.get('valor')+f.get('unidad');
+                document.getElementById("station_avg").innerHTML=f.get('fondo')+f.get('unidad');
+                document.getElementById("station_date").innerHTML=f.get('fecha');
+                document.getElementById("station_operativity").innerHTML=f.get('operatividad')+"%";
+                chart.data.datasets.pop();
+                medias = {
+                    data: f.get('valores').reverse(),
+                    backgroundColor: 'transparent',
+                    borderColor: colors[0],
+                    borderWidth: 1,
+                    pointBackgroundColor: colors[0]
+                };
+                chart.data.datasets.push(medias);
+                chart.update();
+            }
+            else{
+                $('#estacion').fadeOut();
+            }
+        }
+
+        /** EVENTO ZOOM CAMBIADO **/
+        var currZoom = map.getView().getZoom();
+        map.on('moveend', function(e) {
+            var newZoom = map.getView().getZoom();
+            if (currZoom != newZoom) {
+                //alert('zoom end, new zoom: ' + newZoom);
+                currZoom = newZoom;
+            }
+        });
+        /* Recorro la lista de estaciones pasada desde el view creando los marcadores */
+        var listaEstaciones = {{ json_estaciones|safe }};
+        for (let i = 0; i < listaEstaciones.length; i++) {
+            var estacion = listaEstaciones[i];
+
+            var marker = new ol.Feature({
+                geometry: new ol.geom.Point(ol.proj.fromLonLat([parseFloat(estacion.lon),parseFloat(estacion.lat)]))
+            });
+            marker.setId(estacion.id+estacion.nombre);
+            if(estacion.tipo == 'RARE'){
+                marker.setProperties({'nombre':estacion.nombre, 'lat':estacion.lat, 'lon':estacion.lon, 'fondo': estacion.fondo, 'valor': estacion.valor, 'fecha':estacion.fecha, 'unidad':estacion.unidad, 'tipo':estacion.tipo, 'actualizado':estacion.actualizado, 'valores':estacion.valores, 'fechas':estacion.fechas, 'operatividad':estacion.operatividad});
+                vectorSource.addFeature(marker);
+            }
+            else{
+                marker.setProperties({'nombre':estacion.nombre, 'lat':estacion.lat, 'lon':estacion.lon, 'tipo':estacion.tipo});
+                vectorSourceUI.addFeature(marker);
+            }
+        }
+
+
+        /**** Grafica simple dosis ****/
+
+        var colors = ['#007bff','#28a745','#333333','#c3e6cb','#dc3545','#6c757d'];
+
+        /* large line chart */
+        var chLine = document.getElementById("chLine");
+        var chartData;
+        document.onmousemove = function(){
+            if (salvapantallas_activo){
+                $('#salvapantallas').fadeOut();
+                salvapantallas_activo = false;
+                pasa = 0;
+                reset();
+            }
+            clearTimeout(tempor);
+            controlar();
+        };
+        window.onload=controlar();
+        var salvapantallas_activo = false;
+        var tempor;
+        var vuelta = false;
+        function controlar(){
+            tempor=setInterval("salvapantallas()",30000);
+        }
+        function salvapantallas(){
+            var w = $(window).width();
+            if (w > 480){
+                if (salvapantallas_activo == false){
+                    $('#salvapantallas').fadeIn();
+                    salvapantallas_activo = true;
+                    activarFiltrado();
+                }
+                else{
+                    activarFiltrado();
+                }
+            }
+        }
+
+        function activarFiltrado(){
+            if(!vuelta){
+                var aleatorio = Math.ceil(Math.random() * vectorSource.getFeatures().length);
+                var polygon = vectorSource.getFeatures()[aleatorio-1].getGeometry().getCoordinates();
+                view.animate({
+                    zoom: 11,
+                    center: polygon,
+                    duration: 2000
+                });
+                cargarEstacion(vectorSource.getFeatures()[aleatorio-1]);
+                vuelta = true;
+            }
+            else{
+                reset();
+                vuelta = false;
+            }
+        }
+        function reset(){
+            $('#estacion').fadeOut();
+            view.animate({
+                zoom: 8,
+                center: ol.proj.fromLonLat([-6.3460114,39.4787914]),
+                duration: 2000
+            });
+        }
+
+        function recargarValoresMedia(){
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url:"/private/rare/mapMedia/recarga/",
+                success: function(data)
+                {
+
+                    var listaEstaciones = JSON.parse(data).listaEstaciones;
+                    var media = JSON.parse(data).media;
+                    var fechas = JSON.parse(data).fechas;
+                    vectorSource.clear()
+                    for (let i = 0; i < listaEstaciones.length; i++) {
+                        var estacion = listaEstaciones[i];
+                        var marker = new ol.Feature({
+                            geometry: new ol.geom.Point(ol.proj.fromLonLat([parseFloat(estacion.lon),parseFloat(estacion.lat)]))
+                        });
+                        marker.setId(estacion.id+estacion.nombre);
+                        marker.setProperties({'id':estacion.id, 'nombre':estacion.nombre, 'lat':estacion.lat, 'lon':estacion.lon, 'fondo': estacion.fondo, 'valor': estacion.valor, 'fecha':estacion.fecha, 'unidad':estacion.unidad, 'tipo':estacion.tipo, 'retraso':estacion.retraso, 'valores':estacion.valores, 'fechas':estacion.fechas, 'operatividad':estacion.operatividad, 'actualizado':estacion.actualizado});
+                        vectorSource.addFeature(marker);
+                    }
+                    var chartData = {
+                      labels: fechas,
+                      datasets: [{
+                        data: [589],
+                        backgroundColor: 'transparent',
+                        borderColor: colors[0],
+                        borderWidth: 1,
+                        pointBackgroundColor: colors[0]
+                      }]
+                    };
+
+                    if (chLine) {
+                      chart = new Chart(chLine, {
+                          type: 'line',
+                          data: chartData,
+                          options: {
+                            maintainAspectRatio: false,
+                            scales: {
+                              yAxes: [{
+                                ticks: {
+                                  beginAtZero: false
+                                }
+                              }]
+                            },
+                            legend: {
+                              display: false
+                            }
+                          }
+                      });
+                    }
+                    var pos = (150 * (media/1000));
+                    document.getElementById("media").style.top = (-1 * pos) -20 + (20 * (media/1000));
+                    document.getElementById("media").innerHTML = media + "&mu;Sv---------";
+                    $('#cargando').fadeOut();
+                },
+
+            })
+        }
+
+        recargarValoresMedia();
+    </script>
+{% endblock %}

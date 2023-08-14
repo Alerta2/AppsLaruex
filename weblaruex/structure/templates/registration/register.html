@@ -1,0 +1,28 @@
+{% extends "base/base.html" %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-center h-100">
+        <div class="card card-registration">
+            <div class="card-header">
+                <div class="d-flex justify-content-end social_icon">
+                    <span><i class="fa fa-info-circle"></i></span>
+                </div>
+                <h3>Formulario de Registro.</h3>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-center links p-3">
+                    Lamentamos informar que en este momento no aceptamos registros. <br>
+                    Para cualquier información adicional no encontrada en esta web contacte con:<br>
+                    Junta de Extremadura. Consejería de Medio Ambiente y Rural,<br>
+                     Políticas Agrarias y Territorio
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    $('.btnright').hide();
+    $('.btnleft').hide();
+{% endblock %}

@@ -1,0 +1,63 @@
+{% load static %}
+
+<section id="nuestros-clientes" class="map">
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+        <h2>Laboratorios</h2>
+        <p>Nuestros clientes</p>
+    </div>
+    <div align="center">
+      <p>
+        Realizamos servicios de análisis del contenido radiactivo en diferentes tipos de muestras ambientales e industriales para clientes en toda España y Portugal. A continuación se muestra en un mapa los puntos desde donde recibimos dichas  muestras.
+      </p>
+      <br>
+
+
+    </div>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+    <script type="text/javascript" src="{% static 'js/provincias-espanolas.geojson' %}"></script>
+    <div id="open_map" class="open_map"></div>
+
+  </div>
+    <script type="text/javascript">
+
+      var provincias=obtenerProvincias();
+      var geojsonProvincias = provincias.features;
+      var map = L.map('open_map').setView([40.44,-3.82], 5);
+      var Stamen_Terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
+          attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          subdomains: 'abcd',
+          minZoom: 0,
+          maxZoom: 20,
+          ext: 'png'
+      });
+
+      map.addLayer(Stamen_Terrain);
+      let mylayer = L.layerGroup().addTo( map )
+      L.geoJSON( geojsonProvincias, {
+        onEachFeature: addMyData,
+      })
+      function addMyData( feature, layer ){
+        layer.setStyle({
+            fillColor: "#2033ac",
+            fillOpacity: 0.8,
+            weight: 0.5
+        });
+        var provincias = ['10', '06','28','18','04','30','37','21','47','35','38','03','43','29','13','12','09','39','15','14','32','46','17','08'];
+        if(( provincias.indexOf(feature.properties.codigo)>=0) || (feature.properties.name == "Portugal" )) {
+          if (feature.properties.name == "Portugal" )
+            layer.bindPopup(feature.properties.name);
+          else
+            layer.bindPopup(feature.properties.provincia);
+          mylayer.addLayer(layer);
+        }
+        // some other code can go here, like adding a popup with layer.bindPopup("Hello")
+      }
+
+    </script>
+</section><!-- End Trainers Section -->

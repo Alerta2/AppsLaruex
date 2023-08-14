@@ -1,0 +1,53 @@
+{% load static %}
+<!-- ======= External Service Section ======= -->
+<section id="popular-courses" class="courses">
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+      <h2>Web pública</h2>
+      <p>Servicios de Mantenimiento</p>
+    </div>
+    <div class="row" data-aos="zoom-in" data-aos-delay="100">
+      {% for servicio in servicios %}
+        {% if servicio.categoria == "mantenimientoWeb" %}
+        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 align-items-stretch mb-5 my-2">
+          <div class="card shadow rounded">
+            <div class="course-item my-2 mt-2 mx-2">
+              <div class="course-content">
+                <img src="{% static 'img/servicios/' %}{{ servicio.imagen }}" class="img-fluid" alt="..." >
+                <div class="row d-flex justify-content-lg-center align-items-lg-center mt-4 mx-2">
+                  <h4 class="col-12 my-2 d-flex justify-content-center"><span>{{ servicio.grupo }}</span></h4>
+                  
+                </div>
+                {% if user.is_superuser %}
+                <div class="row">
+                  <div class="col-12 mx-1 d-flex justify-content-center">
+
+                    <button class="btn btn-outline-danger mx-2 my-auto" title="Eliminar servicio" onclick="agregarInfoServicio('{{servicio.id}}', '{{servicio.nombre}}')">Eliminar Servicio</button>
+                    <button class="btn btn-outline-info mx-2 my-auto" title="Editar servicio" onclick="editarServicio('{{servicio.id}}')">Editar Servicio</button>
+                  
+                  </div>
+                </div>
+                
+                {% endif %}
+                <div class="row">
+                  <div class="col-12 mx-1 d-flex justify-content-center mt-3 mb-2">
+                    <div style="height: 100px;">
+                      <h3 class="text-center"><a href="{{ servicio.enlace }}" target="_blank">{{ servicio.nombre|upper }}</a></h3>
+                      <p class="text-center">{{ servicio.descripcion }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- End rare Item-->
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+ 
+
+
+</section><!-- End External Service Section -->
+

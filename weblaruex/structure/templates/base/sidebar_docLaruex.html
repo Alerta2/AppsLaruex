@@ -1,0 +1,70 @@
+<style>
+  @media print
+  {    
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
+  }
+</style>
+
+ <!-- ======= Sidebar ======= -->
+ 
+  <aside id="sidebar" class="sidebar no-print">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+      <!-- Elemento no desplegable -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="/docLaruex">
+          <i class="bi bi-house"></i>
+          <span>Home</span>
+        </a>
+      </li>
+      <!-- End Elemento no desplegable -->
+      {% for item in itemsMenu %}
+        {% if item.desplegable == 0 and item.padre == NULL %}
+          <!-- Elemento no desplegable -->
+          <li class="nav-item">
+            {% if item.id >= 16 %}
+              <a class="nav-link collapsed" href="{{ item.url }}" target="_blank">
+            {% else %}
+              <a class="nav-link collapsed" href="{{ item.url }}">
+            {% endif %}
+              <i class="{{ item.icono }}"></i>
+              <span>{{ item.nombre }}</span>
+            </a>
+          </li>
+          <!-- End Elemento no desplegable -->
+        {% elif item.desplegable == 1 %}
+          <!-- Elemento desplegable -->
+
+          <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target='#{{ item.nombre|cut:" " }}-nav' data-bs-toggle="collapse" href="{{ item.url }}">
+              <i class="{{ item.icono }}"></i><span>{{ item.nombre }}</span><i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id='{{ item.nombre|cut:" " }}-nav' class="nav-content collapse " data-bs-parent="#sidebar-nav">
+              {% regroup itemsMenu by padre as hijosGroup %}
+              {% for grupo in hijosGroup %}
+                {% if grupo.grouper == item.id %}
+                  {% for elem in grupo.list %}
+                  <li>
+
+                    <a href="{{ elem.url }}">
+                      <i class="{{ elem.icono }}"></i><span>{{ elem.nombre }}</span>
+                    </a>
+                    
+                  </li>
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+
+
+            </ul>
+          </li><!-- End Forms Nav -->
+          <!-- End Elemento desplegable -->
+        {% endif %}
+      {% endfor %}
+
+    </ul>
+
+  </aside><!-- End Sidebar-->

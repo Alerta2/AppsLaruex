@@ -1,0 +1,1152 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  hr {
+    height: 10px;
+    width: 20%;
+    margin: auto;
+    background-color: rgb(5, 215, 243);
+    color: rgb(5, 215, 243);
+  }
+
+  .add:hover {
+    color: #ce8312;
+  }
+
+  .descargaPDF:hover {
+    color: #ce8312;
+  }
+
+  .agregarFormacion:hover {
+    color: #064061;
+  }
+
+  /* estilo añadirFichero PDF*/
+  .addFicheroPDF {
+    color: rgb(161, 16, 32);
+  }
+
+  .addFicheroPDF:hover {
+    color: rgb(99, 10, 20);
+  }
+
+    /* estilo añadirFichero PDF*/
+    .addFicheroActualizado {
+    color: #0a9663;
+  }
+
+  /* ===============================
+  *  Estilo del las pestañas
+  =================================*/
+
+  .nav-tabs-bordered .nav-link {
+    margin-bottom: -2px;
+    border: none;
+    color: #2c384e;
+  }
+
+  .nav-tabs-bordered .nav-link.active {
+    background-color: #fff;
+    color: #4154f1;
+    border-bottom: 2px solid #4154f1;
+  }
+
+  .nav-tabs {
+    --bs-nav-tabs-border-color: #dee2e6;
+    --bs-nav-tabs-border-radius: 0.375rem;
+    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
+    --bs-nav-tabs-link-active-color: #495057;
+    --bs-nav-tabs-link-active-bg: #fff;
+    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+  }
+
+  .profile .profile-actualizar label {
+    font-weight: 600;
+    color: rgba(1, 41, 112, 0.6);
+}
+</style>
+
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <nav>
+    <h5 class="card-title">{{curriculum.id_usuario__first_name}} {{curriculum.id_usuario__last_name}} 
+      {% if request.user.id == curriculum.id_usuario__id or administrador %}
+      <a href="" title="Añadir Documento" class="mx-1" data-toggle="modal" data-target="#modalFormularioAgregarDocumentos"
+        style="color: #ee9b00"><i class="fa-duotone fa-square-plus fa-lg add"></i></a>
+        <a href=""  title="Agregar formaciones" data-toggle="modal" data-target="#modalFormularioAgregarFormaciones" style="color: #005F73"><i class="fa-duotone fa-books-medical fa-lg agregarFormacion"></i></a>
+      {% endif %}
+    </h5>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item" style="font-size: large;"><a
+          href="\private/docLaruex/tipoObjeto/Curriculum/">Curriculums</a>
+      </li>
+      <li class="breadcrumb-item" style="font-size: large;"><a
+          href="\private/docLaruex/verObjeto/{{curriculum.id}}">{{curriculum.id_usuario__first_name}}
+          {{curriculum.id_usuario__last_name}}</a>
+      </li>
+    </ol>
+  </nav>
+</div>
+
+
+
+
+
+<!-- =================== Información de Contactos =================== -->
+
+<section class="section profile">
+  <div class="row">
+    <div class="col-xl-4">
+
+      <div class="card">
+        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+
+          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+            style="background-color: #41c9ef52;">
+            <i class="fa-solid fa-user-headset  fa-4x" style="color: #18414b; "></i>
+          </div>
+          <h2>{{curriculum.id_usuario__first_name}} {{curriculum.id_usuario__last_name}}</h2>
+          <h3>{{curriculum.id_contacto__puesto}}</h3>
+ 
+          {% if request.user.id == curriculum.id_usuario__id or administrador or direccion %}
+          <h6 class="d-flex justify-content-end">
+            <a href="{{ media }}/{{ curriculum.id__tipo }}/{{ curriculum.id__ruta }}" class="mx-1"
+              title="Descargar Curriculum" download><i
+                class="fa-solid fa-file-pdf fa-2x addFicheroPDF"></i></a>
+            {% if not formaciones %}
+              <a onclick="mostrarModal()" class="mx-1" title="Descargar formaciones" style="color: #005F73">
+            {% else %}
+              <a href="\private/docLaruex/descargarZipCurriculum" class="mx-1" title="Descargar formaciones" style="color: #005F73">
+            {% endif %}
+            <i class="fa-duotone fa-books fa-2x agregarFormacion"></i></a>
+          </h6>
+          {% endif %}
+        </div>
+
+
+      </div>
+
+    </div>
+
+    <div class="col-xl-8">
+
+      <div class="card">
+        <div class="card-body pt-3">
+          <!-- Bordered Tabs -->
+          <ul class="nav nav-tabs nav-tabs-bordered">
+
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab"
+                data-bs-target="#profile-overview">Información</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab"
+                data-bs-target="#profile-actualizar">Actualizar Curriculum </button>
+            </li>
+            {% if administrador %}
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar datos de
+                contacto</button>
+            </li>
+            {% endif %}
+            {% if administrador or direccion %}
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-delete">Eliminar</button>
+            </li>
+            {% endif %}
+
+          </ul>
+          <div class="tab-content pt-2">
+            <!-- Información del Contacto-->
+            <div class="tab-pane fade show active profile-overview" id="profile-overview">
+              <h5 class="card-title">Información de {{contacto.nombre}}</h5>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Nombre Completo</div>
+                <div class="col-lg-9 col-md-8">{{curriculum.id_usuario__first_name}}
+                  {{curriculum.id_usuario__last_name}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Puesto</div>
+                <div class="col-lg-9 col-md-8">{{curriculum.id_contacto__puesto}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Dirección</div>
+                <div class="col-lg-9 col-md-8">{{curriculum.id_contacto__direccion}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Teléfono</div>
+                {% if curriculum.id_contacto__telefono == null %}
+                <div class="col-lg-9 col-md-8">-</div>
+
+                {% else %}
+                <div class="col-lg-9 col-md-8">{{curriculum.id_contacto__telefono|slice:"0:3" }}
+                  {{curriculum.id_contacto__telefono|slice:"3:18" }}</div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Teléfono 2</div>
+                {% if curriculum.id_contacto__telefono_fijo == null %}
+                <div class="col-lg-9 col-md-8">-</div>
+                {% else %}
+                <div class="col-lg-9 col-md-8">{{curriculum.id_contacto__telefono_fijo|slice:"0:3" }}
+                  {{curriculum.id_contacto__telefono_fijo|slice:"3:18" }} </div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Extensión</div>
+
+                {% if curriculum.id_contacto__extension == null %}
+                <div class="col-lg-9 col-md-8">--</div>
+                {% else %}
+                <div class="col-lg-9 col-md-8">{{curriculum.id_contacto__extension}}</div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Email</div>
+                <div class="col-lg-9 col-md-8">{{curriculum.id_contacto__email|urlize}}</div>
+              </div>
+
+              <h5 class="card-title">Información Adicional</h5>
+              <p class="small fst-italic" style="white-space: pre-line;">{{curriculum.id_contacto__info_adicional}}</p>
+            </div>
+
+            <!-- Actualizar Curriculum -->
+            <div class="tab-pane fade profile-actualizar pt-3" id="profile-actualizar">
+
+              <!-- Edit Form -->
+              <form id="formularioActualizarCurriculum"
+                action="/private/docLaruex/editarObjeto/{{curriculum.id__id}}/" method="POST"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label class="text-center">Agrega aquí una nueva versión de tu curriculum </label>
+                </div>
+                <div class="text-center">          
+                  <div class="col-md-auto" id="adjuntoNoEditable">
+                    <div class="form-group">
+                      <label for="nuevoFicheroAdjuntoCurriculum"><i id="pdf-fileCurriculum"
+                          class="fa-duotone fa-file-arrow-up fa-4x addFicheroPDF">
+                        </i>
+                      </label>
+                      <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                        id="nuevoFicheroAdjuntoCurriculum" name="nuevoFicheroAdjuntoCurriculum"
+                        onchange="mostrarNombreCurriculumNuevo(this.value)" />
+                      <spam class="text-center"><strong id="mostrarNombreCurriculumNuevo"><br></strong>
+                        <spam id="file-name"></spam>
+                      </spam>
+      
+                    </div>
+        
+                  </div>
+                </div>
+                <div class="text-center my-2">
+                  <button id="actualizarCurriculum" type="submit" class="btn btn-success"
+                    onclick="crearAviso('guardarActualizarCurriculum', 'Curriculum {{ curriculum.id.nombre }} actualizado con éxito', 'alert-success', 3000)">Actualizar</button>
+
+                  <button id="canclearActualizarCurriculum" type="reset" class="btn btn-secondary"
+                    onclick="crearAviso('cerrarActualizarCurriculum', 'No se ha podido eliminar el contacto {{ contacto.nombre }}', 'alert-warning', 3000); location.reload()">Cancelar</button>
+                </div>
+
+              </form><!-- End Profile Actualizar curriculum -->
+
+            </div>
+
+    
+            <!-- Editar Contacto -->
+            <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+              <!-- Edit Form -->
+              <form id="formularioEditarContacto"
+                action="/private/docLaruex/editarContacto/{{curriculum.id_contacto__id}}/" method="POST"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row mb-3" hidden>
+                  <label for="nuevoNombreContacto" class="col-md-4 col-lg-3 col-form-label">Nombre</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevoNombreContacto" type="text" class="form-control" id="nuevoNombreContacto"
+                      value="{{curriculum.id_contacto__nombre}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3" hidden>
+                  <label for="nuevaEmpresaContacto" class="col-md-4 col-lg-3 col-form-label">Empresa</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevaEmpresaContacto" type="text" class="form-control" id="nuevaEmpresaContacto"
+                      value="Laruex">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoPuestoContacto" class="col-md-4 col-lg-3 col-form-label">Puesto</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevoPuestoContacto" type="text" class="form-control" id="nuevoPuestoContacto"
+                      value="{{curriculum.id_contacto__puesto}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaDireccionContacto" class="col-md-4 col-lg-3 col-form-label">Dirección</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevaDireccionContacto" type="text" class="form-control" id="nuevaDireccionContacto"
+                      value="{{curriculum.id_contacto__direccion}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoTelefono" class="col-md-4 col-lg-3 col-form-label">Teléfono</label>
+                  {% if curriculum.id_contacto__telefono == null%}
+                  <div class="col-md-2 col-lg-2">
+                    <input name="nuevoPrefijoTelefono" type="text" class="form-control" id="nuevoPrefijoTelefono"
+                      value="">
+                  </div>
+                  <div class="col-md-6 col-lg-7">
+                    <input name="nuevoTelefono" type="text" class="form-control" id="nuevoTelefono" value="">
+                  </div>
+                  {% else %}
+                  <div class="col-md-2 col-lg-2">
+                    <input name="nuevoPrefijoTelefono" type="text" class="form-control" id="nuevoPrefijoTelefono"
+                      value="{{curriculum.id_contacto__telefono|slice:'0:3'}}">
+                  </div>
+                  <div class="col-md-6 col-lg-7">
+                    <input name="nuevoTelefono" type="text" class="form-control" id="nuevoTelefono"
+                      value="{{curriculum.id_contacto__telefono|slice:'3:18'}}">
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoTelefonoFijo" class="col-md-4 col-lg-3 col-form-label">Teléfono 2</label>
+                  {% if curriculum.id_contacto__telefono_fijo == null%}
+                  <div class="col-md-2 col-lg-2">
+                    <input name="nuevoPrefijoTelefonoFijo" type="text" class="form-control"
+                      id="nuevoPrefijoTelefonoFijo">
+                  </div>
+                  <div class="col-md-6 col-lg-7">
+                    <input name="nuevoTelefonoFijo" type="text" class="form-control" id="nuevoTelefonoFijo">
+                  </div>
+                  {% else %}
+                  <div class="col-md-2 col-lg-2">
+                    <input name="nuevoPrefijoTelefonoFijo" type="text" class="form-control"
+                      id="nuevoPrefijoTelefonoFijo" value="{{curriculum.id_contacto__telefono_fijo|slice:'0:3'}}">
+                  </div>
+                  <div class="col-md-6 col-lg-7">
+                    <input name="nuevoTelefonoFijo" type="text" class="form-control" id="nuevoTelefonoFijo"
+                      value="{{curriculum.id_contacto__telefono_fijo|slice:'3:18'}}">
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaExtension" class="col-md-4 col-lg-3 col-form-label">Extension</label>
+                  <div class="col-md-6 col-lg-7">
+                    <input name="nuevaExtension" type="text" class="form-control" id="nuevaExtension"
+                      value="{{curriculum.id_contacto__extension}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoEmailContacto" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevoEmailContacto" type="nuevoEmailContacto" class="form-control" id="Email"
+                      value="{{curriculum.id_contacto__email}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaInfoAdicionalContacto" class="col-md-4 col-lg-3 col-form-label">Información
+                    Adicional</label>
+                  <div class="col-md-8 col-lg-9">
+                    <textarea name="nuevaInfoAdicionalContacto" class="form-control" id="nuevaInfoAdicionalContacto"
+                      style="height: 100px">{{curriculum.id_contacto__info_adicional}}</textarea>
+                  </div>
+                </div>
+
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+
+            <!-- Eliminar Contacto -->
+            <div class="tab-pane fade profile-edit pt-3" id="profile-delete">
+
+              <!-- Edit Form -->
+              <form form id="fomularioEliminarContacto"
+                action="/private/docLaruex/eliminarCurriculum/{{ curriculum.id }}/" method="POST"
+                enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label class="text-center">¿Estás seguro de eliminar el Curriculum de
+                    {{curriculum.id_usuario__first_name}} {{curriculum.id_usuario__last_name}}?</label>
+                </div>
+                <div class="text-center">
+                  <button id="eliminarContacto" type="submit" class="btn btn-danger"
+                    onclick="crearAviso('guardarEliminarContacto', 'Contacto {{ contacto.nombre }} eliminado con éxito', 'alert-success', 3000)">Eliminar</button>
+
+                  <button id="canclearEliminar" type="reset" class="btn btn-secondary"
+                    onclick="crearAviso('cerrarEliminarContacto', 'No se ha podido eliminar el contacto {{ contacto.nombre }}', 'alert-warning', 3000); location.reload()">Cancelar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+          </div><!-- End Bordered Tabs -->
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ===================== Separación Formaciones ===================== -->
+<div class="section-title">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="text-center">
+          <div class="content">
+            <br>
+            <h2 class="fw-bold">Formaciones</h2>
+            <hr>
+            <br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================   Tabla de Formaciones relacionadas con el curriculum =================== -->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Cursos y formaciones</h6>
+      <!-- Accordion without outline borders -->
+      <div class="accordion accordion-flush" id="accordionFlushFormaciones">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingFormaciones">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseFormaciones" aria-expanded="false"
+              aria-controls="flush-collapseFormaciones">Cursos y formaciones realizados por {{ curriculum.id_usuario__first_name }} {{ curriculum.id_usuario__last_name }}
+            </button>
+          </h2>
+          <div id="flush-collapseFormaciones" class="accordion-collapse collapse"
+            aria-labelledby="flush-headingFormaciones" data-bs-parent="#accordionFlushFormaciones">
+            <div class="accordion-body">
+
+              <div class="select col-4">
+                <label for="yearSelected"><strong>Seleccione el año</strong></label>
+                <select class="form-control form-select" id="yearSelected" name="yearSelected"
+                  onchange="getSelecionados()">
+                  <option value="Todos">Todos</option>
+                  {% regroup formaciones by fecha_fin|date:"Y" as years %}
+                  {% for anio in years %}
+                  <option value="{{anio.grouper}}">{{anio.grouper}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <table id="tabla_formaciones" data-toggle="table" data-show-export="true"
+                data-export-types="['excel', 'pdf']" data-page-list="[10, 25, 50, 100, All]" data-search="true"
+                data-show-columns="true" data-show-columns-toggle-all="true" data-buttons="buttons"
+                data-buttons-class="light" data-pagination="true" ></table>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Accordion without outline borders -->
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Separación Otros Documentos ===================== -->
+<div class="section-title">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="text-center">
+          <div class="content">
+            <br>
+            <h2 class="fw-bold">Documentos Relacionados</h2>
+            <hr>
+            <br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================   Tabla de Formaciones relacionadas con el curriculum =================== -->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Documentos relacionados</h6>
+      <!-- Accordion without outline borders -->
+      <div class="accordion accordion-flush" id="accordionFlushDocumentosRelacionados">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingDocumentosRelacionados">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseDocumentosRelacionados" aria-expanded="false"
+              aria-controls="flush-collapseDocumentosRelacionados">Documentos relacionados con {{ curriculum.id_usuario__first_name }} {{ curriculum.id_usuario__last_name }}
+            </button>
+          </h2>
+          <div id="flush-collapseDocumentosRelacionados" class="accordion-collapse collapse"
+            aria-labelledby="flush-headingDocumentosRelacionados"
+            data-bs-parent="#accordionFlushDocumentosRelacionados">
+            <div class="accordion-body">
+              <table id="tabla_relacionados_curriculum" data-toggle="table" data-show-export="true"
+                data-export-types="['excel', 'pdf']" data-page-list="[10, 25, 50, 100, All]" data-search="true"
+                data-show-columns="true" data-show-columns-toggle-all="true" data-buttons="buttons"
+                data-buttons-class="light" data-pagination="true" ></table>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Accordion without outline borders -->
+    </div>
+  </div>
+</section>
+
+
+<!-- ===================== Formulario agregar Formaciones ===================== -->
+
+<div id="modalFormularioAgregarFormaciones" class="modal fade" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Formación</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioAgregarFormaciones"
+          action="/private/docLaruex/agregarFormacionCurriculum/{{curriculum.id}}/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div id="formularioCurriculum" class="divFormularios">
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="fechaInicioFormacion">Fecha de Inicio</label>
+                  <input type="date" id="fechaInicioFormacion" name="fechaInicioFormacion" class="form-control"
+                    required />
+                </div>
+
+
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <label for="fechaFinFormacion">Fecha de Finalización</label>
+                  <input type="date" id="fechaFinFormacion" name="fechaFinFormacion" class="form-control" required />
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <label for="horasFormacion">Horas</label>
+                  <input type="number" step="0.5" class="form-control" id="horasFormacion" name="horasFormacion"
+                    data-rule="required" placeholder="0" />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="tituloFormacion">Titulo de la formación</label>
+                  <input type="text" class="form-control" id="tituloFormacion"
+                    placeholder="Ejemplo: Curso en excel avanzado" name="tituloFormacion" data-rule="required" />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="descripcionFormacion">Descripción del Equipo</label>
+                  <textarea type="text" class="form-control" id="descripcionFormacion"
+                    placeholder="Introduzca aquí los objetivos de la formación." rows="5" name="descripcionFormacion"
+                    data-rule="required"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="row d-flex justify-content-center">
+              <div class="col-md-auto" id="adjuntoNoEditable">
+                <div class="form-group">
+                  <label for="ficheroAdjuntoFormacionCurriculum"><i id="pdf-file"
+                      class="fa-solid fa-file-pdf fa-4x addFicheroPDF">
+                    </i>
+                  </label>
+                  <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                    id="ficheroAdjuntoFormacionCurriculum" name="ficheroAdjuntoFormacionCurriculum"
+                    onchange="mostrarNombreFormacion(this.value)" />
+                  <spam class="text-center"><strong id="mostrarNombreFormacion"><br></strong>
+                    <spam id="formacion-name"></spam>
+                  </spam>
+
+                </div>
+              </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+              <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+                Cerrar
+              </button>
+              <button id="reset" type="reset" class="btn btn-secondary" hidden>
+              </button>
+              <button type="submit" value="submit" class="btn btn-primary">
+                Guardar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Formulario agregar Documentos ===================== -->
+
+<div id="modalFormularioAgregarDocumentos" class="modal fade" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalDocumento">Añadir Contrato</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="modalFormularioAgregarDocumentos"
+          action="/private/docLaruex/agregarArchivo/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div id="formularioDocumento" class="divFormularioDocumentos">
+            <div class="row" hidden>
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+                    value="Documento" style="display: none;" />
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="estado" name="estado" data-rule="required" readonly
+                    value="1" style="display: none;" />
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="number" class="form-control" id="padre" name="padre" data-rule="required"
+                    value="{{curriculum.id}}" />
+                </div>
+              </div>
+            </div>
+
+
+            <div class="row">
+
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="sobreNombreDocumento">Tipo de Documento</label>
+                  <select class="form-select" data-rule="required" id="sobreNombreDocumento" name="sobreNombreDocumento"
+                    onchange="mostrarTitulo(this.value)">
+                    <option value="1">Contrato de trabajo </option>
+                    <option value="2">Contrato de confidencialidad </option>
+                    <option value="3">Investigación </option>
+                  </select>
+                </div>
+              </div>
+              
+
+
+              <div class="col" hidden>
+                <div class="form-group">
+                  <input type="text" class="form-control" id="tipoDocumento" name="tipoDocumento" data-rule="required" readonly style="display: none;"  />
+                  <input type="text" class="form-control" id="habilitacion" name="habilitacion" data-rule="required" readonly
+                    value="{{curriculum.id__id_habilitacion}}" style="display: none;" />
+                </div>
+              </div>
+
+              <div class="col" hidden>
+                <div class="form-group" hidden>
+                  <select class="form-select" data-rule="required" id="editable" name="editable">
+                    <option value="0">No</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="fechaActualizacion" id="tituloFechainicioContrato">Fecha de Inicio</label>
+                  <input type="date" class="form-control" id="fechaActualizacion" name="fechaActualizacion" onchange="cambiarFechaInicio()"/>
+                </div>
+              
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="fechaFinContrato" id="tituloFechaFinContrato">Fecha de finalización</label>
+                  <input type="date" class="form-control" id="fechaFinContrato" name="fechaFinContrato" onchange="cambiarFechaFin()" />
+                </div>
+              </div>
+
+            </div>
+
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="nombreObjeto" id="tituloObjetoNombre">Nombre del Archivo</label>
+                  <input type="text" class="form-control" id="nombreObjeto" name="nombreObjeto" data-rule="required" />
+                </div>
+              </div>
+            </div>
+
+            <div class="row d-flex justify-content-center">
+              <div class="col-md-auto" id="adjuntoNoEditable">
+                <div class="form-group">
+                  <label for="ficheroAdjuntoDocumento"><i id="pdf-file"
+                      class="fa-solid fa-file-pdf fa-4x addFicheroPDF">
+                    </i>
+                  </label>
+                  <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                    id="ficheroAdjuntoDocumento" name="ficheroAdjuntoDocumento"
+                    onchange="mostrarNombreDocumento(this.value)" />
+                  <spam class="text-center"><strong id="mostrarNombreDocumento"><br></strong>
+                    <spam id="file-name-documento"></spam>
+                  </spam>
+
+                </div>
+              </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+              <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" onclick="crearAviso('agregarAñadirDocumentoCerrar', 'No se ha podido agregar ningun documento asociado {{ curriculum.id__nombre }}', 'alert-warning', 3000)">
+                Cerrar
+              </button>
+              <button id="reset" type="reset" class="btn btn-secondary" hidden>
+              </button>
+              <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('agregarDocumentoGuardar', 'Nuevo documento asociado a {{ curriculum.id__nombre }}', 'alert-success', 3000)">
+                Guardar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Código HTML para el modal -->
+<div class="modal fade" id="avisoModal" tabindex="-1" role="dialog" aria-labelledby="avisoModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger" id="avisoModalLabel">Aviso</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="cerrarModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Contenido del modal -->
+        <h5 class="text-center">No hay formaciones para descargar</h5>
+      </div>
+      <div class="modal-footer">
+        <button onclick="cerrarModal()" type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============= Modal Eliminar ====================-->
+
+<div id="modalEliminarAsociacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarAsociacion"><strong>¿Estas seguro que deseas eliminar esta asociación?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarAsociacion" action="/private/docLaruex/eliminarAsociacion/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarAsociacion" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarAsociacion" name="cancel" onclick="crearAviso('eliminarObjetoCancelar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarObjetoGuardar', 'Objeto  eliminado', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Código JavaScript para abrir el modal automáticamente -->
+
+<script type="text/javascript">
+function mostrarModal(){
+    $('#avisoModal').modal('show');
+}
+
+function cerrarModal(){
+    $('#avisoModal').modal('toggle');
+}
+
+
+
+  // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreCurriculumNuevo(value) {
+
+    document.getElementById('file-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreCurriculumNuevo').style.display = 'none';
+
+    const elemento = document.getElementById('pdf-fileCurriculum')
+    const nuevoElemento = document.createElement("i");
+    nuevoElemento.className = "fa-duotone fa-file-check fa-4x addFicheroActualizado";
+    elemento.replaceWith(nuevoElemento);
+
+  }
+
+  // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreDocumento(value) {
+
+    document.getElementById('file-name-documento').innerHTML = value;
+
+    document.getElementById('mostrarNombreDocumento').style.display = 'none';
+  }
+
+
+  function addZero(i) {
+    if (i < 10) { i = "0" + i }
+    return i;
+  }
+
+
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioEditarContacto").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarContacto/{{ curriculum.id_contacto__id }}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Contacto modificado con éxito', 'alert-success', 2000);
+        $('#modalFormularioContacto').trigger('reset');
+        $('#cerrarContacto').trigger('click');
+        location.reload(true);
+
+      }
+    });
+  });
+
+
+  $("#fomularioEliminarCurriculum").submit(function (e) {
+    e.preventDefault();
+    var data = new FormData(this);
+    $.ajax({
+      url: "/private/docLaruex/eliminarCurriculum/{{ curriculum.id }}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        // redireccionar a la pagina de inicio
+        var url = "/private/docLaruex/tipoObjeto/Curriculum/";
+        $(location).attr('href', url);
+
+      }
+    });
+  });
+
+  // Tabla con lista de referencias asociadas
+  $("#tabla_formaciones").bootstrapTable({
+    method: "get",
+    url: "/private/docLaruex/formacionesAsociadas/{{ curriculum.id }}/",
+    cache: false,
+    locale: navigator.language,
+    columns: [
+      {
+        title: "Titulo",
+        field: "titulo",
+        align: "center",
+      },
+      {
+        title: "Horas",
+        field: "horas",
+        align: "center",
+      },
+      {
+        title: "Fecha de Inicio",
+        field: "fecha_inicio",
+        sortable: "true",
+        align: "center",
+        formatter: function (value, row) {
+          var fecha = new Date(row.fecha_inicio);
+          return (
+            $.datepicker.formatDate("dd-mm-yy", fecha)
+          );
+        },
+      },
+      {
+        title: "Fecha Finalización",
+        field: "fecha_fin",
+        sortable: "true",
+        align: "center",
+        formatter: function (value, row) {
+          var fecha = new Date(row.fecha_fin);
+          return (
+            $.datepicker.formatDate("dd-mm-yy", fecha)
+          );
+        },
+      }, {
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          var admin = '{{administrador}}';
+          var id_curriculum = '{{curriculum.id}}';
+
+          var botonConsultarFormacion = '<a href="/private/docLaruex/consultarFormacionCurriculum/{{ curriculum.id }}' + '/' + row.id + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-lg" style="color:#A11020"></i></a>';
+          var botonEliminarFormacion = '<a href="/private/docLaruex/eliminarItemCurriculum/' + id_curriculum + '/' + row.id + '/' + '" class="mx-1"><i class="fa-solid fa-xmark fa-lg" style="color:#ae2012"></i></a>';
+          if (admin == 'True') {
+            return (botonConsultarFormacion + botonEliminarFormacion);
+          } else {
+            return (botonConsultarFormacion);
+          }
+        },
+      },
+    ],
+    search: true,
+    sortName: "fecha_fin",
+    sortOrder: "desc",
+  });
+
+  function getSelecionados() {
+    // get value of selected  element in select box
+    var yearSelected = document.getElementById("yearSelected").value;
+    var id_curriculum = '{{ curriculum.id }}';
+    console.log(typeof(yearSelected));
+    if (yearSelected == "Todos"){
+      $("#tabla_formaciones").bootstrapTable('refresh', { url: "/private/docLaruex/formacionesAsociadas/" + id_curriculum + "/" });
+    }
+    else{
+    // actualizar la tabla con los seleccionados
+    $("#tabla_formaciones").bootstrapTable('refresh', { url: "/private/docLaruex/formacionesAsociadasCurriculum/" + id_curriculum + "/" + yearSelected + "/" });
+    }
+  }
+
+
+  // Tabla con lista de referencias asociadas
+  $("#tabla_relacionados_curriculum").bootstrapTable({
+    method: "get",
+    url: "/private/docLaruex/archivosAsociados/{{ curriculum.id }}/",
+    cache: false,
+    locale: navigator.language,
+    columns: [
+      {
+        title: "Nombre",
+        field: "id_relacionado__nombre",
+        align: "center",
+      }, {
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          var admin = '{{administrador}}';
+          var objeto = '{{curriculum.id__id}}';
+
+          var botonVerDocumento = '<a href="/private/docLaruex/verObjeto/' + row.id_relacionado + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg"></i></a>';
+          var botonDescargarDocumentoPDF = '<a href="/private/docLaruex/consultarArchivo/' + row.id_relacionado + '/' + '" class="mx-1" title="Descargar" style="color:#A11020" download><i class="fa-solid fa-file-pdf fa-lg" ></i></a>';
+          var botonDescargarDocumentoWord = '<a href="/private/docLaruex/consultarArchivoEditable/' + row.id_relacionado + '/' + '" class="mx-1" title="Descargar" style="color:#266353" download><i class="fa-duotone fa-file-signature fa-lg" ></i></a>';
+          var botonEliminarReferencia = '<a href="/private/docLaruex/eliminarAsocicion/' + row.id_relacionado + '/' +  objeto + '/" class="mx-1" title="Eliminar Asociacion" data-toggle="modal" data-target="#modalEliminarAsociacion" onclick="$('+"'#formularioModalEliminarAsociacion').attr('action', '/private/docLaruex/eliminarAsocicion/"+ row.id_relacionado +"/"+ objeto + "/');"+'"  style="color:#AE2012"><i class="fa-duotone fa-link-slash" ></i></a>';
+
+          if (row.id_relacionado__ruta_editable){
+            if (admin == 'True'){
+              return (botonVerDocumento + botonDescargarDocumentoPDF + botonDescargarDocumentoWord + botonEliminarReferencia);
+            }else{
+              return (botonVerDocumento + botonDescargarDocumentoPDF + botonDescargarDocumentoWord);
+            }
+          }else{
+            if (admin == 'True'){
+              return (botonVerDocumento + botonDescargarDocumentoPDF + botonEliminarReferencia);
+            }else{
+              return (botonVerDocumento + botonDescargarDocumentoPDF);
+            }
+          }
+        },
+      },
+    ],
+    search: true,
+    sortOrder: "desc",
+  });
+
+
+  
+  // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreArchivo(value) {
+
+      document.getElementById('file-name').innerHTML = value;
+
+      document.getElementById('mostrarNombreArchivo').style.display = 'none';
+    }
+
+
+      // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreFormacion(value) {
+
+    document.getElementById('formacion-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreFormacion').style.display = 'none';
+  }
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioAgregarFormaciones").submit(function (e) {
+
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    console.log("entro para agregar");
+    id_curriculum = '{{ curriculum.id }}';
+    console.log(id_curriculum);
+
+    var url = "/private/docLaruex/verObjeto/" + id_curriculum;
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarFormacionCurriculum/" + id_curriculum + "/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Formación guardada con éxito', 'alert-success', 2000)
+        $(".divFormularios").remove();
+        $("#reset").trigger("click");
+        $('#tabla_formaciones').bootstrapTable('refresh');
+        $('#cerrar').trigger('click');
+        $("#modalFormularioAgregarFormaciones").trigger('reset');
+        location.reload();
+      }
+    });
+  });
+
+  function cambiarFechaInicio(){
+    
+    var prueba =  $("#fechaActualizacion").datepicker('getDate');
+    console.log("value: ", prueba)
+    var fechaInicioSeleccionada = document.getElementById("fechaActualizacion");
+    var fechaInicio = fechaInicioSeleccionada.value;
+    
+    console.log("FECHAAAA")
+    console.log(fechaInicio)
+    $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + fechaInicio + " de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
+    $("#tituloObjetoNombre").html("Añadir Contrato de Trabajo");
+    $("#TituloModalDocumento").html("Añadir Contrato de Trabajo");
+  }
+
+  
+  function cambiarFechaFin(){
+    
+    var prueba =  $("#fechaActualizacion").datepicker('getDate');
+    console.log("value: ", prueba)
+    var fechaInicioSeleccionada = document.getElementById("fechaActualizacion");
+    var fechaInicio = fechaInicioSeleccionada.value;
+    
+    var prueba =  $("#fechaFinContrato").datepicker('getDate');
+    console.log("value: ", prueba)
+    var fechaFinSeleccionada = document.getElementById("fechaFinContrato");
+    var fechaFin = fechaFinSeleccionada.value;
+    
+    console.log("FECHAAAA")
+    console.log(fechaInicio)
+    $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + fechaInicio + " a " + fechaFin + " de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
+    $("#tituloObjetoNombre").html("Añadir Contrato de Trabajo");
+    $("#TituloModalDocumento").html("Añadir Contrato de Trabajo");
+  }
+
+
+
+  function mostrarTitulo(value) {
+
+    if (value == "1") {
+      var fechaInicioSeleccionada = document.getElementById("fechaInicioContrato");
+      var fechaInicio = fechaInicioSeleccionada.value;
+      console.log(fechaInicio)
+
+      var prueba =  $("#fechaFinContrato").datepicker('getDate');
+      console.log("value: ", prueba)
+      var fechaFinSeleccionada = document.getElementById("fechaFinContrato");
+      var fechaFin = fechaFinSeleccionada.value;
+
+      $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + fechaInicio + " a " + fechaFin + " de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
+      $("#tituloObjetoNombre").html("Añadir Contrato de Trabajo");
+      $("#TituloModalDocumento").html("Añadir Contrato de Trabajo");
+      $("#tipoDocumento").val('6');
+      
+    } else if (value == "2") {
+      $("#tituloObjetoNombre").html("Añadir Contrato de Confidencialidad");
+      $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + "de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
+      
+      $("#TituloModalDocumento").html("Añadir Contrato de Confidencialidad");
+      $("#sobreNombreDocumento").prop('readonly', true);
+      
+      $("#tipoDocumento").val('6');
+    } else if (value == "3") {
+      $("#tituloObjetoNombre").html("Añadir Investigación");
+      
+      $("#TituloModalDocumento").html("Añadir Investigación");
+      $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + " - " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
+      
+      $("#tipoDocumento").val('9');
+    } else {
+      $("#tituloObjetoNombre").html("Añadir Documento");
+    }
+  }
+</script>
+{% endblock %}

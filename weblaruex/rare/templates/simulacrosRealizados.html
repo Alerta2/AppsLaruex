@@ -1,0 +1,66 @@
+{% extends "base/base2.html" %}
+{% load static %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+
+{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="row mx-5 px-5">
+        <div class="col-1 m-1 py-4">
+            <i class="fa-regular fa-business-time fa-xl" style="color: #206b05;"></i>
+        </div>
+        <div class="col-10 m-1 py-4">
+            <h5>Próximo simulacro programado</h5>
+            <p>Fecha encriptada: <a href="#" title="Pulsa para copiar" onclick="navigator.clipboard.writeText('{{proximoSimulacro.fecha}}')">{{proximoSimulacro.fecha|slice:":20"}}</a>...</p>            
+        </div>
+        <h3 class="my-5">SIMULACROS REALIZADOS</h3>
+        {% regroup simulacros by inicio_nivel1|date:"Y" as simulacrosRealizados %}
+        {% for simulacro in simulacrosRealizados %}
+            <section class="row col-12 mt-2 mb-2 p-2 my-2">
+                <h5 class="col-12">Simulacros realizados en {{simulacro.grouper}}</h5>
+                {% for evento in  simulacro.list %}
+                    <div class="col-5 border rounded border-info m-1 py-4">
+                        <h5>{% if evento.exitoso == 1%}<i class="fa-sharp fa-solid fa-badge-check fa-lg" style="color: #005201;"></i>{% else %}<i class="fa-regular fa-octagon-xmark fa-lg" style="color: #8f0000;"></i>&nbsp;{% endif %}Simulacro {% if evento.exitoso == 1 %}exitoso{% else %}fallido{% endif %}</h5>
+                        <p>Estación: {{ evento.estacion.nombre }}</p>
+
+                        <p>Nivel 1: Inicio {{ evento.inicio_nivel1 }} Respuesta {{ evento.minutos_nivel1 }}</p>
+                        {% if evento.inicio_nivel2 %}
+                            <p>Nivel 2: Inicio {{ evento.inicio_nivel2 }} Respuesta {{ evento.minutos_nivel2 }}</p>
+                            {% if evento.incio_nivel3 %}
+                                <p>Nivel 3: Inicio {{ evento.inicio_nivel3 }} Respuesta {{ evento.minutos_nivel3 }}</p>ç
+                            {% else %}
+                                <p>No se activa el Nivel 3</p>
+                            {% endif %}
+                        {% else %}
+                            <p>No se activa el Nivel 2</p>
+                        {% endif %}
+                        
+                        <p>Fecha encriptada: <a href="#" title="Pulsa para copiar" onclick="navigator.clipboard.writeText('{{proximoSimulacro.fecha}}')">{{evento.fecha|slice:":20"}}</a>...</p>
+                        <a type="button" class="btn btn-outline-primary" href="/private/rare/informeSimulacro/{{ evento.id }}/" target="_blank">Consultar informe</a>
+                    </div>
+                {% endfor %}
+            </section>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block js %}
+    $('.btnright').hide();
+    $('.btnleft').hide();
+    $('#carga').hide();
+    function checkMobile(){
+        if( window.innerWidth < 1024)
+            $("#boton_collapse_sidebar").click();
+    }
+    checkMobile();
+    $('.correcciones').toggle();
+    $('.infoguardias').toggle();
+    
+{% endblock %}

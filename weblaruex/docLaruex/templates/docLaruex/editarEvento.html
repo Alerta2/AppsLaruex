@@ -1,0 +1,120 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Editar Evento {{evento.nombre}}</h5>
+    
+    <!-- Edit Form -->
+    <form id="formularioEditarEvento"  action="/private/docLaruex/editarEvento/{{evento.id}}/" method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+
+
+    <div id="divFormularioAgregarEvento" class="divFormularios">
+      <div class="row d-flex justify-content-center my-4">
+        <div class="col-auto my-auto"  style="align-items: center;">
+            <h5><strong class="text-info">Periodicidad</strong></h5>
+        </div>
+          <div class="col-auto">
+              <div class="form-group">
+                  <label for="nuevaCantidad" class="text-info"><strong>Cantidad</strong></label>
+                  <input type="number" class="form-control col-md-auto" id="nuevaCantidad"
+                      name="nuevaCantidad" data-rule="required" value="{{evento.periodicidad.cantidad}}"/>
+              </div>
+          </div>
+          <div class="col-auto">
+              <div class="form-group">
+                  <label for="nuevaUnidad"  class="text-info"><strong>Unidad</strong></label>
+                  <select class="form-select" data-rule="required" id="nuevaUnidad"
+                      name="nuevaUnidad" >
+                      <option value="{{evento.periodicidad.unidad}}" selected hidden>{{evento.periodicidad.unidad}}
+                      </option>
+                      <option value="Hora">Hora
+                      </option>
+                      <option value="Día">Día
+                      </option>
+                      <option value="Semana">Semana
+                      </option>
+                      <option value="Mes">Mes
+                      </option>
+                      <option value="Año">Año
+                      </option>
+                      
+                  </select>
+              </div>
+          </div>
+      </div>  
+      <div class="row">
+        <div class="col-4"> 
+          <div class="form-group">
+            <label for="nuevoTipoEvento">Tipo de Evento</label>
+            <select class="form-select" data-rule="required" id="nuevoTipoEvento"
+                name="nuevoTipoEvento">
+                <option value="{{evento.tipo_evento.id}}" selected hidden>{{evento.tipo_evento.nombre}}
+                </option>
+                <option value="1">Mantenimiento</option>
+                <option value="2">Verificación</option>
+                <option value="3">Calibrado</option>
+                <option value="4">Suscripción</option>                                        
+            </select>
+          </div>
+        </div>
+        <div class="col-4"> 
+          <div class="form-group">
+            <label for="nuevoTipoPeriodicidad">Tipo de Periodicidad</label>
+            <select class="form-select" data-rule="required" id="nuevoTipoPeriodicidad"
+                name="nuevoTipoPeriodicidad">
+                <option value="{{evento.tipo_periodicidad.id}}" selected hidden>{{evento.tipo_periodicidad.periodicidad}}
+                </option>
+                <option value="1">Fija</option>
+                <option value="2">Relativa</option> 
+                
+            </select>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="form-group">
+              <label for="nuevoProcedimiento">Procedimiento</label>
+              <select class="form-select" data-rule="required" id="nuevoProcedimiento"
+                  name="nuevoProcedimiento">
+                  <option value="{{evento.procedimiento_asociado.id_doc.id}}" selected hidden>{{evento.procedimiento_asociado.id_doc.nombre}}
+                  </option>
+                  {% for procedimiento in procedimientos %}
+                  <option value="{{procedimiento.id_doc__id}}">
+                      {{procedimiento.id_doc__nombre}}
+                  </option>
+                  {% endfor %}
+              </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+          <div class="col-12">
+              <div class="form-group">
+                  <label for="nuevoNombreEvento" class="col-md-auto">Titulo del
+                      Evento</label>
+                  <input type="text" class="form-control col-md-auto" id="nuevoNombreEvento"
+                      name="nuevoNombreEvento" data-rule="required"
+                      pattern="[a-zA-Z\w\s\sáéíóúÁÉÍÓÚüÜñÑ,]{1,255}"
+                      title="No permite guiones ni otros caracteres que no sean espacios" value="{{evento.nombre}}"/>
+              </div>
+          </div>
+      </div>
+
+  </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary" onclick="crearAviso('eventoEditar', 'Evento editado con éxito', 'alert-success', 2000);">Guardar</button>
+      </div>
+    </form><!-- End Profile Edit Form -->
+
+  </div>
+</div>
+
+<script>
+
+</script>
+
+{% endblock %}

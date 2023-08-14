@@ -1,0 +1,224 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: rgb(16, 108, 161);
+  }
+  
+  .addImagen:hover {
+    color: rgb(10, 59, 99);
+  }
+  
+  .imagen-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+  }  
+
+</style>  
+
+<div class="card-body">
+
+    <nav>
+      <ol class="breadcrumb" style="background-color:#fff !important">
+        <li class="breadcrumb-item" style="font-size: large;"><a href="{% url 'docLaruex:docLaruexPortada' %}"><i
+              class="bi bi-house-door"></i></a></li>
+        <li class="breadcrumb-item" style="font-size: large;"><a href="{% url 'docLaruex:docLaruexObjeto' %}">Listado de
+            Objetos</a>
+        </li>
+        <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/tipoObjeto/Procedimiento/">Listado de
+            Procedimientos</a>
+        </li>
+        <li class="breadcrumb-item" style="font-size: large;"><a
+            href="\private/docLaruex/editarProcedimiento/{{ procedimiento.id_doc.id }}/">Editar {{formato.id_doc.padre.nombre}} {{formato.id_doc.nombre}}</a></li>
+      </ol>
+    </nav>
+</div>
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title my-4">Editar {{formato.id_doc.padre.nombre}} {{formato.id_doc.nombre}}</h5>
+        <form id="formularioEditarFormato" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row divFormularioEditarFormato" >
+            <div class="col">
+              <div class="form-group">
+                <label for="nuevaHabilitacion">Habilitación</label>
+                <select class="form-select" data-rule="required" id="nuevaHabilitacion" name="nuevaHabilitacion">
+                  <option value="{{formato.id_doc.id_habilitacion.id}}" selected hidden>
+                    {{formato.id_doc.id_habilitacion.titulo}}
+                  </option>
+                  {% for habilitacion in habilitaciones %}
+                  <option value="{{habilitacion.id}}">
+                    {{habilitacion.titulo}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="nuevoNombre">Nombre</label>
+                <input type="text" class="form-control" id="nuevoNombre" name="nuevoNombre" data-rule="required"
+                  value="{{formato.id_doc.nombre}}" />
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                <label for="nuevaVersion">Version</label>
+                <input type="number" class="form-control" id="nuevaVersion" name="nuevaVersion" data-rule="required"
+                  value="{{formato.version}}" />
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="nuevaFechaEdicion">Fecha de Edición</label>
+                <input type="date" id="nuevaFechaEdicion" name="nuevaFechaEdicion" class="form-control"
+                  value="{{formato.fecha_edicion.date|safe }}"/>
+              </div>
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col" hidden>
+              <div class="form-group">
+                <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required"
+                  value="{{formato.id_doc.tipo}}" />
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="nuevoTitulo">Titulo</label>
+                <input type="text" class="form-control" id="nuevoTitulo" name="nuevoTitulo" data-rule="required"
+                  value="{{formato.titulo}}" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-9">
+              <div class="form-group">
+                <label for="nuevoProcedimiento">Procedimiento</label>
+                <select class="form-select" data-rule="required" id="nuevoProcedimiento" name="nuevoProcedimiento">
+                  <option value="{{formato.procedimiento}}"selected hidden>{{formato.procedimiento}}</option>
+                  {% for procedimiento in procedimientos %}
+                  <option value="{{procedimiento.titulo}}">
+                    {{procedimiento.id_doc__nombre}} - Revisión: {{procedimiento.version}} {{procedimiento.titulo}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="nuevoEditor">Editor</label>
+                <select class="form-select" data-rule="required" id="nuevoEditor" name="nuevoEditor">
+                  <option value="{{formato.editor.id}}" selected hidden>{{formato.editor.first_name}} {{formato.editor.last_name}}</option>
+                  {% for editor in editores %}
+                  <option value="{{editor.id}}">
+                    {{editor.first_name}} {{editor.last_name}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label for="nuevaPlantilla">¿Es Plantilla?</label>
+              <select class="form-control" id="nuevaPlantilla" name="nuevaPlantilla">
+                <option value="{{formato.plantilla}}" selected hidden>
+                  {% if formato.plantilla == 1 %}
+                  Si
+                  {% else %}
+                  No
+                  {% endif %}
+                </option>
+                <option value="0">No
+                </option>
+                <option value="1">Si
+                </option>
+              </select>
+            </div>
+            <div class="col">
+              <label for="nuevoEditable">¿Es Editable?</label>
+              <select class="form-control" id="nuevoEditable" name="nuevoEditable">
+                <option value="{{formato.editable}}" selected hidden>
+                  {% if formato.editable == 1 %}
+                  Si
+                  {% else %}
+                  No
+                  {% endif %}
+                </option>
+                <option value="0">No
+                </option>
+                <option value="1">Si
+                </option>
+              </select>
+            </div>
+          </div>
+
+
+      <!-- END Body del ModalAsociarFormato -->
+
+      <!-- Footer del ModalAsociarFormato -->
+      <div class="modal-footer d-flex justify-content-center my-2">
+        <button id="cerrar" type="button" onclick="salir()" class="btn btn-secondary" data-dismiss="modal">
+          Cerrar
+        </button>
+        <button type="submit" value="submit" class="btn btn-primary">
+          Guardar
+        </button>
+      </div>
+      <!-- END Footer del ModalAsociarFormato -->
+      </form>
+
+  </div>
+</div>
+
+<script>
+// cambiamos la funcionalidad del boton submit del formulario
+$("#formularioEditarFormato").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarFormato/{{formato.id_doc.id}}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('formatoGuardar', 'Formato editado con éxito', 'alert-success', 2000);
+        window.location.href = "/private/docLaruex/verObjeto/{{formato.id_doc.id}}/";
+      }
+    });
+  });
+
+  function salir(){
+    window.location.href = "/private/docLaruex/verObjeto/{{formato.id_doc.padre.id}}/";
+    crearAviso('procedimientoCerrar', 'No se ha podido modificar el procedimiento', 'alert-warning', 2000);
+  }
+
+      // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+
+    document.getElementById('imagen-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreNuevaImagen').style.display = 'none';
+  }
+
+
+</script>
+
+{% endblock %}

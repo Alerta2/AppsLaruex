@@ -1,0 +1,36 @@
+/* BOTON COMENZAR */
+.btn {
+    background-color: #1E90FF;
+    margin: 5px;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.btn:hover {
+    color: white;
+}
+
+.btn:focus {
+    color: white;
+}
+
+
+/* IMAGEN AVATAR LISTADO PERSONAL DADO DE ALTA EN LAS GUARDIAS PARA EL AREA ESPECIFICADA */
+.userArea {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
+.container {
+    width: 100%;
+    height: 100%;
+}
+
+
+

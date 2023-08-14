@@ -1,0 +1,562 @@
+{% extends "base/base_docLaruex.html" %} {% load static %} {% block content %}
+
+<!-- ======= Importación del css de los curricculum  ======= -->
+<link href="{% static 'niceAdminAssets' %}/css/curriculum.css" rel='stylesheet' />
+
+
+<!-- breadcrumb   -->
+<div class="card-body" >
+  <nav >
+    <ol class="breadcrumb"style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/objetos">Listado de Objetos</a></li>
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/tipoObjeto/{{ curriculum.id_doc.tipo }}/">{{ curriculum.id_doc.tipo }}</a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">{{  curriculum.propietario.first_name }} {{  curriculum.propietario.last_name }}</li>
+    </ol>
+  </nav>
+</div>
+
+<div class="row">
+  <img
+    src="{{ user.profile.image.url }}"
+    alt="Profile"
+    class="rounded-circle"
+    style="max-width: 10em; max-height: 10em"
+  />
+  <div class="col-auto my-auto">
+    <h3
+      class="display-5 font-weight-bold"
+      style="color: rgb(7, 49, 61); line-height: 1; display: inline-block"
+    >
+      {{ curriculum.propietario.first_name }} {{ curriculum.propietario.last_name }}
+    </h3>
+    <h2><span>{{ curriculum.acreditacion }}</span></h2>
+  </div>
+  <div class="col d-flex justify-content-end align-items-end p-4">
+      <!-- Boton que permite rellenar un documento  -->
+      <a href="" title="Rellenar Curriculum" class="mx-1" data-toggle="modal" data-target="#modalRellenarFormato"
+      style="color: #68b29e"><i class="fa-solid fa-pen-to-square fa-3x"></i></a>
+
+      <!-- boton que permite asociar elementos al formato actual-->
+      <a href="/archivos/{{ curriculum.id_doc.tipo }}/{{ curriculum.id_doc.ruta }}" title="Añadir Archivo Asociado"
+      class="mx-1" data-toggle="modal" data-toggle="tooltip" data-target="#modalAsociarArchivo" style="color: #68b29e;"><i class="fa-solid fa-link fa-3x"></i></a>
+
+      <!-- boton que permite la descarga del formato actual que estamos visualizando-->
+      <a href="/archivos/{{ curriculum.id_doc.tipo }}/{{ curriculum.id_doc.ruta }}" class="mx-1" 
+        style=" color: #EBA43D; align-items: md-center" download><i class="fa-solid fa-download fa-3x"></i></a>
+
+  </div>
+</div>
+
+<!-- ========== Modal para asociar Archivos al Curriculum ========== -->
+<div id="modalAsociarArchivo" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+  aria-labelledby="modalAsociarArchivo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">
+          <strong>
+            Seleccione los archivos que desea asociar.
+          </strong>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+      </div>
+      <!-- END Cabecera del ModalAsciarFormato -->
+
+      <!-- Body del modalAsociarArchivo -->
+      <div class="modal-body">
+        <form id="formularioAsociarArchivo" enctype="multipart/form-data">
+          {% csrf_token %}
+
+
+          <div class="row justify-content-center">
+            <div class="col-lg-5">
+              <div class="card card p-4 ">
+                <h5 class="card-title text-center">Archivos</h5>
+                <table class="table-sm table-hover" id="tabla_objetos_para_asociar" data-search="true"
+                  data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10]"
+                  data-toolbar="#toolbar"></table>
+              </div>
+            </div>
+            {% if device_info.type == 'phone' %}
+
+
+            {% else %}
+            <div class="col-lg-1 col-12 my-auto text-center">
+              <i id="flechas" class="fa-solid fa-arrow-right-arrow-left fa-3x" style="color: rgb(41,68,87)"></i>
+            </div>
+            {% endif %}
+
+            <div class="col-lg-5">
+              <div class="card p-4">
+                <h5 class="card-title text-center">Archivos Seleccionados</h5>
+                <table id="tabla_objetos_para_asociar_seleccionados" class="table-sm table-hover" data-search="true"
+                  data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10]"
+                  data-toolbar="#toolbar"></table>
+              </div>
+            </div>
+          </div>
+      </div>
+
+
+      <input type="text" id="idFormatoActual" value="{{ curriculum.id_doc.id }}" hidden name="idFormatoActual"
+        data-rule="required" />
+      <input type="text" id="idArchivosSeleccionados" hidden name="idArchivosSeleccionados" data-rule="required" />
+
+      <!-- Footer del ModalAsociarFormato -->
+      <div class="modal-footer d-flex">
+
+        <button id="cerrarAsociar" type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cerrar
+        </button>
+        <button type="submit" value="submit" class="btn btn-primary">
+          Guardar
+        </button>
+      </div>
+      <!-- END Footer del ModalAsociarFormato -->
+    </div>
+  </div>
+</div><!-- END Body del ModalAsociarFormato -->
+</form>
+</div> <!-- END modalAsociarArchivo -->
+
+<nav id="navbar" class="navbar">
+  <ul class="row w-100">
+    <li class="col-auto my-1">
+      <a
+        class="nav-link"
+        href="#accordionContratoVigente"
+        data-toggle="collapse"
+        data-target="#collapseContratoVigente"
+        aria-expanded="false"
+        aria-controls="collapseContratoVigente"
+        onclick="$(this).find('i').toggleClass('fa-caret-square-down fa-caret-square-up');"
+        ><h4>Contrato Actual</h4></a
+      >
+    </li>
+
+    <li class="col-auto my-1">
+      <a
+        class="nav-link"
+        href="#accordionTitulacionEmpleado"
+        data-toggle="collapse"
+        data-target="#collapseTitulacionEmpleado"
+        aria-expanded="false"
+        aria-controls="collapseTitulacionEmpleado"
+        onclick="$(this).find('i').toggleClass('fa-caret-square-down fa-caret-square-up');"
+        ><h4>Titulación</h4></a
+      >
+    </li>
+
+    <li class="col-auto my-1">
+      <a
+        class="nav-link"
+        href="#accordionFormacionComplementariaEmpleado"
+        data-toggle="collapse"
+        data-target="#collapseFormacionComplementariaEmpleado"
+        aria-expanded="false"
+        aria-controls="collapseFormacionComplementariaEmpleado"
+        onclick="$(this).find('i').toggleClass('fa-caret-square-down fa-caret-square-up');"
+        ><h4>Formación Complementaria</h4></a
+      >
+    </li>
+
+    <li class="col-auto my-1">
+      <a
+        class="nav-link"
+        href="#accordionHabilitacionesEmpleado"
+        data-toggle="collapse"
+        data-target="#collapseHabilitacionesEmpleado"
+        aria-expanded="false"
+        aria-controls="collapseHabilitacionesEmpleado"
+        onclick="$(this).find('i').toggleClass('fa-caret-square-down fa-caret-square-up');"
+        ><h4>Habilitaciones</h4></a
+      >
+    </li>
+
+    <li class="col-auto my-1">
+      <a
+        class="nav-link"
+        href="#accordionAcuerdoConfidencialidad "
+        data-toggle="collapse"
+        data-target="#collapseAcuerdoConfidencialidad"
+        aria-expanded="false"
+        aria-controls="collapseAcuerdoConfidencialidad"
+        onclick="$(this).find('i').toggleClass('fa-caret-square-down fa-caret-square-up');"
+        ><h4>Acuerdo de Confidencialidad</h4></a
+      >
+    </li>
+
+    <li class="col-auto my-1">
+      <a
+        class="nav-link"
+        href="#accordionCredencialesEmpleado"
+        data-toggle="collapse"
+        data-target="#collapseCredencialesEmpleado"
+        aria-expanded="false"
+        aria-controls="collapseCredencialesEmpleado"
+        onclick="$(this).find('i').toggleClass('fa-caret-square-down fa-caret-square-up');"
+        ><h4>Credenciales</h4></a
+      >
+    </li>
+  </ul>
+</nav>
+<!-- .navbar -->
+
+<!--collapse con contrato vigente -->
+<div id="accordionContratoVigente">
+  <div
+    id="collapseContratoVigente"
+    class="collapse show"
+    aria-labelledby="headingContratoVigente"
+    data-parent="#accordionContratoVigente"
+  >
+    <div class="card-body">
+      <table
+        id="tabla_contrato_vigente"
+        data-toggle="table"
+        data-search="true"
+        data-show-columns="true"
+        data-show-columns-toggle-all="true"
+        data-buttons="buttons"
+        data-buttons-class="light"
+      >
+        <h3
+          class="display-5 font-weight-bold"
+          style="color: rgb(7, 49, 61); line-height: 1; display: inline-block"
+        >
+          Contrato Actual
+        </h3>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!--collapse con titulación del empleado -->
+<div id="accordionTitulacionEmpleado">
+  <div
+    id="collapseTitulacionEmpleado"
+    class="collapse show"
+    aria-labelledby="headingTitulacionEmpleado"
+    data-parent="#accordionTitulacionEmpleado"
+  >
+    <div class="card-body">
+      <table
+        id="tabla_titulacion_empleado"
+        data-toggle="table"
+        data-search="true"
+        data-show-columns="true"
+        data-show-columns-toggle-all="true"
+        data-buttons="buttons"
+        data-buttons-class="light"
+      >
+        <h3
+          class="display-5 font-weight-bold"
+          style="color: rgb(7, 49, 61); line-height: 1; display: inline-block"
+        >
+          Titulaciones del Empleado
+        </h3>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!--collapse con Formacion complementaria del empleado -->
+<div id="accordionFormacionComplementariaEmpleado">
+  <div
+    id="collapseFormacionComplementariaEmpleado"
+    class="collapse show"
+    aria-labelledby="headingFormacionComplementariaEmpleado"
+    data-parent="#accordionFormacionComplementariaEmpleado"
+  >
+    <div class="card-body">
+      <table
+        id="tabla_formacion_complementaria"
+        data-toggle="table"
+        data-search="true"
+        data-show-columns="true"
+        data-show-columns-toggle-all="true"
+        data-buttons="buttons"
+        data-buttons-class="light"
+      >
+        <h3
+          class="display-5 font-weight-bold"
+          style="color: rgb(7, 49, 61); line-height: 1; display: inline-block"
+        >
+          Formación Complementaria
+        </h3>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!--collapse con habilitaciones del empleado -->
+<div id="accordionHabilitacionesEmpleado">
+  <div
+    id="collapseHabilitacionesEmpleado"
+    class="collapse show"
+    aria-labelledby="headingHabilitacionesEmpleado"
+    data-parent="#accordionHabilitacionesEmpleado"
+  >
+    <div class="card-body">
+      <table
+        id="tabla_habilitaciones_empleado"
+        data-toggle="table"
+        data-search="true"
+        data-show-columns="true"
+        data-show-columns-toggle-all="true"
+        data-buttons="buttons"
+        data-buttons-class="light"
+      >
+        <h3
+          class="display-5 font-weight-bold"
+          style="color: rgb(7, 49, 61); line-height: 1; display: inline-block"
+        >
+          Habilitaciones del Empleado
+        </h3>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!--collapse con consulta del Acuerdo de Confidencialidad Vigente -->
+<div id="accordionAcuerdoConfidencialidad">
+  <div
+    id="collapseAcuerdoConfidencialidad"
+    class="collapse show"
+    aria-labelledby="headingAcuerdoConfidencialidad"
+    data-parent="#accordionAcuerdoConfidencialidad"
+  >
+    <div class="card-body">
+      <table
+        id="tabla_habilitaciones_empleado"
+        data-toggle="table"
+        data-search="true"
+        data-show-columns="true"
+        data-show-columns-toggle-all="true"
+        data-buttons="buttons"
+        data-buttons-class="light"
+      >
+        <h3
+          class="display-5 font-weight-bold"
+          style="color: rgb(7, 49, 61); line-height: 1; display: inline-block"
+        >
+          Acuerdo de Confidencialidad
+        </h3>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!--collapse con consulta de las credenciales del Empleado -->
+<div id="accordionCredencialesEmpleado">
+  <div
+    id="collapseCredencialesEmpleado"
+    class="collapse show"
+    aria-labelledby="headingCredencialesEmpleado"
+    data-parent="#accordionCredencialesEmpleado"
+  >
+    <div class="card-body">
+      <table
+        id="tabla_credenciales_empleado"
+        data-toggle="table"
+        data-search="true"
+        data-show-columns="true"
+        data-show-columns-toggle-all="true"
+        data-buttons="buttons"
+        data-buttons-class="light"
+      >
+        <h3
+          class="display-5 font-weight-bold"
+          style="color: rgb(7, 49, 61); line-height: 1; display: inline-block"
+        >
+          Credenciales del Empleado
+        </h3>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  // definicion de acciones collapse
+  $(".collapse").collapse();
+
+  // permite visualizar el elemento de la fila en la tabla titulacion empleado
+  $("#tabla_titulacion_empleado").on(
+    "click-row.bs.table",
+    function (e, row, $element) {
+      window.location.href = "/private/docLaruex/verObjeto/" + row.id_doc + "/";
+    }
+  );
+
+  // permite visualizar el elemento de la fila en la tabla formacion complementaria empleado
+  $("#tabla_formacion_complementaria_empleado").on(
+    "click-row.bs.table",
+    function (e, row, $element) {
+      window.location.href = "/private/docLaruex/verObjeto/" + row.id_doc + "/";
+    }
+  );
+
+  
+  /*
+    ------------ TABLAS Y FUNCIONES DEL MODAL ASOCIAR OBJETOS ------------
+  */
+
+  //tabla del modal asociar objetos
+  $("#tabla_objetos_para_asociar").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/docLaruex/objetosDatosAsociar",
+    cache: false,
+    columns: [
+      {
+        title: "Nombre",
+        align: "center",
+        formatter: function (value, row) {
+          if (row.nombre == null)
+            return row.id_doc__nombre;
+          else
+            return row.nombre;
+        }
+      },
+      {
+        title: "Version",
+        align: "center",
+        formatter: function (value, row) {
+          if (row.version == null)
+            return "-";
+          else
+            return row.version;
+        }
+      },
+      {
+        title: "Tipo",
+        align: "center",
+        formatter: function (value, row) {
+          if (row.tipo == null)
+            return row.id_doc__tipo;
+          else
+            return row.tipo;
+        }
+      },
+      {
+        title: "",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          if (row.id == null) {
+            row.id = row.id_doc__id;
+            row.nombre = row.id_doc__nombre;
+            row.tipo = row.id_doc__tipo;
+          }
+          else {
+            row.version = "-";
+          }
+          return (
+
+            '<div onclick="addValueTable(' + row.id + ',&apos;' + row.nombre + '&apos;,&apos;' + row.version + '&apos;,&apos;' + row.tipo + '&apos;)" class="mx-1" title="select"><i class="fa-solid fa-angles-right fa-lg" style="color:#68B29E"></i></div>'
+          );
+        },
+      },
+    ],
+    search: true,
+    sortName: "fecha_subida",
+    sortOrder: "desc",
+  });
+
+  function addValueTable(id, nombre, version, tipo) {
+    $("#tabla_objetos_para_asociar_seleccionados").bootstrapTable('insertRow', {
+      index: 0,
+      row: {
+        id: id,
+        nombre: nombre,
+        id__version: version,
+        tipo: tipo
+      }
+    });
+  }
+  function addZero(i) {
+    if (i < 10) {
+      i = "0" + i;
+    }
+    return i;
+  }
+
+  // tatbla de elementos seleccionados
+  $("#tabla_objetos_para_asociar_seleccionados").bootstrapTable({
+    locale: navigator.language,
+    cache: false,
+    columns: [
+      {
+        title: "Nombre",
+        field: "nombre",
+        align: "center",
+      },
+      {
+        title: "Version",
+        field: "id__version",
+        align: "center",
+      },
+      {
+        title: "Tipo",
+        field: "tipo",
+        align: "center",
+      },
+      {
+        title: "",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            '<div onclick="deleteValue(' + row.id + ')" class="mx-1" ><i class="fa-solid fa-xmark fa-lg" style="color:#F52220"></i></div>'
+
+          );
+        },
+      },
+    ],
+    search: true,
+    sortName: "fecha_subida",
+    sortOrder: "desc",
+  });
+
+  function deleteValue(id) {
+    $("#tabla_objetos_para_asociar_seleccionados").bootstrapTable('remove', {
+      field: 'id',
+      values: [id]
+    })
+  }
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioAsociarArchivo").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    $table = $("#tabla_objetos_para_asociar_seleccionados");
+    var idSeleccionado = "";
+    for (let value of $table.bootstrapTable('getData')) {
+      idSeleccionado = idSeleccionado + value["id"] + "#";
+    }
+    console.log(idSeleccionado);
+    $("#idArchivosSeleccionados").val(idSeleccionado);
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/asociarArchivos/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        $table.bootstrapTable('removeAll');
+        $("#idArchivosSeleccionados").val("");
+        $('#cerrarAsociar').trigger('click');
+      }
+    });
+  });
+
+</script>
+
+{% endblock%}

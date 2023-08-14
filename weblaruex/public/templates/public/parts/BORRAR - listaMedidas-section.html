@@ -1,0 +1,363 @@
+{% load static %}
+
+<style>
+  /* thead{
+      background-color: #1d8896b1;
+  }
+  tbody{
+      background-color: #d8eeed39;
+  }
+  
+  .table-responsive{
+    border-radius: 20px;
+  } */
+
+  h4 {
+	margin: 0 auto 2em;
+	font: 400 1.3em "Poppins", sans-serif;
+	color: #052b34;
+	text-align: center;
+} 
+
+  /*----------------------------------------------
+                       MEDIDA
+   ----------------------------------------------*/
+
+
+/* alcalinos */
+.alcalinos{
+	border: 3px solid;
+	border-radius: 10px;
+	border-image: linear-gradient(to bottom right, #f3f9a6, #cbc634) 1;
+  width: 90%;
+  max-width: 80px !important;
+  margin: 0 auto;
+  box-sizing: border-box;
+	
+}
+
+.alcalinos .title, .alcalinos .description {  
+  background: -webkit-linear-gradient(#f3f9a6, #cbc634);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.alcalinos:hover {
+    background: linear-gradient(to bottom right, #f3f9a6 0%, #cbc634 100%);
+}
+
+
+
+/* alcalinoterreos */
+
+.alcalinoterreos{
+	border: 3px solid;
+	border-radius: 10px;
+	border-image: linear-gradient(to bottom right, #FFA07A, #FF7F50) 1;
+  width: 90%;
+  max-width: 80px !important;
+  margin: 0 auto;
+  box-sizing: border-box;
+	
+}
+
+.alcalinoterreos .title, .alcalinoterreos .description {
+  background: -webkit-linear-gradient(#FFA07A, #FF7F50);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.alcalinoterreos:hover {
+    background: linear-gradient(to bottom right, #FFA07A 0%, #FF7F50 100%);
+}
+
+/* metalesTransicion */
+
+.metalesTransicion{
+	border: 3px solid;
+	border-radius: 10px;
+	border-image: linear-gradient(to bottom right, #808080, #DCDCDC) 1;
+  width: 90%;
+  max-width: 80px !important;
+  margin: 0 auto;
+  box-sizing: border-box;
+	
+}
+
+.metalesTransicion .title, .metalesTransicion .description {
+  background: -webkit-linear-gradient(#808080, #DCDCDC);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.metalesTransicion:hover {
+    background: linear-gradient(to bottom right, #808080 0%, #D3D3D3 100%);
+}
+
+/* terreos */
+
+.terreos{
+	border: 3px solid;
+	border-radius: 10px;
+	border-image: linear-gradient(to bottom right, #C0C0C0, #D3D3D3) 1;
+  width: 90%;
+  max-width: 80px !important;
+  margin: 0 auto;
+  box-sizing: border-box;
+	
+}
+
+.terreos .title, .terreos .description {
+  background: -webkit-linear-gradient(#C0C0C0, #DCDCDC);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.terreos:hover {
+    background: linear-gradient(to bottom right, #C0C0C0 0%, #DCDCDC 100%);
+}
+
+/* carbonoides */
+
+.carbonoides { 
+	border: 3px solid;
+	background: linear-gradient(to bottom, #8FBC8F, #3CB371); 
+	border-radius: 10px;
+  width: 90%;
+  max-width: 80px !important;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.carbonoides .title, .carbonoides .description {
+  background: -webkit-linear-gradient(#8FBC8F, #3CB371);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.carbonoides:hover {
+    background: linear-gradient(to bottom right, #8FBC8F 0%, #3CB371 100%);
+}
+
+/* nitrogenoides */
+
+.nitrogenoides { 
+	border: 3px solid;
+  border-radius: 10px;
+	background: linear-gradient(to bottom, #ADD8E6, #87CEEB); 
+  width: 90%;
+  max-width: 80px !important;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.nitrogenoides .title, .nitrogenoides .description {
+  background: -webkit-linear-gradient(#ADD8E6, #87CEEB);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nitrogenoides:hover {
+    background: linear-gradient(to bottom right, #ADD8E6 0%, #87CEEB 100%);
+}
+
+/* calcogenos */
+
+.calcogenos { 
+	border: 3px solid;
+  border-radius: 10px;
+	background: linear-gradient(to bottom, #C71585, #FF1493); 
+  width: 90%;
+  max-width: 80px !important;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.calcogenos .title, .calcogenos .description {
+  background: -webkit-linear-gradient(#C71585, #FF1493);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.calcogenos:hover {
+    background: linear-gradient(to bottom right, #C71585 0%, #FF1493 100%);
+}
+
+/* halogenos */
+.halogenos { 
+	border: 3px solid;
+  border-radius: 10px;
+	background: linear-gradient(to bottom, #B22222, #CD5C5C); 
+  width: 90%;
+  max-width: 80px !important;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.halogenos .title, .halogenos .description {
+  background: -webkit-linear-gradient(#B22222, #CD5C5C);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.halogenos:hover {
+    background: linear-gradient(to bottom right, #B22222 0%, #CD5C5C 100%);
+}
+
+
+/* gasesNobles */
+
+.gasesNobles { 
+	border: 3px solid;
+  border-radius: 10px;
+	background: linear-gradient(to bottom, #B22222, #CD5C5C); 
+  width: 90%;
+  max-width: 80px !important;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.gasesNobles .title, .gasesNobles .description {
+  background: -webkit-linear-gradient(#B22222, #CD5C5C);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gasesNobles:hover {
+    background: linear-gradient(to bottom right, #B22222 0%, #CD5C5C 100%);
+}
+
+
+
+
+.element {
+  position: relative;
+  border-radius: 10px;
+  z-index: 1;
+  cursor: default;
+  transition: all 0.3s ease;
+  width: 90%;
+  max-width: 400px;
+  margin: 0 auto;
+  background-color: #052b34;
+  box-sizing: border-box;
+}
+
+.element-inner {
+  padding: 10px 15px;
+  width: 100%;
+  height: 100%;
+  transition: inherit;
+  box-sizing: border-box;
+}
+
+.element .title {
+  font: 700 34px/1.3 "Poppins", sans-serif;
+  margin: 0.3em 0 0;
+  transition: 0.8s ease 600ms;
+}
+
+.element .description {
+  font: 500 12px "Poppins", sans-serif;
+  margin-top: -0.2em;
+}
+
+
+.element:hover {
+  transform: scale(1.12);
+  z-index: 10;
+}
+
+.element:hover .element-inner {
+  background: transparent;
+}
+
+.element:hover .title,
+.element:hover .description {
+  -webkit-text-fill-color: #222;
+}
+
+.element:hover:after {
+  top: 105%;
+  opacity: 1;
+}
+
+@media (max-width: 767px) {
+  .social-media,
+  .element {
+    width: 100%;
+    max-width: none;
+  }
+}
+a.element {
+	cursor: pointer;
+}
+
+a {
+	text-decoration: none;
+}
+</style>
+
+
+<!-- ======= Medidas Section ======= -->
+<section id="medidas" class="medidas" data-aos="fade-up">
+
+
+  <div class="table-responsive">
+    <table class="table table-hover table-borderless" >
+      <thead>
+        <tr class="text-center" >
+          <th scope="col"></th>
+          <th scope="col"><h4><strong>Medidas</strong></h4></th>
+          <th scope="col"><h4><strong>Norma</strong></h4></th>
+          <th scope="col"><h4><strong>Resumen</strong></h4></th>
+          {% if user.is_superuser %}
+          <th scope="col"><h4><strong>Botones</strong></h4></th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for medida in medidas %}
+        <tr>
+          <td>
+            <div class="element alcalinos">
+              <a href="#">
+                <input id="nombreMedida" type="text" value="{{ medida.nombre }}" hidden>
+                <div class="element-inner">
+                  <div class="title text-center">{{medida.simbolo}}</div>
+                  <div class="description text-center">{{medida.nombre}}</div>
+                </div>
+              </a>
+            </div>
+          </td>
+          <td class="text-center align-middle">{{medida.tipo_medida}}</td>
+          <td class="text-center align-middle">{{medida.norma}}</td>
+          <td class="text-center align-middle">{{medida.resumen_medida}}</td>
+          {% if user.is_superuser %}
+          <td class="text-center align-middle">
+            <a href="" class="btn btn-outline-info my-auto" title="Editar medida" data-toggle="modal" data-target="#modalEditarMedida"><span>Editar</span>
+            </a>
+            <button class="btn btn-outline-danger my-2 my-sm-0" title="Eliminar medida" onclick="agregarInfoMedida('{{medida.id}}', '{{medida.nombre}}')">Eliminar</button>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      
+
+      </tbody>
+    </table>
+  </div>
+</section><!-- End Medidas Section -->
+
+
+
+
+

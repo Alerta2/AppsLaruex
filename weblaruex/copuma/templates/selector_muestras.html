@@ -1,0 +1,219 @@
+{% load static %}
+
+<nav id="seleccion_checkbox" class="clearfix_bot">
+    <div class="tab">
+      <input type="image"  class="tablinks" src="{% static "img/botonesA/muestras.png" %}" width="48px" heigth="48px" onclick="openTab(event, 'Muestras')" id="defaultOpen" style="margin: 4px;"></button>
+      <input type="image"  class="tablinks" src="{% static "img/botonesA/analisis.png" %}" width="48px" heigth="48px" onclick="openTab(event, 'Analiticas')" style="margin: 4px;"></button>
+      <input type="image"  src="{% static "img/botonesA/arriba.png" %}" width="48px" heigth="48px" onclick="subir()" id="subirLeyenda" style="margin: 4px;"></button>
+      <input type="image"  src="{% static "img/botonesA/abajo.png" %}" width="48px" heigth="48px" onclick="bajar()" id="bajarLeyenda" style="margin: 4px;"></button>
+      {% if perms.auth.report_copuma %}
+        <input type="image"  src="{% static "img/botonesN/export.png" %}" width="48px" heigth="48px" onclick="mostrarReportes()" id="mostrarReportes" style="margin: 4px;"></button>
+      {% endif %}
+    </div>
+    <div id="Muestras" class="tabcontent">
+        <ul class="clearfix_bot">
+          <li>
+            <div id="Aire" onClick="SelectCheckbox('Aire');$(Aire).hide();$(Aire2).show();"><img src="{% static "img/botonesN/Aire.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Aire2" onClick="$(Aire2).hide();$(Aire).show();"><img src="{% static "img/botonesA/Aire.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Agua"  onClick="SelectCheckbox('AguaLluvia');$(Agua).hide();$(Agua2).show();"><img src="{% static "img/botonesN/lluvia.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Agua2"   onClick="$(Agua2).hide();$(Agua).show();"><img src="{% static "img/botonesA/lluvia.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="AguaPotable"  onClick="SelectCheckbox('AguaPotable');$(AguaPotable).hide();$(AguaPotable2).show();"><img src="{% static "img/botonesN/potable.png" %}" width="48px" heigth="48px"/></div>
+            <div id="AguaPotable2"   onClick="$(AguaPotable2).hide();$(AguaPotable).show();"><img src="{% static "img/botonesA/potable.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="AguaSuperficial"  onClick="SelectCheckbox('AguaSuperficial');$(AguaSuperficial).hide();$(AguaSuperficial2).show();"><img src="{% static "img/botonesN/superficial.png" %}" width="48px" heigth="48px"/></div>
+            <div id="AguaSuperficial2"   onClick="$(AguaSuperficial2).hide();$(AguaSuperficial).show();"><img src="{% static "img/botonesA/superficial.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <!--
+          <li>
+            <div id="AguaPozo"  onClick="SelectCheckbox('AguaPozo');$(AguaPozo).hide();$(AguaPozo2).show();"><img src="{% static "img/botonesN/pozo.png" %}" width="48px" heigth="48px"/></div>
+            <div id="AguaPozo2"   onClick="$(AguaPozo2).hide();$(AguaPozo).show();"><img src="{% static "img/botonesA/pozo.png" %}" width="48px" heigth="48px"/></div>
+          </li>-->
+          <li>
+            <div id="Leche"  onClick="SelectCheckbox('Leches');$(Leche).hide();$(Leche2).show();"><img src="{% static "img/botonesN/leche.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Leche2"   onClick="$(Leche2).hide();$(Leche).show();"><img src="{% static "img/botonesA/leche.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Vegetales"  onClick="SelectCheckbox('Vegetales');$(Vegetales).hide();$(Vegetales2).show();"><img src="{% static "img/botonesN/vegetal.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Vegetales2"   onClick="$(Vegetales2).hide();$(Vegetales).show();"><img src="{% static "img/botonesA/vegetal.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Carnes"  onClick="SelectCheckbox('Carnes');$(Carnes).hide();$(Carnes2).show();"> <img src="{% static "img/botonesN/carne.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Carnes2"  onClick="$(Carnes2).hide();$(Carnes).show();"><img src="{% static "img/botonesA/carne.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Peces"  onClick="SelectCheckbox('Peces');$(Peces).hide();$(Peces2).show();"><img src="{% static "img/botonesN/pez.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Peces2"  onClick="$(Peces2).hide();$(Peces).show();"><img src="{% static "img/botonesA/pez.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Moluscos"  onClick="SelectCheckbox('Moluscos');$(Moluscos).hide();$(Moluscos2).show();"><img src="{% static "img/botonesN/molusco.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Moluscos2"  onClick="$(Moluscos2).hide();$(Moluscos).show();"><img src="{% static "img/botonesA/molusco.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Algas"  onClick="SelectCheckbox('Algas');$(Algas).hide();$(Algas2).show();"><img src="{% static "img/botonesN/alga.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Algas2"  onClick="$(Algas2).hide();$(Algas).show();"><img src="{% static "img/botonesA/alga.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Suelos"  onClick="SelectCheckbox('Suelos');$(Suelos).hide();$(Suelos2).show();"><img src="{% static "img/botonesN/suelo.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Suelos2"  onClick="$(Suelos2).hide();$(Suelos).show();"><img src="{% static "img/botonesA/suelo.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Sedimentos"  onClick="SelectCheckbox('Sedimentos');$(Sedimentos).hide();$(Sedimentos2).show();"><img src="{% static "img/botonesN/sedimento.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Sedimentos2"  onClick="$(Sedimentos2).hide();$(Sedimentos).show();"><img src="{% static "img/botonesA/sedimento.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Huevos"  onClick="SelectCheckbox('Huevos');$(Huevos).hide();$(Huevos2).show();"><img src="{% static "img/botonesN/huevo.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Huevos2"  onClick="$(Huevos2).hide();$(Huevos).show();"><img src="{% static "img/botonesA/huevo.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Aves"  onClick="SelectCheckbox('Aves');$(Aves).hide();$(Aves2).show();"><img src="{% static "img/botonesN/ave.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Aves2"  onClick="$(Aves2).hide();$(Aves).show();"><img src="{% static "img/botonesA/ave.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Miel"  onClick="SelectCheckbox('Miel');$(Miel).hide();$(Miel2).show();"><img src="{% static "img/botonesN/miel.png" %}"  width="48px" heigth="48px"/></div>
+            <div id="Miel2"  onClick="$(Miel2).hide();$(Miel).show();"><img src="{% static "img/botonesA/miel.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Hongos"  onClick="SelectCheckbox('Hongos');$(Hongos).hide();$(Hongos2).show();"><img src="{% static "img/botonesN/hongo.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Hongos2"  onClick="$(Hongos2).hide();$(Hongos).show();"><img src="{% static "img/botonesA/hongo.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="Dosis"  onClick="SelectCheckbox('Dosis');$(Dosis).hide();$(Dosis2).show();"><img src="{% static "img/botonesN/dosis.png" %}" width="48px" heigth="48px"/></div>
+            <div id="Dosis2"  onClick="$(Dosis2).hide();$(Dosis).show();"><img src="{% static "img/botonesA/dosis.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+        </ul>
+    </div>
+    <div id="Analiticas" class="tabcontent">
+        <ul class="clearfix_bot">
+          <li>
+            <div id="americio" onClick="SelectAnalisis('AM');dameId(this.id);$(americio).hide();$(americio2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/americio.png" %}" width="48px" heigth="48px"/></div>
+            <div id="americio2" onClick="$(americio).show();$(americio2).hide();"><img src="{% static "img/botonesA/americio.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="alfa_total" onClick="SelectAnalisis('AT');dameId(this.id);$(alfa_total).hide();$(alfa_total2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/alfa_total.png" %}" width="48px" heigth="48px"/></div>
+            <div id="alfa_total2" onClick="$(alfa_total).show();dameId(this.id);$(alfa_total2).hide();"><img src="{% static "img/botonesA/alfa_total.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="alfa_uranio" onClick="SelectAnalisis('AU');dameId(this.id);$(alfa_uranio).hide();$(alfa_uranio2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/alfa_uranio.png" %}" width="48px" heigth="48px"/></div>
+            <div id="alfa_uranio2" onClick="$(alfa_uranio).show();$(alfa_uranio2).hide();"><img src="{% static "img/botonesA/alfa_uranio.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="beta_resto" onClick="SelectAnalisis('BR');dameId(this.id);$(beta_resto).hide();$(beta_resto2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/beta_resto.png" %}" width="48px" heigth="48px"/></div>
+            <div id="beta_resto2" onClick="$(beta_resto).show();$(beta_resto2).hide();"><img src="{% static "img/botonesA/beta_resto.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="beta_total" onClick="SelectAnalisis('BT');dameId(this.id);$(beta_total).hide();$(beta_total2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/beta_total.png" %}" width="48px" heigth="48px"/></div>
+            <div id="beta_total2" onClick="$(beta_total).show();$(beta_total2).hide();"><img src="{% static "img/botonesA/beta_total.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="carbono" onClick="SelectAnalisis('CB');dameId(this.id);$(carbono).hide();$(carbono2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/carbono.png" %}" width="48px" heigth="48px"/></div>
+            <div id="carbono2" onClick="$(carbono).show();$(carbono2).hide();"><img src="{% static "img/botonesA/carbono.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="curio" onClick="SelectAnalisis('CM');dameId(this.id);$(curio).hide();$(curio2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/curio.png" %}" width="48px" heigth="48px"/></div>
+            <div id="curio2" onClick="$(curio).show();$(curio2).hide();"><img src="{% static "img/botonesA/curio.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="cesio" onClick="SelectAnalisis('CS');dameId(this.id);$(cesio).hide();$(cesio2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/cesio.png" %}" width="48px" heigth="48px"/></div>
+            <div id="cesio2" onClick="$(cesio).show();$(cesio2).hide();"><img src="{% static "img/botonesA/cesio.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="descendiente_radon" onClick="SelectAnalisis('D');dameId(this.id);$(descendiente_radon).hide();$(descendiente_radon2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/descendientes_radon.png" %}" width="48px" heigth="48px"/></div>
+            <div id="descendiente_radon2" onClick="$(descendiente_radon).show();$(descendiente_radon2).hide();"><img src="{% static "img/botonesA/descendientes_radon.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="exposicion_integrada" onClick="SelectAnalisis('DP');dameId(this.id);$(exposicion_integrada).hide();$(exposicion_integrada2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/exposicion_integrada.png" %}" width="48px" heigth="48px"/></div>
+            <div id="exposicion_integrada2" onClick="$(exposicion_integrada).show();$(exposicion_integrada2).hide();"><img src="{% static "img/botonesA/exposicion_integrada.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="expectrometria_masas" onClick="SelectAnalisis('DTT');dameId(this.id);$(expectrometria_masas).hide();$(expectrometria_masas2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/expectrometria_masas.png" %}" width="48px" heigth="48px"/></div>
+            <div id="expectrometria_masas2" onClick="$(expectrometria_masas).show();$(expectrometria_masas2).hide();"><img src="{% static "img/botonesA/expectrometria_masas.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="exhalacion_radon" onClick="SelectAnalisis('EX');dameId(this.id);$(exhalacion_radon).hide();$(exhalacion_radon2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/exhalacion_radon.png" %}" width="48px" heigth="48px"/></div>
+            <div id="exhalacion_radon2" onClick="$(exhalacion_radon).show();$(exhalacion_radon2).hide();"><img src="{% static "img/botonesA/exhalacion_radon.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="hierro" onClick="SelectAnalisis('FE');dameId(this.id);$(hierro).hide();$(hierro2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/hierro.png" %}" width="48px" heigth="48px"/></div>
+            <div id="hierro2" onClick="$(hierro).show();$(hierro2).hide();"><img src="{% static "img/botonesA/hierro.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="tritio" onClick="SelectAnalisis('H');dameId(this.id);$(tritio).hide();$(tritio2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/tritio.png" %}" width="48px" heigth="48px"/></div>
+            <div id="tritio2" onClick="$(tritio).show();$(tritio2).hide();"><img src="{% static "img/botonesA/tritio.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="yodo" onClick="SelectAnalisis('I');dameId(this.id);$(yodo).hide();$(yodo2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/yodo.png" %}" width="48px" heigth="48px"/></div>
+            <div id="yodo2" onClick="$(yodo).show();$(yodo2).hide();"><img src="{% static "img/botonesA/yodo.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="kripton" onClick="SelectAnalisis('KR');dameId(this.id);$(kripton).hide();$(kripton2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/kripton.png" %}" width="48px" heigth="48px"/></div>
+            <div id="kripton2" onClick="$(kripton).show();$(kripton2).hide();"><img src="{% static "img/botonesA/kripton.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="niquel" onClick="SelectAnalisis('NI');dameId(this.id);$(niquel).hide();$(niquel2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/niquel.png" %}" width="48px" heigth="48px"/></div>
+            <div id="niquel2" onClick="$(niquel).show();$(niquel2).hide();"><img src="{% static "img/botonesA/niquel.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="plomo" onClick="SelectAnalisis('PB');dameId(this.id);$(plomo).hide();$(plomo2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/plomo120.png" %}" width="48px" heigth="48px"/></div>
+            <div id="plomo2" onClick="$(plomo).show();$(plomo2).hide();"><img src="{% static "img/botonesA/plomo120.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="polonio" onClick="SelectAnalisis('PO');dameId(this.id);$(polonio).hide();$(polonio2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/polonio.png" %}" width="48px" heigth="48px"/></div>
+            <div id="polonio2" onClick="$(polonio).show();$(polonio2).hide();"><img src="{% static "img/botonesA/polonio.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="plutonio" onClick="SelectAnalisis('PU');dameId(this.id);$(plutonio).hide();$(plutonio2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/plutonio239.png" %}" width="48px" heigth="48px"/></div>
+            <div id="plutonio2" onClick="$(plutonio).show();$(plutonio2).hide();"><img src="{% static "img/botonesA/plutonio239.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="radio" onClick="SelectAnalisis('RA');dameId(this.id);$(radio).hide();$(radio2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/radio.png" %}" width="48px" heigth="48px"/></div>
+            <div id="radio2" onClick="$(radio).show();$(radio2).hide();"><img src="{% static "img/botonesA/radio.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="radon" onClick="SelectAnalisis('RN');dameId(this.id);$(radon).hide();$(radon2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/radon.png" %}" width="48px" heigth="48px"/></div>
+            <div id="radon2" onClick="$(radon).show();$(radon2).hide();"><img src="{% static "img/botonesA/radon.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="estroncios" onClick="SelectAnalisis('SR');dameId(this.id);$(estroncios).hide();$(estroncios2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/estroncio.png" %}" width="48px" heigth="48px"/></div>
+            <div id="estroncios2" onClick="$(estroncios).show();$(estroncios2).hide();"><img src="{% static "img/botonesA/estroncio.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="tecnecio" onClick="SelectAnalisis('TC');dameId(this.id);$(tecnecio).hide();$(tecnecio2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/tecnecio.png" %}" width="48px" heigth="48px"/></div>
+            <div id="tecnecio2" onClick="$(tecnecio).show();$(tecnecio2).hide();"><img src="{% static "img/botonesA/tecnecio.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="torio" onClick="SelectAnalisis('TH');dameId(this.id);$(torio).hide();$(torio2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/torio.png" %}" width="48px" heigth="48px"/></div>
+            <div id="torio2" onClick="$(torio).show();$(torio2).hide();"><img src="{% static "img/botonesA/torio.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="uranio_total" onClick="SelectAnalisis('U');dameId(this.id);$(uranio_total).hide();$(uranio_total2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/uranio_total_238.png" %}" width="48px" heigth="48px"/></div>
+            <div id="uranio_total2" onClick="$(uranio_total).show();$(uranio_total2).hide();"><img src="{% static "img/botonesA/uranio_total_238.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="uranio_total_suma" onClick="SelectAnalisis('UG');dameId(this.id);$(uranio_total_suma).hide();$(uranio_total_suma2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/uranio_total_suma_ig.png" %}" width="48px" heigth="48px"/></div>
+            <div id="uranio_total_suma2" onClick="$(uranio_total_suma).show();$(uranio_total_suma2).hide();"><img src="{% static "img/botonesA/uranio_total_suma_ig.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="uranio_natural" onClick="SelectAnalisis('UT');dameId(this.id);$(uranio_natural).hide();$(uranio_natural2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/uranio_natural.png" %}" width="48px" heigth="48px"/></div>
+            <div id="uranio_natural2" onClick="$(uranio_natural).show();$(uranio_natural2).hide();"><img src="{% static "img/botonesA/uranio_natural.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="yodo_gamma" onClick="SelectAnalisis('YG');dameId(this.id);$(yodo_gamma).hide();$(yodo_gamma2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/yodo_gamma.png" %}" width="48px" heigth="48px"/></div>
+            <div id="yodo_gamma2" onClick="$(yodo_gamma).show();$(yodo_gamma2).hide();"><img src="{% static "img/botonesA/yodo_gamma.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="isotopico_uranio" onClick="SelectAnalisis('IU');dameId(this.id);$(isotopico_uranio).hide();$(isotopico_uranio2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/isotopico_uranio.png" %}" width="48px" heigth="48px"/></div>
+            <div id="isotopico_uranio2" onClick="$(isotopico_uranio).show();$(isotopico_uranio2).hide();"><img src="{% static "img/botonesA/isotopico_uranio.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+          <li>
+            <div id="isotopico_gamma" onClick="SelectAnalisis('IG');dameId(this.id);$(isotopico_gamma).hide();$(isotopico_gamma2).show();deshabilitarBotones();"><img src="{% static "img/botonesN/isotopico_gamma.png" %}" width="48px" heigth="48px"/></div>
+            <div id="isotopico_gamma2" onClick="$(isotopico_gamma).show();$(isotopico_gamma2).hide();"><img src="{% static "img/botonesA/isotopico_gamma.png" %}" width="48px" heigth="48px"/></div>
+          </li>
+        </ul>
+    </div>
+    <a href="#" id="pull_bot">Selector</a>
+  </nav>

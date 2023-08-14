@@ -1,0 +1,442 @@
+{% extends "base/base_spida.html" %}
+{% load static %}
+
+{% block imports %}
+
+	
+
+    <!-- Mapa Leaflet -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    <!--<script src='http://cdn.leafletjs.com/leaflet/v1.3.1/leaflet.js'></script>
+    <link href='http://cdn.leafletjs.com/leaflet/v1.3.1/leaflet.css' rel='stylesheet' />-->
+
+	<!-- Capas Shapefiles -->
+	<script type="text/javascript" src="{% static 'js/spida/shapefiles/provincias.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/spida/shapefiles/aemet.js' %}"></script>
+	<!--Boton Home/Info -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+	<script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+
+	<!--Boton Full Screen -->
+	<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+	<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+
+    <!--Control Window -->
+    <link rel="stylesheet" href="{% static 'css/spida/L.Control.Window.css' %}" />
+    <script src="{% static 'js/spida/L.Control.Window.js' %}"></script>
+
+	<!--Brujula -->
+    <link rel="stylesheet" href="{% static 'css/spida/leaflet-compass.css' %}" />
+    <script src="{% static 'js/spida/leaflet-compass.js' %}"></script>
+
+	<!-- Creditos mapa (Icono Alerta2) -->
+ 	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/leaflet-control-credits.css' %}"/>
+	<script src="{% static 'js/spida/leaflet-control-credits.js' %}"></script>
+
+	<!-- Fluid water animation -->
+	<!--https://www.cssscript.com/liquid-progress-indicator/-->
+	<script src="{% static 'js/spida/js-fluid-meter.js' %}"></script>
+
+	<!-- Funciones del Mapa personalizadas -->>
+	<script src="{% static 'js/spida/funcionesMapaSpida.js' %}"></script>
+	
+
+	<!-- Pulse icon (Alarmas)-->
+ 	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/L.Icon.Pulse.css' %}"/>
+	<script src="{% static 'js/spida/L.Icon.Pulse.js' %}"></script>
+
+	<!-- Spin Reload Map -->
+    <script src="{% static 'js/spida/spin.min.js' %}" charset="utf-8"></script>
+	<script src="{% static 'js/spida/leaflet.spin.min.js' %}" charset="utf-8"></script>
+
+	<!-- Control Mini Mapa-->
+	<script src="{% static 'js/spida/Control.MiniMap.min.js' %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/Control.MiniMap.min.css' %}"/>
+
+	<!-- https://elmarquis.github.io/Leaflet.GestureHandling/ -->
+	<link rel="stylesheet" href="//unpkg.com/leaflet-gesture-handling/dist/leaflet-gesture-handling.min.css" type="text/css">
+	<script src="//unpkg.com/leaflet-gesture-handling"></script>
+
+
+	<!-- Resizable Control (Avisos)-->
+    <!--<link rel="stylesheet" href="{% static 'css/jquery.jscrollpane.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.css" />
+    <link rel="stylesheet" href="{% static 'css/Leaflet.ResizableControl.css' %}" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.js"></script>
+	<script src="{% static 'js/jquery.jscrollpane.min.js' %}"></script>
+    <script src="{% static 'js/Leaflet.ResizableControl.js' %}"></script>-->
+
+	<!--Descarga Datos -->
+	<!--<script src="{% static 'js/spida/dumpJSON.js' %}"></script>-->
+
+	<!--Info Avisos -->
+	<script src="{% static 'js/spida/L.Control.Info.js' %}"></script>
+
+	<!--Layer Photos -->
+	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/Leaflet.Photo.css' %}"/>
+
+	<!-- MarkersCluster -->
+	<link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css" />
+	<link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
+	<script src="http://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+
+	<!-- Control Sidebar -->
+	<script src="{% static 'js/spida/L.Control.Sidebar.js' %}"></script>
+ 	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/L.Control.Sidebar.css' %}"/>
+
+	<!-- Control Leyenda -->
+	<script src="{% static 'js/spida/leaflet.legend.js' %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/leaflet.legend.css' %}"/>
+
+	<!-- Control Panel Layers -->
+	<script src="{% static 'js/spida/leaflet-panel-layers.js' %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/leaflet-panel-layers.css' %}"/>
+
+	 <!-- Graficos HighCharts -->        
+	 <script src="https://code.highcharts.com/highcharts.js"></script>
+	 <script src="https://code.highcharts.com/modules/data.js"></script>
+	 <script src="https://code.highcharts.com/highcharts-more.js"></script>
+	 <script src="https://code.highcharts.com/modules/exporting.js"></script>
+	 <script src="https://code.highcharts.com/modules/export-data.js"></script>
+	 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<!-- 	 <script src="https://code.highcharts.com/stock/highstock.js"></script>
+	 <script src="https://code.highcharts.com/stock/modules/data.js"></script> -->
+
+	<!--Boton Imprimir Mapa -->
+	<script src="{% static 'js/spida/bundle.js' %}"></script>
+
+	<!-- Mi ubicacion actual -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+
+	<!--Geosearch (buscador de direcciones)-->
+	<!-- https://github.com/perliedman/leaflet-control-geocoder -->
+	<!-- https://github.com/perliedman/leaflet-control-geocoder/tree/1.13.0#api -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
+	<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+	<!-- Control search (buscador de markers)-->
+	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/leaflet-search.css' %}"/>
+	<script src="{% static 'js/spida/leaflet-search.js' %}"></script>
+
+
+	<!-- Estilo mapaSpida.html -->
+	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/mapaSpida.css' %}"/>
+
+
+	<!--Plugin CSS file with desired skin Para opacidad de capas wms-->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/css/ion.rangeSlider.min.css"/>
+
+	<!-- Control Leyenda Capas Wms -->
+	<script src="{% static 'js/spida/leaflet.wmslegend.js' %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/leaflet.wmslegend.css' %}"/>
+
+	<!-- Control Side by Side (vision de dos capas base simultaneas) -->
+	<script src="{% static 'js/spida/leaflet-side-by-side.js' %}"></script>
+
+	<!-- Cambio rapido mapa sat o street -->
+	<!-- https://github.com/ScanEx/Leaflet-IconLayers -->
+	<script src="{% static 'js/spida/iconLayers.js' %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/iconLayers.css' %}"/>
+
+	<!-- Time Dimension (Imagenes Prediccion Precipitacion 1 h Aemet)-->
+	<!-- https://github.com/socib/Leaflet.TimeDimension -->
+	<link rel="stylesheet" type="text/css" href="{% static 'css/spida/leaflet.timedimension.control.css' %}"/>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/iso8601-js-period@0.2.1/iso8601.min.js"></script>
+	<script src="{% static 'js/spida/leaflet.timedimension.js' %}"></script>
+	<script src="{% static 'js/spida/leaflet.timedimension.util.js' %}"></script>
+	<script src="{% static 'js/spida/leaflet.timedimension.layer.js' %}"></script>
+	<script src="{% static 'js/spida/leaflet.timedimension.layer.wms.js' %}"></script>
+	<script src="{% static 'js/spida/leaflet.timedimension.layer.geojson.js' %}"></script> 
+	<script src="{% static 'js/spida/leaflet.timedimension.player.js' %}"></script>
+	<script src="{% static 'js/spida/leaflet.timedimension.control.js' %}"></script>
+
+
+<!--<style>
+/* Paste this css to your style sheet file or under head tag */
+/* This only works with JavaScript, 
+if it's not present, don't show loader */
+.no-js #loader { display: none;  }
+.js #loader { display: block; position: absolute; left: 100px; top: 0; }
+.se-pre-con {
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;
+	background-color: #00CED1;
+	/*background: url(https://smallenvelop.com/wp-content/uploads/2014/08/Preloader_11.gif) center no-repeat #fff;*/
+	padding: 0;
+	margin: 0;
+
+  z-index: 9999;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.wrapper {
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: #343a40;
+  z-index: 9999;
+  /* background: linear-gradient(#a4d7f6, #5191bf); */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.outer-shadow {
+  width: 100%;
+  height: 50%;
+  border-radius: 50%;
+  box-shadow:
+  -0.7rem 0.2rem 0.5rem rgba(34, 100, 158, 0.1),
+  0.7rem 0.2rem 0.5rem rgba(34, 100, 158, 0.1),
+  0 0.5rem 0.5rem rgba(34, 100, 158, 0.1),
+  inset 0 -0.1rem 0.2rem rgba(34, 100, 158, 0.2),
+  inset 0 0.1rem 0.1rem rgba(255, 255, 255, 0.1),
+  0 -0.3rem 0.3rem rgba(255, 255, 255, 0.1);
+  animation: wave 3s ease-out infinite;
+  transform: scale(0);
+}
+.inner-shadow {
+  height: 90%;
+  width: 90%;
+  border-radius: 50%;
+  box-shadow:
+  0 0.1rem 0.15rem rgba(255, 255, 255, 0.3),
+  inset 0 -0.1rem 0.15rem rgba(255, 255, 255, 0.3),
+  inset 0 0.5rem 0.5rem rgba(255, 255, 255, 0.2),
+  inset 0.2rem 0 0.3rem rgba(255, 255, 255, 0.1),
+  inset -0.2rem 0 0.3rem rgba(255, 255, 255, 0.1),
+  0 -0.1rem 0.1rem rgba(255, 255, 255, 0.2);
+/*   0 0.1rem 0.15rem rgba(255, 255, 255, 0.3),
+  inset 0 -0.1rem 0.15rem rgba(255, 255, 255, 0.3),
+  inset 0 0.5rem 0.5rem rgba(34, 100, 158, 0.2),
+  inset 0.2rem 0 0.3rem rgba(34, 100, 158, 0.1),
+  inset -0.2rem 0 0.3rem rgba(34, 100, 158, 0.1),
+  0 -0.1rem 0.1rem rgba(34, 100, 158, 0.2); */
+}
+.wave_1 {
+  animation-delay: 1s;
+}
+.wave_2 {
+  animation-delay: 2s;
+}
+ .wave_3 {
+  animation-delay: 3s;
+}
+.align-center {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+.drop {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #ffffff;
+/*   box-shadow:
+  inset 0 -0.2rem 0.2rem rgba(34, 100, 158, 0.3),
+  inset 0 -0.1rem 0.2rem #7cb5db, 
+  0 -0.5rem 1rem #7cb5db ; */
+  transform: translateY(-7rem);
+  animation: fall 1s linear infinite;
+  opacity: 0;
+}
+@keyframes wave {
+  to { transform: scale(1); opacity: 0 }
+}
+@keyframes fall {
+  90% { transform: scale(0.7, 1); opacity: 1; }
+  100% { transform: translateY(0rem) scale(0.7, 0.3); opacity: 0.7 }
+ }
+
+
+</style>-->
+{% endblock %}
+
+
+
+{% block content %}
+
+	{{ user.is_authenticated|json_script:"user_logged" }}
+	<div id="footer"> {% include "bottom/footer_spida.html" %}</div>
+
+	<!--Preload Page-->
+ 	<!--<div id="pre-loader" class="wrapper">
+		<div class="wave_1 outer-shadow">
+		<div class="inner-shadow align-center"></div>
+		</div>
+		<div class="wave_2 outer-shadow align-center">
+		<div class="inner-shadow align-center"></div>
+		</div>
+		<div class="wave_3 outer-shadow align-center">
+		<div class="inner-shadow align-center"></div>
+		</div>
+		<div class="drop align-center"></div>
+	</div>-->
+	{% include "popups/loader.html" %}
+ 
+	<!--CREO EL SIDEBAR-->
+    <div id="sidebar" class="pt-4 pr-4">
+        <!--<h1>leaflet-sidebar</h1>-->
+	</div>
+
+    <!--CREO EL MAPA-->
+	<div id="map" style="background: #343a40"></div>
+	<script src="{% static 'js/spida/reqwest.min.js' %}"></script>
+	<script src="{% static 'js/spida/Leaflet.Photo.js' %}"></script>
+
+
+	<!--SWIPE PARA VISUALIZAR DOS TIPOS DE MAPA (SATELITE Y STREET)-->
+	<!--{% if user.is_anonymous %}
+	<input id='range' class='range' type='range' min='0' max='1.015' value='0' step='any' style="z-index: 1;" />
+	{% else %}
+	<div class="progress">
+		<div id="bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="300" style="margin-left: 10px; margin-right: 10px; border-radius: .25rem;"></div>
+		<span class="justify-content-center d-flex position-absolute w-100" style="color:black;"></span>
+ 	</div>
+	{% endif %} -->
+
+	<!--CUADRO INFO AVISOS-->
+	<div id="avisos" style="float: right;"></div>
+	
+	<!--CUADRO MODAL PARA MOSTRAR INFORMACION (Ej: datos sujetos a validacion)-->
+	<div class="modal" id="myModal" tabindex="-1">
+	  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" style="color:#00CED1;font-family: 'Brush Script MT', cursive; font-size:35px; text-align:center;">
+				Aviso sobre la provisionalidad de los datos en tiempo real
+			</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+		  <div class="modal-body" style="text-align: justify;">
+			<p>
+				La Red Spida es un Sistema de Alerta Temprana con telecontrol en tiempo real a través de la cual se
+				monitorean amenazas o eventos adversos de carácter previsible que puedan desembocar en episodios de inundacion.
+				<br><br>
+				Los datos recopilados por los sensores de los diversos puntos de control existentes, son transmitidos
+				de forma automática sin ningún tipo de aprobación final al Centro Hispano-Luso de Redes de Alerta
+				Temprana (Alerta2), con una periodicidad decimominutal mediante comunicaciones LTE y/o IPSAT.
+				<br><br>
+				La alta frecuencia de transmision de los datos, aporta a éstos un caracter de provisionalidad hasta su
+				posterior revisión, validacion y consolidacion por parte del personal técnico del Centro Alerta2.
+				<br><br>
+				Consecuencia de ello, los datos no pueden ser legalmente utilizados ya que pueden estar afectados por
+				diversos factores como:
+				<ul>
+					<li> Embalsamiento natural del agua debido a troncos y follaje.</li>
+					<li> Crecimiento de la Vegetacion proxima a los sensores. </li>
+					<li> Funcionamiento incorrecto de los equipos de medición, registro y comunicación. </li>
+					<li> Desembalses decontrolados. </li>
+			  		<li> Transporte de sedimentos puntuales. </li>
+				</ul>
+				En cuanto a los datos meteorológicos (puvliometría), destacar que en ningun caso tendrán validez
+			    oficial los recopilados por las diversas estaciones de la Red Spida, siendo los únicos datos
+			    meteorológicos válidos los proporcionados por la Agencia Estatal de Meteorología (Aemet), referente
+			    a la previsión de precipitacion.
+				<br><br>
+				Los usuarios de los datos en tiempo real son advertidos de la naturaleza provisional de la información
+			    antes de usarla para la toma de decisiones que conciernen a seguridad personal o pública o aplicada a
+			    un negocio que suponga consecuencias económicas u operacionales substanciales.
+				<br><br>
+			  	Cualquier comentario debe realizarse al buzón de Alerta2:
+			  	<a style="color:'blue';" href="mailto:redalertaspida@gmail.com">redalertaspida@gmail.com</a>
+
+			</p>
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-primary" data-dismiss="modal">De acuerdo</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+
+	<!-- CREO EL CUADRO DE LA IMAGEN MODAL -->
+	 <div id="myModalImagen" class="modal" style="display: none;position: fixed;padding-top: 100px;left: 0;top: 0;width: 100%;height: 100%;overflow: auto;background-color: rgba(0,0,0,0.9);">
+		 <span class="closeImg">&times;</span>
+		 <img class="modal-content-img" id="img01" style="border-radius: 10px; margin:0px auto;">
+		 <div id="caption"></div>
+	 </div>
+
+
+	
+	<script src="{% static 'js/spida/mapaSpida.js' %}"></script>
+	<script type="text/javascript">
+
+		//var jsonSol = {{jsonPuestasDeSol|safe}}; 
+		var menuChart=['viewFullscreen','downloadJPEG'];
+
+		/*// Funcion Preload Page
+		window.onload=fadeOut("pre-loader");
+
+		function fadeOut(nameElement) {
+			var element = document.getElementById(nameElement);
+			var op = 1;  // initial opacity
+			var timer = setInterval(function () {
+				if (op <= 0.1){
+					clearInterval(timer);
+					element.style.display = 'none';
+				}
+				element.style.opacity = op;
+				element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+				op -= op * 0.1;
+			}, 50);
+		}
+		function fadeIn(element) {
+			var op = 0.1;  // initial opacity
+			element.style.display = 'block';
+			var timer = setInterval(function () {
+				if (op >= 1){
+					clearInterval(timer);
+				}
+				element.style.opacity = op;
+				element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+				op += op * 0.1;
+			}, 10);
+		};*/
+	</script>
+	
+
+
+	{% if user.is_authenticated %}
+		{% if perms.auth.spida_documentacion %}	
+			<script type="text/javascript">
+				var menuChart=["viewFullscreen", "printChart", "separator", "downloadPNG", "downloadJPEG", "downloadPDF", "downloadSVG","separator", "downloadCSV", "downloadXLS", "viewData"]
+			</script>
+			
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
+	 		<!-- Mapa Privado -->
+			<script src="{% static 'js/spida/mapaSpidaPrivado.js' %}" type="text/javascript"></script>
+		{% else %}
+	 		<!-- Mapa Publico -->
+			<script src="{% static 'js/spida/mapaSpidaPublico.js' %}" type="text/javascript"></script>	
+		{% endif %}
+
+
+	{% else %}
+	 	<!-- Mapa Publico -->
+		<script src="{% static 'js/spida/mapaSpidaPublico.js' %}" type="text/javascript"></script>
+
+	{% endif %}
+    
+
+	
+{% endblock %}
+
+

@@ -1,0 +1,905 @@
+{% extends "base/base_docLaruex.html" %}
+{% load crispy_forms_tags %}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+{% load static %}
+
+{% block content %}
+<style>
+  
+  /* ===============================
+  *  Estilo del las pestañas
+  =================================*/
+  
+  .nav-tabs-bordered .nav-link {
+    margin-bottom: -2px;
+    border: none;
+    color: #2c384e;
+}
+  .nav-tabs-bordered .nav-link.active {
+    background-color: #fff;
+    color: #4154f1;
+    border-bottom: 2px solid #4154f1;
+}
+.nav-tabs {
+    --bs-nav-tabs-border-color: #dee2e6;
+    --bs-nav-tabs-border-radius: 0.375rem;
+    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
+    --bs-nav-tabs-link-active-color: #495057;
+    --bs-nav-tabs-link-active-bg: #fff;
+    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+}
+
+.agregarFormacion:hover {
+    color: #051925;
+  }
+
+.cancelarMantenimiento:hover{
+  color: #ca9802;
+}
+
+  /* estilo añadirFichero PDF*/
+  .addFicheroPDF {
+    color: rgb(161, 16, 32);
+  }
+
+  .addFicheroPDF:hover {
+    color: rgb(99, 10, 20);
+  }
+
+  /* estilo añadirFichero PDF*/
+  .addFicheroActualizado {
+    color: #0a9663;
+  }
+  /* estilo añadirFichero PDF*/
+  .addFicheroActualizado:hover {
+    color: #064930;
+  }
+
+</style>
+
+
+
+<!-- breadcrumb   -->
+<div class="card-body" >
+  <h5 class="card-title">Tarea</h5>
+  <nav >
+    <ol class="breadcrumb"style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/tareas">Listado de tareas</a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">{{ tarea.id_evento__nombre }}</li>
+    </ol>
+  </nav>
+</div>
+
+
+
+
+
+<!-- =================== Información de Tarea =================== -->
+
+<section class="section profile">
+  <div class="row">
+    <div class="col-xl-4">
+
+      <div class="card">
+        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+          
+          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+            style="background-color: #41c9ef52;">
+            <i class="fa-solid fa-list-check  fa-4x" style="color: #18414b; "></i>
+          </div>
+          <h2> Tarea de {{tarea.id_evento__tipo_evento__nombre}}</h2>
+          {% if registro.estado__id|safe in '1,2,4' %}
+            <h3 class="d-flex justify-content-center">
+              <a href="" class="mx-1 my-2" title="Completar registro de la tarea" data-toggle="modal"
+                data-target="#modalCompletarHistorico" style="color: #005f73"><i class="fa-duotone fa-pen-to-square fa-3x agregarFormacion"></i></a>
+            </h3>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+          
+          {% if  tarea.fecha_proximo_mantenimiento %}
+            {% if registro.estado__id == 1 %}
+              <h2 style="color:#005f73"><i class="fa-duotone fa-clock fa-beat fa-lg me-2" style="color: #005f73;"></i><strong>{{tarea.fecha_proximo_mantenimiento|date}}</strong></h2>
+            {% elif registro.estado__id == 2 %} 
+              <h3>Cuidado, mantenimiento a punto de cumplir</h3>
+              <h2 style="color:#bb3e03"><i class="fa-duotone fa-clock fa-beat fa-lg me-2" style="color: #bb3e03;"></i><strong>{{tarea.fecha_proximo_mantenimiento|date}}</strong></h2>
+            {% elif registro.estado__id == 4 %} 
+            <h3>¡Alerta!, mantenimiento fuera de plazo</h3>
+              <h2 style="color:#ae2012"><i class="fa-duotone fa-clock fa-beat fa-lg me-2" style="color: #ae2012;"></i><strong>{{tarea.fecha_proximo_mantenimiento|date}}</strong></h2>
+            {% else %}
+              <h1 style="color: #001219"><strong>Mantenimiento cancelado</strong></h3>
+            {% endif %}
+          {% endif %}
+
+        </div>
+      </div>      
+
+    </div>
+
+    <div class="col-xl-8">
+
+      <div class="card">
+        <div class="card-body pt-3">
+          <!-- Bordered Tabs -->
+          <ul class="nav nav-tabs nav-tabs-bordered">
+
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Información</button>
+            </li> 
+              
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-historial">Histórico</button>
+            </li>           
+
+            {% if administrador %}
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-eliminar">Eliminar</button>
+            </li>
+            {% endif %}
+
+          </ul>
+          <div class="tab-content pt-2">
+
+            <div class="tab-pane fade show active profile-overview" id="profile-overview">
+              <h5 class="card-title">Información de la tarea <a href="" class="mx-1 my-2" title="Cancelar el mantenimiento" data-toggle="modal"
+                data-target="#modalCancelarMantenimiento" style="color:#ca6702"><i class="fa-solid fa-power-off cancelarMantenimiento"></i></a></h5>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Nombre</div>
+                <div class="col-lg-9 col-md-8">{{tarea.id_evento__nombre}} de {{objeto.id__nombre}} </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Objeto asociado</div>
+                    <div class="col-lg-9 col-md-8"><a href="\private/docLaruex/verObjeto/{{objeto.id}}" style="color:#005f73">{{objeto.id__nombre}}</a></div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Procedimiento asociado</div>
+                    <div class="col-lg-9 col-md-8"><a href="\private/docLaruex/verObjeto/{{tarea.id_evento__procedimiento_asociado__id_doc}}" style="color:#005f73">{{tarea.id_evento__procedimiento_asociado__id_doc__nombre}}</a></div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Último mantenimiento</div>
+                {% if tarea.fecha_ultimo_mantenimiento %}
+                <div class="col-lg-9 col-md-8 my-auto">{{tarea.fecha_ultimo_mantenimiento}}</div>
+                {% else %}
+                <div class="col-lg-9 col-md-8 text-danger my-auto">Sin datos</div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Próximo mantenimiento</div>
+                {% if tarea.fecha_proximo_mantenimiento %}
+                <div class="col-lg-9 col-md-8 my-auto"><i class="fa-duotone fa-clock fa-beat fa-lg me-2" style="color: #9768b2;"></i><strong>{{tarea.fecha_proximo_mantenimiento|date}}</strong></div> 
+                {% else %}
+                <div class="col-lg-9 col-md-8 text-danger my-auto">Aún por asignar</div>
+                {% endif %}
+              </div>
+
+              
+              <h5 class="card-title">Información Adicional</h5>
+              
+              {% if tarea.observaciones %}
+              <p class="small fst-italic" style="white-space: pre-line;">{{tarea.observaciones}}</p>
+              {% else %}
+              <p class="small fst-italic" style="white-space: pre-line;">--</p>
+
+              {% endif %}
+            </div>
+
+
+            <div class="tab-pane fade profile-historial pt-3 dashboard" id="profile-historial">
+              <div class="card-body">
+                <table id="tabla_registros_tarea" data-toggle="table" data-search="true" data-show-columns="true"
+                data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+                data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+                data-pagination="true" data-id-field="id" data-page-list="[5, 10, 25, 50, 100, All]" data-toolbar="#toolbar" 
+                data-click-to-select="true"  data-smart-display="true" >
+                </table>
+              </div>
+
+            </div>
+
+            <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+              <!-- Edit Form -->
+              <form id="formularioEditarTarea"  action="/private/docLaruex/editarTarea/{{tarea.id}}/" method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+                <div class="row mb-3">
+                  <label for="nuevaFechaInicial" class="col-md-4 col-lg-3 col-form-label">Fecha Inicial</label>
+                  <div class="col-md-3 col-lg-3">
+                    <input name="nuevaFechaInicial" type="datetime-local" class="form-control" id="nuevaFechaInicial" value="{{ tarea.fecha_inicial|date:'Y-m-d\TH:i' }}" >
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="evento" class="col-md-4 col-lg-3 col-form-label">Evento</label>
+                  <div class="col-md-8 col-lg-9"><select class="form-control" id="evento" name="evento">
+                    <option value="{{tarea.id_evento__id}}" selected hidden>
+                      {{ tarea.id_evento__nombre }} [{{tarea.id_evento__tipo_periodicidad__periodicidad}}: {{tarea.id_evento__periodicidad__cantidad}} {{tarea.id_evento__periodicidad__unidad}}] [{{tarea.id_evento__procedimiento_asociado__id_doc__nombre}}]
+                    </option>
+                    {% for evento in eventos %}
+                    <option value="{{evento.id}}">
+                      [{{evento.procedimiento_asociado__id_doc__nombre}}] {{evento.nombre}} [{{evento.tipo_periodicidad__periodicidad}}: {{evento.periodicidad__cantidad}} {{evento.periodicidad__unidad}}]
+                    </option>
+                    {% endfor %}
+                  </select>
+                  </div>
+                </div> 
+
+
+
+
+                <div class="row mb-3">
+                  <label for="nuevasObservaciones" class="col-md-4 col-lg-3 col-form-label">Observaciones</label>
+                  <div class="col-md-8 col-lg-9">
+                    <textarea name="nuevasObservaciones" class="form-control" id="nuevasObservaciones" style="height: 100px">{{tarea.observaciones}}</textarea>
+                  </div>
+                </div>
+
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary" onclick="crearAviso('tareaEditar', 'Tarea modificada con éxito', 'alert-success', 2000);">Guardar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+
+            <!-- Eliminar Proveedor -->
+            <div class="tab-pane fade profile-eliminar pt-3" id="profile-eliminar">
+
+              <!-- Edit Form -->
+              <form form id="fomularioEliminarTarea" action="/private/docLaruex/eliminarTarea/{{ tarea.id }}/"
+              method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label class="text-center">¿Estás seguro de eliminar la tarea?</label>
+                </div>
+                <div class="text-center">
+                  <button id="eliminarTarea" type="submit" class="btn btn-danger" onclick="crearAviso('guardarEliminarTarea', 'Tarea  eliminada con éxito', 'alert-success', 3000)">Eliminar</button>
+
+                  <button  id="cancelarEliminarTarea" type="reset" class="btn btn-secondary" onclick="crearAviso('cerrarEliminarTarea', 'No se ha podido eliminar la tarea', 'alert-warning', 3000); location.reload()">Cancelar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+          </div><!-- End Bordered Tabs -->
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ============= Modal Agregar Tarea ====================-->
+
+<div id="modalCompletarHistorico" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalCompletarHistorico"><strong>Completar Registro de la tarea</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalCompletarHistorico" action="/private/docLaruex/completarHistorico" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="row">
+            <div class="col">
+              <input type="text" id="tareaProgramada" name="tareaProgramada" value="{{tarea.id}}"hidden>
+              <input type="text" id="historico" name="historico" value="{{registro.id}}" hidden>
+              <input type="number" id="conforme" name="conforme" value="1" hidden>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center my-3">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="fecha_realizado">Fecha de realización </label>
+                <input type="datetime-local" id="fecha_realizado" name="fecha_realizado" class="form-control"  required />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="conforme">¿Conforme?</label>
+                <select class="form-control" id="conforme" name="conforme">
+                  <option value="0">No
+                  </option>
+                  <option value="1">Si
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <textarea class="form-control" id="observacionesRegistro" name="observacionesRegistro"  rows="3"
+                data-rule="required" placeholder="Observaciones"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            
+            <div class="col">
+            <div class="form-group">{{ form|crispy }}</div>
+            </div>
+          </div>
+          
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarCompletarHistorico" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarEvento" name="cancel" onclick="crearAviso('eliminarCompletarHistorico', 'No se ha podido crear la tarea', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-info" onclick="crearAviso('agregarTareaGuardar', 'Tarea Agregada con éxito', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ============= Modal Agregar Tarea ====================-->
+
+<div id="modalCancelarMantenimiento" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalCancelarMantenimiento"><strong>Cancelar mantenimiento</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalCancelarMantenimiento" action="/private/docLaruex/cancelarRegistroTarea" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="row">
+            <div class="col">
+              <input type="text" id="id_tarea" name="id_tarea" value="{{tarea.id}}"hidden>
+              <input type="text" id="id_registro" name="id_registro" value="{{registro.id}}" hidden>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <textarea class="form-control" id="motivoCancelacion" name="motivoCancelacion"  rows="3"
+                data-rule="required" placeholder="Motivo de la cancelación"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="row" id="divProgramarSiguiente">
+            <div class="col d-flex justify-content-center align-items-center">
+              <div class="form-group">
+                <label for="programarSiguiente">¿Quiere reprogramar la tarea?</label>
+                <select class="form-select"  id="programarSiguiente" name="programarSiguiente"  onchange="reprogramarFecha(this);">
+                  <option selected hidden>Indique si o no</option>
+                  <option value="1">Si</option>
+                  <option value="0">No</option>
+                </select>
+              </div>     
+            </div>
+          </div>
+          <div class="row" id="divFechaReprogramada" hidden>
+            <div class="col d-flex justify-content-center my-3">
+              <div class="form-group">
+                <label for="FechaReprogramada">Fecha de realización </label>
+                <input type="datetime-local" id="FechaReprogramada" name="FechaReprogramada" class="form-control" />
+              </div>
+            </div>
+          </div>
+          
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarCompletarHistorico" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarEvento" name="cancel" onclick="crearAviso('eliminarCompletarHistorico', 'No se ha podido crear la tarea', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-info" onclick="crearAviso('agregarTareaGuardar', 'Tarea Agregada con éxito', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============= Modal Eliminar ====================-->
+
+<div id="modalEliminarRegistroTarea" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarRegistroTarea"><strong>¿Estas seguro que deseas eliminar registro?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarRegistroTarea" action="/private/docLaruex/eliminarRegistroTarea/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarRegistroTarea" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarRegistroTarea" name="cancel" onclick="crearAviso('eliminarRegistroTareaCancelar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarRegistroTareaGuardar', 'Registro de la tarea eliminado', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============= MODAL AVISO ====================-->
+<div class="modal fade" id="avisoModal" tabindex="-1"
+     role="dialog" aria-labelledby="avisoModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger" id="avisoModalLabel">
+          <strong>Aviso</strong>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal"
+                aria-label="Close" onclick="cerrarModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col text-center">
+            <h5 id="textModalAviso"></h5>
+          </div>
+        </div>
+        <!-- Contenido del modal -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Modal con el formulario para añadir un formato relleno ========== -->
+
+<div id="modalRellenarFormato" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+  aria-labelledby="modalRellenarFormato" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">
+          <strong>
+            Añadir {{tarea.id_evento__formato_asociado__id_doc__nombre}} relleno
+            <h5 class="modal-title">{{tarea.id_evento__procedimiento_asociado__id_doc__nombre}} {{tarea.id_evento__formato_asociado__id_doc__nombre}} {{tarea.id_evento__formato_asociado__titulo}}</h5>
+          </strong>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+      </div>
+      <!-- END Cabecera del ModalAñadirFormatoRelleno -->
+
+      <!-- Body del ModalAñadirFormatoRelleno -->
+      <div class="modal-body">
+        <form id="formularioModalAgregarFormatoRelleno"  enctype="multipart/form-data">
+          {% csrf_token %}
+            <input type="text" class="form-control" id="habilitacion" name="habilitacion" data-rule="required" readonly hidden
+                value="{{tarea.id_evento__formato_asociado__id_doc__id_habilitacion}}" />
+          <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly hidden
+            value="Formato" />
+          <input type="text" class="form-control" id="procedimientoAsociado" name="procedimientoAsociado"
+            data-rule="required" readonly hidden value="{{tarea.id_evento__procedimiento_asociado__id_doc__nombre}}" />
+            
+          <input type="text" class="form-control" id="padre" name="padre"
+          data-rule="required" readonly hidden value="{{tarea.id_evento__procedimiento_asociado__id_doc__id}}" />
+
+          <!-- 0 - relleno 1- plantilla -->
+          <input type="text" class="form-control" id="plantilla" name="plantilla" data-rule="required" readonly hidden
+            value="0" />
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="fechaEdicion">Fecha de edición</label>
+                <input type="date" id="fechaEdicion" name="fechaEdicion" class="form-control" required />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="editable">¿Es rellenable?</label>
+                <select class="form-select" data-rule="required" id="editable" name="editable"
+                  onchange="mostrarFicheroFormato(this.value)">
+                  <option value="0" selected>No</option>
+                  <option value="1">Si</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="infoMuestra">Código de Muestra / Referencia *</label>
+                  <input type="text" id="infoMuestra" name="infoMuestra" class="form-control" required />
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="infoAlicuota">Código reducido</label>
+                  <input type="text" id="infoAlicuota" name="infoAlicuota" class="form-control" />
+                </div>
+              </div>
+              <input type="text" class="form-control" id="nombreObjeto" name="nombreObjeto" readonly hidden
+                data-rule="required" value={{tarea.id_evento__formato_asociado__id_doc__nombre}} />
+            </div>
+            <input type="text" class="form-control col-md-auto" id="tituloFormato" value="{{tarea.id_evento__formato_asociado__titulo}}" readonly hidden
+               name="tituloFormato" data-rule="required" />
+            <input type="text" class="form-control col-md-auto" id="version" value="{{tarea.id_evento__formato_asociado__version}}" readonly hidden
+              name="versionFormato" data-rule="required" />
+            <input type="text" class="form-control col-md-auto" id="editor" value="{{user.id}}" readonly hidden
+              name="editor" data-rule="required" />
+
+            <div class="row d-flex justify-content-center">
+              <div class="col-md-auto" id="adjuntoEditable">
+                <div class="form-group">
+                  <label for="ficheroAdjuntoFormato"><i id="iconoFormato"
+                      class="fa-solid fa-file-pdf fa-4x addFicheroPDF"></i>
+                  </label>
+                  <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                    id="ficheroAdjuntoFormato" name="ficheroAdjuntoFormato" data-rule="required"
+                    onchange="mostrarNombreFormatoRellenable(this.value)" re />
+                  <spam class="text-center"><strong id="mostrarNombreFormatoRellenable"></strong>
+                    <spam id="file-name-formatoRellenable"></spam>
+                  </spam>
+
+                </div>
+              </div>
+            </div>
+            <!-- END Body del ModalAsociarFormato -->
+
+            <!-- Footer del ModalAsociarFormato -->
+            <div class="modal-footer">
+              <button id="cerrarAgregarFormatoRelleno" type="button" class="btn btn-secondary" data-dismiss="modal">
+                Cerrar
+              </button>
+              <button type="reset" id="resetAgregarFormatoRelleno" class="btn btn-secondary" hidden>Reiniciar</button>
+
+              <button type="submit" value="submit" class="btn btn-primary">
+                Guardar
+              </button>
+            </div>
+            <!-- END Footer del ModalAsociarFormato -->
+        </form>
+      </div>
+    </div>
+  </div>
+</div><!-- END ModalAsociarFormato -->
+
+
+
+<script type="text/javascript">
+
+
+// mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+function mostrarNombreFormatoRellenable(value) {
+
+  document.getElementById('file-name-formatoRellenable').innerHTML = value;
+
+  document.getElementById('mostrarNombreFormatoRellenable').style.display = 'none';
+}
+function mostrarFicheroFormato(value) {
+
+if (value == "1") {
+  const elemento = document.getElementById('iconoFormato')
+  const nuevoElemento = document.createElement("i");
+  nuevoElemento.className = "fa-duotone fa-file-excel fa-4x addFicheroActualizado";
+  elemento.replaceWith(nuevoElemento);
+} else {
+  $("#tituloObjetoNombre").html("Añadir Documento");
+}
+}
+  function reprogramarFecha(value){
+    if(value.value == 1){
+      document.getElementById("divFechaReprogramada").hidden = false;
+      document.getElementById("FechaReprogramada").required = true;
+      document.getElementById("divProgramarSiguiente").hidden = true;
+
+    }else{
+      document.getElementById("divProgramarSiguiente").hidden = true;
+    }
+  }
+
+  
+  function addZero(i) {
+    if (i < 10) { i = "0" + i }
+    return i;
+  }
+
+  function comprobarSiFormatoRelleno(value){
+    event.preventDefault(); // Evita que se siga con la acción predeterminada del enlace
+
+    var url = "/private/docLaruex/consultarArchivo/" + value + "/";
+      // guardar el resultado de la lista de datos obtenidos en la views.py
+      var respuesta = $.get(url, function (data) {
+        if(data.status === "error"){
+          $('#avisoModal').modal('show');
+          $('#textModalAviso').text(data.message);
+        }else{
+          window.open("/private/docLaruex/consultarArchivo/" + value + "/", '_blank');
+        }
+ 
+    });
+  }
+  function cerrarModal(){
+    $('#avisoModal').modal('toggle');
+  }
+
+  function actualizarFormulario(element) {
+    var rowId = element.getAttribute('data-row-id');
+    // crea un div
+    var div = document.createElement("div");
+    div.setAttribute("id", "divIdRegistroTarea");
+    $('#formularioModalAgregarFormatoRelleno').append(div);
+
+    var input = document.createElement("input");
+    input.setAttribute("name", "idRegistroTarea");
+    input.setAttribute("id", "idRegistroTarea");
+    input.setAttribute("type", "text");
+    input.setAttribute("class", "form-control");
+    input.setAttribute("readonly", "true");
+    input.setAttribute("hidden", "true");
+    input.setAttribute("value", element.getAttribute('data-row-id'));
+    div.append(input); 
+}
+
+  // cambiamos la funcionalidad del boton submit del formulario de envio de notificaciones
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  $("#formularioModalAgregarFormatoRelleno").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Formato asignado con éxito', 'alert-success', 2000);
+        $("#resetAgregarFormatoRelleno").trigger("click");
+        $('#cerrarAgregarFormatoRelleno').trigger('click');
+        location.reload();
+      }
+    });
+  });
+
+  // Obtiene la fecha y hora actual
+  var fechaActual = new Date();
+    
+  // Formatea la fecha y hora en formato ISO para usarlo en el campo de entrada
+  var fechaFormateada = fechaActual.toISOString().slice(0, 16);
+  
+  // Establece el valor del campo de entrada con la fecha y hora actual
+  document.getElementById("fecha_realizado").value = fechaFormateada;
+
+    // tatbla de elementos seleccionados
+    $("#tabla_registros_tarea").bootstrapTable({
+    locale: navigator.language,
+    url:"/private/docLaruex/registrosTareaDatos/{{tarea.id}}/" ,
+    cache: false,
+    columns: [ {
+        title: "ID",
+        field: 'id',
+        align: "center", 
+      }, {
+        title: "Fecha",
+        field: 'fecha',
+        align: "center",
+        formatter: function (value, row) {
+          
+          var fechaProgramada = new Date(row.fecha_programada)
+          var fechaRealizacion = new Date(row.fecha)
+
+          // formateamos las fechas
+          var fechaRealizacionFormateada = $.datepicker.formatDate('dd-mm-yy', fechaRealizacion) + " " + addZero(fechaRealizacion.getHours()) + ":" + addZero(fechaRealizacion.getMinutes());
+          var fechaProgramadaFormateada = $.datepicker.formatDate('dd-mm-yy', fechaProgramada);
+
+          // Comprobamos si la tarea esta programada o realizada y devolvemos la fecha correspondiente
+          if (row.estado__id == 1){
+            return ("<i class='fa-duotone fa-clock fa-lg me-2 estadoReloj' id='relojito'></i> " + fechaProgramadaFormateada);
+          }else{
+            return (fechaRealizacionFormateada);
+          }
+          
+        },
+      },{
+        title: "Estado",
+        field: 'estado__id',
+        align: "center",
+        formatter: function (value, row) {
+          var defecto = '<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+          switch (row.estado__id) {
+            case 1:
+              estado = '<span class="badge badge-success" style="background-color: #0A9396;">Programado</span>';
+              return estado;
+              break;
+            case 2:
+              estado = '<span class="badge" style="background-color: #EB8E34;">Avisado</span>';
+              return estado;
+              break;
+            case 3:
+              estado = '<span class="badge" style="background-color: #21b563;">Realizado</span>';
+              return estado;
+              break;
+            case 4:
+              estado = '<span class="badge" style="background-color: #b52121;">Caducado</span>';
+              return estado;
+              break;
+            case 5:
+              estado = '<span class="badge" style="background-color: #524e4e;">Cancelado</span>';
+              return estado;
+              break;
+            case 6:
+              estado = '<span class="badge" style="border:2px solid #0A9396; background-color: transparent; color:#0A9396;">Corregido</span>';
+              return estado;
+              break;
+            case 7:
+              estado = '<span class="badge" style="border:2px solid #b52121; background-color: transparent; color:#b52121;">Erroneo</span>';
+              return estado;
+              break;
+
+            default:
+              console.log("No se ha encontrado el estado", row.estado__id)
+              return defecto;
+
+          }
+        },
+      },{
+        title: "Observaciones",
+        field: 'observaciones',
+        align: "center",
+      },{
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+
+          var admin = '{{administrador}}';
+          var botonVerHistorico = '<a href="/private/docLaruex/reportRegistroTarea/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg" ></i></a>';
+          var botonEditarHistorico = '<a href="/private/docLaruex/editarRegistroTarea/' + row.id + '/" class="mx-1" title="Editar" style="color:#4F5775" ><i class="fa-duotone fa-money-check-pen fa-lg agregarFormacion"></i></a>';
+          var botonEliminarHistorico = '<a href="/private/docLaruex/eliminarRegistroTarea/' + row.id + '/' + '" class="mx-1" title="Eliminar Registro de la tarea" data-toggle="modal" data-target="#modalEliminarRegistroTarea" onclick="$('+"'#formularioModalEliminarRegistroTarea').attr('action', '/private/docLaruex/eliminarRegistroTarea/"+ row.id +"/');"+'" ><i class="fa-solid fa-x" style="color:#AE2012"></i></a>';
+
+          var botonAgregarFormatoRelleno ='<a href="#" class="mx-1" title="Agregar Formato Relleno al registro" data-toggle="modal" data-row-id="'+ row.id +'" data-target="#modalRellenarFormato" onclick="actualizarFormulario(this);"><i class="fa-solid fa-plus fa-lg" style="color:#CA6702"></i></a>';
+
+          var botonDescargarFormatoRelleno = '<a onclick="comprobarSiFormatoRelleno(' + row.id_formato__id_doc__id +')"  href="/private/docLaruex/consultarArchivo/' + row.id_formato__id_doc__id + '/' + '" class="mx-1" title="Descargar Formato Relleno" download><i class="fa-solid fa-file-pdf fa-lg" style="color:9b2226"></i></a>';
+          var defecto ="";      
+          switch (row.estado__id) {
+            case 1:
+              if (admin == 'True'){
+                return (botonVerHistorico + botonEditarHistorico );
+               }
+               else{
+                return (botonVerHistorico );
+               }        
+              break;
+            case 2:
+              if (admin == 'True'){
+                return (botonVerHistorico + botonEditarHistorico );
+               }
+               else{
+                return (botonVerHistorico );
+               }        
+              break;
+            case 3:
+              if (admin == 'True'){
+                if (row.id_formato != null){
+                  return (botonVerHistorico + botonEditarHistorico + botonDescargarFormatoRelleno + botonEliminarHistorico);
+                }else{
+                  return (botonVerHistorico + botonEditarHistorico + botonAgregarFormatoRelleno + botonEliminarHistorico);
+                }
+               }
+               else{
+                if (row.id_formato != null){
+                  return (botonVerHistorico + botonDescargarFormatoRelleno);
+                }else{
+                  return (botonVerHistorico + botonAgregarFormatoRelleno);
+                }
+               }  
+              break;
+            case 4:
+              if (admin == 'True'){
+                return (botonVerHistorico + botonEditarHistorico );
+               }
+               else{
+                return (botonVerHistorico );
+               }        
+               break;
+            case 5:
+              if (admin == 'True'){
+                return (botonVerHistorico + botonEditarHistorico + botonEliminarHistorico);
+               }
+               else{
+                return (botonVerHistorico );
+               }        
+               break;
+            case 6:
+              if (admin == 'True'){
+                if (row.id_formato != null){
+                  return (botonVerHistorico + botonEditarHistorico + botonDescargarFormatoRelleno + botonEliminarHistorico);
+                }else{
+                  return (botonVerHistorico + botonEditarHistorico + botonAgregarFormatoRelleno + botonEliminarHistorico);
+                }
+               }
+               else{
+                if (row.id_formato != null){
+                  return (botonVerHistorico + botonDescargarFormatoRelleno);
+                }else{
+                  return (botonVerHistorico + botonAgregarFormatoRelleno);
+                }
+               }  
+               break;
+            case 7:
+              if (admin == 'True'){
+                if (row.id_formato != null){
+                  return (botonVerHistorico + botonEditarHistorico + botonDescargarFormatoRelleno + botonEliminarHistorico);
+                }else{
+                  return (botonVerHistorico + botonEditarHistorico + botonEliminarHistorico);
+                }
+               }
+               else{
+                if (row.id_formato != null){
+                  return (botonVerHistorico + botonDescargarFormatoRelleno);
+                }else{
+                  return (botonVerHistorico);
+                }
+               } 
+               break;
+            default:
+              console.log("No se ha encontrado el estado", row.estado__id)
+              return defecto;
+
+          }
+
+      }
+    },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "desc",
+  });
+
+
+
+
+  </script>
+{% endblock %}

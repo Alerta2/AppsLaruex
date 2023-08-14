@@ -1,0 +1,26 @@
+{% load static %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'rare:juntaexPortada' %}">JUNTAEX</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'rare:juntaexPortadaVRAEX' %}">VRAEX</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'copuma:juntaexMapPublicoVraex' %}">Mapa VRAEX publico</a>
+    </li>
+    {% if perms.auth.muestras_vraex %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'copuma:vraexMapaPrivado' %}">Mapa VRAEX <i class="fa-solid fa-lock"></i></a>
+        </li>
+    {% endif %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'rare:juntaexPortadaRarex' %}">RAREx</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'rare:juntaexMapMediaRarex' %}">Mapa RAREx publico</a>
+    </li>
+    {% if perms.auth.mapa_diario %}
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'rare:rarexMapaEstado' %}">Mapa RAREx <i class="fa-solid fa-lock"></i></a>
+        </li>
+    {% endif %}

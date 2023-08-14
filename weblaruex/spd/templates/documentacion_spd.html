@@ -1,0 +1,149 @@
+{% extends "base/base_spd.html" %}
+
+{% load static %}
+
+{% block imports %}
+<!-- Estilo propio css -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/documentacion_spd.css' %}">
+
+<!-- Estilo cards flip css -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/card_flip_spd.css' %}">
+
+
+
+{% endblock %}
+
+{% block content %}
+
+<section class="block-documentacion">
+    <div class="container">
+      <h2 class="cursive-brush" style="font-size: 9vh;">Documentación</h2>
+      
+      <!--Linea divisoria-->
+      <hr class="linea-hr"/>
+
+
+      <div class="container"> <!-- Cards Documentacion -->
+        <div class="row text-center">
+            <div class="col-lg-4 col-md-6 card-container">
+                <div class="card card-flip">
+                  <div class="front card-block">
+                    <span style="font-size: 4em; color:#343a40"><i class="fa fa-users-cog"></i></span>
+                    <h4 class="card-title">Mantenimiento</h4>
+                    <p class="card-text">Constituye la principal herramienta para la evaluación de la consecución de objetivos de la Red SPIDA.</p>
+                    <a class="btn btn-primary btn-sm"><i class="fa fa-plus"></i></a>
+                  </div>
+          
+                  <div class="back card-block">
+                    <h4 class="card-title">Mantenimiento</h4>
+                    <p class="card-text">
+                        En esta sección podreis consultar los informes trimestrales que describen por un lado,
+                        la verificación	de la existencia, idoneidad y funcionalidad de las infraestructuras básicas para el
+                        funcionamiento de la Red SPIDA así como las actuaciones realizadas o iniciadas, que hayan
+                        contribuido significativamente a la reducción de las consecuencias adversas de las inundaciones.
+                    </p>
+                    <a href="{% url 'spd:InformesTrimestralesSpida' %}" class="btn btn-primary btn-sm"><i class="fa fa-paste"></i></a>
+                  </div>
+                </div>
+              </div>
+          
+          
+              <div class="col-lg-4 col-md-6 card-container">
+                <div class="card card-flip">
+                  <div class="front card-block">
+                    <span style="font-size: 4em; color:#343a40"><i class="fa fa-hands-helping"></i></span>
+                    <h4 class="card-title">Protocolo</h4>
+                    <p class="card-text">Establece el procedimiento de actuacion y comunicación ante un evento de inundación.</p>
+                    <a class="btn btn-primary btn-sm"><i class="fa fa-plus"></i></a>
+                  </div>
+          
+                  <div class="back card-block">
+                    <h4 class="card-title">Protocolo</h4>
+                    <p class="card-text">
+                        En esta sección podreis consultar el protocolo de actuacion y comunicación entre El Centro Logístico de
+                        Operaciones de la Red Spida y la dirección General de Emergencias, Protección Civil e Interior de la Junta
+                        de Extremadura, integrante de la Dirección del Plan Especial de Protección Civil de Riesgo de Inundaciones.
+                    </p>
+                    <a href="{% url 'spd:ViewProtocolo' %}" class="btn btn-primary btn-sm" target="_blank"><i class="fa fa-file-pdf"></i></a>
+                  </div>
+                </div>
+              </div>
+          
+              <div class="col-lg-4 col-md-6 card-container">
+                <div class="card card-flip">
+                  <div class="front card-block">
+                    <span style="font-size: 4em; color:#343a40"><i class="fas fa-tint"></i></span>
+                    <h4 class="card-title">Eventos</h4>
+                    <p class="card-text">Medio por el cual se comparte toda la documentación perteneciente a los distintos grupos
+                      implicados en la Red Spida.</p>
+                    <a class="btn btn-primary btn-sm"><i class="fa fa-plus"></i></a>
+                  </div>
+          
+                  <div class="back card-block">
+                    <h4 class="card-title">Eventos</h4>
+                    <p class="card-text">
+                        En esta sección podreis consultar así como adjuntar toda aquella documentación de interés que se reciba o
+                        se envíe respecto a un evento adverso que conlleve a una evolución desfavorable del nivel de río de cuañquier
+                        municipio perteneciente o no a la Red Spida.
+                    </p>
+                    <a href="{% url 'spd:EventosInundacion' %}" class="btn btn-primary btn-sm"><i class="fas fa-file-medical"></i></a>
+                  </div>
+                </div>
+              </div>
+
+              {% if user.is_authenticated %} <!-- Si el usuario esta logeado ... -->
+                {% if perms.auth.spida_alerta2 %} <!-- Si el usuario pertenece a Alerta2 -->
+              <div class="col-lg-4 col-md-6 card-container">
+                <div class="card card-flip">
+                  <div class="front card-block">
+                    <span style="font-size: 4em; color:#343a40"><i class="fas fa-phone-volume"></i></span>
+                    <h4 class="card-title">Contactos</h4>
+                    <p class="card-text">Medio por el cual se tiene acceso a los teléfonos de contactos de los municipios donde disponemos de una estación Spida</p>
+                    <a class="btn btn-primary btn-sm"><i class="fa fa-plus"></i></a>
+                  </div>
+          
+                  <div class="back card-block">
+                    <h4 class="card-title">Contactos</h4>
+                    <p class="card-text">
+                        En esta sección podreis consultar las personas de contacto disponibles de aquellos municipios donde se dispone de una estación fija de la Red Spida
+                    </p>
+                    <a href="{% url 'spd:Contactos' %}" class="btn btn-primary btn-sm"><i class="fas fa-address-card"></i></a>
+                  </div>
+                </div>
+              </div>
+                {% endif %} <!-- END Si el usuario pertenece a Alerta2 -->
+              {% endif %} <!-- END Si el usuario esta logeado ... -->
+
+        </div>
+      </div> <!-- END Cards Documentacion -->
+    </div>
+</section>
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+  var front = document.getElementsByClassName("front");
+  var back = document.getElementsByClassName("back");
+
+  var highest = 0;
+  var absoluteSide = "";
+
+  for (var i = 0; i < front.length; i++) {
+    if (front[i].offsetHeight > back[i].offsetHeight) {
+      if (front[i].offsetHeight > highest) {
+        highest = front[i].offsetHeight;
+        absoluteSide = ".front";
+      }
+    } else if (back[i].offsetHeight > highest) {
+      highest = back[i].offsetHeight;
+      absoluteSide = ".back";
+    }
+  }
+  $(".front").css("height", highest);
+  $(".back").css("height", highest);
+  $(absoluteSide).css("position", "absolute");
+});
+
+</script>
+
+{% endblock %}

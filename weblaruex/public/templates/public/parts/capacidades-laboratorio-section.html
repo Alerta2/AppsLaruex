@@ -1,0 +1,42 @@
+{% load static %}
+<!-- ======= Capacidades Section ======= -->
+
+
+<section id="capacidades" class="about">
+  <div class="container" data-aos="fade-up">
+    {% if request.resolver_match.url_name == "laboratorios" %}
+      <div class="section-title">
+        <h2>Capacidades</h2>
+        <p>¿A qué nos dedicamos?</p>
+      </div>
+    {% endif %}
+
+
+
+    <div class="row">
+      <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
+        <img src="{% static 'img/about 1.jpg' %}" class="img-fluid" alt="">
+      </div>
+      <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content">
+        <h3>El LARUEX o Laboratorio de Radiactividad  Ambiental de la Universidad de Extremadura es un grupo de investigación integrado en los Servicios de Apoyo a la Investigación de la citada Universidad, cuyo ámbito preferente de desarrollo se enmarca en la Protección Radiológica Ambiental.</h3>
+        <p class="font-italic">
+         En los "Laboratorios de Ensayo", se llevan a cabo todos los implicados en los estudios relativos al comportamiento de los radionucleidos en la naturaleza, tanto la faceta de I+D, como en la de prestación de servicios, que se realizan en el LARUEX. Concretamente, dentro de este grupo de actividades, pueden identificarse las siguientes:
+        </p>
+        <ul>
+          <li><i class="icofont-check-circled"></i>Estudio de la dinámica de radionucleidos en aguas continentales y de consumo. Eliminación de actividades anómalas debidas a radionucleidos naturales.</li>
+          <li><i class="icofont-check-circled"></i>Estudio de la dinámica de radionucleidos en la atmósfera con o sin términos fuente próximo localizado</li>
+          <li><i class="icofont-check-circled"></i>Estudio de la transferencia suelo – planta (hongos). Disponibilidad de radionucleidos</li>
+          <li><i class="icofont-check-circled"></i>Radioecología</li>
+          <li><i class="icofont-check-circled"></i>Valoración radiológico / dosimétrica de actividades NORM</li>
+          <li><i class="icofont-check-circled"></i>Puesta a punto y mejora de técnicas radioquímicas para la determinación del contenido radiactivo presente en diferentes tipos de muestras</li>
+
+          <li><i class="icofont-check-circled"></i>Realización de planes de vigilancia radiológicos ambientales</li>
+          <li><i class="icofont-check-circled"></i>Apoyo a empresas, particulares e instituciones, en la determinación del contenido radiactivo en muestras y emisión de informes y certificados</li>
+
+        </ul>
+        {% if request.get_full_path == "/" %}<a href="{% url 'public:publicNosotros' %}" class="learn-more-btn">Saber más</a>{% endif %}
+      </div>
+    </div>
+
+  </div>
+</section><!-- End About Section -->

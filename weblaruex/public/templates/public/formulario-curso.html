@@ -1,0 +1,34 @@
+{% extends "public/template.html" %}
+
+{% block meta %}
+  <title>Formulario - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+  <main id="main">
+    <div></div>
+
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs" data-aos="fade-in">
+      <div class="container">
+        <h2>{{ curso.titulo }}</h2>
+        <h3>Del {{ curso.fecha_inicio.day }} al {{ curso.fecha_fin }}</h3>
+      </div>
+    </div><!-- End Breadcrumbs -->
+
+    {% if curso.inscripciones == '0' %}
+    <div class="container">
+      <h3 class="text-center"><strong>Lo sentimos, las inscripciones a este curso están cerradas</strong></h3></br>
+    </div>
+    {% else %}
+      {% include "public/parts/formulario-curso-section.html" %}
+    {% endif %}
+
+    {% include "public/parts/patrocinadores-section.html" %}
+
+  </main><!-- End #main -->
+
+{% endblock %}

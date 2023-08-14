@@ -1,0 +1,55 @@
+{% load static %}
+<div id="activador_model" data-toggle="modal" data-target="#modalinfo" hidden></div>
+<h3 style="text-decoration: underline;" id="titulo_grafica_h1" hidden> Estacion </h3>
+<h3 style="text-decoration: underline;" id="actividad_grafica" hidden></h3>
+<h3 style="text-decoration: underline;" id="actividad_maxima" hidden></h3>
+<h3 style="text-decoration: underline;" id="lid_grafica" hidden></h3>
+<h3 style="text-decoration: underline;" id="unidad_grafica" hidden></h3>
+<div class="modal fullscreen-modal h-100 bg-light fade" id="modalinfo" tabindex="-1" role="dialog" aria-labelledby="modalinfo" aria-hidden="true" style="height: 90%">
+    <div class="modal-dialog w-100" style="max-width: 4000px;" role="document">
+        <div class="modal-content h-100 w-100">
+            <div class="modal-header">
+                <div class="col-11">
+                    <div class="row">
+                        <div id="titulo_grafica" class="col-6 col-sm-6 col-md-6 col-lg-2 col-xl-2" >
+                            <img id="logo_enac" src="{% static 'img/logo_enac.jpg' %}" data-toggle="tooltip" data-placement="bottom" title="Medidas realizadas conforme a la acreditación en la Norma UNE-EN ISO/IEC 17025 del Laboratorio de Radiactividad Ambiental de la Universidad de Extremadura. Para más información consulte en http://www.laruex.com/" height="60" width="150">
+                        </div>
+                        <div id="maximo_legal" class="col-6 col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                            <div class="p-2 font-weight-old"><label id="label_maximo_legal" data-toggle="tooltip" data-placement="bottom" title="Valor extraído de la normativa española">Máximo Legal: <br>No Definido</label></div>
+                        </div>
+                        <div id="leyenda_isotopos" class="col-5 col-sm-5 col-md-5 col-lg-4 col-xl-4" >
+                            <div class="d-flex flex-column bg-warning">
+                                <div class="p-0 font-weight-bold text-black" data-toggle="tooltip" data-placement="bottom" title="Radionucleidos producidos en la naturaleza. Su existencia depende de diversos factores, como es la composición de los suelos de la zona de medida.">Isotopos Naturales</div>
+                                <div class="p-0 font-weight-bold text-danger" data-toggle="tooltip" data-placement="bottom" title="Radionucleidos producidos de forma artificial. Su existencia es debida a la acción del hombre y provienen de acciones como la de producción de energía eléctrica o algunos tratamientos médicos.">Isotopos Artificiales</div>
+                            </div>
+                        </div>
+                        <div id="contenedor_isotopos" class="col-6 col-sm-6 col-md-6 col-lg-2 col-xl-2" style="z-index:9999">
+                            <select id="menu_isotopos" onchange="CargarGraficas(document.getElementById('checkbox_comparar'));"></select>
+                        </div>
+                        <div id="informacion" class="col-1 col-sm-1 col-md-1 col-lg-1 col-xl-1">
+                            <i class="explicacion_generica fas fa-info-circle fa-2x" data-toggle="tooltip" data-placement="bottom" title="Explicación de los valores: los valores del AMD son los valores de la actividad mínima detectable por los equipos de medida conforme a los procedimientos acreditados por el laboratorio que las realiza, el LARUEX. Los valores de actividad son aquellos en los que el equipo es capaz de detectar la presencia de algún radionucleido de origen natural o artificial. En ambos casos, su aparición en el ambiente será radiológicamente segura siempre y cuando se encuentre por debajo de la línea del valor máximo legal establecido por la normativa vigente española y/o europea."></i>
+                            <i class="explicacion_dosis fas fa-info-circle fa-2x" data-toggle="tooltip" data-placement="bottom" title="Explicación de los valores: Los valores de tasa de dosis detectados son aquellos en los que el equipo registra en cada momento y localización. Esta detección se debe a las radiaciones ionizantes, procedentes principalmente de la composición del suelo, que salvo contaminación corresponden al fondo radiológico natural de cada zona. Se presentan las medidas individuales junto a el valor medio del fondo radiológico histórico de la zona y el nivel máximo permitido para personal no profesinalmente expuesto segun la normativa vigente española y/o europea."></i>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="close col-1" style="z-index:9999" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body h-75">
+                <div id="datos_grafica" class="col-md-12 col-xs-12" ></div>
+                <ul class="list-group">
+                    <li class="explicacion_generica list-group-item">Actividad: Valor medido en el equipo correspondiente, corregido para la fecha en que se tomó la muestra, siempre que supera el AMD</li>
+                    <li class="explicacion_generica list-group-item">AMD: Valor mínimo detectable por el equipo y técnica correspondiente</li>
+                    <li class="explicacion_generica list-group-item">Máximo legal: Valor límite legal según la legislación vigente</li>
+                    <li class="explicacion_dosis list-group-item">Tasa de dosis: Valor medido en el equipo correspondiente</li>
+                    <li class="explicacion_dosis list-group-item">Media histórica: Valor medio de todos los valores de tasa de dosis registrados en el punto y con las mismas condiciones de medida</li>
+                    <li class="explicacion_dosis list-group-item">Máximo legal: Valor límite legal según la legislación vigente</li>
+                    <li class="explicacion_sin_limite list-group-item">Actividad: Valor medido en el equipo correspondiente, corregido para la fecha en que se tomó la muestra, siempre que supera el AMD</li>
+                    <li class="explicacion_sin_limite list-group-item">AMD: Valor mínimo detectable por el equipo y técnica correspondiente</li>
+                    <li class="explicacion_sin_limite list-group-item">Máximo legal: Valor límite legal no establecido en la legislación vigente</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,1053 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}
+    VRAEX
+{% endblock %}
+{% block imports %}
+    <link rel="stylesheet" href="{% static 'js/ol/ol.css' %}" type="text/css">
+    <script src="{% static 'js/ol/ol.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jsonmuestras.js' %}"></script>
+
+
+    <!-- scripts de grafica -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.8.6/apexcharts.min.js"></script>
+{% endblock %}
+{% block css %}
+        /* Zoom In #1 */
+        .hoverZoomIn figure img {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            -webkit-transition: .3s ease-in-out;
+            transition: .3s ease-in-out;
+        }
+        .hoverZoomIn figure:hover img {
+            -webkit-transform: scale(1.3);
+            transform: scale(1.3);
+        }
+        .exportCSV {
+            display: none;
+        }
+        .custom-zoom {
+            position: absolute;
+            margin-left: auto;
+            bottom: 10px;
+        }
+
+{% endblock %}
+
+
+{% block modal %}
+{% include "modal/modal_grafica.html" %}
+{% endblock %}
+
+{% block map %}
+    {% include "map/map.html" %}
+{% endblock %}
+
+
+{% block sidebar1 %}
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div id="captionheaderl" class="card-header card-captionheader d-flex">
+                <h4><span><i id="card-headerbuttonl" class="fas fa-eye-slash col-md-3"></i></span></h4>
+                <h4 class="card-title col-md-8">Ocultar Selector</h4>
+            </div>
+            <!-- Card content -->
+            <div id="captionbodyl" class="card-body card-captionbody">
+                <div id="botonesSeleccion" class="row mr-2">
+                    <div id="Aire" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Aire.png' %}" onClick="SelectCheckbox('Aire');" width="48px" heigth="48px"/></figure></div>
+                    <div id="AguaLluvia" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/AguaLluvia.png' %}" onClick="SelectCheckbox('AguaLluvia');" width="48px" heigth="48px"/></figure></div>
+                    <div id="AguaPotable" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/AguaPotable.png' %}" onClick="SelectCheckbox('AguaPotable');" width="48px" heigth="48px"/></figure></div>
+                    <div id="AguaSuperficial" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/AguaSuperficial.png' %}" onClick="SelectCheckbox('AguaSuperficial');" width="48px" heigth="48px"/></figure></div>
+                    <!---<div id="AguaPozo" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/AguaPozo.png' %}" onClick="SelectCheckbox('AguaPozo');" width="48px" heigth="48px"/></figure></div>-->
+                    <div id="Leches" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Leches.png' %}" onClick="SelectCheckbox('Leches');" width="48px" heigth="48px"/></figure></div>
+                    <div id="Vegetales" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Vegetales.png' %}" onClick="SelectCheckbox('Vegetales');" width="48px" heigth="48px"/></figure></div>
+                    <div id="Carnes" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Carnes.png' %}" onClick="SelectCheckbox('Carnes');" width="48px" heigth="48px"/></figure></div>
+                    <div id="Peces" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Peces.png' %}" onClick="SelectCheckbox('Peces');" width="48px" heigth="48px"/></figure></div>
+                    <!--<div id="Moluscos" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Moluscos.png' %}" onClick="SelectCheckbox('Moluscos');" width="48px" heigth="48px"/></figure></div>-->
+                    <!--<div id="Algas" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Algas.png' %}" onClick="SelectCheckbox('Algas');" width="48px" heigth="48px"/></figure></div>-->
+                    <div id="Suelos" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Suelos.png' %}" onClick="SelectCheckbox('Suelos');" width="48px" heigth="48px"/></figure></div>
+                    <div id="Sedimentos" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Sedimentos.png' %}" onClick="SelectCheckbox('Sedimentos');" width="48px" heigth="48px"/></figure></div>
+                    <div id="Huevos" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Huevos.png' %}" onClick="SelectCheckbox('Huevos');" width="48px" heigth="48px"/></figure></div>
+                    <div id="Aves" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Aves.png' %}" onClick="SelectCheckbox('Aves');" width="48px" heigth="48px"/></figure></div>
+                    <!--<div id="Miel" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Miel.png' %}" onClick="SelectCheckbox('Miel');" width="48px" heigth="48px"/></figure></div>-->
+                    <!--<div id="Hongos" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Hongos.png' %}" onClick="SelectCheckbox('Hongos');" width="48px" heigth="48px"/></figure></div>-->
+                    <div id="Dosis" class="col-3 col-xl-2 col-lg-2 mb-2 hoverZoomIn"><figure><img src="{% static 'img/botonesN/Dosis.png' %}" onClick="SelectCheckbox('Dosis');" width="48px" heigth="48px"/></figure></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#sidebar").mCustomScrollbar({
+                theme: "minimal"
+            });
+
+            $('#captionheaderl, .overlay').on('click', function () {
+                $('#sidebar').removeClass('active');
+                $('.overlay').removeClass('active');
+                $('.btnleft').show();
+            });
+
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').addClass('active');
+                $('.overlay').addClass('active');
+                $('.collapse.in').toggleClass('in');
+                $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+                $('.btnleft').hide();
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block sidebar2 %}
+<nav id="sidebar2" class="sidebar">
+    <div class="sidebar-header">
+        <div id="captionheaderr" class="card-header card-captionheader d-flex">
+            <h4><span><i id="card-headerbuttonr" class="fas fa-eye-slash col-md-3"></i></span></h4>
+            <h4 id="cardtitler" class="card-title col-md-8">Ocultar Estación</h4>
+        </div>
+
+        <!-- Card content -->
+        <div id="captionbodyr" class="card-body card-captionbody text-white">
+            <p>En esta web puedes consultar las medidas del plan de vigilancia radiológica ambiental de la Junta de Extremadura. Pulsa en un elemento del cuadro de la izquierda y se mostrarán las ubicaciones de las medidas. Al pulsar en una estación verás en este cuadro los análisis realizados, selecciona una determinación en el desplagable y consulta la gráfica</p>
+        </div>
+    </div>
+</nav>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#sidebar2").mCustomScrollbar({
+            theme: "minimal"
+        });
+
+        $('#captionheaderr, .overlay').on('click', function () {
+            $('#sidebar2').removeClass('active');
+            $('.overlay').removeClass('active');
+            $('.btnright').show();
+        });
+
+        $('#sidebar2Collapse').on('click', function () {
+            $('#sidebar2').addClass('active');
+            $('.overlay').addClass('active');
+            $('.collapse.in').toggleClass('in');
+            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+            $('.btnright').hide();
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+
+    <script type="text/javascript">
+
+        function isMobile(){
+            if( window.innerWidth > 1024)
+                return false;
+            else
+                return true;
+        }
+
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        $(document).ready(function() {
+
+            $("#modalinfo").on("show.bs.modal", function(event) {
+
+            });
+            $('#modalinfo').on('hide.bs.modal', function () {
+                //alert("cierro");
+            });
+
+
+            if(!isMobile()){
+                $('#sidebarCollapse').click();
+                $('#sidebar2Collapse').click();
+            }
+            else{
+                $('#sidebarCollapse').click();
+            }
+
+        })
+
+        var vectorSource = new ol.source.Vector({});
+        var markers = new ol.layer.Vector({
+            source: vectorSource,
+            style: function (feature) {
+                var rutaimagen='{% static img %}'+'img/botonesN/'+ feature.get('tipo');
+                var nombre = feature.get('name');
+                style = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        opacity: 1,
+                        src: rutaimagen,
+                        scale: 0.06
+                    }),
+                    text: new ol.style.Text({
+                        text: nombre,
+                        scale: 1.3,
+                        offsetY: 30,
+                        padding: [1, 0, 0, 3],
+                        fill: new ol.style.Fill({
+                            color: '#000000'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: '#0000FF',
+                            width: 0.2
+                        })
+                    })
+                });
+                return style;
+            }
+        });
+
+        var map = new ol.Map({
+            controls: [],
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                markers,
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([-6.3460114,39.4787914]),
+                zoom: 8
+            }),
+        });
+
+        map.addControl(new ol.control.Zoom({
+            className: 'custom-zoom'
+        }));
+        /** EVENTO FEATURE ACCION MARKER **/
+        map.on('singleclick', function(e){
+            document.getElementById("captionbodyr").innerHTML = "<p>En esta web puedes consultar las medidas en el plan de vigilancia radiológica ambiental de la Junta de Extremadura. Pulsa en un elemento del cuadro de la izquierda y se mostrarán las ubicaciones de medida. Al pulsar en una estación verás en este cuadro los análisis realizados, selecciona una determinación en el desplagable y consulta la gráfica</p>";
+            map.forEachFeatureAtPixel(e.pixel, function (f) {
+                if(isMobile()){
+                    $('#sidebar2Collapse').click();
+                }
+                document.getElementById("captionbodyr").innerHTML = "<p>Selecciona el análisis deseado en el desplegable y accede a la gráfica correspondiente.</p>";
+                selected = f;
+                document.getElementById("captionbodyr").innerHTML = document.getElementById("captionbodyr").innerHTML + selected.get('description');
+                document.getElementById('titulo_grafica_h1').innerHTML = selected.getId();
+            });
+        });
+
+        /** EVENTO ZOOM CAMBIADO **/
+        var currZoom = map.getView().getZoom();
+        map.on('moveend', function(e) {
+            var newZoom = map.getView().getZoom();
+            if (currZoom != newZoom) {
+                //alert('zoom end, new zoom: ' + newZoom);
+                currZoom = newZoom;
+            }
+        });
+        var c=0;
+        var e="";
+        var elementos_anteriores="";
+        var muestras_json=dame_json();
+        var select_interaction = new ol.interaction.Select();
+        var markers=[];
+        var elementos_anteriores="";
+        var busqueda="";
+        var cod_muestra="";
+        var isotopos_artificiales = ["Ce144","Co58","Co60","Cs134","Cs137","Fe59","Mn54","Sb124","Zn65","Zn65"];
+
+        function ClearMarkers(){
+            vectorSource.clear();
+            select_interaction.getFeatures().clear();
+            markers = [];
+            c=0;
+            e="";
+            elementos_anteriores="";
+            busqueda="";
+            cod_muestra="";
+            document.getElementById("captionbodyr").innerHTML = "Pulsa en una estación para mostrar en este cuadro los análisis que puedes consultar. Selecciona uno en el desplegable y accede a la gráfica.";
+
+            map.getView().animate({
+                center: ol.proj.fromLonLat([-6.3460114,39.4787914]),
+                zoom: 8,
+                duration: 1000
+            })
+        }
+
+        function SelectCheckbox(element){
+            $(".loader-wrapper").show();
+            if(isMobile()){
+                $('#card-headerbuttonl').click();
+            }
+
+            ClearMarkers();
+            e=element;
+            for(var i=0; i<muestras_json.RECORDS.length; i++){
+                if(element == muestras_json.RECORDS[i].tipo){
+                    c=c+1;
+                }
+            }
+            elemento=element+".png";
+
+            for(var i=0; i<muestras_json.RECORDS.length; i++){
+                if(element=="AguaPotable"){
+                    element="PO";//código para url
+                }
+                if(element=="AguaSuperficial"){
+                    element="SP";//código para url
+                }
+                if(element=="AguaPozo"){
+                    element="Agua";//código para url
+                }
+                if(element=="AguaLluvia"){
+                    element="LL";//código para url
+                }
+                if( (element == muestras_json.RECORDS[i].tipo) || (element == muestras_json.RECORDS[i].codigo) ){
+                    cod_muestra=muestras_json.RECORDS[i].codigo;
+                    if( element == "Agua") {
+                        if(muestras_json.RECORDS[i].codigo=="PZ"){
+                            cod_muestra = "PZ";//almacena pozo
+                        }else if(muestras_json.RECORDS[i].codigo=="SB"){
+                            cod_muestra = "SB";//almacena subterránea
+                        }else{
+                            cod_muestra="*";//no almacena nada
+                        }
+                    }
+                    if (cod_muestra != "*")
+                        busqueda = busqueda +cod_muestra + "_";
+                }
+            }
+            if (busqueda.charAt(busqueda.length-1) != '_')
+                elementos_anteriores = elementos_anteriores + '_' + busqueda;
+            else
+                elementos_anteriores = elementos_anteriores + busqueda;
+            busqueda = elementos_anteriores.replace(/.$/,"");
+
+            $.ajax({
+                url: '/vraex/muestras/'+busqueda+"/"+"-1"+"/"+"-1",
+                dataType: 'text',
+                success: function(data) {
+                    if (data != "")
+                        procedencias=data.split("##");
+                    else
+                        procedencias=[];
+                    filtrar();
+                }
+            });
+        }
+
+        function filtrar(){
+            if(procedencias.length>0){
+                marcadores = procedencias;
+                for(var i=0;i<procedencias.length;i++){
+                    var nombre = "";
+                    var codnombre = "";
+                    var lat;
+                    var lon;
+                    var valores = procedencias[i].split('#');
+                    var muestra = "";
+                    var codmuestra = "";
+                    var auxMuestra = [];
+                    var auxCodMuestra = [];
+                    var analisis = [];
+                    for (var j=0;j<valores.length;j++){
+                        if (j == 0){
+                            nombre = valores[j].split('@')[0];
+                            lat = valores[j].split('@')[1];
+                            lon = valores[j].split('@')[2];
+                            codnombre = valores[j].split('@')[3];
+                        }
+                        else{
+                            auxMuestra.push(valores[j].split('@')[0].split('*')[0]);
+                            auxCodMuestra .push(valores[j].split('@')[0].split('*')[1]);
+                            analisis.push(valores[j].split('@')[1]);
+                        }
+                    }
+
+                    var rutaimagen='{% static img %}'+'img/botonesN/'+ elemento;
+
+                    var marker = new ol.Feature({
+                        geometry: new ol.geom.Point(ol.proj.fromLonLat([parseFloat(lon),parseFloat(lat)]))
+                    });
+
+                    myLastLatLng = {lat: parseFloat(lat),lng: parseFloat(lon)};
+
+                    marker.setId(nombre);
+                    cadena = '<h3 class="text-body" align="center">'+nombre+'</h3>'
+
+                    for(var m=0;m<auxMuestra.length;m++){
+                        cadena+='<div class="px-5">'+
+                          '<div class="d-flex justify-content-start">'+
+                            '<div class="p-2"><img src="'+rutaimagen+'" width="48px" height="48px"></img></div>'+
+                            '<div class="p-2 my-auto">'+auxMuestra[m]+'</div>'+
+                          '</div>'+
+                          '<div class="d-flex justify-content-start">'+
+                            '<div class="dropdown p-2">'+
+                              '<button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'+
+                              'SELECCIONAR</button>'+
+                              '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="min-width:80px;">';
+                        var isotopos = String(analisis[m]).split('*');
+
+                        for(var k=0;k<isotopos.length-1;k++){
+                            var valor = codnombre + '@' + auxCodMuestra[m] + '@' + isotopos[k].split('%')[1]  +'@'+ lat  + '@' + lon;
+                            cadena+='<a class="dropdown-item" onclick="datosGrafica(';
+                            cadena+="'"+valor+"'";
+                            cadena+=');" value="' + valor +  '">'+isotopos[k].split('%')[0]+'</a>';
+                        }
+                        cadena+='</div>'+
+                            '</div>'+
+                          '</div>'+
+                        '</div>';
+                    }
+
+                    marker.setProperties({'name':nombre, 'description':cadena, 'tipo':elemento})
+                    vectorSource.addFeature(marker);
+                }
+            }
+            $(".loader-wrapper").fadeOut("slow");
+        }
+
+        function datosGrafica(datoG){
+            $(".loader-wrapper").show();
+            procedencia = datoG.split("@")[0];
+            muestra = datoG.split("@")[1];
+            analisis = datoG.split("@")[2]
+            lat = datoG.split("@")[3];
+            lng = datoG.split("@")[4];
+            if(muestra != "DOS"){
+                $.ajax({
+                    url: '/vraex/getgrafica/'+muestra.trim()+'/'+analisis+'/'+procedencia+'/',
+                    dataType: 'text',
+                    success: function(data) {
+                        aux=data.split("##");
+                        if (aux[5].startsWith("Ac228"))
+                            document.getElementById("leyenda_isotopos").style.visibility = "visible";
+                        else
+                            document.getElementById("leyenda_isotopos").style.visibility = "hidden";
+                        pintar_grafica(aux[0], aux[2], aux[3], aux[4], aux[5], lat, lng, aux[6], aux[1]);
+                        
+                    }
+                });
+            }
+            else{
+                $.ajax({
+                    url: '/vraex/getgraficadose/'+muestra.trim()+'/'+analisis+'/'+procedencia+'/',
+                    dataType: 'text',
+                    success: function(data) {
+                        aux=data.split("##");
+                        pintar_grafica_dose(aux[0], aux[1].split("%"), aux[2]);
+                        
+                    }
+                });
+            }
+        }
+
+        function createAxisAndSeriesError(chart, name, axis, description) {
+          var series = chart.series.push(new am4charts.ColumnSeries());
+          series.dataFields.valueY = "errorAE";
+          series.dataFields.dateX = "date";
+          series.name = "Error";
+          series.yAxis = axis;
+          series.hidden = true;
+          series.visible = false;
+          series.dummyData = {
+            description: description
+          };
+        }
+        function createAxisAndSeriesBarra(chart, field, name, opposite, axis, error, hidden, description) {
+          var series = chart.series.push(new am4charts.ColumnSeries());
+          series.dataFields.valueY = field;
+          series.dataFields.dateX = "date";
+          series.yAxis = axis;
+          series.hidden = hidden;
+          series.name = name;
+          series.columns.template.width = 10;
+          series.columns.template.strokeWidth = 2;
+          series.columns.template.strokeOpacity = 1;
+          series.dummyData = {
+            description: description
+          };
+
+          var bullet = series.bullets.push(new am4charts.CircleBullet());
+          bullet.size = 5;
+          if (error){
+            bullet.tooltipText = "{name}: [bold]{valueY}+-{errorAE}[/]";
+            series.tooltip.pointerOrientation = "down";
+            chart.scrollbarX = new am4charts.XYChartScrollbar();
+            chart.scrollbarX.series.push(series);
+          }
+          else{
+            bullet.tooltipText = "{name}: [bold]{valueY}[/]";
+            series.tooltip.pointerOrientation = "down";
+          }
+          series.fillOpacity = 0.8;
+        }
+        function createAxisAndSeriesBarraSimple(chart, field, name, opposite, axis, error, hidden, description) {
+          var series = chart.series.push(new am4charts.ColumnSeries());
+          series.dataFields.valueY = field;
+          series.dataFields.dateX = "date";
+          series.yAxis = axis;
+          series.hidden = hidden;
+          series.name = name;
+          series.columns.template.width = 10;
+          series.columns.template.strokeWidth = 2;
+          series.columns.template.strokeOpacity = 1;
+          series.dummyData = {
+            description: description
+          };
+
+          var bullet = series.bullets.push(new am4charts.CircleBullet());
+          bullet.size = 5;
+          if (error){
+            bullet.tooltipText = "{name}: [bold]{valueY}[/]";
+            series.tooltip.pointerOrientation = "down";
+            chart.scrollbarX = new am4charts.XYChartScrollbar();
+            chart.scrollbarX.series.push(series);
+          }
+          else{
+            bullet.tooltipText = "{name}: [bold]{valueY}[/]";
+            series.tooltip.pointerOrientation = "down";
+          }
+          series.fillOpacity = 0.8;
+        }
+
+        function createAxisAndSeriesArea(chart, field, name, axis, error, hidden, scroll, decimales, description) {
+          var series = chart.series.push(new am4charts.LineSeries());
+          series.dataFields.valueY = field;
+          series.dataFields.dateX = "date";
+          series.strokeWidth = 2;
+          series.yAxis = axis;
+          series.hidden = hidden;
+          series.name = name;
+          series.dummyData = {
+            description: description
+          };
+
+          if (decimales){
+              chart.numberFormatter.numberFormat = "#.000000";
+          }
+
+          var bullet = series.bullets.push(new am4charts.CircleBullet());
+          if (error){
+            bullet.tooltipText = "{name}: [bold]{valueY}+-{errorAE}[/]";
+            chart.scrollbarX = new am4charts.XYChartScrollbar();
+            chart.scrollbarX.series.push(series);
+          }
+          else
+            bullet.tooltipText = "{name}: [bold]{valueY}[/]";
+          series.tensionX = 1;
+          series.tensionY = 1;
+          series.fillOpacity = 0.5;
+          if (scroll){
+            chart.scrollbarX = new am4charts.XYChartScrollbar();
+            chart.scrollbarX.series.push(series);
+            //chart.scrollbarY = new am4core.Scrollbar();
+          }
+        }
+
+        function createAxisAndSeriesLinea(chart, field, name, opposite, axis, hidden, description, color) {
+          var series = chart.series.push(new am4charts.LineSeries());
+          series.dataFields.valueY = field;
+          series.dataFields.dateX = "date";
+          series.strokeWidth = 2;
+          series.yAxis = axis;
+          series.hidden = hidden;
+          series.name = name;
+          series.tooltipText = "{name}: [bold]{valueY}[/]";
+          series.tensionX = 0.8;
+          if(color!=null)
+            series.stroke = am4core.color(color);
+          series.dummyData = {
+            description: description
+          };
+        }
+
+        function pintar_grafica_dose(procedencia, valores, unidad){
+            $(".explicacion_generica").hide();
+            $(".explicacion_dosis").show();
+            var textoUnidad = unidad;
+            document.getElementById("leyenda_isotopos").style.visibility = "hidden";
+            if (isMobile())
+                document.getElementById("informacion").style.display="none";
+            else
+                document.getElementById("informacion").style.display="block";
+            chartData = [];
+            procedencia_actual = procedencia;
+            document.getElementById("logo_enac").style.display="none";
+            maximo = "";
+            document.getElementById('menu_isotopos').innerHTML=document.getElementById('menu_isotopos').innerHTML+"<option data-toggle='tooltip' data-placement='bottom' title='Tasa de dosis' value='1'><h3 ><p>Dosis</p></h3></option>";
+            for(var i=0;i<valores.length;i++){
+                var obj = JSON.parse(valores[i].replaceAll("'", "\""));
+                mes = parseInt(obj.fecha.split("@")[1]) - 1;
+                dia = new Date(obj.fecha.split("@")[0],mes,obj.fecha.split("@")[2],obj.fecha.split("@")[3],obj.fecha.split("@")[4],0,0);
+                maximo = obj.maximo;
+                chartData.push({
+                    date: dia,
+                    dose: parseFloat(obj.actividad),
+                    media: parseFloat(obj.fondo),
+                    maximo: parseFloat(obj.maximo),
+                  });
+            }
+
+            chartFechas = [];
+            chartDose = [];
+            chartMedia = [];
+            chartMaximo = [];
+
+            for (var k=0; k<chartData.length; k++){
+                if(chartData[k].dose !== null){
+                    dia = parseInt(chartData[k].date.toISOString().substring(8, 10)) + 1;
+                    fecha = chartData[k].date.toISOString().substring(0, 8) + dia;
+                    chartFechas.push(fecha);
+                    chartDose.push(chartData[k].dose);
+                    chartMedia.push(chartData[k].media);
+                    chartMaximo.push(chartData[k].maximo);
+                }
+            }
+
+             var options = {
+                series: [{
+                  name: 'Tasa de dosis',
+                  type: 'column',
+                  color: '#006F0C',
+                  data: chartDose
+                }, {
+                  name: 'Media histórica',
+                  color: '#5B97FF',
+                  type: 'line',
+                  data: chartMedia
+                }, {
+                  name: 'Máximo legal',
+                  color: '#FD0000',
+                  type: 'line',
+                  data: chartMaximo
+                }],
+                chart: {
+                  height: '75%',
+                  type: 'line',
+                },
+                stroke: {
+                  curve: 'smooth'
+                },
+                title: {
+                  text: document.getElementById('titulo_grafica_h1').innerHTML + " - Tasa de dosis"
+                },
+                 stroke: {
+                    show: true,
+                    curve: 'smooth',
+                    lineCap: 'butt',
+                    colors: undefined,
+                    width: 2,
+                    dashArray: 0,
+                },
+                dataLabels: {
+                  enabled: false
+                },
+                labels: chartFechas,
+                xaxis: {
+                  type: 'datetime'
+                },
+                yaxis: {
+                  show: true,
+                  showAlways: true,
+                  title: {
+                      text: textoUnidad
+                  },
+                  min: 0,
+                },
+            };
+
+            if(chart != null) chart.destroy();
+            chart = new ApexCharts(document.querySelector("#datos_grafica"), options);
+            document.getElementById('label_maximo_legal').innerHTML='Máximo Legal: <br>'+maximo+' '+unidad;
+
+            document.getElementById('activador_model').click();
+            $(".loader-wrapper").fadeOut("slow");
+            chart.render();
+        }
+
+        var chart = null;
+
+        function pintar_grafica(unidad,data_in,produccion,csn,isotopos,lat,lng, enac, procedencia) {
+            console.log(data_in);
+            var ajuste = 1;
+            var textoUnidad = unidad;
+            if (isMobile())
+                document.getElementById("informacion").style.display = "none";
+            else
+                document.getElementById("informacion").style.display = "block";
+
+            chartData = [];
+            procedencia_actual = procedencia;
+            isotopos_chart = [];
+            isotopos_ocultos = ["Ba140", "Cr51", "I 131", "La140", "Nb95", "Ru103", "Zr95"];
+            isotopos_chart_data = [];
+            isotopos_chart_dates = [];
+
+
+            document.getElementById('menu_isotopos').innerHTML="";
+
+            isotopos_chart=isotopos.split("$");
+
+            if (enac == 0){
+                document.getElementById("logo_enac").style.display="none";
+            }
+            else{
+                document.getElementById("logo_enac").style.display="block";
+            }
+
+            ultimaFecha = null;
+
+            for(var i=0;i<isotopos_chart.length;i++){
+                var aux = [];
+                isotopos_chart_data.push(aux);
+                if(isotopos_artificiales.indexOf(isotopos_chart[i].trim()) > -1){
+                    document.getElementById('menu_isotopos').innerHTML=document.getElementById('menu_isotopos').innerHTML+"<option data-toggle='tooltip' data-placement='bottom' title='Elemento producido de forma artificial' class='text-danger' value=\""+i+"\"><h3 ><p>"+isotopos_chart[i]+" (Artificial)</p></h3></option>";
+                }
+                else if(isotopos_ocultos.indexOf(isotopos_chart[i].trim()) == -1){
+                    document.getElementById('menu_isotopos').innerHTML=document.getElementById('menu_isotopos').innerHTML+"<option data-toggle='tooltip' data-placement='bottom' title='Elemento producido de forma natural' value=\""+i+"\"><h3 ><p>"+isotopos_chart[i]+" </p></h3></option>";
+                }
+
+                datos = data_in.split("@");
+                var mes;
+                var date;
+                for(var j=0;j<datos.length;j++){
+                  info = datos[j].split("%");
+                  var ae = parseFloat(info[5*i+1]) * ajuste;
+                  var lid = parseFloat(info[5*i+2]) * ajuste;
+                  var error = parseFloat(info[5*i+3]) * ajuste;
+                  var limite = parseFloat(info[5*i+4]) * ajuste;
+                  var csn = parseInt(info[5*i+5]) * ajuste;
+                  if((i == 0 )&&(csn == 0)){
+                    a = parseInt(info[5*i].split(",")[0]);
+                    b = parseInt(info[5*i].split(",")[1]) - 1;
+                    c = parseInt(info[5*i].split(",")[2]);
+                    //alert("fecha 1: " + new Date(a, b, c));
+                    isotopos_chart_dates.push(new Date(a, b, c));
+
+                  }
+                  if((i == 0 )&&(csn == 1)){
+                    a = parseInt(info[5*i].split(",")[0]);
+                    b = parseInt(info[5*i].split(",")[1]) - 1;
+                    c = parseInt(info[5*i].split(",")[2]);
+                    //alert("fecha 1: " + new Date(a, b, c));
+                    isotopos_chart_dates.push(new Date(a, b, c));
+                  }
+                  if (csn == 0){
+                    if(ae > lid){
+                      isotopos_chart_data[i].push( {
+                        date: isotopos_chart_dates[j],
+                        ae: ae,
+                        lid: lid,
+                        errorAE: error,
+                        maximo: limite,
+                        aeCSN: null,
+                        lidCSN: null,
+                        energiamod1: null,
+                        energiamod2: null
+                      } );
+                    }
+                    else{
+                      isotopos_chart_data[i].push( {
+                        date: isotopos_chart_dates[j],
+                        ae: null,
+                        lid: lid,
+                        errorAE: null,
+                        maximo: limite,
+                        aeCSN: null,
+                        lidCSN: null,
+                        energiamod1: null,
+                        energiamod2: null
+                      } );
+                    }
+                  }
+                }
+            }
+              for (x=0; x<isotopos_chart_data.length;x++){
+                prod = produccion.split("@");
+                for(var k=0;k<prod.length;k++){
+                  valor = prod[k].split("%");
+                  fecha = valor[0].split("-");
+                  mes = parseInt(fecha[1]) - 1;
+                  dia = new Date(fecha[0],mes,fecha[2],0,0,0,0);
+                  //alert("Inserto en " + x + " --  " + dia + " -- " + valor[1] + " -- " + valor[2]);
+                  isotopos_chart_data[x].push({
+                    date: dia,
+                    ae: null,
+                    lid: null,
+                    errorAE: null,
+                    maximo: null,
+                    aeCSN: null,
+                    lidCSN: null,
+                    energiamod1: valor[1],
+                    energiamod2: valor[2]
+                  } );
+                }
+                primera = false;
+                isotopos_chart_data[x].sort(function(a, b) {
+                  var dateA = new Date(a.date), dateB = new Date(b.date);
+                  return dateA - dateB;
+                });
+              }
+
+            var auxVector = isotopos_chart_data[0];
+            for (var z=0; z<auxVector.length; z++){
+                //alert("Inserto " + auxVector[z].date + " -- " + auxVector[z].ae + " -- " + auxVector[z].energiamod1);
+                chartData.push(auxVector[z]);
+            }
+
+            /*var actividad = "Actividad (" + unidad + ")";
+            var lid = "LID (" + unidad + ")";*/
+            document.getElementById('actividad_grafica').innerHTML="Actividad (" + unidad + ") = ";
+            document.getElementById('actividad_maxima').innerHTML=textoUnidad;
+            document.getElementById('lid_grafica').innerHTML="LID (" + unidad + ") = ";
+            document.getElementById('unidad_grafica').innerHTML=textoUnidad;
+
+
+            $(".explicacion_generica").show();
+            $(".explicacion_dosis").hide();
+            $(".explicacion_sin_limite").hide();
+
+            var maximo = "Máximo Legal";
+            var valueMaximo = "maximo";
+            if(auxVector[0].maximo == 99){
+                $(".explicacion_generica").hide();
+                $(".explicacion_sin_limite").show();
+                maximo = "Máximo legal no establecido";
+                valueMaximo = "";
+                document.getElementById('label_maximo_legal').innerHTML="Máximo Legal<br>No Definido";
+            }
+            else{
+                document.getElementById('label_maximo_legal').innerHTML='Máximo Legal: <br>'+auxVector[0].maximo+' ' +document.getElementById('actividad_maxima').innerHTML;
+            }
+
+            chartFechas = [];
+            chartMedidas = [];
+            chartAmds = [];
+            chartLimites = [];
+
+            for (var k=0; k<chartData.length; k++){
+                if(chartData[k].lid !== null){
+                    fecha = calcularFecha(chartData[k].date);
+                    chartFechas.push(fecha);
+                    if (chartData[k].ae !== null)
+                        chartMedidas.push(chartData[k].ae);
+                    else
+                        chartMedidas.push(null);
+                    chartAmds.push(chartData[k].lid);
+                    chartLimites.push(chartData[k].maximo);
+                }
+            }
+            console.log(chartMedidas);
+            console.log(chartAmds);
+            console.log(chartLimites);
+            var series = []
+            series.push({
+                  name: 'Actividad',
+                  type: 'column',
+                  color: '#006F0C',
+                  data: chartMedidas
+                });
+            series.push({
+                  name: 'AMD',
+                  color: '#5B97FF',
+                  type: 'area',
+                  data: chartAmds
+                });
+            if(auxVector[0].maximo != 99) {
+                series.push({
+                    name: 'Máximo Legal',
+                    color: '#FD0000',
+                    type: 'line',
+                    data: chartLimites
+                });
+            }
+             var options = {
+                series: series,
+                chart: {
+                  height: '75%',
+                },
+                stroke: {
+                  curve: 'smooth'
+                },
+                title: {
+                  text: document.getElementById('titulo_grafica_h1').innerHTML + " - " + isotopos_chart[0]
+                },
+                 stroke: {
+                    show: true,
+                    curve: 'smooth',
+                    lineCap: 'butt',
+                    colors: undefined,
+                    width: 2,
+                    dashArray: 0,
+                },
+                dataLabels: {
+                  enabled: false
+                },
+                labels: chartFechas,
+                xaxis: {
+                  type: 'datetime'
+                },
+                yaxis: {
+                  show: true,
+                  showAlways: true,
+                  title: {
+                      text: textoUnidad
+                  },
+                  min: 0,
+                },
+            };
+            if(chart != null) chart.destroy();
+            chart = new ApexCharts(document.querySelector("#datos_grafica"), options);
+            document.getElementById('activador_model').click();
+            $(".loader-wrapper").fadeOut("slow");
+            
+            chart.render();
+        }
+
+        function CargarGraficas(){
+            SelectOption(document.getElementById("menu_isotopos"));
+        }
+    function calcularFecha(date){
+        anio = parseInt(date.toISOString().substring(0, 4));
+        mes = parseInt(date.toISOString().substring(5, 7));
+        dia = parseInt(date.toISOString().substring(8, 10)) + 1;
+        if (dia > diasMes(mes)){
+            dia = 1;
+            mes = mes + 1;
+            if (mes == 13){
+                mes = 1;
+                anio = anio + 1;
+            }
+        }
+        fecha = anio + "-" + mes + "-" + dia;
+        return fecha;
+    }
+
+    function diasMes(mes){
+        switch (mes){
+            case 1:
+                return 31;
+            case 2:
+                return 28;
+            case 3:
+                return 31;
+            case 4:
+                return 30;
+            case 5:
+                return 31;
+            case 6:
+                return 30;
+            case 7:
+                return 31;
+            case 8:
+                return 31;
+            case 9:
+                return 30;
+            case 10:
+                return 31;
+            case 11:
+                return 30;
+            case 12:
+                return 31;
+        }
+    }
+
+var tiene_csn = 0;
+
+    function SelectOption(element){
+      chartData = [];
+      var auxVector = isotopos_chart_data[element.selectedIndex];
+      for (var z = 0; z < auxVector.length; z++){
+        chartData.push(auxVector[z]);
+      }
+        chartFechas = [];
+        chartMedidas = [];
+        chartAmds = [];
+        chartLimites = [];
+
+        for (var k=0; k<chartData.length; k++){
+            if(chartData[k].lid !== null){
+                fecha = calcularFecha(chartData[k].date);
+                chartFechas.push(fecha);
+                if (chartData[k].ae !== null)
+                    chartMedidas.push(chartData[k].ae);
+                else
+                    chartMedidas.push(null);
+                chartAmds.push(chartData[k].lid);
+                chartLimites.push(chartData[k].maximo);
+            }
+        }
+
+      var maximo = "Máximo Legal";
+      var valueMaximo = "maximo";
+      if(auxVector[0].maximo == 99){
+        maximo = "Máximo legal no establecido";
+        valueMaximo = "";
+        document.getElementById('label_maximo_legal').innerHTML="Máximo Legal<br>No Definido";
+      }
+      else{
+        document.getElementById('label_maximo_legal').innerHTML='Máximo Legal: <br>'+auxVector[0].maximo+' ' +document.getElementById('actividad_maxima').innerHTML;
+      }
+
+    var series = []
+    series.push({
+          name: 'Actividad',
+          type: 'column',
+          color: '#006F0C',
+          data: chartMedidas
+        });
+    series.push({
+          name: 'AMD',
+          color: '#5B97FF',
+          type: 'area',
+          data: chartAmds
+        });
+    if(auxVector[0].maximo != 99) {
+        series.push({
+            name: 'Máximo Legal',
+            color: '#FD0000',
+            type: 'line',
+            data: chartLimites
+        });
+    }
+     var options = {
+        series: series,
+        chart: {
+          height: '75%',
+          type: 'line',
+        },
+        stroke: {
+          curve: 'smooth'
+        },
+        title: {
+          text: document.getElementById('titulo_grafica_h1').innerHTML + " - " + isotopos_chart[element.selectedIndex]
+        },
+         stroke: {
+            show: true,
+            curve: 'smooth',
+            lineCap: 'butt',
+            colors: undefined,
+            width: 2,
+            dashArray: 0,
+        },
+        dataLabels: {
+          enabled: false
+        },
+        labels: chartFechas,
+        xaxis: {
+          type: 'datetime'
+        },
+        yaxis: {
+          show: true,
+          showAlways: true,
+          title: {
+              text: document.getElementById('unidad_grafica').innerHTML
+          }
+        },
+    };
+        chart.updateOptions(options);
+
+    }
+
+    </script>
+{% endblock %}

@@ -1,0 +1,460 @@
+{% extends "base/base_sin_mapa.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+
+{% block imports %}
+    <!-- style y js de carousel -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900" rel="stylesheet">
+	<link rel="stylesheet" href="{% static 'owl/css/owl.carousel.min.css' %}">
+	<link rel="stylesheet" href="{% static 'owl/css/owl.theme.default.min.css' %}">
+	<link rel="stylesheet" href="{% static 'owl/css/animate.css' %}">
+	<link rel="stylesheet" href="{% static 'owl/css/style.css' %}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons.min.css">
+{% endblock %}
+{% block css %}
+    body {
+        margin:0px; 
+        padding: 0px; 
+        overflow: hidden; 
+      }
+      #canvas-wrap { position:relative }
+      #overlay {
+          position: absolute;
+          top: 10%;
+          left: 10%;
+          width: 80%;
+          height: 88%;
+          overflow-y: auto;
+          color: #000;
+      }
+{% endblock %}
+{% block content %}
+    <div id="canvas-wrap">
+        <canvas id="world"></canvas>
+        <div id="overlay" class="row rounded font-weight-bold do-nicescrol">
+            <div class="col-12">
+                <section class="ftco-section p-0">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="slider-hero">
+                                    <div class="featured-carousel owl-carousel">
+                                        <div class="item">
+                                            <div class="work">
+                                                <div class="img d-flex align-items-center justify-content-center" style="background-image: url({%static 'owl/images/slider-1.png' %});">
+                                                    <div class="w-100 h-100 row" >
+                                                        <div class="col-12 text-center">
+                                                            <img class="mt-5 col-md-3 col-6 rounded mx-auto d-block" src="{% static 'img/logos/logo_JuntadeExtremadura.png' %}" alt="Logo JUNTAEX" title="Logo Junta de Extremadura" width="60px"/>
+                                                            <br>
+                                                            <h2 style="font-size: 2vw; color:black; 'Gill Sans', condensed;">Consejería para la Transición Ecológica y Sostenibilidad</h2>
+                                                            <br>
+                                                            <h1 style="font-size: 3vw; color:white; font-family: 'Gill Sans', condensed;">Portal de Vigilancia Radiológica Ambiental de la Junta de Extremadura</h1>
+                                                            <a href="#"><i class="fa-light fa-square-info fa-4x" data-toggle="modal" data-target="#modalJUNTAEXInfo"></i></a>
+                                                            <br>
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <a href="{% url 'rare:juntaexMapMediaRarex' %}" style="color:white; font-family: 'Gill Sans', condensed;"><i class="fa-regular fa-map-location fa-3x fa-flip" style="--fa-animation-duration: 3s;"></i><h3 style="font-size: 2vw;">Datos RAREx</h3></a>
+                                                                </div>
+                                                                <div class="col-6">
+                                                                    <a href="{% url 'copuma:juntaexMapPublicoVraex' %}" style="color:white; font-family: 'Gill Sans', condensed;"><i class="fa-regular fa-map-location fa-3x fa-flip" style="--fa-animation-duration: 3s;"></i><h3 style="font-size: 2vw;">Datos VRAEx</h3></a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="work">
+                                                <div class="img d-flex align-items-center justify-content-center" style="background-image: url({%static 'owl/images/slider-2.png' %});">
+                                                    <div class="w-100 h-100 row">
+                                                        <div class="col-12 text-center">
+                                                            <img class="col-md-3 col-6 rounded mx-auto d-block mt-4" src="{% static 'img/logos/logo_rarex.png' %}" alt="Logo RAREX" title="Logo Red de Alerta Radiológica de Extremadura" width="48px"/>
+                                                            <h1 style="font-size: 3vw; color:white; font-family: 'Gill Sans', condensed;">Red de Alerta Radiológica de la Junta de Extremadura</h1>
+                                                            <a href="{% url 'rare:juntaexMapMediaRarex' %}"><i class="fa-regular fa-map-location fa-4x mr-3 fa-flip" style="--fa-animation-duration: 3s;"></i></a><a href="#"><i class="fa-light fa-square-info fa-4x" data-toggle="modal" data-target="#modalRARExInfo"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="work">
+                                                <div class="img d-flex align-items-center justify-content-center" style="background-image: url({%static 'owl/images/slider-3.jpg' %});">
+                                                    <div class="w-100 h-100 row">
+                                                        <div class="col-12 text-center">
+                                                            <img class="col-md-3 col-6 rounded mx-auto d-block" src="{% static 'img/logos/logo_vraex.png' %}" alt="Logo VRAEX" title="Logo Plan de Vigilancia Radiológica de Extremadura" width="48px"/>
+                                                            <h1 style="font-size: 3vw; color:white; font-family: 'Gill Sans', condensed;">Plan de Vigilancia Radiológica Ambiental de la Junta de Extremadura</h1>
+                                                            <a href="{% url 'copuma:juntaexMapPublicoVraex' %}"><i class="fa-regular fa-map-location fa-4x mr-3 fa-flip" style="--fa-animation-duration: 3s;"></i></a><a href="#"><i class="fa-light fa-square-info fa-4x" data-toggle="modal" data-target="#modalVRAExInfo"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+        
+                                    <div class="my-5 text-center">
+                              <ul class="thumbnail">
+                                <li class="active img"><a href="#"><img src="{%static 'owl/images/thumb-1.jpg' %}" alt="Image" class="img-fluid"></a></li>
+                                <li><a href="#"><img src="{%static 'owl/images/thumb-2.jpg' %}" alt="Image" class="img-fluid"></a></li>
+                                <li><a href="#"><img src="{%static 'owl/images/thumb-3.jpg' %}" alt="Image" class="img-fluid"></a></li>
+                              </ul>
+                            </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Modal JUNTAEX-->
+            <div class="modal fade" id="modalJUNTAEXInfo" tabindex="-1" role="dialog" aria-labelledby="modalJUNTAEXInfoTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalJUNTAEXInfoLongTitle"><img class="rounded mx-auto d-block" src="{% static 'img/logos/logo_JuntadeExtremadura.png' %}" alt="Logo RAREX" title="Logo Red de Alerta Radiológica de Extremadura" width="168"/></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h6 class="mt-3">En este portal se muestran las medidas realizadas por el LARUEX en los distintos programas de protección radiológica ambiental encargados por la Junta de Extremadura. Hay que tener presente que las radiaciones ionizantes se encuentra de forma natural en la Tierra y que forman parte de nuestro día a día. Así mismo, hay procesos artificiales que aumentan su presencia y, por tanto, la dosis que recibimos (pruebas médicas, viajes en avión, procesos industriales...). El objetivo de los programas de vigilancia radiológicos ambientales es asegurar que la dosis que recibe la población es tan baja como sea posible y no suponiendo por tanto un riesgo para la población.
+                                <img class="col-lg-8 col-md-12 col-sm-12 col-12 rounded mx-auto d-block" src="{% static 'img/rare/platano.jpg' %}" alt="Platano Operador Nuclear" title="Comparación radiación de un plátano con vivir junto a una Central Nuclear" width="600px"/>
+                                <br>Existen en este momento dos programas de protección radiológica ambiental:<br>
+                                <ul>
+                                    <li>RAREx: se trata de un programa de seguimiento a tiempo real de la situación radiológica ambiental en áreas seleccionadas de la Comunidad Extremeña y en tres poblaciones de Portugal dentro de la provincia del Alentejo. El objetivo de este programa es llevar a cabo el control y aviso automático y de manera instantánea en el caso de que se detecte cualquier anomalía calificable de significativa para adoptar con la mayor celeridad posible las medidas correctivas precisas. Acceso <a href="{% url 'rare:juntaexMapMediaRarex' %}">aquí</a>.</li> 
+                                    <li>VRAEx: en este programa se realiza una planificación de ensayos sobre muestras variadas pertenecientes a las vías tróficas, para conocer la afectación radiológica en los mismos y poder detectar, con una precisión muy alta, cualquier tipo de variación radiológica que pudiera afectar a la población existente en el entorno de la instalación sometida a control. Acceso <a href="{% url 'copuma:juntaexMapPublicoVraex' %}">aquí</a>.</li>
+                                </ul>
+                                
+                            </h6>                
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal RAREX-->
+            <div class="modal fade" id="modalRARExInfo" tabindex="-1" role="dialog" aria-labelledby="modalRARExInfoTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalRARExInfoLongTitle"><img class="rounded mx-auto d-block" src="{% static 'img/logos/logo_rarex.png' %}" alt="Logo RAREX" title="Logo Red de Alerta Radiológica de Extremadura" width="168"/></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h6 class="mt-3">Es obligatorio tener un conocimiento preciso del impacto radiológico que una central nuclear puede producir sobre su entorno. Para ello, se implantan en los mismos Planes de Vigilancia Radiológicos Ambientales o PVRAs, así como redes de alerta radiológicas o RVRAs. Ambos sistemas son complementarios. La ejecución de los planes de vigilancia radiológicos suponen la toma periódica de muy diferentes tipos de muestras y el posterior análisis de su contenido radiactivo. La información que se obtiene de los mismos es muy precisa sobre cualquier alteración que pueda producirse, pero la obtención de los resultados puede dilatarse significativamente frente al momento en que se recolectaron las citadas muestras. Las redes de alerta radiológicas, tienen menos capacidad de detectar tan pequeñas alteraciones radiológicas en el ambiente, pero los valores que obtienen están disponibles prácticamente en el mismo momento en que son detectados, conociendo inmediatamente que se ha producido una alteración significativa.</h6>
+                            <h6>La realización de ambos sistemas de control medioambiental, son promovidos por los propietarios de las centrales o instalaciones nucleares y radiactivas. por las Comunidades Autónomas y por el Consejo de Seguridad Nuclear. Además y como consecuencia de la incorporación de España a la Unión Europea y la firma entre otros, del tratado EURATOM, inspectores de dicho Organismo supervisan periódicamente el cumplimiento por parte de los Países miembros entre otros aspectos, los artículos: 35 <em><b>“Cada Estado miembro creará las instalaciones necesarias a fin de controlar de modo permanente el índice de radiactividad de la atmósfera, de las aguas y del suelo, así como la observancia de las normas básicas. La Comisión tendrá derecho de acceso a estas instalaciones de control; podrá verificar su funciona­miento y eficacia”</b></em> y 36 <em><b>“La información relativa a los controles mencionados en el artículo 35 será comunicada regularmente por las autoridades competentes a la Comisión, a fin de tenerla al corriente del índice de radiactividad que pudiere afectar a la población”</b></em>.</h6>
+                            <h6>En esta página web se muestran los valores medios diarios de la tasa de dosis ambiental registrada por las estaciones de la Red de Alerta Radiológica de Extremadura, RAREx. Estas estaciones se encuentran distribuidas por tres zonas de interés. Por un lado el entorno de la central nuclear de Almaraz, en las distintas direcciones de los vientos, por otro lado, en diferentes puntos de Badajoz y mas concretamente, en las proximidades de la instalación nuclear de El Cabril, y por último, la región del Alentejo portugués. Las medias mostradas se obtienen mediante detectores que realizan medidas cada 10 minutos, que son monitorizados de forma continua por el Laboratorio de Radiactividad Ambiental de la Universidad de Extremadura LARUEX. Su funcionamiento es posible gracias a la financiación recibida de la Junta de Extremadura a través de su Consejería de Transición Ecológica y Sostenibilidad y del Consejo de Seguridad Nuclear.</h6>                
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal VRAEX-->
+            <div class="modal fade" id="modalVRAExInfo" tabindex="-1" role="dialog" aria-labelledby="modalVRAExInfoTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalVRAExInfoLongTitle"><img class="rounded mx-auto d-block" src="{% static 'img/logos/logo_vraex.png' %}" alt="Logo VRAEX" title="Logo Plan de Vigilancia Radiológica de Extremadura" width="168"/></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h6>La realización de los planes de vigilancia radiológica, son obligatoriamente promovidos por los propietarios de las centrales o instalaciones nucleares y radiactivas. Así mismo, son promovidos por las Comunidades Autónomas y por el Consejo de Seguridad Nuclear. Además y como consecuencia de la incorporación de España a la Unión Europea y la firma entre otros, del tratado EURATOM, inspectores de dicho Organismo supervisan periódicamente el cumplimiento por parte de los Países miembros entre otros aspectos, los artículos: 35 <em><b>“Cada Estado miembro creará las instalaciones necesarias a fin de controlar de modo permanente el índice de radiactividad de la atmósfera, de las aguas y del suelo, así como la observancia de las normas básicas. La Comisión tendrá derecho de acceso a estas instalaciones de control; podrá verificar su funciona­miento y eficacia”</b></em> y 36 <em><b>“La información relativa a los controles mencionados en el artículo 35 será comunicada regularmente por las autoridades competentes a la Comisión, a fin de tenerla al corriente del índice de radiactividad que pudiere afectar a la población”</b></em>.</h6>
+                            <h6>En esta página web se muestran resumidamente los resultados que proporcionan los programas de vigilancia radiológicos ambientales promovidos por la Junta de Extremadura en los entornos de la central nuclear de Almaraz y de las antiguas instalaciones mineras de la Haba y llevados a cabo por el Laboratorio de Radiactividad Ambiental de la Universidad de Extremadura, LARUEX.</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 card">
+                <div class="row my-auto">
+                    <div class="col-md-4 col-12 text-center my-auto"><h6>Dosis media diaria Extremadura: 0,10&mu;Sv/h</h6></div>
+                    <div class="col-md-1 col-12 text-center my-auto"><a href="#"><i style="color:511391" class="fa-light fa-circle-info fa-3x" data-toggle="modal" data-target="#modalDetectorInfo"></i></a></div>
+                    <div class="col-md-3 col-12">
+                        <div class="row">
+                            <div class="col-12"><h6>Selector dosis simulada</h6></div>
+                            <input type="range" class="col-12 form-range col-3 w-100" min="10" max="500" step="5" id="radiacion" value="10">
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6 text-center"><h6>CHOQUES: <div id="choques" class="ml-1">0</div></h6></div>
+                    <div class="col-md-2 col-6 text-center"><h6>CHOQUES/s: <div id="choquesXSeg" class="ml-1">0</div></h6></div>
+                </div>
+            </div>
+            <div class="col-12">
+                <p style="font-size:11px">Los datos mostrados en el fondo de esta web son una simulación del funcionamiento de un detector. La relación entre el aumento de la dosis simulada y los choques es una representación instructiva que se asemeja a la realidad pero está simplificada eliminando otros factores que afectan a la medida de la radiación.</p>
+            </div>
+
+            <!-- Modal Detector Simulado-->
+            <div class="modal fade" id="modalDetectorInfo" tabindex="-1" role="dialog" aria-labelledby="modalDetectorInfoTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <h6>El fondo de esta página web simula el interior de un detector del tipo Cámara de Ionización Gaseosa. Este tipo de detectores se caracterizan por tener una cantidad conocida de partículas en el interior (partículas verdes de la simulación) a la espera de que partículas del exterior entren y choquen con ellas. En el ambiente hay radiación de forma natural, y esta se puede ver incrementada de forma natural o artificial. Desplazando el selector simularemos un cambio en la radiación que tendremos en el aire. Cada choque es medido y de este modo podremos hacer una valoración aproximada de la dosis que se registra en la ubicación del detector. Las partículas pueden tener más o menos energía, dependiendo de su origen, si quisiesemos conocer quien es el causante de la radiación y no solo la cantidad de radiación en el ambiente necesitaremos un detector que nos permita realizar espectrometría y su medida se dará como actividad respecto al elemento que la causa.</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+<script>
+    // nice scroll para los paneles de la tabla
+    $(".do-nicescrol").niceScroll();
+</script>
+<script src="{% static 'owl/js/popper.js' %}"></script>
+<script src="{% static 'owl/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'owl/js/owl.carousel.min.js' %}"></script>
+<script src="{% static 'owl/js/main.js' %}"></script>
+
+
+<script>
+
+
+    var colorParticulaRadiacion = "#eb8634";
+    var colorParticulaDetector = "#97B69D";
+    var choquesXSeg = 0;
+    var intervalId = window.setInterval(function(){
+        $("#choquesXSeg").text(parseInt($("#choques").text())-choquesXSeg);
+        choquesXSeg = parseInt($("#choques").text());
+        
+    }, 1000);
+    (function() {
+        var lastTime = 0;
+        var vendors = ['ms', 'moz', 'webkit', 'o'];
+        for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+            window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+            window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+        }
+        
+        if (!window.requestAnimationFrame)
+            window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime();
+            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+            var id = window.setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+            };
+        
+            if (!window.cancelAnimationFrame)
+            window.cancelAnimationFrame = function(id) {
+                clearTimeout(id);
+            };
+        }());
+
+        (function() {
+            var SCREEN_WIDTH = 900;
+            var SCREEN_HEIGHT = 500;
+            var RADIUS = 110;
+            var RADIUS_SCALE = 1;
+            var RADIUS_SCALE_MIN = 1;
+            var RADIUS_SCALE_MAX = 1.5;
+            var QUANTITY = 100;
+            var canvas;
+            var context;
+            var particles;
+            var mouseX = (window.innerWidth - SCREEN_WIDTH);
+            var mouseY = (window.innerHeight - SCREEN_HEIGHT);
+            var targetX = 0;
+            var targetY = 0;
+            var PARTICLE_SIZE = 10;
+            var depth = 0;
+
+            var quantity_rad = 10;
+            var quantity_det = 500;
+            var particles_rad;
+            var particles_det;
+            var particle_size_rad = 10;
+            var particle_size_det = 10;
+            var color_particle_rad = colorParticulaRadiacion;
+            var color_particle_det = colorParticulaDetector;
+
+            function init(){
+
+                canvas = document.getElementById('world');
+
+                if(canvas && canvas.getContext) {
+                    context = canvas.getContext('2d');
+                    context.globalCompositeOperation = 'destination-over';
+                    window.addEventListener('resize', windowResizeHandler, false);
+                    windowResizeHandler();
+                    createParticles();
+                    loop();
+                }
+            }
+            function crearParticulaRadiacion(i){
+                var plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+                var posX = 0;
+                if (plusOrMinus > 0)
+                    posX = particle_size_rad;
+                else
+                    posX =  window.innerWidth - particle_size_rad
+                var posY = particle_size_rad/2 + Math.random() * (window.innerHeight - particle_size_rad/2);
+                var speed = 2;
+                var directionX = -speed + (Math.random() * speed*2);
+                var directionY = -speed + (Math.random()* speed*2);
+                var color = color_particle_rad;
+                var particle = {
+                    position: { x: posX, y: posY },
+                    size: Math.random() * particle_size_rad,
+                    directionX: directionX,
+                    directionY: directionY,
+                    speed: speed,
+                    targetX: posX,
+                    targetY: posY,
+                    depth: depth,
+                    index:i,
+                    fillColor: color
+                };
+                return particle;
+            }
+            function crearParticulaDetector(i){
+                var posX = particle_size_det/2 + Math.random() * (window.innerWidth - particle_size_det/2);
+                var posY = particle_size_det/2 + Math.random() * (window.innerHeight - particle_size_det/2);
+                var speed = 0.2;
+                var directionX = -speed + (Math.random() * speed*2);
+                var directionY = -speed + (Math.random()* speed*2);
+                var color = color_particle_det;
+                var particle = {
+                    position: { x: posX, y: posY },
+                    size: particle_size_det,
+                    directionX: directionX,
+                    directionY: directionY,
+                    speed: speed,
+                    targetX: posX,
+                    targetY: posY,
+                    depth: depth,
+                    index:i,
+                    fillColor: color
+                };
+                return particle;
+            }
+            function createParticles(){
+                particles = [];
+                for (var i = 0; i < quantity_rad; i++) {
+                    particles.push( crearParticulaRadiacion(i) );
+                }
+                for (var i = 0; i < quantity_det; i++) {
+                    particles.push( crearParticulaDetector(i) );
+                }
+            }
+            $("#radiacion").change(function(){
+                //$("#radiacionValor").text($("#radiacion").val());
+                quitarParticulas();
+                $("#choques").text("");
+                choquesXSeg = 0;
+                quantity_rad = $("#radiacion").val();
+                for (var i = 0; i < quantity_rad; i++) {
+                    particles.push( crearParticulaRadiacion(i) );
+                }
+            });
+            function quitarParticulas(){
+                for (var k=0; k<10; k++){
+                    for(var i=0; i < particles.length; i++) {
+                        var particle = particles[i];
+                        if (particle.fillColor == colorParticulaRadiacion){
+                            removeParticle(particle);
+                        }
+                    }
+                }
+            }
+
+
+            function loop(){
+                context.fillStyle = 'rgba(248,249,250,0.2)';
+                context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+                var z = 0;
+                var xdist = 0;
+                var ydist = 0;
+                var dist = 0;
+                for (var i=0; i < particles.length; i++){
+                    var particle = particles[i];
+
+                    var lp = { x: particle.position.x, y: particle.position.y };
+
+                    if(particle.position.x <=particle.size/2 || particle.position.x >= SCREEN_WIDTH - PARTICLE_SIZE/2){
+                        particle.directionX *= -1;
+                        if (particle.fillColor == colorParticulaRadiacion){
+                            removeParticle(particle);
+                            particles.push( crearParticulaRadiacion(1));
+                        }
+                    }
+
+                    if(particle.position.y <= particle.size/2 || particle.position.y >= SCREEN_HEIGHT - PARTICLE_SIZE/2){
+                        particle.directionY *= -1;
+                        if (particle.fillColor == colorParticulaRadiacion){
+                            removeParticle(particle);
+                            particles.push( crearParticulaRadiacion(1));
+                        }
+                    }
+
+                    for(var s=0; s < particles.length; s++) {
+                        var bounceParticle = particles[s];
+                        if(bounceParticle.index != particle.index) {
+                            //what are the distances
+                            z = PARTICLE_SIZE;
+                            xdist = Math.abs(bounceParticle.position.x - particle.position.x);
+                            ydist = Math.abs(bounceParticle.position.y - particle.position.y);
+                            dist = Math.sqrt(Math.pow(xdist, 2) + Math.pow(ydist, 2));
+                            if(dist < z) {
+                                if (particle.fillColor == colorParticulaRadiacion){
+                                    removeParticle(particle);
+                                    particles.push( crearParticulaRadiacion(1));
+                                    var choques = parseInt($("#choques").text());
+                                    if (isNaN(choques)){
+                                        choques = 0;
+                                    }
+                                    choques = choques + 1;
+                                    $("#choques").text(choques);
+                                }
+                                randomiseDirection(particle);
+                                randomiseDirection(bounceParticle);
+                            }
+                        }
+                    }
+                    particle.position.x -= particle.directionX;
+                    particle.position.y -= particle.directionY;
+                    context.beginPath();
+                    context.fillStyle = particle.fillColor;
+                    context.lineWidth = particle.size;
+                    context.moveTo(lp.x, lp.y);
+                    context.arc(particle.position.x, particle.position.y, particle.size/2, 0, Math.PI*2, true);
+                    context.closePath();
+                    context.fill();
+                }
+                
+                requestAnimationFrame(loop);
+            }
+            function removeParticle(particle){
+                particles.splice(particles.indexOf(particle),1);
+            }
+            function randomiseDirection (particle) {
+                //pick a random deg
+                var d = 0;
+                while((d == 0) || (d == 90) || (d == 180) || (d == 360)) {
+                d = Math.floor(Math.random() * 360);
+                }
+
+                var r = (d * 180)/Math.PI;
+                particle.directionX = Math.sin(r) * particle.speed;
+                particle.directionY = Math.cos(r) * particle.speed;
+
+            }
+
+            function windowResizeHandler() {
+                SCREEN_WIDTH = window.innerWidth;
+                SCREEN_HEIGHT = window.innerHeight;
+                canvas.width = SCREEN_WIDTH;
+                canvas.height = SCREEN_HEIGHT;
+            }
+
+            init();
+
+        }())
+    $('.btnright').hide();
+    $('.btnleft').hide();
+</script>
+{% endblock %}

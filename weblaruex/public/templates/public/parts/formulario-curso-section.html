@@ -1,0 +1,94 @@
+{% load static %}
+<!-- ======= Contact Section ======= -->
+
+<section id="form-curso" class="contact">
+
+{% if curso.inscripciones == "1" %}
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+        <h2>Formulario de inscripción</h2>
+        <p>{{curso.titulo}}</p>
+    </div>
+  </div>
+
+  <div class="container" data-aos="fade-up">
+    <div class="row mt-5">
+      <div class="col-lg-4">
+        <div class="info">
+          <div class="address">
+            <i class="icofont-google-map"></i>
+            <h4>Organizador del Curso:</h4>
+            <p>LARUEX</p>
+            <p>Labroratorio de Radiactividad Ambiental de Extremadura.</p>
+          </div>
+
+          <div class="email">
+            <i class="icofont-envelope"></i>
+            <h4>Email de contacto:</h4>
+            <p>contacto@laruex.com</p>
+            <p>ymiralle@gmail.com</p>
+          </div>
+
+          <div class="phone">
+            <i class="icofont-phone"></i>
+            <h4>Teléfono de contacto:</h4>
+            <p>+34 927 257 153</p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="col-lg-8 mt-5 mt-lg-0">
+
+        <form action="/formularioCurso/" method="post" role="form" class="php-email-form">
+          {% csrf_token %}
+          <input name="IDCurso" value="{{ curso.id }}" type="hidden" hidden/>
+          <div class="form-row">
+            <div class="col-md-6 form-group">
+              <input type="text" name="name" class="form-control" id="name" placeholder="Nombre" data-rule="minlen:4" data-msg="Por favor introduce al menos 4 caracteres"  required/>
+              <div class="validate"></div>
+            </div>
+            <div class="col-md-6 form-group">
+              <input type="text" name="surnames" class="form-control" id="surnames" placeholder="Apellidos" data-rule="minlen:4" data-msg="Por favor introduce al menos 10 caracteres"  required/>
+              <div class="validate"></div>
+            </div>
+            <div class="col-md-6 form-group">
+              <input type="text" name="ID" class="form-control" id="ID" placeholder="DNI o Pasaporte" data-rule="minlen:9" data-msg="Por favor introduzca un documento de identidad válido"  required/>
+              <div class="validate"></div>
+            </div>
+            <div class="col-md-6 form-group">
+              <input type="text" name="Phone" class="form-control" id="phone" placeholder="Teléfono Ej: 666777111" data-rule="minlen:9" data-msg="Por favor introduzca un teléfono válido"  required/>
+              <div class="validate"></div>
+            </div>
+            <div class="col-md-6 form-group">
+              <div ></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="email" class="form-control" name="email" id="email" placeholder="Tu Email" data-rule="email" data-msg="Por favor introduce un email valido"  required/>
+            <div class="validate"></div>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" name="work" id="work" placeholder="Institución o grupo de investigación en donde trabaja" data-rule="minlen:4" data-msg="Por favor introduce al menos 50 caracteres"  required/>
+            <div class="validate"></div>
+          </div>
+          <div class="form-group">
+            <textarea class="form-control" name="curriculum" rows="5" data-rule="required" data-msg="Dejanos una breve descripción de tu curriculum, máximo 10 lineas." placeholder="Breve curriculum" required></textarea>
+            <div class="validate"></div>
+          </div>
+          <div class="mb-3">
+            <div class="loading">Cargando</div>
+            <div class="error-message"></div>
+            <div class="sent-message">Registro completado con éxito. Gracias.</div>
+          </div>
+            <div class="text-center"><button type="submit">Enviar</button></div>
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+{% endif %}
+</section><!-- End Contact Section -->

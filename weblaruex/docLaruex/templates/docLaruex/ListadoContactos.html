@@ -1,0 +1,374 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+    .add:hover {
+    color: #ce8312;
+  }
+  /*  3 estilo del campo añadir archivo*/
+
+  .addFicheroEditable {
+    color: rgb(9, 58, 65);
+  }
+
+  .addFicheroEditable:hover {
+    color: rgb(133, 198, 228);
+  }
+
+  /* estilo añadirFichero PDF*/
+  .addFicheroPDF {
+    color: rgb(161, 16, 32);
+  }
+
+  .addFicheroPDF:hover {
+    color: rgb(99, 10, 20);
+  }
+
+      /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: rgb(16, 108, 161);
+  }
+
+  .addImagen:hover {
+    color: rgb(10, 59, 99);
+  }
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Contactos</h5>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Contactos</li>
+    </ol>
+  </nav>
+</div>
+
+{% if administrador %}
+<div id="toolbar">
+  <!-- boton que permite añadir un nuevo fabricante -->
+  <a href="" class="mx-1" title="Agregar un nuevo contacto" data-toggle="modal" data-target="#modalFormularioContacto" style="color: #eba43d"><i
+      class="fa-solid fa-square-plus fa-2x add"></i></a>
+</div>
+{% endif %}
+
+
+<!--- modalFormularioContacto que los proyectos-->
+<div id="modalFormularioContacto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Contacto</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioContacto"  action="/private/docLaruex/agregarContacto/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row" >  
+            <div class="form-group">
+              <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+                value="Proyecto" hidden />
+            </div>
+            <div class="col">
+            <div class="form-group">
+              <label for="habilitacion">Habilitación</label>
+              <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                {% for habilitacion in habilitaciones %}
+                <option value="{{habilitacion.id}}">
+                  {{habilitacion.titulo}}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            </div>
+          </div>             
+         <div class="row">
+            <div class="col-4">
+              <div class="form-group">
+                <label for="nombreContacto">Nombre</label>
+                <input type="text" class="form-control" id="nombreContacto" name="nombreContacto"
+                  data-rule="required" required/>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label for="puestoContacto">Puesto</label>
+                <input type="text" id="puestoContacto" name="puestoContacto" class="form-control" />
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label for="empresaContacto">Empresa</label>
+                <input type="text" id="empresaContacto" name="empresaContacto" class="form-control" />
+              </div>
+            </div>
+          </div>            
+          <div class="row">
+             <div class="col-4">
+               <div class="form-group">
+                 <label for="DNI">DNI</label>
+                 <input type="text" class="form-control" id="DNI" name="DNI" placeholder="12345678-A" pattern="[0-9]{8}-[A-Z]{1}"/>
+               </div>
+             </div>
+             <div class="col-4">
+               <div class="form-group">
+                 <label for="fechaNacimiento">Fecha de Nacimiento</label>
+                 <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control" />
+               </div>
+             </div>
+             <div class="col-4">
+               <div class="form-group">
+                 <label for="tipoContacto">Tipo de contacto</label>
+                 <select class="form-select my-auto" id="tipoContacto" name="tipoContacto" >
+                  <option value="Persona">Persona</option>
+                  <option value="Otro">Otro</option>
+                  </select>
+               </div>
+             </div>
+           </div>
+          <div class="row">
+            <div class="col-4">
+              <div class="form-group">
+                <label for="email">Correo</label>
+                <input type="text" id="email" name="email" class="form-control" />
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <div class="row">
+                    <div class="col-4">
+                      <input type="text" id="prefijoTelefono" name="prefijoTelefono" class="form-control"  value="+34"/>
+                    </div>
+                    <div class="col-8">
+                    <input type="text" id="telefono" name="telefono" class="form-control" />
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label for="telefono_fijo">Teléfono 2</label>
+                <div class="row">
+                    <div class="col-4">
+                      <input type="text" id="prefijoTelefonoFijo" name="prefijoTelefonoFijo" class="form-control"  value="+34"/>
+                    </div>
+                    <div class="col-8">
+                    <input type="text" id="telefono_fijo" name="telefono_fijo" class="form-control" />
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-3">
+              <div class="form-group">
+                <label for="direccionContacto">Extensión</label>
+                <input type="text" id="extension" name="extension" class="form-control" />
+              </div>
+            </div>
+            <div class="col-9">
+              <div class="form-group">
+                <label for="direccionContacto">Dirección</label>
+                <input type="text" id="direccionContacto" name="direccionContacto" class="form-control" />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <textarea class="form-control" id="info_adicional_contacto" name="info_adicional_contacto" rows="3"
+                data-rule="required" placeholder="Información Adicional"></textarea>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center" >
+            <div class="col-md-auto ">
+              <div class="form-group">
+                <label for="imagenContacto">
+                  <i class="fa-duotone fa-image fa-4x addImagen"></i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="imagenContacto" name="imagenContacto"
+                  onchange="mostrarNombreImagen(this.value)" />
+                <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+                  <spam id="imagen-name"></spam>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button id="cerrarContacto" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+</form>
+</div> <!-- END ModalAgregarProyecto -->
+
+<!-- ============= Tablas ============= -->
+
+<!-- Tabla con lista de proyectos -->
+
+    <table id="tabla_contactos" data-toggle="table" data-search="true" data-show-columns="true"
+      data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+      data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+      data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+    </table>
+
+
+<script type="text/javascript">
+
+  $('#tabla_contactos').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/contactosDatos",
+    cache: false,
+    columns: [{
+      title: 'Nombre',
+      field: 'nombre',
+      align: "center",
+      sortable: 'true',
+    },{
+      title: 'Empresa',
+      field: 'empresa',
+      align: "center"
+    },{
+      title: 'Puesto',
+      field: 'puesto',
+      align: "center"
+    },{
+      title: 'Extensión',
+      field: 'extension',
+      align: "center"
+    },{
+      title: 'Teléfono',
+      field: 'telefono',
+      align: "center"
+    },{
+      title: 'Teléfono Fijo',
+      field: 'telefono_fijo',
+      align: 'center',
+    },{
+      title: 'Mail',
+      field: 'email',
+      align: 'center',
+    },{
+      title: 'Dirección',
+      field: 'direccion',
+      align: "center",
+    },{
+      title: "Acciones",
+      field: "action",
+      align: "center",
+      formatter: function (value, row) {
+        
+        var botonVerContacto = '<a href="/private/docLaruex/contacto/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+        var botonModificarContacto = '<a href="/private/docLaruex/editarContacto/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#9768b2"></i></a>';
+
+        var admin = '{{administrador}}';
+        if (admin == 'True') { 
+            return (botonVerContacto + botonModificarContacto);
+        }        
+        else { 
+            return (botonVerContacto);
+        }
+      },
+  },
+    ],
+    locale: "es-ES",
+    search: true,
+    sortName: 'id',
+    sortOrder: 'desc',
+
+  });
+
+
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioContacto").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarContacto/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Contacto guardado con éxito', 'alert-success', 2000);
+        document.getElementById('formularioContacto').remove();
+        $('#tabla_contactos').bootstrapTable('refresh');
+        $('#modalFormularioContacto').trigger('reset');
+        $('#cerrarContacto').trigger('click');
+        location.reload(true);
+
+      }
+    });
+  });
+
+
+
+
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+
+    document.getElementById('imagen-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreImagen').style.display = 'none';
+  }
+
+
+</script>
+
+{% endblock %}

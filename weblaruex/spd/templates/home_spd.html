@@ -1,0 +1,698 @@
+{% extends "base/base_spd.html" %}
+
+{% load static %}
+
+{% block imports %}
+<!-- Custom css home -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/home_spd.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/slide_images_spd.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/clouds_spd.css' %}">
+
+<style>
+  #content {
+    font-family: "Bradley Hand ITC";
+    font-weight: bold;
+    font-size: 21px;
+  }
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+
+
+<!--https://codepen.io/developersahad/pen/WNpPwNv-->
+<!-- Carrousel Imagenes Portada y Titulos -->
+<div id="portada" class="carousel slide carousel-fade" data-ride="carousel">
+  <canvas id="canvas1"></canvas>
+  <canvas id="canvas2"></canvas>
+  <canvas id="canvas3"></canvas>
+
+  <!-- Indicators -->
+  <ul class="carousel-indicators" style="z-index: 300;">
+    <li data-target="#portada" data-slide-to="0" class="active"></li>
+    <li data-target="#portada" data-slide-to="1"></li>
+    <li data-target="#portada" data-slide-to="2"></li>
+    <li data-target="#portada" data-slide-to="3"></li>
+    <li data-target="#portada" data-slide-to="4"></li>
+    <li data-target="#portada" data-slide-to="5"></li>
+  </ul>
+
+  <!-- The slideshow -->
+  <div class="carousel-inner" style="background-color: #1B1C1C;">
+    <div class="carousel-item active">
+      <img src="{% static 'img/spd/portada/p1.jpg' %}">
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'img/spd/portada/p2.jpg' %}">
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'img/spd/portada/p3.jpg' %}">
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'img/spd/portada/p4.jpg' %}">
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'img/spd/portada/p5.jpg' %}">
+    </div>
+    <div class="carousel-item">
+      <img src="{% static 'img/spd/portada/p6.jpg' %}">
+    </div>
+  </div>
+
+  <!-- Left and right controls -->
+  <a class="carousel-control-prev" href="#portada" data-slide="prev" style="z-index: 300;">
+    <span class="carousel-control-prev-icon"></span>
+  </a>
+  <a class="carousel-control-next" href="#portada" data-slide="next" style="z-index: 300;">
+    <span class="carousel-control-next-icon"></span>
+  </a>
+
+  <!-- Titulo Portada -->
+  <div class="section-title-portada">
+    <h1 class="title-portada" data-aos="zoom-in" ata-aos-offset="50" data-aos-duration="3000">Spida</h1>
+    <!--color:Khaki;-->
+
+
+    <h2 class="cursive-brush" style=" font-size: 5vh; padding-top: 2%;" data-aos="zoom-in" ata-aos-offset="70"
+      data-aos-duration="3000"> Sistema
+      de Predicción Inteligente de Inundaciones</h2>
+    <p class="cursive-brush" style=" font-size: 4vh; padding-top: 2%;" data-aos="zoom-in" ata-aos-offset="70"
+      data-aos-duration="3000"><span style="color:lightgreen">Comunidad</span><span style="color:white"> Autónoma de
+      </span><span style="color:darkgray">Extremadura</span>
+    </p>
+    <img src="{% static 'img/spd/portada/extremadura.png' %}"
+      style="width:50px; height: 30px; opacity: 70%; margin-bottom: 20px;" data-aos="zoom-in" ata-aos-offset="70"
+      data-aos-duration="3000" />
+    <a class="btn btn-primary btn-xl text-uppercase js-scroll-trigger button-portada" href="{% url 'spd:MapaSpida' %}"
+      data-aos="zoom-in" ata-aos-offset="70" data-aos-duration="3000">Datos en Tiempo
+      Real</a>
+  </div>
+</div> <!-- End Carrousel Imagenes Portada y Titulos -->
+
+
+<!-- Seccion ¿QUE ES SPIDA?-->
+<!--https://codepen.io/bhautikbharadava/pen/VwLxyLa-->
+<section id="defspida" class="section-dark">
+
+  <!--class="block"-->
+  <!--<div class="clouds">
+    <div class="cloudsWrapper cloudImg"></div>
+  </div>-->
+
+  <div class='container-clouds'>
+    <div class='clouds-1'></div>
+    <div class='clouds-2'></div>
+    <div class='clouds-3'></div>
+  </div>
+
+  <div class="container">
+    <!-- Titulo seccion -->
+    <div class="section-title">
+      <h2>¿Qué es
+        <span class="text-spida">SPIDA</span>
+        ?
+      </h2>
+    </div>
+
+
+    <!-- Contenido Info-->
+    <div class="row">
+      <div class="col-lg-12" data-aos="fade-up">
+        <p>
+          <span class="text-spida">SPIDA </span>
+          es el Sistema de Predicción Inteligente de Inundaciones de la Comunidad Autónoma de Extremadura.
+          Su objetivo de aplicación consiste en la monitorización y análisis en tiempo real y diferido de datos
+          procedentes de diversos instrumentos de medida pertenecientes a Sistemas Automáticos de Información
+          Hidrológica.
+        </p>
+        <p>
+          Se trata, por tanto, de un Sistema de Alerta Temprana a través del cual se monitorizan eventos adversos de
+          carácter previsible que pueden suponer riesgo de inundación en su entorno, cuya importancia radica en que
+          permite conocer anticipadamente y con cierto nivel de certeza, en que tiempo y espacio, la crecida del nivel
+          de agua de un cauce puede desencadenar en situaciones peligrosas.
+        </p>
+      </div>
+    </div>
+  </div>
+</section><!-- End Section ¿QUE ES SPIDA? -->
+
+
+<!-- https://codeconvey.com/pure-css-coverflow-slider/ -->
+<section id="fotosSpida" class="section-light" style="overflow-x: hidden;">
+
+  <!-- Section Fotos -->
+  <div class="container">
+    <div class="col-rt-12">
+      <div class="Scriptcontent">
+
+        <div class="container">
+          <div class="wgh-slider">
+            <input class="wgh-slider-target" type="radio" id="slide-1" name="slider" />
+            <input class="wgh-slider-target" type="radio" id="slide-2" name="slider" />
+            <input class="wgh-slider-target" type="radio" id="slide-3" name="slider" />
+            <input class="wgh-slider-target" type="radio" id="slide-4" name="slider" checked="checked" />
+            <input class="wgh-slider-target" type="radio" id="slide-5" name="slider" />
+            <input class="wgh-slider-target" type="radio" id="slide-6" name="slider" />
+            <input class="wgh-slider-target" type="radio" id="slide-7" name="slider" />
+            <div class="wgh-slider__viewport" data-aos="fade-down" data-aos-offset="50" data-aos-easing="ease-in-sine">
+              <div class="wgh-slider__viewbox">
+                <div class="wgh-slider__container">
+                  <div class="wgh-slider-item">
+                    <div class="wgh-slider-item__inner">
+                      <figure class="wgh-slider-item-figure"><img class="wgh-slider-item-figure__image"
+                          src="{% static 'img/spd/portada/mantenimiento.jpg' %}" alt="" />
+                        <figcaption class="wgh-slider-item-figure__caption">
+                          <p class="Title-Imagen cursive-brush">Mantenimiento</p>
+                          <p><span class="text-alerta2" style="font-size: 22px; top:1px;">alerta<span
+                                style="font-size: 25px;">2</span></span></p>
+                        </figcaption>
+                      </figure>
+                      <label class="wgh-slider-item__trigger" for="slide-1" title="Show product 2"></label>
+                    </div>
+                  </div>
+                  <div class="wgh-slider-item">
+                    <div class="wgh-slider-item__inner">
+                      <figure class="wgh-slider-item-figure"><img class="wgh-slider-item-figure__image"
+                          src="{% static 'img/spd/portada/equipo_portatil.jpg' %}" alt="" />
+                        <!--<figcaption class="wgh-slider-item-figure__caption"><a href="">The 5th Exotic</a><p><span class="text-alerta2">alerta<span>2</span></span></p></figcaption>-->
+                        <figcaption class="wgh-slider-item-figure__caption">
+                          <p class="Title-Imagen cursive-brush">Equipamiento portatil</p>
+                          <p><span class="text-alerta2" style="font-size: 22px; top:1px;">alerta<span
+                                style="font-size: 25px;">2</span></span></p>
+                        </figcaption>
+                      </figure>
+                      <label class="wgh-slider-item__trigger" for="slide-2" title="Show product 1"></label>
+                    </div>
+                  </div>
+                  <div class="wgh-slider-item">
+                    <div class="wgh-slider-item__inner">
+                      <figure class="wgh-slider-item-figure"><img class="wgh-slider-item-figure__image"
+                          src="{% static 'img/spd/portada/actuacion.JPG' %}" alt="" />
+                        <figcaption class="wgh-slider-item-figure__caption">
+                          <p class="Title-Imagen cursive-brush">Actuación in situ</p>
+                          <p><span class="text-alerta2" style="font-size: 22px; top:1px;">alerta<span
+                                style="font-size: 25px;">2</span></span></p>
+                        </figcaption>
+                      </figure>
+                      <label class="wgh-slider-item__trigger" for="slide-3" title="Show product 2"></label>
+                    </div>
+                  </div>
+                  <div class="wgh-slider-item">
+                    <div class="wgh-slider-item__inner">
+                      <figure class="wgh-slider-item-figure"><img class="wgh-slider-item-figure__image"
+                          src="{% static 'img/spd/portada/monitores.jpg' %}" alt="" />
+                        <figcaption class="wgh-slider-item-figure__caption">
+                          <p class="Title-Imagen cursive-brush">Control 24 horas</p>
+                          <p><span class="text-alerta2" style="font-size: 22px; top:1px;">alerta<span
+                                style="font-size: 25px;">2</span></span></p>
+                        </figcaption>
+                      </figure>
+                      <label class="wgh-slider-item__trigger" for="slide-4" title="Show product 3"></label>
+                    </div>
+                  </div>
+                  <div class="wgh-slider-item">
+                    <div class="wgh-slider-item__inner">
+                      <figure class="wgh-slider-item-figure"><img class="wgh-slider-item-figure__image"
+                          src="{% static 'img/spd/portada/inundacion.jpg' %}" alt="" />
+                        <figcaption class="wgh-slider-item-figure__caption">
+                          <p class="Title-Imagen cursive-brush">Prevención</p>
+                          <p><span class="text-alerta2" style="font-size: 22px; top:1px;">alerta<span
+                                style="font-size: 25px;">2</span></span></p>
+                        </figcaption>
+                      </figure>
+                      <label class="wgh-slider-item__trigger" for="slide-5" title="Show product 4"></label>
+                    </div>
+                  </div>
+                  <div class="wgh-slider-item">
+                    <div class="wgh-slider-item__inner">
+                      <figure class="wgh-slider-item-figure"><img class="wgh-slider-item-figure__image"
+                          src="{% static 'img/spd/portada/estacion_fija.jpg' %}" alt="" />
+                        <figcaption class="wgh-slider-item-figure__caption">
+                          <p class="Title-Imagen cursive-brush">Estaciones propias</p>
+                          <p><span class="text-alerta2" style="font-size: 22px; top:1px;">alerta<span
+                                style="font-size: 25px;">2</span></span></p>
+                        </figcaption>
+                      </figure>
+                      <label class="wgh-slider-item__trigger" for="slide-6" title="Show product 5"></label>
+                    </div>
+                  </div>
+                  <div class="wgh-slider-item">
+                    <div class="wgh-slider-item__inner">
+                      <figure class="wgh-slider-item-figure"><img class="wgh-slider-item-figure__image"
+                          src="{% static 'img/spd/portada/pcivil.jpg' %}" alt="" />
+                        <figcaption class="wgh-slider-item-figure__caption">
+                          <p class="Title-Imagen cursive-brush">Toma de decisiones</p>
+                          <p><span class="text-alerta2" style="font-size: 22px; top:1px;">alerta<span
+                                style="font-size: 25px;">2</span></span></p>
+                        </figcaption>
+                      </figure>
+                      <label class="wgh-slider-item__trigger" for="slide-7" title="Show product 5"></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section> <!-- END Section Fotos -->
+
+
+<!-- Seccion ¿DONDE SE ENMARCA?-->
+<section id="defenmarcacion" class="section-dark"
+  style="background-image: linear-gradient(rgba(27,27,28,0.9), rgba(27,27,28,0.9)), url({% static 'img/spd/portada/pcivil1.jpg' %}); background-repeat: no-repeat;background-size: cover;background-position: center;">
+
+  <div class="container">
+
+    <!-- Titulo seccion -->
+    <div class="section-title">
+      <h2 class="cursive-brush">¿Donde se enmarca?</h2>
+    </div>
+
+    <!-- Contenido Info-->
+    <div class="row" data-aos="zoom-in">
+      <div class="col-lg-12">
+        <p>
+          Se enmarca dentro del desarrollo del Proyecto INTERREG / RAT_VA_PC, cuyo beneficiario principal
+          es la Dirección General de Emergencias, Protección Civil e Interior (DGEPCI) de la Junta de Extremadura
+          integrante del Plan Especial de Protección Civil del Riesgo de Inundaciones de la Comunidad Autónoma
+          de Extremadura (INUNCAEX).
+        </p>
+        <p>
+          <!--<span class="cursive-brush" style="font-size: 40px;color: aquamarine;">Spida</span>-->
+          <span class="text-spida">SPIDA </span>
+          se ha desarrollado en el Centro Hispano-Luso de Redes de Alerta Temprana
+          <span class="text-alerta2">alerta<span>2</span></span>
+          <!--<span style="background-image: url('../../../static/img/spd/logos/logo_alerta2_transparente.png');display:block;width:auto;height:28px; background-size: auto 30px; background-repeat: no-repeat;">&nbsp;</span>-->
+          , por parte del grupo de investigación <span class="text-laruex">LARUEX</span>, que a su vez es responsable
+          del diseñado, la gestión
+          y el mantenimiento de la Red de Alerta Radiológica de la Comunidad Autónoma de Extremadura (RAREX) desde hace
+          30 años.
+        </p>
+      </div>
+    </div>
+  </div>
+</section><!-- End Section ¿DONDE SE ENMARCA? -->
+
+
+
+<!-- ======= Section LOGOS ======= -->
+<section id="logos" class="logos">
+  <div class="row" data-aos="zoom-in" style="width:100%; height:100%;padding:0; margin:0">
+    <div class=" col-3 d-flex align-items-center justify-content-center"
+      style="width:100%; height:100%;padding:0; margin:0">
+      <img src="{% static 'img/spd/logos/logo_laruex.png' %}" alt="">
+    </div>
+    <div class=" col-3 d-flex align-items-center justify-content-center"
+      style="width:100%; height:100%;padding:0; margin:0">
+      <img src="{% static 'img/spd/logos/logo_junta_extremadura.png' %}" alt="">
+    </div>
+    <div class="col-3 d-flex align-items-center justify-content-center"
+      style="width:100%; height:100%;padding:0; margin:0">
+      <img src="{% static 'img/spd/logos/logo_interreg.png' %}" alt="">
+    </div>
+    <div class="col-3 d-flex align-items-center justify-content-center"
+      style="width:100%; height:100%;padding:0; margin:0">
+      <img src="{% static 'img/spd/logos/logo_rat_va_pc.png' %}" alt="">
+    </div>
+  </div>
+</section><!-- End Section LOGOS -->
+
+
+
+<!-- Seccion Estaciones SPIDA-->
+<section id="defestaciones" class="section-dark"
+  style="background-image: linear-gradient(rgba(27,27,28,0.9), rgba(27,27,28,0.9)), url({% static 'img/spd/portada/estacion_fija.jpg' %}); background-repeat: no-repeat;background-size: cover;background-position: center;">
+  <div class="container">
+    <div class="section-title">
+      <h2 class="cursive-brush">Estaciones
+        <span class="text-spida">SPIDA </span>
+      </h2>
+    </div>
+
+    <div class="row">
+      <p data-aos="fade-right">
+        En la actualidad, el Sistema de Alerta Temprana
+        <span class="text-spida">SPIDA </span>
+        se compone de un total de veinte estaciones de monitoreo de nivel de agua repartidas por igual entre
+        las provincias de Cáceres y Badajoz. Se encuentran ubicadas en zonas consideradas como Áreas con Riesgo
+        Potencial Significativo de Inundación (ARPSI), y determinadas como de riesgo medio, alto y/o extremo por el
+        INUNCAEX.
+      </p>
+      <img src="{% static 'img/spd/portada/estacion_fija.jpg' %}" class="img-fluid" data-aos="zoom-in"
+        style="margin-bottom:36px" data-aos-offset="50" data-aos-easing="ease-in-sine">
+      <p data-aos="fade-left">
+        Cada estación consta de diversos elementos y/o dispositivos hardware entre los cuales se encuentran instrumentos
+        de medición para la captación de información del medio físico que les rodea. Dicho equipamiento cumple toda la
+        legislación vigente de aplicación, así como los estándares IEC, valores límites de CEM y autorizaciones de
+        emisión de la legislación vigente en Europa.
+      </p>
+
+    </div>
+  </div>
+</section><!-- End Section Estaciones SPIDA -->
+
+
+<!-- Section REDES DE INFORMACION -->
+<section id="defredesinfo" class="redesInfo section-light">
+
+  <div class="container">
+
+    <div class="section-title">
+      <h2 class="cursive-brush" style="color: #343a40;">Redes de información</h2>
+    </div>
+
+    <!--https://codepen.io/studiojvla/pen/qVbQqW-->
+    <div class="slider">
+      <div class="slide-track">
+        <div class="slide">
+          <img src="{% static 'img/spd/logos/logo_aemet.jpg' %}" alt="" />
+        </div>
+        <div class="slide">
+          <img src="{% static 'img/spd/logos/confederacion_tajo.jpg' %}" alt="" />
+        </div>
+        <div class="slide">
+          <img src="{% static 'img/spd/logos/confederacion_guadiana.png' %}" alt="" />
+        </div>
+        <div class="slide">
+          <img src="{% static 'img/spd/logos/logo_spida.png' %}" alt="" />
+        </div>
+        <div class="slide">
+          <img src="{% static 'img/spd/logos/logo_aemet.jpg' %}" alt="" />
+        </div>
+        <div class="slide">
+          <img src="{% static 'img/spd/logos/confederacion_tajo.jpg' %}" alt="" />
+        </div>
+        <div class="slide">
+          <img src="{% static 'img/spd/logos/confederacion_guadiana.png' %}" alt="" />
+        </div>
+        <div class="slide">
+          <img src="{% static 'img/spd/logos/logo_spida.png' %}" alt="" />
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <p data-aos="fade-up">
+        La activación del plan de emergencia ante inundaciones de la Comunidad Autónoma de Extremadura (INUNCAEX),
+        está basado en los sistemas de previsión, meteorológica e hidrológica, así como en los avisos que de
+        sus escenarios de emergencia hagan las entidades que gestionan las presas.
+        Por ello, dicho Sistema de Alerta Temprana integra los datos reportados por cuatro redes de información como
+        son:
+      </p>
+    </div>
+    <div class="row-redes-info">
+      <div class="col-xl-3 col-md-6 col-sm-12 d-flex align-items-stretch mt-4 mt-md-0" data-aos="zoom-in"
+        ata-aos-offset="50">
+        <div class="icon-box" style="height: 100%;">
+          <p><a href="http://www.aemet.es/es/portada" target="_blank">Aemet</a></p>
+          <p style="color: #343a40; padding-top: 15px; padding-bottom:15px;">Agencia Estatal de Meteorología</p>
+          <img src="{% static 'img/spida/portada/red_aemet.PNG' %}">
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 d-flex align-items-stretch mt-4 mt-md-0" data-aos="zoom-in" ata-aos-offset="60">
+        <div class="icon-box">
+          <p><a href="https://saihtajo.chtajo.es/" target="_blank">Saih del Tajo</a></p>
+          <p style="color: #343a40; padding-top: 15px; padding-bottom:15px;">Sistema de Información Hidrográfica de la
+            Confederación del Río Tajo</p>
+          <img src="{% static 'img/spida/portada/red_saih_tajo.PNG' %}">
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 d-flex align-items-stretch mt-4 mt-xl-0" data-aos="zoom-in" ata-aos-offset="70">
+        <div class="icon-box">
+          <p><a href="http://www.saihguadiana.com:7080/visorTR/index.php" target="_blank">Saih del Guadiana</a></p>
+          <p style="color: #343a40; padding-top: 15px; padding-bottom:15px;">Sistema de Información Hidrográfica de la
+            Confederación del Río Guadiana</p>
+          <img src="{% static 'img/spida/portada/red_saih_guadiana.PNG' %}">
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6 d-flex align-items-stretch mt-4 mt-xl-0" data-aos="zoom-in" ata-aos-offset="80">
+        <div class="icon-box">
+          <p><a href="{% url 'spd:MapaSpida' %}">Spida</a></p>
+          <p style="color: #343a40; padding-top: 15px; padding-bottom:15px;">Sistema de Predicción Inteligente de
+            Inundaciones</p>
+          <img src="{% static 'img/spida/portada/red_spida.PNG' %}">
+        </div>
+      </div>
+    </div>
+  </div>
+</section><!-- End Section REDES DE INFORMACION -->
+
+<!-- Seccion Objetivo aplicacion SPIDA-->
+<section id="defobjetivo" class="section-dark">
+  <!--style="background-image: linear-gradient(rgba(27,27,28,0.8), rgba(27,27,28,0.8)), url({% static 'img/spd/portada/paisaje.gif' %}); background-repeat: no-repeat;background-size: cover;background-position: center;">-->
+  <!--style="background-image: url('https://i.pinimg.com/originals/9d/9a/23/9d9a23a4d99de3a7fae1a34e5972a4b7.gif');"-->
+
+  <div class='container-clouds'>
+    <div class='clouds-1'></div>
+    <div class='clouds-2'></div>
+    <div class='clouds-3'></div>
+  </div>
+
+  <div class="container">
+
+    <div class="section-title">
+      <h2 class="cursive-brush">Objetivo de Aplicación</h2>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6" data-aos="fade-down-right">
+        <p>
+          Desde el centro de operaciones
+          <span class="text-alerta2">alerta<span>2</span></span>, se monitoriza de forma continua
+          el estado de <span class="text-spida">SPIDA
+          </span>
+          durante los 365 días del año y las 24 horas del día, con el objetivo
+          de poder antiniciparse a cualquier fenómeno adverso que pueda desencadenar en una situación de inundación,
+          logrando evitar o reducir pérdidas de vidas o daños de bienes mediante la aplicación de
+          protección y reducción de riesgos de los Servicios de Emergencia de la
+          Comunidad Autónoma de Extremadura.
+        </p>
+      </div>
+      <div class="col-lg-6 pt-4 pt-lg-0" data-aos="zoom-in-left"
+        style="display: grid; grid-auto-flow: column; align-items: center; justify-items: center;">
+        <img src="{% static 'img/spd/portada/Imagen1.png' %}" style="width: 100%;">
+      </div>
+    </div>
+
+
+
+    <div class="row">
+      <div class="col-lg-6 align-self-center" data-aos-id="aos-numavisos" data-aos="zoom-in-right"
+        data-aos-easing="ease-in-out">
+        <p style="text-align: center;">
+          <!--<span class="data-number" data-number="49" data-aos-id="aos-numavisos" data-aos="zoom-in-right"
+            data-aos-easing="ease-in-out" style="font-size: 35px;">49</span>-->
+          <span class="count" style="font-family:'Roboto', sans-serif;" data-number="365">365</span>
+          <span class="cursive-brush" style="font-size: 35px;"> días </span>
+          <span class="count" style="font-family:'Roboto', sans-serif;" data-number="24">24</span>
+          <span class="cursive-brush" style="font-size: 35px;"> horas</span>
+        </p>
+      </div>
+      <div class="col-lg-6 pt-4 pt-lg-0" data-aos="fade-up-left"
+        style="display: grid; grid-auto-flow: column; align-items: center; justify-items: center;">
+        <p>
+          Los datos mostrados en este visor son transmitidos en tiempo real, con una periodicidad decimominutal.
+          La alta frecuencia de transmisión de los datos, aporta a éstos un carácter de provisionalidad hasta su
+          posterior revisión, validación y consolidación por parte del personal técnico de <span
+            class="text-alerta2">alerta<span>2</span></span>.
+        </p>
+      </div>
+    </div>
+  </div>
+</section><!-- End Section Objetivo aplicacion SPIDA -->
+
+
+
+<!-- Seccion Sistema inteligente SPIDA-->
+<section id="avisos" class="section-light">
+  <div class='container-clouds'>
+    <div class='clouds-1'></div>
+    <div class='clouds-2'></div>
+    <div class='clouds-3'></div>
+  </div>
+  <div class="container">
+    <div class="section-title">
+      <h2 class="cursive-brush" style="color: #343a40;">Sistema inteligente</h2>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-6" data-aos="fade-down-right">
+        <p>
+          Gracias al desarrollo software diseñado y desarrollado por el personal científico-ténico que conforma el
+          centro
+          <span class="text-alerta2">alerta<span>2</span></span>,
+          <span class="text-spida"> SPIDA</span>
+          dispone de la capacidad suficiente para detectar de forma automática cualquier anomalía que pudiera conllevar
+          a una situación de emergencia.
+        </p>
+        <p>
+          Dicho sistema permite alertar al analista de guardia mediante el envío de mensajes y/o llamadas de cualquier
+          alteración detectada tanto en el funcionamiento operaracional como en la monitorización de los datos
+          capturados.
+        </p>
+        <p>
+
+        </p>
+        <p style="text-align: center; align-items: center; justify-items: center;">
+          <img src="{% static 'img/spd/portada/servicio_llamada.PNG' %}" style="width: 80%;">
+        </p>
+      </div>
+      <div class="col-lg-6 pt-4 pt-lg-0" data-aos="zoom-in">
+        <p style="text-align: center; align-items: center; justify-items: center;">
+          <img src="{% static 'img/spd/portada/servicio_sms.PNG' %}" style="width: 80%;">
+        </p>
+        <p>
+          Para la detección de los indicadores de emergencia, cada estación dispone de unos umbrales únicos en función
+          de la sección de la cuenca por la que atraviesa el río.
+          <!--Dichos valores, vienen representados en cuatro franjas
+          de colores, verde, amarillo, naranja y rojo, que vienen a representar los estados de alerta de dicha estación-->
+        </p>
+        <p>
+          <span class="text-spida"> SPIDA </span>
+          contempla 4 niveles que corresponden a los colores verde, amarillo, naranja y rojo en función del riesgo que
+          supone una situación de inundación.
+        </p>
+        <p>
+          Dichos valores son periódicamente revisados en base a la experiencia real de situaciones anómalas detectadas
+          en las mismas o con motivo de las modificaciones severas observadas em las cuencas hidrográficas.
+        </p>
+      </div>
+    </div>
+  </div>
+</section><!-- End Section Sistema Inteligente SPIDA -->
+
+
+<!-- Seccion x SPIDA-->
+<section id="defobjetivo" class="section-dark">
+  <div class='container-clouds'>
+    <div class='clouds-1'></div>
+    <div class='clouds-2'></div>
+    <div class='clouds-3'></div>
+  </div>
+  <div class="container">
+    <h1 class="title-portada" data-aos="zoom-in" ata-aos-offset="50" data-aos-duration="3000" style="padding-top:60px;">Spida</h1>
+    <h1 style="padding-bottom:60px; font-weight: bold;" data-aos="zoom-in" ata-aos-offset="50" data-aos-duration="3000">“Saber para prever. Y prever para proteger”</h1>
+  </div>
+</section>
+<!-- Seccion x SPIDA-->
+
+
+
+
+<!-- Seccion Contacto SPIDA-->
+<section id="contacto" class="section-light">
+  <div class="container">
+    <div class="section-title">
+      <h2 class="cursive-brush" style="color: #343a40;">Contacto</h2>
+    </div>
+
+    <div class="contact-info">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3079.5611384646245!2d-6.349758684483658!3d39.479242120041526!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd15e09e238e696b%3A0xa866be3b8ff6e847!2sALERTA2!5e0!3m2!1ses!2ses!4v1633772580822!5m2!1ses!2ses"
+        width="100%" height="400px" style="border:0;" allowfullscreen="" loading="lazy" ></iframe> <!--data-aos="zoom-in" ata-aos-offset="50" data-aos-duration="3000"-->
+      <div class="card">
+        <i class="fas fa-envelope icon-contact"></i>
+        <!--<i class="icon fas fa-envelope"></i>-->
+        <div class="card-content">
+          <h3>Email</h3>
+          <span><a
+              href="mailto:redalertaspida@gmail.com?Subject=Contactar%20con%20el%20servicio%20tecnico%20de%20la%20web%20Spida"
+              style="color: white; font-family:'Roboto', sans-serif;">redalertaspida@gmail.com</a></span>
+          <!--<span>redalertaspida@gmail.com</span>-->
+        </div>
+      </div>
+
+      <div class="card">
+        <i class="fas fa-phone icon-contact"></i>
+        <div class="card-content">
+          <h3>Teléfono</h3>
+          <span><a href="tel:+34927257153" style="color: white; font-family:'Roboto', sans-serif;">927 257
+              153</a></span>
+          <!--<span>+34 927 257 153</span>-->
+        </div>
+      </div>
+
+      <div class="card">
+        <i class="fas fa-map-marker-alt icon-contact"></i>
+        <div class="card-content">
+          <h3>Localización</h3>
+          <span style="font-family:'Roboto', sans-serif;">Cáceres, España</span>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</section><!-- End Section Contacto SPIDA -->
+
+
+<!-- Seccion Copyright SPIDA-->
+<section id="derechosautor" class="section-dark">
+  <div class="container">
+    <p style="line-height : 25px; font-size: 16px; font-family:'Roboto', sans-serif;">
+      © Copyright 2021
+      <span class="text-alerta2" style="font-size: 22px;">alerta<span
+          style="font-size: 25px; top: 0px;">2</span></span>
+      . Todos los derechos reservados.
+    </p>
+  </div>
+</section><!-- End Section Copyright SPIDA -->
+
+
+
+<!-- Animacion nubes -->
+<script type="text/javascript" src="{% static 'js/spd/clouds_spd.js' %}"></script>
+
+
+
+<!--https://codepen.io/duvander/pen/KXOpXw-->
+<!--Animacion numeros-->
+<script>
+
+  var increment
+
+  document.addEventListener('aos:in:aos-numavisos', function (e) {
+    clearInterval(increment);
+
+    increment = setInterval(() => {
+
+      $('.count').each(function (e) {
+        var finalNumber = $(this).attr('data-number')
+        finalNumber = parseInt(finalNumber)
+        $(this).text(finalNumber)
+      });
+      Number.prototype.format = function (n) {
+        var r = new RegExp('\\d(?=(\\d{3})+' + (n > 0 ? '\\.' : '$') + ')', 'g');
+        return this.toFixed(Math.max(0, Math.floor(n))).replace(r, '$&,');
+      };
+
+      $('.count').each(function (e) {
+        $(this).prop('counter', 0).animate({
+          counter: $(this).text()
+        }, {
+          duration: 3000,
+          step: function (step) {
+            $(this).text('' + step.format());
+            console.log($(this).attr('data-aos-id'))
+          }
+        });
+      });
+      clearInterval(increment);
+    });
+
+  });
+
+</script>
+
+
+
+{% endblock %}

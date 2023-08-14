@@ -1,0 +1,33 @@
+{% load static %}
+
+<!-- ======= Trainers Section ======= -->
+<section id="trainers" class="trainers">
+  <div class="container" data-aos="fade-up">
+
+    <div class="section-title">
+        <h2>Responsables</h2>
+        <p>Nuestros máximos responsables</p>
+    </div>
+
+    <div class="row d-flex justify-content-center">
+      {% for responsable in responsables %}
+      <div class="col-lg-4 col-md-6 d-flex align-items-stretch" data-aos="fade-left" data-aos-delay="100">
+        <div class="member">
+          <img src="{% static 'img/personal/responsables/' %}{{ responsable.imagen }}" class="img-fluid" alt="">
+          <div class="member-content">
+            <h4>{{ responsable.nombre }}</h4>
+            <span>{{ responsable.cargo }}</span>
+            <div class="social">
+              <a href="tel:{{responsable.telefono}}" data-toggle="tooltip" data-placement="bottom" title="{% if responsable.telefono|slice:':3' == '+34' %}{{ responsable.telefono|slice:'0:3'}} {{responsable.telefono|slice:'3:6'}} {{responsable.telefono|slice:'6:9'}} {{responsable.telefono|slice:'9:12'}}{% else %}+34 {{responsable.telefono|slice:'3:6'}} {{responsable.telefono|slice:'6:9'}} {{responsable.telefono|slice:'9:12'}}{% endif %}" style="margin-right: 10px;">
+                <i class="fa-duotone fa-phone fa-xl"></i></a>
+              <a href="mailto:{{responsable.email}}" data-toggle="tooltip" data-placement="bottom" title="{{responsable.email}}">
+                <i class="fa-solid fa-at fa-xl"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section><!-- End Trainers Section -->

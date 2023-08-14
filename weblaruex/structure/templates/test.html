@@ -1,0 +1,65 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+    <link rel="stylesheet" href="{% static 'js/ol/ol.css' %}" type="text/css">
+    <script src="{% static 'js/ol/ol.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jsonmuestras.js' %}"></script>
+{% endblock %}
+{% block map %}
+    {% include "map/map.html" %}
+{% endblock %}
+
+
+{% block js %}
+    $('.btnright').hide();
+    $('.btnleft').hide();
+
+
+    var resolutions = [];
+    var matrixIds = [];
+    var proj3857 = ol.proj.get('EPSG:3857');
+    var maxResolution = ol.extent.getWidth(proj3857.getExtent()) / 256;
+    for (var i = 0; i < 18; i++) {
+      matrixIds[i] = i.toString();
+      resolutions[i] = maxResolution / Math.pow(2, i);
+    }
+
+    var tileGrid = new ol.tilegrid.WMTS({
+      origin: [-20037508, 20037508],
+      resolutions: resolutions,
+      matrixIds: matrixIds,
+    });
+    var ign_source = new ol.source.WMTS({
+      url: 'https://wxs.ign.fr/pratique/geoportail/wmts',
+      layer: 'GEOGRAPHICALGRIDSYSTEMS.MAPS',
+      matrixSet: 'PM',
+      format: 'image/jpeg',
+      projection: 'EPSG:3857',
+      tileGrid: tileGrid,
+      style: 'normal',
+      attributions:
+        '<a href="http://www.ign.fr" target="_blank">' +
+        '<img src="https://wxs.ign.fr/static/logos/IGN/IGN.gif" title="Institut national de l\'' +
+        'information géographique et forestière" alt="IGN"></a>',
+    });
+    var map = new ol.Map({
+        controls: [],
+        target: 'map',
+        layers: [
+            new ol.layer.Tile({
+                source: ign_source
+            }),
+        ],
+        view: new ol.View({
+            center: ol.proj.fromLonLat([-6.3460114,39.4787914]),
+            zoom: 8
+        }),
+    });
+
+    map.addControl(new ol.control.Zoom({
+        className: 'custom-zoom'
+    }));
+{% endblock %}

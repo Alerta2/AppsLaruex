@@ -1,0 +1,78 @@
+{% extends "public/template.html" %}
+{% load static %}
+{% block meta %}
+  <title>Laboratorios - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+<!-- ======= Normal Section ======= -->
+<section id="incidencia" class="about">
+  <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>Modos de Funcionamiento</h2>
+        <p>Incidencia</p>
+      </div>
+
+
+    <div class="row">
+      <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
+        <img src="{% static 'img/funcionamiento_incidencia.jpg' %}" class="img-fluid" alt="">
+      </div>
+      <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content">
+        <h3>En caso de PROBLEMAS de funcionamiento, de alguna/s estación/es o del sistema de comunicaciones, los ordenadores del Centro Logístico de la RARE, comunican automáticamente por "sms" dichos problemas al menos a tres técnicos del LARUEX (el analista y el informático de guardia, así como al Director del LARUEX), que tras confirmar la recepción del problema registrado, adoptan las medidas que están previstas, para subsanar el problema detectado a la mayor brevedad posible.
+
+De esta forma, se consigue una operatividad media de la red, que como puede verse en la figura, para los últimos 15 años no ha bajado del 95.5%. Este resultado implica que la probabilidad de que en diez minutos NO se posea una información actualizada de los parámetros radiológicos / dosimétricos que ofrece cada estación es inferior al 0,09% y en quince minutos la probabilidad de que se mantenga dicha pérdida de información es inferior al 0,004%, es decir, nula a efectos prácticos.</h3>
+        <p class="font-italic">
+          ---------------------------------------1
+        </p>
+        <ul>
+          <li><i class="icofont-check-circled"></i> ------------------------------2 </li>
+          <li><i class="icofont-check-circled"></i> ------------------------------3 </li>
+        </ul>
+        <p>
+           ---------------------------------------4
+        </p>
+        {% if request.get_full_path == "/" %}<a href="{% url 'public:publicNosotros' %}" class="learn-more-btn">Saber más</a>{% endif %}
+      </div>
+    </div>
+
+  </div>
+</section><!-- End About Section -->
+{% endblock %}
+
+
+{% load static %}
+<!-- ======= Incidencia Section ======= -->
+<section id="incidencia" class="about">
+  <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>Modos de Funcionamiento</h2>
+        <p>Normal</p>
+      </div>
+
+    <div class="row">
+      <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
+        <img src="{% static 'img/funcionamiento_normal.jpg' %}" class="img-fluid" alt="">
+      </div>
+      <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content">
+        <h3>En caso de PROBLEMAS de funcionamiento, de alguna/s estación/es o del sistema de comunicaciones, los ordenadores del Centro Logístico de la RARE, comunican automáticamente por "sms" dichos problemas al menos a tres técnicos del LARUEX (el analista y el informático de guardia, así como al Director del LARUEX), que tras confirmar la recepción del problema registrado, adoptan las medidas que están previstas, para subsanar el problema detectado a la mayor brevedad posible.
+
+De esta forma, se consigue una operatividad media de la red, que como puede verse en la figura, para los últimos 15 años no ha bajado del 95.5%. Este resultado implica que la probabilidad de que en diez minutos NO se posea una información actualizada de los parámetros radiológicos / dosimétricos que ofrece cada estación es inferior al 0,09% y en quince minutos la probabilidad de que se mantenga dicha pérdida de información es inferior al 0,004%, es decir, nula a efectos prácticos.</h3>
+        <p class="font-italic">
+          ---------------------------------------1
+        </p>
+        <ul>
+          <li><i class="icofont-check-circled"></i> ------------------------------2 </li>
+          <li><i class="icofont-check-circled"></i> ------------------------------3 </li>
+        </ul>
+        <p>
+           ---------------------------------------4
+        </p>
+        {% if request.get_full_path == "/" %}<a href="{% url 'public:publicNosotros' %}" class="learn-more-btn">Saber más</a>{% endif %}
+      </div>
+    </div>
+
+  </div>
+</section><!-- End About Section -->

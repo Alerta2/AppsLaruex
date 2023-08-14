@@ -1,0 +1,537 @@
+
+{% load static %}
+<style>
+  @media print
+  {    
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
+  }
+</style>
+
+<!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center no-print">
+
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="/docLaruex/" class="logo d-flex align-items-center" style="text-decoration:none">
+        <img src="{% static 'niceAdminAssets' %}/img/azul intenso data.jpg" alt="">
+        <span class="d-none d-lg-block">Laruex WareHouse</span>
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div><!-- End Logo -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+
+        <li class="nav-item dropdown" hidden >
+
+          <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown" >
+            <i class="bi bi-bell"></i>
+            <span class="badge bg-primary badge-number">4</span>
+          </a><!-- End Notification Icon -->
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+            <li class="dropdown-header">
+              You have 4 new notifications
+              <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li class="notification-item">
+              <i class="bi bi-exclamation-circle text-warning"></i>
+              <div>
+                <h4>Lorem Ipsum</h4>
+                <p>Quae dolorem earum veritatis oditseno</p>
+                <p>30 min. ago</p>
+              </div>
+            </li>
+
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li class="notification-item">
+              <i class="bi bi-x-circle text-danger"></i>
+              <div>
+                <h4>Atque rerum nesciunt</h4>
+                <p>Quae dolorem earum veritatis oditseno</p>
+                <p>1 hr. ago</p>
+              </div>
+            </li>
+
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li class="notification-item">
+              <i class="bi bi-check-circle text-success"></i>
+              <div>
+                <h4>Sit rerum fuga</h4>
+                <p>Quae dolorem earum veritatis oditseno</p>
+                <p>2 hrs. ago</p>
+              </div>
+            </li>
+
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li class="notification-item">
+              <i class="bi bi-info-circle text-primary"></i>
+              <div>
+                <h4>Dicta reprehenderit</h4>
+                <p>Quae dolorem earum veritatis oditseno</p>
+                <p>4 hrs. ago</p>
+              </div>
+            </li>
+
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li class="dropdown-footer">
+              <a href="#">Show all notifications</a>
+            </li>
+
+          </ul><!-- End Notification Dropdown Items -->
+
+        </li><!-- End Notification Nav -->
+
+
+
+        <li class="nav-item dropdown" >
+
+          <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+            <i class="fa-duotone fa-calendar-clock"></i>
+          </a><!-- End Messages Icon -->
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+            <li class="dropdown-header">
+              Ver todas las tareas {{tareas}}
+              <a href="\private/docLaruex/tareasProximas"><span class="badge rounded-pill bg-primary p-2 ms-2">Ver todas</span></a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            
+            <div id="ubicacionTareas">
+            </div>
+
+
+
+            <li class="dropdown-footer">
+              <a href="\private/docLaruex/tareasProximas">Ver todas las tareas</a>
+            </li>
+
+          </ul><!-- End Notification Dropdown Items -->
+        </li><!-- End Messages Nav -->
+
+        <li class="nav-item dropdown" >
+
+          <a onclick="$('#numeroNotificacionesNuevas').text(0)" class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+            <i class="fa-duotone fa-messages"></i>
+            <span id="numeroNotificacionesNuevas" class="badge bg-success badge-number"></span>
+          </a><!-- End Messages Icon -->
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages" style="max-height:250px;
+          overflow:auto;">
+            <li class="dropdown-header">
+              Últimos 5 notificaciones del sistema
+              <a href="\private/docLaruex/notificaciones"><span class="badge rounded-pill bg-primary p-2 ms-2">Ver todas</span></a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <div id="ubicacionNotificaciones"></div>
+
+            
+            <!--
+            <li class="message-item">
+              <a href="#">
+                <img src="{{ user.profile.image.url }}" alt="" class="rounded-circle">
+                <div>
+                  <h4>{{user.first_name}} {{user.last_name}}</h4>
+                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
+                  <p>4 hrs. ago</p>
+                </div>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>-->
+
+            <li class="dropdown-footer">
+              <a href="\private/docLaruex/notificaciones">Mostrar todos las notificaciones</a>
+            </li>
+
+          </ul><!-- End Messages Dropdown Items -->
+
+        </li><!-- End Messages Nav -->
+
+
+
+        <li class="nav-item dropdown"  hidden>
+
+          <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+            <i class="bi bi-chat-left-text"></i>
+            <span class="badge bg-success badge-number">3</span>
+          </a><!-- End Messages Icon -->
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
+            <li class="dropdown-header">
+              You have 3 new messages
+              <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            
+            <li class="message-item">
+              <a href="#">
+                <img src="{{ user.profile.image.url }}" alt="" class="rounded-circle">
+                <div>
+                  <h4>Maria Hudson</h4>
+                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
+                  <p>4 hrs. ago</p>
+                </div>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li class="message-item">
+              <a href="#">
+                <img src="{% static 'niceAdminAssets' %}/img/messages-2.jpg" alt="" class="rounded-circle">
+                <div>
+                  <h4>Anna Nelson</h4>
+                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
+                  <p>6 hrs. ago</p>
+                </div>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li class="message-item">
+              <a href="#">
+                <img src="{% static 'niceAdminAssets' %}/img/messages-3.jpg" alt="" class="rounded-circle">
+                <div>
+                  <h4>David Muldon</h4>
+                  <p>Velit asperiores et ducimus soluta repudiandae labore officia est ut...</p>
+                  <p>8 hrs. ago</p>
+                </div>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li class="dropdown-footer">
+              <a href="#">Show all messages</a>
+            </li>
+
+          </ul><!-- End Messages Dropdown Items -->
+
+        </li><!-- End Messages Nav -->
+
+        <li class="nav-item dropdown pe-3">
+
+          <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+            <img src="{{ user.profile.image.url }}" alt="Profile" class="rounded-circle">
+            <span class="d-none d-md-block dropdown-toggle ps-2">{{user.username}}</span>
+          </a><!-- End Profile Iamge Icon -->
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li class="dropdown-header">
+              <h6>{{user.first_name}} {{user.last_name}}</h6>
+            </li>
+            <li hidden>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="\private/docLaruex/verUsuario/{{request.user.id}}/">
+                <i class="bi bi-person"></i>
+                <span>Mi perfil</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{% url 'docLaruex:docLaruexVerCurriculumUsuario' %}">
+                <i class="fa-solid fa-file-user me-2"></i>
+                <span>Mi curriculum</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{% url 'docLaruex:docLaruexListaNotificacionesUsuario' %}">
+                <i class="fa-duotone fa-messages me-2"></i>
+                <span>Notificaciones creadas</span>
+              </a>
+            </li>
+
+            <li hidden>
+              <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
+                <i class="bi bi-gear"></i>
+                <span>Account Settings</span>
+              </a>
+            </li>
+            <li hidden>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li hidden>
+              <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
+                <i class="bi bi-question-circle"></i>
+                <span>Need Help?</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              {% if user.is_authenticated %}
+                <a class="dropdown-item d-flex align-items-center" href="/accounts/logout/?next={{request.path}}">
+                  <i class="bi bi-box-arrow-right"></i>
+                  <span>Salir</span>
+                </a>
+              {% else %}
+                <a class="dropdown-item d-flex align-items-center" href="/accounts/login/?next={{request.path}}">
+                  <i class="bi bi-box-arrow-right"></i>
+                  <span>Entrar</span>
+                </a>
+              {% endif %}
+            </li>
+
+          </ul><!-- End Profile Dropdown Items -->
+        </li><!-- End Profile Nav -->
+
+      </ul>
+    </nav><!-- End Icons Navigation -->
+
+  </header><!-- End Header -->
+
+
+  <script>
+
+function generarElementoTarea(titulo, objeto, fecha, estado) {
+  // Obtener el elemento div
+  var ubicacionTareasDiv = document.getElementById("ubicacionTareas");
+
+  // Crear un elemento li
+  var liElement = document.createElement("li");
+  liElement.classList.add("notification-item");
+
+  // Crear el elemento i con la clase correspondiente
+  var iElement = document.createElement("i");
+  if (estado == 1){
+    iElement.classList.add("bi", "bi-info-circle", "text-info");
+  }else if (estado == 2){
+    iElement.classList.add("bi", "bi-exclamation-circle", "text-warning");
+  }else if (estado == 4){
+    iElement.classList.add("bi", "bi-x-circle", "text-danger");
+  }else{
+    iElement.classList.add("bi", "bi-check-circle", "text-success");
+  }
+
+  // Crear el elemento div dentro del li
+  var divElement = document.createElement("div");
+
+  // Crear el elemento h4 con el título
+  var h4Element = document.createElement("h4");
+  h4Element.textContent = titulo;
+  if (estado == 2){
+    h4Element.classList.add("text-warning");  
+  }else if (estado == 4){
+    h4Element.classList.add("text-danger");  
+  }else{
+    h4Element.classList.add("text-info");
+  }
+
+  // Crear el elemento p con la ubicación
+  var p1Element = document.createElement("p");
+  p1Element.textContent = objeto;
+
+  // Crear el elemento p con la fecha
+  var p2Element = document.createElement("p");
+  p2Element.textContent = fecha;
+
+  // Agregar los elementos creados al div
+  divElement.appendChild(h4Element);
+  divElement.appendChild(p1Element);
+  divElement.appendChild(p2Element);
+
+  // Agregar los elementos al li
+  liElement.appendChild(iElement);
+  liElement.appendChild(divElement);
+
+  // Crear el elemento hr
+  var hrElement = document.createElement("hr");
+  hrElement.classList.add("dropdown-divider");
+
+  // Agregar el li y el hr al div
+  ubicacionTareasDiv.appendChild(liElement);
+  ubicacionTareasDiv.appendChild(hrElement);
+}
+
+
+$(document).ready(function() {
+        // Función para obtener los datos del backend y mostrarlos en un div
+        function consultarTareas() {
+            $.ajax({
+                url: "/private/docLaruex/tareasProximasDatos",
+                type: 'GET',
+                success: function(data) {
+                  // recorro la lista de tareas y muestro los 5 últimos
+                  for (var i = 0; i <= 5; i++) {
+                    // obtengo los datos de la tarea
+                    var titulo = data[i].id_evento__nombre;
+                    var objeto = data[i].id_objeto__nombre;
+                    var fecha = data[i].fecha_proximo_mantenimiento;
+                    // formatear la fecha con el formato dd-mm-yyyy
+                    var fechaFormateada = fecha.substring(8, 10) + "/" + fecha.substring(5, 7) + "/" + fecha.substring(0, 4);
+                    var estado = data[i].registro.estado.id;
+
+                    // genero el elemento de la tarea
+                    generarElementoTarea(titulo, objeto, fechaFormateada, estado);
+                  }
+
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        // Llamar a la función para obtener los datos y mostrarlos al cargar la página
+        consultarTareas();
+    });
+
+
+
+    var notificacionesNuevas = -1;
+    var id_ultima_notificacion = 0;
+    window.setInterval(function(){
+      if (notificacionesNuevas < 0){
+        consultarNotificaciones();
+        notificacionesNuevas = 0;
+      }
+      else{
+        consultarNotificacionesNuevas();
+      }
+    }, 300000);
+
+    function consultarNotificaciones(){
+
+      //ajax que llame a solicitar las noticiaciones
+      $.ajax({
+        url: "/private/docLaruex/consultarNotificaciones/",
+        type: "GET",
+        cache: false,
+        contentType: false,
+        processData: false,
+        // gestiono el return del view
+        success: function (data) {          
+          id_ultima_notificacion = data[0].id;
+
+          $("#numeroNotificacionesNuevas").text(0);
+          data.forEach(element => {
+            creador = element.creador__first_name + " " + element.creador__last_name;
+            objeto = element.id_doc__nombre;
+            console.log(element);
+            document.getElementById("ubicacionNotificaciones").appendChild(nuevaNotificacion(objeto, creador, element.titulo, element.resumen, element.fecha));
+          });
+        }
+      });
+    }
+    function consultarNotificacionesNuevas(){
+
+      //ajax que llame a solicitar las noticiaciones
+      $.ajax({
+        url: "/private/docLaruex/consultarNotificacionesNuevas/"+id_ultima_notificacion,
+        type: "GET",
+        cache: false,
+        contentType: false,
+        processData: false,
+        // gestiono el return del view
+        success: function (data) {
+          if (data.length > 0){
+            playBeep();
+            if ($("#numeroNotificacionesNuevas").text() == "0"){
+              $("#numeroNotificacionesNuevas").text(data.length);
+              document.getElementById("numeroNotificacionesNuevas").style.display = "none";
+            }
+            else{
+              $("#numeroNotificacionesNuevas").text(parseInt($("#numeroNotificacionesNuevas").text())+data.length);
+            }
+            id_ultima_notificacion = data[0].id;
+            data.forEach(element => {
+              creador = element.creador__first_name + " " + element.creador__last_name;
+              objeto = element.id_doc__nombre;
+              document.getElementById("ubicacionNotificaciones").prepend(nuevaNotificacion(objeto, creador, element.titulo, element.resumen, element.fecha));
+            });
+          }
+          else{
+            if ($("#numeroNotificacionesNuevas").text() != "0"){
+            }
+          }
+        }
+      });
+    }
+
+    function playBeep(){
+      var beepsound = new Audio("{% static 'audios' %}/notificacionArmonica.mp3");   
+      beepsound.play();   
+    } 
+
+    function nuevaNotificacion(objeto ,creador, titulo, resumen, fecha){
+
+      // Creamos un nuevo elemento li
+      const li = document.createElement('li');
+      // Le añadimos la clase 'message-item'
+      li.classList.add('message-item');
+      // Creamos un nuevo elemento a
+      const a = document.createElement('a');
+      // Creamos un nuevo elemento div
+      const div = document.createElement('div');
+      // Creamos un nuevo elemento h4
+      const h5 = document.createElement('p');
+      h5.classList.add('h5');
+      h5.classList.add('text-info');
+      h5.classList.add('my-2');
+      h5.textContent = objeto;
+      // Creamos un nuevo elemento h5
+      const h4 = document.createElement('h4');
+      h4.textContent = titulo;
+      // Creamos un nuevo elemento p
+      const p = document.createElement('p');
+      p.textContent = resumen;
+      // Creamos un nuevo elemento p
+      const p2 = document.createElement('p');
+      p2.textContent = creador + " " + fecha;
+
+      
+      // creamos un nuevo separador 
+      const hr = document.createElement('hr');
+      hr.classList.add("dropdown-divider");
+    
+
+      // Añadimos el elemento h4 y p al elemento div
+      div.appendChild(h5);
+      div.appendChild(h4);
+      div.appendChild(p);
+      div.appendChild(p2);
+      div.appendChild(hr);
+      // Añadimos el elemento div al elemento a
+      a.appendChild(div);
+      // Añadimos el elemento a al elemento li
+      li.appendChild(a);
+      return li;
+    }
+  </script>

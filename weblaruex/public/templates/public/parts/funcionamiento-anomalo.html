@@ -1,0 +1,74 @@
+{% extends "public/template.html" %}
+{% load static %}
+{% block meta %}
+  <title>Laboratorios - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+<!-- ======= Normal Section ======= -->
+<section id="anomalo" class="about">
+  <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>Modos de Funcionamiento</h2>
+        <p>Anómalo</p>
+      </div>
+
+
+    <div class="row">
+      <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
+        <img src="{% static 'img/funcionamiento_anomalo.jpg' %}" class="img-fluid" alt="">
+      </div>
+      <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content">
+         <h3>En el supuesto de que se detecte alguna anomalía radiológica/dosimétrica por las estaciones de la Red de Alerta Radiológica de Extremadura, los ordenadores del Centro Logístico de la RARE, comunican automáticamente por "sms" dichos problemas, en primer lugar a al menos a tres técnicos del LARUEX (el analista y el informático de guardia, así como al Director del LARUEX), que deben confirmar la recepción del problema registrado. Acto seguido, son así mismo alertados por "sms" determinados responsables tanto del Gobierno Autónomo de Extremadura, como del Consejo de Seguridad Nuclear, conmutando automáticamente el modo de remitir información desde los ordenadores del Centro Logístico de la RARE, hacia los de los citados dos Organismos, para que se reciba por los tres citados grupos en paralelo toda la información que se vaya generando. A partir de ese momento se aplican los Protocolos de emergencia existentes al efecto con los precitados dos Organismos, en donde se detallan las medidas que están previstas adoptar, para valorar la anomalía registrada y en su caso, para adoptar a la mayor brevedad posible, las oportunas medidas correctivas.</h3>
+        <p class="font-italic">
+          Trimestralmente, se efectúa un simulacro de emergencia, que afectan exclusivamente a los responsables de la Gestión de la Red, adscritos al Centro Logístico de la RARE, cuyo objetivo es garantizar la rapidez en la respuesta ante una supuesta anomalía radiológica. Anualmente y coincidiendo con el simulacro que el Consejo de Seguridad Nuclear promueve en torno a la Central Nuclear de Almaraz, se participa en el mismo, verificando el funcionamiento integral de la RARE y de sus Protocolos de Emergencias, realizando incluso actuaciones complementarias, al desplazar el laboratorio móvil a la zona supuestamente afectada por la emergencia radiológica detectada.
+        </p>
+        <ul>
+          <li><i class="icofont-check-circled"></i> ------------------------------2 </li>
+          <li><i class="icofont-check-circled"></i> ------------------------------3 </li>
+        </ul>
+        <p>
+           ---------------------------------------4
+        </p>
+        {% if request.get_full_path == "/" %}<a href="{% url 'public:publicNosotros' %}" class="learn-more-btn">Saber más</a>{% endif %}
+      </div>
+    </div>
+
+  </div>
+</section><!-- End About Section -->
+{% endblock %}
+
+
+{% load static %}
+<!-- ======= Anomalo Section ======= -->
+<section id="anomalo" class="about">
+  <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>Modos de Funcionamiento</h2>
+        <p>Anómalo</p>
+      </div>
+
+    <div class="row">
+      <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
+          <iframe src="https://youtu.be/fyHInZZE7Ls" class="img-fluid" alt=""></iframe>
+      </div>
+      <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content">
+        <h3>En el supuesto de que se detecte alguna anomalía radiológica/dosimétrica por las estaciones de la Red de Alerta Radiológica de Extremadura, los ordenadores del Centro Logístico de la RARE, comunican automáticamente por "sms" dichos problemas, en primer lugar a al menos a tres técnicos del LARUEX (el analista y el informático de guardia, así como al Director del LARUEX), que deben confirmar la recepción del problema registrado. Acto seguido, son así mismo alertados por "sms" determinados responsables tanto del Gobierno Autónomo de Extremadura, como del Consejo de Seguridad Nuclear, conmutando automáticamente el modo de remitir información desde los ordenadores del Centro Logístico de la RARE, hacia los de los citados dos Organismos, para que se reciba por los tres citados grupos en paralelo toda la información que se vaya generando. A partir de ese momento se aplican los Protocolos de emergencia existentes al efecto con los precitados dos Organismos, en donde se detallan las medidas que están previstas adoptar, para valorar la anomalía registrada y en su caso, para adoptar a la mayor brevedad posible, las oportunas medidas correctivas.</h3>
+        <p class="font-italic">
+          Trimestralmente, se efectúa un simulacro de emergencia, que afectan exclusivamente a los responsables de la Gestión de la Red, adscritos al Centro Logístico de la RARE, cuyo objetivo es garantizar la rapidez en la respuesta ante una supuesta anomalía radiológica. Anualmente y coincidiendo con el simulacro que el Consejo de Seguridad Nuclear promueve en torno a la Central Nuclear de Almaraz, se participa en el mismo, verificando el funcionamiento integral de la RARE y de sus Protocolos de Emergencias, realizando incluso actuaciones complementarias, al desplazar el laboratorio móvil a la zona supuestamente afectada por la emergencia radiológica detectada.
+        </p>
+        <ul>
+          <li><i class="icofont-check-circled"></i> ------------------------------1 </li>
+          <li><i class="icofont-check-circled"></i> ------------------------------2 </li>
+        </ul>
+        <p>
+           ---------------------------------------3
+        </p>
+        {% if request.get_full_path == "/" %}<a href="{% url 'public:publicNosotros' %}" class="learn-more-btn">Saber más</a>{% endif %}
+      </div>
+    </div>
+
+  </div>
+</section><!-- End About Section -->

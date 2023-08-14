@@ -1,0 +1,13 @@
+{% load static %}
+<section id="triptico" class="triptico">
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+        <h2>Descargable del Curso</h2>
+        <p>Triptico</p>
+    </div>
+    <div align="center" class="container">
+      <a class="pdf-mobile get-started-btn mb-3" href="{% static 'files/cursos/' %}{{ curso.triptico }}">Si no ve el documento descarguelo aquí</a>
+      <embed src="{% static 'files/cursos/' %}{{ curso.triptico }}" type="application/pdf" width="100%" height="700px"/>
+    </div>
+  </div>
+</section><!-- End certification Section -->

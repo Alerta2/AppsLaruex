@@ -1,0 +1,23 @@
+{% load static %}
+<div class="row">
+    {% for medida in medidas %}
+        <div class="col-12 border border-primary my-2">
+            <div class="row">
+                <div class="col-6">Fecha:</div><div class="col-6">{{ medida.fecha_hora|date:'d-m-Y H:i' }}</div>
+                <div class="col-6">Analista:</div><div class="col-6">{{ medida.analista }}</div>
+                {% if medida.tiempo_medida %}
+                    <div class="col-6">Tiempo media:</div><div class="col-6">{{ medida.tiempo_medida }} {{ medida.tiempo_medida_unidad }}</div>
+                {% endif %}
+                {% if medida.dosis %}
+                    <div class="col-6">Dosis:</div><div class="col-6">{{ medida.dosis }}</div>
+                {% endif %}
+                {% if medida.cuentas %}
+                    <div class="col-6">Cuentas:</div><div class="col-6">{{ medida.cuentas }}</div>
+                {% endif %}
+                {% if medida.comentario %}
+                    <div class="col-6">Comentario:</div><div class="col-6">{{ medida.comentario }}</div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>

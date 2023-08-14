@@ -1,0 +1,203 @@
+{% extends "public/template.html" %}
+{% load static %}
+
+
+{% block meta %}
+  <title>{{ medida.nombre }}</title>
+  <meta content="{{ medida.meta_descripcion }}" name="descriptison">
+  <meta content="{{ medida.meta_keywords }}" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+<style>
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: #1d8896;
+  }
+  
+  .addImagen:hover {
+    color: rgba(29, 136, 150, 10);
+    filter: brightness(80%);
+  }
+  
+  .imagenCargada{
+    color: #1d9678;
+  }
+  
+  .close:focus {
+    outline: none;
+  }
+
+  .checkboxDiv input[type="checkbox"]:checked{
+    
+    background-color: #1d8896 !important;
+    border: 2px solid #1d8896 !important;
+    color: #fff;
+    accent-color: #1d8896;
+  }
+  
+  /* alcalinos */
+  .alcalinos{
+    border: 3px solid;
+    border-radius: 10px;
+    border-image: linear-gradient(to bottom right, #f3f9a6, #cbc634) 1;
+    width: 90%;
+    height: 70%;
+    max-width: 400px !important;
+    max-height: 150px !important;
+    margin: 0 auto;
+    box-sizing: border-box;
+    
+  }
+  
+  
+  .element {
+    position: relative;
+    border-radius: 10px;
+    z-index: 1;
+    cursor: default;
+    transition: all 0.3s ease;
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  
+  .element-inner {
+    padding: 10px 15px;
+    width: 100%;
+    height: 100%;
+    transition: inherit;
+    box-sizing: border-box;
+  }
+  
+  .element .title {
+    font: 700 34px/1.3 "Poppins", sans-serif;
+    margin: 0.3em 0 0;
+    transition: 0.8s ease 600ms;
+  }
+  
+  .element .description {
+    font: 500 12px "Poppins", sans-serif;
+    margin-top: -0.2em;
+  }
+  
+  
+  .element:hover {
+    transform: scale(1.12);
+    z-index: 10;
+  }
+  
+  .element:hover .element-inner {
+    background: transparent;
+  }
+  
+  
+  .element:hover:after {
+    top: 105%;
+    opacity: 1;
+  }
+  
+  @media (max-width: 767px) {
+    .element {
+      width: 100%;
+      max-width: none;
+    }
+  }
+  a.element {
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+
+
+  </style>
+
+<div class="my-5">
+  <meta content="{{medida.meta_descripcion}}" name="descriptison">
+  <meta content="{{medida.meta_keywords}}" name="keywords">
+</div>
+<!-- ======= noticia completa ======= -->
+<section id="about" class="about">
+
+
+  {% if alerta %}
+  {% if alerta.tipo == "success" %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fa-solid fa-circle-check"></i> {{ alerta.mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% else %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fa-sharp fa-solid fa-circle-exclamation"></i> {{ alerta.mensaje }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endif %}
+{% endif %}
+
+  <div class="container" data-aos="fade-up">
+    <nav aria-label="breadcrumb" class="my-3 mx-auto" >
+      <ol class="breadcrumb" style="background-color: transparent;">
+        <li class="breadcrumb-item"><a href="\">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="\medidas">Medidas</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{medida.nombre}}</li>
+      </ol>
+    </nav>
+    <div class="section-title">
+
+      <div class="row">
+        <div class="col col-sm-12 col-md-12 col-lg-7">
+          
+        <h2>{{ medida.nombre }}</h2>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-5 d-flex justify-content-sm-center justify-content-lg-start">
+          
+        {% if user.is_superuser %}
+            <a href="{% url 'public:publicEditarMedida' id=medida.id %}" class="btn btn-outline-info my-auto" title="Editar medida" ><span>Editar</span></a>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="row d-flex justify-content-sm-center ">
+      <div class="col-lg-6 col-xs-12 col-sm-12 pb-sm-3 order-1 d-flex justify-content-sm-center justify-content-lg-end pt-4" data-aos="fade-left" data-aos-delay="100">
+        <div class="element d-flex justify-content-center">
+          <img src="{% static 'img/medidas/' %}{{ medida.imagen }}" class="img-fluid rounded" alt="" style="max-width: auto; max-height: 300px;" >
+        </div> 
+      </div>
+      <div class="col-lg-6 col-xs-12 col-sm-12 order-2 pt-4 content get d-flex justify-content-sm-center justify-content-lg-start">
+        <div>
+          <h3>Medidas en {{ medida.nombre }}</h3>
+          <p class="font-italic">
+            {{ medida.resumen_medida }}
+          </p>
+          <p>
+            {{ medida.descripcion_medida|safe }}
+          </p>
+          
+          <p class="text-secondary">
+            Puede consultar el alcance de nuestra acreditación en el siguiente <a href="{% url 'public:publicLaboratorios' %}#certification" class="my-auto" title="Enlace a acreditación"><strong>enlace</strong></a>
+            </p>
+          <p class="text-secondary">
+          Si desea obtener más información puede contactar con nosotros a través del siguiente <a href="{% url 'public:publicContacto' %}" class="my-auto" title="Formulario de contacto"> <strong>formulario de contacto</strong></a>
+          </p>
+        </div>
+        
+      </div>
+    </div>
+    
+
+
+  </div>
+</section><!-- noticia completa -->
+
+
+
+
+{% endblock %}

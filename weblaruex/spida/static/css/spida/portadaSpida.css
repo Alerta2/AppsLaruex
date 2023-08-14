@@ -1,0 +1,287 @@
+/*--------------------------------------------------------------
+# Seccion Titulos de la Portada
+--------------------------------------------------------------*/
+
+      /* Cuadro negro con titulos de la portada */
+      .section-title-portada {
+        padding-bottom: 30px;
+        text-align: center;
+        position:absolute;
+        min-width: 300px;
+        max-width: 80%;
+        max-height: 80%;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background-color: rgba(0, 0, 0, 0.5); /* Añadir para conseguir el fondo con opacidad */
+        margin-right: auto;
+        margin-left: auto;
+        right: 0%;
+        left: 0%;
+        bottom: 100px; /* Cambiar bottom por top y los píxeles que necesites */
+      }
+
+      .section-title-portada h1, h2, p{
+          font-family: "Brush Script MT", cursive;
+          font-style: normal;
+          font-variant: normal;
+          line-height: 1em;
+          color: #fff;
+      }
+      @media (min-width: 500px) {
+        .section-title-portada h1 {
+          font-size: 130px;
+        }
+        .section-title-portada h2 {
+          font-size: 60px;
+        }
+        .section-title-portada p {
+          font-size: 40px;
+        }
+      }
+
+      @media (max-width: 500px) {
+          .section-title-portada h1 {
+            font-size: 70px;
+          }
+          .section-title-portada h2 {
+            font-size: 40px;
+          }
+          .section-title-portada p {
+            font-size: 30px;
+          }
+      }
+
+/*--------------------------------------------------------------
+# Carrousel con Fotos de la Portada
+--------------------------------------------------------------*/
+
+      /* Carrousel de la portada con fotos de paisajes */
+      .carousel-inner img {
+          width: 100%;
+          height: 100%;
+          object-fit:cover ;
+          object-position: center center;
+      }
+
+      .carousel-inner{
+          height: 100%;
+      }
+
+      .carousel-item {
+        height: 100%;
+        background: no-repeat center center scroll;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+      }
+
+/*--------------------------------------------------------------
+# Seccion generica
+--------------------------------------------------------------*/
+      section {
+        padding: 60px 0;
+        overflow: hidden;
+      }
+
+      .section-bg {
+        background-color: #f3f5fa;
+      }
+
+/*--------------------------------------------------------------
+# Titulo de una seccion. Texto y Linea de Subrayado
+--------------------------------------------------------------*/
+
+      .section-title {
+        text-align: center;
+        padding-bottom: 30px;
+      }
+      .section-title h2 {
+          font-family: "Brush Script MT";
+          font-size: 50px;
+          font-style: normal;
+          font-weight: bold;
+          font-variant: normal;
+          position: relative;
+          color: white;
+          margin-bottom: 20px;
+          padding-bottom: 20px;
+
+      }
+      .section-title h2::before {
+        content: '';
+        position: absolute;
+        display: block;
+        width: 200px;
+        height: 1px;
+        background: #ddd;
+        bottom: 1px;
+        left: calc(50% - 100px);
+      }
+      .section-title h2::after {
+        content: '';
+        position: absolute;
+        display: block;
+        width: 60px;
+        height: 5px;
+        background: lightgreen;
+        bottom: 0;
+        left: calc(50% - 30px);
+      }
+
+      div {
+
+       text-align: justify;
+       text-justify: inter-word;
+      }
+
+      #p {
+         line-height : 25px;
+      }
+
+
+/*--------------------------------------------------------------
+# About Us
+--------------------------------------------------------------*/
+
+    .about .content h3 {
+      font-weight: 600;
+      font-size: 26px;
+    }
+
+    .about .content ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .about .content ul li {
+      padding-left: 28px;
+      position: relative;
+    }
+
+    .about .content ul li + li {
+      margin-top: 10px;
+    }
+
+    .about .content ul i {
+      position: absolute;
+      left: 0;
+      top: 2px;
+      font-size: 20px;
+      color: #47b2e4;
+      line-height: 1;
+    }
+
+    .about .content p {
+      font-family: 'Roboto', sans-serif;
+      line-height : 25px;
+    }
+
+    .about .content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .about .content .btn-learn-more {
+      font-family: "Poppins", sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 1px;
+      display: inline-block;
+      padding: 12px 32px;
+      border-radius: 4px;
+      transition: 0.3s;
+      line-height: 1;
+      color: #47b2e4;
+      -webkit-animation-delay: 0.8s;
+      animation-delay: 0.8s;
+      margin-top: 6px;
+      border: 2px solid #47b2e4;
+    }
+
+    .about .content .btn-learn-more:hover {
+      background: #47b2e4;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .about .icon-box {
+      width:100%;
+      height: 100%;
+      box-shadow: 0px 0 25px 0 rgba(0, 0, 0, 0.1);
+      padding: 50px 30px;
+      transition: all ease-in-out 0.4s;
+      background: #fff;
+      text-align: center;
+    }
+
+    .about .icon-box .icon {
+      margin-bottom: 10px;
+    }
+
+    .about .icon-box .icon i {
+      color: #47b2e4;
+      font-size: 36px;
+      transition: 0.3s;
+    }
+
+    .about .icon-box h4 {
+      font-weight: 500;
+      margin-bottom: 15px;
+      font-size: 24px;
+    }
+
+    .about .icon-box h4 a {
+      color: #37517e;
+      transition: ease-in-out 0.3s;
+    }
+
+    .about .icon-box p {
+      font-family: 'Roboto', sans-serif;
+      font-style: normal;
+      line-height: 24px;
+      font-size: 15px;
+      margin-bottom: 0;
+    }
+
+   .about .icon-box p a{
+      font-family: "Brush Script MT", cursive;
+      font-style: normal;
+      font-size: 45px;
+      font-variant: normal;
+      line-height: 1em;
+      color: #00CED1;
+    }
+
+    .about .icon-box:hover {
+      transform: translateY(-10px);
+    }
+
+    .about .icon-box:hover h4 a {
+      color: #47b2e4;
+    }
+
+
+/*--------------------------------------------------------------
+# Logos Grupos Implicantes
+--------------------------------------------------------------*/
+    .logos {
+      margin: 0;
+      padding:0;
+      width:100%;
+      height:150px;
+      background-color:#FFFFFF;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logos img:hover {
+      filter: none;
+      transform: scale(1.1);
+    }
+    .logos img {
+       max-width:90%;
+       max-height:70%;
+       transition: all 0.4s ease-in-out;
+       filter: grayscale(100);
+    }

@@ -1,0 +1,424 @@
+{% extends "base/base_mapa.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+
+{% endblock %}
+{% block css %}
+    .leaflet-marker-icon .number{
+        position: relative;
+        top: 0px;
+        left: -8px;
+        font-size: 14px;
+        font-weight: bold;
+        width: 25px;
+        text-shadow: 0 0 1px #0f0;
+    }
+    @keyframes bouncing-loader {
+      to {
+        opacity: 0.1;
+        transform: translate3d(0, -16px, 0);
+      }
+    }
+    
+    .bouncing-loader {
+      display: flex;
+      justify-content: center;
+    }
+    
+    .bouncing-loader > div {
+      width: 16px;
+      height: 16px;
+      margin: 3rem 0.2rem;
+      background: #8385aa;
+      border-radius: 50%;
+      animation: bouncing-loader 0.6s infinite alternate;
+    }
+    
+    .bouncing-loader > div:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .bouncing-loader > div:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+{% endblock %}
+{% block content %}      
+    <div id="mapid" class="w-100 h-100"></div>
+{% endblock %}
+
+{% block outMain %}             
+
+    <div id="sidebarMapaMedidas" class="leaflet-sidebar collapsed">
+      <!-- Nav tabs -->
+      <div class="leaflet-sidebar-tabs">
+          <ul role="tablist"> <!-- top aligned tabs -->
+              <li><a href="#home" role="tab"><i class="fas fa-bars"></i></a></li>
+          </ul>
+      </div>
+  
+      <!-- Tab panes -->
+      <div class="leaflet-sidebar-content do-nicescrol">
+          <div class="leaflet-sidebar-pane" id="home">
+              <h1 class="leaflet-sidebar-header">
+                  Sesiones de medida
+              </h1>
+              
+              <div id="loadingSesions">
+                <div class="bouncing-loader">
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                </div>
+                <h4>Cargando sesiones, espere...</h4>
+              </div>
+              <div id="sesionesDisponibles"></div>
+          </div>
+      </div>
+    </div>
+
+    <script src="{% static 'js/rare/crearMapaRAREx.js' %}" crossorigin="anonymous"></script>
+    <script>
+        // nice scroll para los paneles de la tabla
+        $(".do-nicescrol").niceScroll();
+        
+        // layer_ArcgisSat, layer_OpenStreetMap, layer_OpenStreetMapMunicipios, layer_OpenTopMap, layer_StamenTerrain
+        layer_ArcgisSat.addTo(map);
+
+        map.setView([39.4034522,-6.7628017], 8);
+        
+        var sesiones = L.layerGroup();
+        map.addLayer(sesiones);
+
+        //DEFINO EL BOTOM HOME (CENTRA EL MAPA EN EXTREMADURA)
+        var botonHome = L.easyButton({
+          states: [{
+                  stateName: 'zoom-to', // nombre del estado
+                  icon: '<i class="fas fa-home pt-1" style="font-size:20px;"></i>', // nombre del icono
+                  title: 'Ajustar mapa', // titulo del boton
+                  onClick: function(btn, map) { // evento del boton
+                      centerMap();
+                  }
+          }]
+        });
+        map.addControl(botonHome);
+
+        L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+        function ubicaciones(){
+             $.ajax({
+                type: 'GET',
+                url: "/private/rare/ubicacionesInteres/",
+                success: function (data) {
+                    data.forEach(function (item, index) {
+                        var icon;
+                        if (item.tipo == 'Central'){
+                            icon = L.icon({
+                                iconUrl: '{% static img %}'+'img/rare/nuclear-plant.png',
+                                iconSize:     [48, 48], // size of the icon
+                                iconAnchor:   [48, 48], // point of the icon which will correspond to marker's location
+                            });
+                            imagen = '{% static img %}'+'img/rare/nuclear-plant.png';
+                        }
+                        else if (item.tipo == 'Almacenamiento'){
+                            icon = L.icon({
+                                iconUrl: '{% static img %}'+'img/rare/container.png',
+                                iconSize:     [48, 48], // size of the icon
+                                iconAnchor:   [48, 48], // point of the icon which will correspond to marker's location
+                            });
+                            imagen = '{% static img %}'+'img/rare/container.png';
+                        }
+                        auxMarker = new L.marker([item.lat,item.lon], {icon: icon});
+                        ubicacionesInteres.addLayer(auxMarker);
+                    });
+                }
+            })
+        }
+        ubicaciones();
+
+        function centerMap(){
+            map.flyTo([39.4034522,-6.7628017], 8, {
+                "animate": true,
+                "pan": {
+                    "duration": 10
+                }
+            });
+        }
+
+        var sidebar = L.control.sidebar({
+          autopan: true,       // whether to maintain the centered map point when opening the sidebar
+          closeButton: true,    // whether t add a close button to the panes
+          container: 'sidebarMapaMedidas', // the DOM container or #ID of a predefined sidebar container that should be used
+          position: 'right',     // left or right
+        }).addTo(map);
+        sidebar.open('home');
+
+        function sesionesMedida(){
+          $.ajax({
+             type: 'GET',
+             url: "/private/rare/sesionesMedidaCarga/",
+             success: function (data) {
+                $( "#loadingSesions" ).remove();
+                $('#sesionesDisponibles').html(data);
+             }
+         });
+     }
+     sesionesMedida();
+        
+    function centrarEn(lat, lon){   
+        map.flyTo([lat, lon], 18, {
+            "animate": true,
+            "pan": {
+                "duration": 1
+            }
+        });
+    }
+
+    var sesionesJSON = {};
+
+
+    function dibujar(idSesion){
+        if (sesionesJSON[idSesion] != null){
+            if(sesionesJSON[idSesion]["medidasPorPintar"].length > 0){
+                var size = sesionesJSON[idSesion]["medidasPorPintar"].length;
+                for (var i = 0; i < size; i++){
+                    var medida = sesionesJSON[idSesion]["medidasPorPintar"].shift();
+                    sesionesJSON[idSesion]["layer"] = L.layerGroup();
+
+                    var iconFijo = crearIconMedida(sesionesJSON[idSesion]["tipo"]);
+                    iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, medida.cuentas_totales);    
+                    
+                    var auxMarker = new L.marker([medida.lat,medida.lon], {
+                        icon:	iconFijo
+                    });
+                    //pintarPopup(idSesion + "_" + medida.id, auxMarker, medida.cuentas, medida.detector);
+
+                    sesionesJSON[idSesion]["layer"].addLayer(auxMarker);
+                }
+            }
+        }
+        else{
+            $.ajax({
+                type: 'GET',
+                dataType: "json",
+                url: "/private/rare/sesionMedida/"+idSesion,
+                success: function (data) {
+                   sesionesJSON[data.sesion] = {"id": data.sesion, "tipo": data.tipo,"medidas": data.medidas, "medidasPorPintar": data.medidas, "markerMovible": null, "layer": null, "interval": null};
+                   
+                   sesionesJSON[data.sesion]["layer"] = L.layerGroup();
+                   var size = sesionesJSON[data.sesion]["medidasPorPintar"].length;
+                   for (var i = 0; i < size; i++){
+                        var medida = sesionesJSON[data.sesion]["medidasPorPintar"].shift();
+                        
+                        var iconFijo = crearIconMedida(data.tipo);
+                        iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, medida.cuentas_totales);    
+
+                        var auxMarker = new L.marker([medida.lat,medida.lon], {
+                            icon:	iconFijo
+                        });
+                        //pintarPopup(data.sesion + "_" + medida.id, auxMarker, medida.cuentas, medida.detector);
+
+                        sesionesJSON[data.sesion]["layer"].addLayer(auxMarker);
+                   }
+
+                   map.addLayer(sesionesJSON[data.sesion]["layer"]);
+                }
+            });
+        }
+    }
+
+    function recorrer(idSesion){
+        if (sesionesJSON[idSesion] != null){
+            sesionesJSON[idSesion]["interval"] = setInterval(function(){
+                if (sesionesJSON[idSesion]["medidasPorPintar"].length > 0){
+                    var medida = sesionesJSON[idSesion]["medidasPorPintar"].shift();
+                    var icon = sesionesJSON[idSesion]["markerMovible"].getIcon();
+                    sesionesJSON[idSesion]["markerMovible"].setIcon(icon);  
+                    sesionesJSON[idSesion]["markerMovible"].moveTo([medida.lat, medida.lon], 1000, {autostart: true}); 
+                    var iconFijo = crearIconMedida(sesionesJSON[idSesion]["tipo"]);
+                    iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, medida.cuentas_totales);    
+                    var auxMarker = new L.marker([medida.lat,medida.lon], {
+                        icon:	iconFijo
+                    });
+                    sesionesJSON[idSesion]["layer"].addLayer(auxMarker);
+                }
+                else{
+                    clearInterval(sesionesJSON[idSesion]["interval"]);
+                } 
+            },1000);
+        }
+        else{
+            $.ajax({
+                type: 'GET',
+                dataType: "json",
+                url: "/private/rare/sesionMedida/"+idSesion,
+                success: function (data) {
+                   sesionesJSON[data.sesion] = {"id": data.sesion, "tipo": data.tipo,"medidas": data.medidas, "medidasPorPintar": data.medidas, "markerMovible": null, "layer": null, "interval": null};
+                   var primeraMedida = sesionesJSON[data.sesion]["medidasPorPintar"].shift();
+                   if (sesionesJSON[data.sesion]["markerMovible"] == null){
+                    var icon = crearIconMarkerMovil(data.tipo);    
+                    sesionesJSON[data.sesion]["markerMovible"] = new L.Marker.movingMarker (
+                        [[primeraMedida.lat,primeraMedida.lon]]
+                        , [2000]);
+                    sesionesJSON[data.sesion]["markerMovible"].setIcon(icon);
+                    
+                    map.addLayer(sesionesJSON[data.sesion]["markerMovible"]);
+                    sesionesJSON[data.sesion]["layer"] = L.layerGroup();
+
+                    var iconFijo = crearIconMedida(data.tipo);
+                    iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, primeraMedida.cuentas_totales);    
+                    
+                    var auxMarker = new L.marker([primeraMedida.lat,primeraMedida.lon], {
+                        icon:	iconFijo
+                    });
+                    //pintarPopup(data.sesion + "_" + primeraMedida.id, auxMarker, primeraMedida.cuentas, primeraMedida.detector);
+
+                    sesionesJSON[data.sesion]["layer"].addLayer(auxMarker);
+
+                    map.addLayer(sesionesJSON[data.sesion]["layer"]);
+                    sesionesJSON[data.sesion]["interval"] = setInterval(function(){
+                        if (sesionesJSON[data.sesion]["medidasPorPintar"].length > 0){
+                            var medida = sesionesJSON[data.sesion]["medidasPorPintar"].shift();
+                            var icon = sesionesJSON[data.sesion]["markerMovible"].getIcon();
+                            sesionesJSON[data.sesion]["markerMovible"].setIcon(icon);  
+                            sesionesJSON[data.sesion]["markerMovible"].moveTo([medida.lat, medida.lon], 1000, {autostart: true}); 
+                            var iconFijo = crearIconMedida(data.tipo);
+                            iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, medida.cuentas_totales);    
+                            var auxMarker = new L.marker([medida.lat,medida.lon], {
+                                icon:	iconFijo
+                            });
+                            sesionesJSON[data.sesion]["layer"].addLayer(auxMarker);
+                        }
+                        else{
+                            clearInterval(sesionesJSON[data.sesion]["interval"]);
+                        } 
+                    },1000);
+                   }
+                   else{
+                     sesionesJSON[data.sesion]["markerMovible"].moveTo([primeraMedida.lat,primeraMedida.lon], 1000, {autostart: true});
+                   }
+                }
+            });
+        }
+    }
+
+    function borrar(idSesion){
+        if(sesionesJSON[idSesion]["layer"] != null){
+            map.removeLayer(sesionesJSON[idSesion]["layer"]);
+        }
+        if(sesionesJSON[idSesion]["interval"] != null){
+            map.removeLayer(sesionesJSON[idSesion]["markerMovible"]);
+        }
+        if(sesionesJSON[idSesion]["markerMovible"] != null){
+            clearInterval(sesionesJSON[idSesion]["interval"]);
+        }
+        if(sesionesJSON[idSesion]["medidas"] != null){
+            sesionesJSON[idSesion]["medidasPorPintar"] = sesionesJSON[idSesion]["medidas"];
+        }
+        sesionesJSON[idSesion] = null;
+    }
+
+
+    function cambiarTextoMarkerMovil(htmlOrigen, texto){
+        var newHtml = htmlOrigen.split("<h6 text-center>")[0]+"<h6 text-center>"+ texto + "</h6>" + htmlOrigen.split("</h6>")[1];
+        return newHtml;
+    }
+
+    function crearIconMarkerMovil(tipoVehiculo){
+        var html = "";
+        if (tipoVehiculo == "FURGONETA"){
+            html = '<div class="row"><div class="col-12 center-block"><i class="fal fa-truck fa-3x" style="color:blue"></i></div><div class="col-12 center-block"><h6 text-center></h6></div></div>';
+        }
+        else if (tipoVehiculo == "DRONE"){
+            html = '<div class="row"><div class="col-12 center-block"><i class="fa-light fa-drone fa-3x" style="color:blue"></i></i></div><div class="col-12 center-block"><h6 text-center></h6></div></div>';
+        }
+        else if (tipoVehiculo == "COCHE"){
+            html = '<div class="row"><div class="col-12 center-block"><i class="fal fa-car fa-3x" style="color:blue"></i></div><div class="col-12 center-block"><h6 text-center></h6></div></div>';
+        }
+        else if (tipoVehiculo == "DETECTOR"){
+            html = '<div class="row"><div class="col-12 center-block"><i class="fal fa-tablet-rugged fa-3x" style="color:blue"></i></div><div class="col-12 center-block"><h6 text-center></h6></div></div>';
+        }
+        var icon = L.divIcon({
+            html: html,
+            iconSize: [32, 32],
+            className: 'myDivIcon'
+        });
+        return icon;
+    }
+
+    function crearIconMedida(tipoVehiculo){
+        var html = "";
+        if (tipoVehiculo == "FURGONETA"){
+            html = '<div class="row"><div class="col-12 center-block"><i class="fal fa-truck fa-2x"></i></div><div class="col-12 center-block"><h6 text-center></h6></div></div>';
+        }
+        else if (tipoVehiculo == "DRONE"){
+            html = '<div class="row"><div class="col-12 center-block"><i class="fa-light fa-drone fa-2x"></i></i></div><div class="col-12 center-block"><h6 text-center></h6></div></div>';
+        }
+        else if (tipoVehiculo == "COCHE"){
+            html = '<div class="row"><div class="col-12 center-block"><i class="fal fa-car fa-2x"></i></div><div class="col-12 center-block"><h6 text-center></h6></div></div>';
+        }
+        else if (tipoVehiculo == "DETECTOR"){
+            html = '<div class="row"><div class="col-12 center-block"><i class="fal fa-tablet-rugged fa-2x"></i></div><div class="col-12 center-block"><h6 text-center></h6></div></div>';
+        }
+        var icon = L.divIcon({
+            html: html,
+            iconSize: [32, 32],
+            className: 'myDivIcon'
+        });
+        return icon;
+    }
+    function pintarPopup(id, marker, cuentas, detector){
+        var customPopup = "<div id='mainDivChartMovil_"+id+"'><canvas id='chartMovil_"+id+"' width='500' height='200'></canvas></div>";
+
+        if (document.getElementById("mainDivChartMovil_"+id) == null){
+            console.log("entro aqui:  " + "mainDivChartMovil_"+id );
+            console.log(customPopup);
+            marker.bindPopup(customPopup);
+        }
+        else{
+            document.getElementById("chartMovil_"+id).remove();
+            document.getElementById("mainDivChartMovil_"+id).innerHTML = "<canvas id='chartMovil_"+id+"' width='500' height='200'></canvas>";
+        }
+        
+        var labels = [];
+        for (var i = 0; i < cuentas.length; i++){
+            labels.push(i);
+        }
+
+        console.log(cuentas);
+        console.log(labels);
+        console.log(document.getElementById("chartMovil_"+id));
+
+        new Chart(document.getElementById("chartMovil_"+id), {
+            type: 'bar',
+            data: {
+            labels: [0, 1, 2],
+            datasets: [
+                {
+                label: "Cuentas",
+                data: [12, 13,15],
+                backgroundColor: 'rgba(10, 10, 200, 1)',
+                }
+            ]
+            },
+            options: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: 'Espectro ' + detector
+                },
+                scales: {
+                    xAxes: [ {
+                        display: false,
+                    } ],
+                }
+            }
+        });
+
+    }
+    </script>
+
+{% endblock %}

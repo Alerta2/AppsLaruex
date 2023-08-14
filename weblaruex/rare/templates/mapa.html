@@ -1,0 +1,186 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block title %}
+    Copuma
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'js/ol/ol.css' %}" type="text/css">
+    <script src="{% static 'js/ol/ol.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jsonmuestras.js' %}"></script>
+
+    <style>
+        /* Zoom In #1 */
+        .hoverZoomIn figure img {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            -webkit-transition: .3s ease-in-out;
+            transition: .3s ease-in-out;
+        }
+        .hoverZoomIn figure:hover img {
+            -webkit-transform: scale(1.3);
+            transform: scale(1.3);
+        }
+    </style>
+{% endblock %}
+
+{% block modal %}
+
+{% endblock %}
+{% block content %}
+    <div id="captionl" class="card card-caption card-left col-3 col-xl-2 col-lg-2 float-left">
+        <div id="captionheaderl" class="card-header card-captionheader d-flex">
+            <h4><span><i id="card-headerbuttonl" class="fas fa-eye col-md-3"></i></span></h4>
+
+        </div>
+        <!-- Card content -->
+        <div id="captionbodyl" class="card-body card-captionbody">
+
+        </div>
+    </div>
+
+    <div id="captionr" class="card card-caption card-right col-3 float-right">
+        <div id="captionheaderr" class="card-header card-captionheader d-flex">
+            <h4><span><i id="card-headerbuttonr" class="fas fa-eye col-md-3"></i></span></h4>
+
+        </div>
+
+        <!-- Card content -->
+        <div id="captionbodyr" class="card-body card-captionbody">
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            $("#captionheaderl").click(function(){
+                if($('#card-headerbuttonl').hasClass('fa-eye-slash')){
+                    $('#card-headerbuttonl').removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+                else{
+                    $('#card-headerbuttonl').removeClass('fa-eye').addClass('fa-eye-slash');
+                }
+                $("#captionbodyl").slideToggle();
+            });
+            $("#captionheaderr").click(function(){
+                if($('#card-headerbuttonr').hasClass('fa-eye-slash')){
+                    $('#card-headerbuttonr').removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+                else{
+                    $('#card-headerbuttonr').removeClass('fa-eye').addClass('fa-eye-slash');
+                }
+                $("#captionbodyr").slideToggle();
+            });
+
+            $("#modalinfo").on("show.bs.modal", function(event) {
+
+            });
+            $('#modalinfo').on('hide.bs.modal', function () {
+                //alert("cierro");
+            });
+
+        })
+
+        var vectorSource = new ol.source.Vector({});
+        var vectorSourceMeteo = new ol.source.Vector({});
+        var vectorSourceControl = new ol.source.Vector({});
+        ruta_img="{% static img %}"+"img/icon.png";
+
+        var map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM(),
+                }),
+                    new ol.layer.Vector({
+                        source: vectorSource,
+                        name: 'dosis'
+                }),
+                    new ol.layer.Vector({
+                        source: vectorSourceMeteo,
+                        name: 'meteo'
+                }),
+                    new ol.layer.Vector({
+                        source: vectorSourceControl,
+                        name: 'control'
+                }),
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([-6.3460114,39.4787914]),
+                zoom: 8
+            }),
+        });
+
+        map.on('singleclick', function(e){
+            map.forEachFeatureAtPixel(e.pixel, function (f) {
+                selected = f;
+
+
+            });
+        });
+
+
+        /**
+        *Pintamos marker dosis
+        **/
+        list_marker_dosis=[];
+        list_marker_operativo=[];
+        list_marker_dosis_alerta=[];
+        list_marker_dosis_peligro=[];
+        function marker_dosis_ol(){
+            <!--id_estacion,nombre de la estacion, latitud de la estacion, longitud de la estacion, valor, icono,precipitacion,mensaje,operatividad-->
+            var alerta_icon=false;
+            var peligro_icon=false;
+            var Pos;
+            datos_mapa={{datos_mapa|safe}};
+            for(var i=0;i<datos_mapa.length;i++){
+                var dato=datos_mapa[i];
+                Pos = {lat: dato[2],lng: dato[3]};
+                <!-- Cambiado por David dato de 5 -->
+                var ico="";
+                if (dato[5]==0){
+                    ico="soporte";
+                }else{
+                    ico=dato[5];
+                }
+                ruta_img="{% static img %}"+"img/icono_mapa/"+ico+".png ";
+                ruta_com="{% static img %}"+"img/nocom.png ";
+                if (dato[8]!=0){
+                    ruta_img=ruta_com;
+                }
+                var iconStyle = new ol.style.Style({
+                    image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                        opacity: 1.0,
+                        src: ruta_img
+                    }))
+                });
+                var marker = new ol.Feature({
+                    geometry: new ol.geom.Point(ol.proj.fromLonLat([dato[3], dato[2]]))
+                });
+                marker.setId(dato[0]);
+                marker.set('name','marcador');
+                marker.setStyle(iconStyle);
+                if (dato[8]!=0){
+                    //console.log(dato[1]);
+                    vectorSourceControl.addFeature(marker);
+                }else{
+                    vectorSource.addFeature(marker);
+                }
+                map.on('singleclick', function(e) {
+                    map.forEachFeatureAtPixel(e.pixel, function(feature) {
+                        alert(feature.get('name'));
+                        if (feature.get('name') == "marcador") {
+                            alert(feature.getId());
+                            document.location.href="/rare/datos/"+feature.getId();
+                        }
+                    });
+
+                });
+            }
+        }
+
+        marker_dosis_ol();
+    </script>
+
+{% endblock %}

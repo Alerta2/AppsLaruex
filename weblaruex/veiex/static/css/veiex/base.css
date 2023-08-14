@@ -1,0 +1,562 @@
+/*---------------------------------------------------------------
+    FUENTES
+---------------------------------------------------------------*/
+
+@font-face {
+    font-family: "Bradley Hand ITC";
+    src: url("../../../static/fonts/spd/bradley_hand.ttf");
+}
+
+@font-face {
+    font-family: "Brush Script MT";
+    src: url("../../../static/fonts/spd/brush_script_mt.ttf");
+}
+
+@font-face {
+    font-family: 'Open Sans Hebrew Bold';
+    src: url("../../../static/fonts/spd/OpenSansHebrew-Bold.ttf");
+}
+
+@font-face {
+    font-family: 'Blippo';
+    src: url("../../../static/fonts/spd/blippo.ttf");
+}
+
+@font-face {
+    font-family: 'ABite';
+    src: url("../../../static/fonts/spd/dahot.ABITE.ttf");
+}
+
+/*Titulo SPIDA portada*/
+@font-face {
+    font-family: 'AllAgesDEMO';
+    src: url("../../../static/fonts/spd/AllAgesDEMO.ttf");
+}
+
+/*Titulo SPIDA contenido*/
+@font-face {
+    font-family: 'Alkeyboard';
+    src: url("../../../static/fonts/spd/alkeyboard.ttf");
+}
+
+@font-face {
+    font-family: 'DaysLater';
+    src: url("../../../static/fonts/veiex/Days_Later.ttf");
+}
+
+@font-face {
+    font-family: 'PhoenixSans';
+    src: url("../../../static/fonts/veiex/Phoenix_Sans.ttf");
+}
+
+@font-face {
+    font-family: 'Cuchillada';
+    src: url("../../../static/fonts/veiex/A-cuchillada.ttf");
+}
+
+@font-face {
+    font-family: 'Veiex';
+    src: url("../../../static/fonts/veiex/veiex.ttf");
+}
+
+
+
+/*---------------------------------------------------------------
+    BASE WEB SPIDA
+---------------------------------------------------------------*/
+
+html,
+body,
+body>div {
+    font-family: "Roboto", sans-serif;
+    /*font-family: "Bradley Hand ITC";*/
+    /*font-weight: bold;*/
+    background-color: #1B1C1C;
+    background: #1B1C1C;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden !important;
+}
+
+/*SCROLLBAR STYLE FOR IE*/
+body {
+    /*margin: 0;*/
+    scrollbar-base-color: #1B1C1C;
+    /*#343a40;*/
+    scrollbar-3dlight-color: #1B1C1C;
+    scrollbar-highlight-color: #1B1C1C;
+    scrollbar-track-color: #1B1C1C;
+    scrollbar-arrow-color: #1B1C1C;
+    scrollbar-shadow-color: #1B1C1C;
+    scrollbar-darkshadow-color: #1B1C1C;
+    background-color: #1B1C1C;
+    background: #1B1C1C;
+}
+
+#content {
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    padding-left: 58px;
+    padding-top: 58px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+}
+
+.text-bradley {
+    font-family: "Bradley Hand ITC";
+    font-weight: bold;
+    font-size: 21px;
+}
+
+/* ----------------------------------------------------------
+    BOOTSTRAP TABLE 
+-----------------------------------------------------------*/
+
+.action-icon {
+    margin-right: 10px;
+}
+
+.fullscreen {
+    padding-top: 58px;
+}
+
+@media (min-width: 650px) {
+    .fullscreen {
+        padding-left: 58px;
+    }
+
+    /*bootstraptable fullscreen*/
+    .bootstrap-table.fullscreen {
+        padding-right: 10px;
+        padding-left: 68px;
+        padding-bottom: 20px;
+    }
+}
+
+@media (max-width: 650px) {
+    #content {
+        padding-left: 0px;
+    }
+
+    .tooltip {
+        display: none;
+    }
+
+    /*bootstraptable fullscreen*/
+    .bootstrap-table.fullscreen {
+        padding-right: 10px;
+        padding-left: 10px;
+        padding-bottom: 20px;
+    }
+}
+
+/*----------------------------------------------------------------
+    TEXTO "SPIDA" ANIMADO CABECERA
+----------------------------------------------------------------*/
+.title-portada {
+    animation: fluido 10s ease-in-out infinite;
+    background: linear-gradient(-45deg, #23a6d5 30%, #23d5ab, lightgreen, white, #343a40);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    z-index: 100002;
+    font-size: 15vh;
+    /*padding-top: 2%; */
+    /*font-family: 'AllAgesDEMO';*/
+    font-family: 'PhoenixSans';
+    font-weight: lighter;
+}
+
+.color-animate {
+    background-size: 350%;
+}
+
+@keyframes fluido {
+    0% {
+        background-position: 0 50%
+    }
+
+    50% {
+        background-position: 100% 50%
+    }
+
+    100% {
+        background-position: 0 50%
+    }
+}
+
+/*---------------------------------------------------------------
+    TEXTO ESPECIAL "SPIDA" CURSIVO
+----------------------------------------------------------------*/
+
+.cursive-brush {
+    /*font-family: 'Brush Script MT', cursive;*/
+    font-family: 'Brush Script MT';
+    color: white;
+    /*padding-top: 5%;*/
+    text-align: center;
+}
+
+/*---------------------------------------------------------------
+    TEXTO ESPECIAL "SPIDA" EN BLOQUES
+----------------------------------------------------------------*/
+.text-spida {
+    /*font-weight: bold;*/
+    font-size: 35px;
+    color: #23d5ab;
+    /*font-family: 'Alkeyboard';*/
+    font-family: 'PhoenixSans';
+}
+
+
+/*---------------------------------------------------------------
+    TEXTO "LARUEX" CORPORATIVO
+----------------------------------------------------------------*/
+
+.text-laruex {
+    font-family: 'Blippo';
+    color: white;
+    font-size: 27px;
+    text-align: center;
+}
+
+/*------------------------------------------------------------
+    TEXTO "ALERTA2" CORPORATIVO
+--------------------------------------------------------------*/
+.text-alerta2 {
+    display: inline;
+    /*font-family: 'Open Sans Hebrew Bold';*/
+    font-family: "Roboto", sans-serif;
+    font-size: 28px;
+    color: #ADADB1;
+    font-weight: bold;
+}
+
+.text-alerta2 span {
+    /*vertical-align: baseline;*/
+    vertical-align: middle;
+    writing-mode: vertical-rl;
+    /*margin: 0;*/
+    color: #009CDD;
+    line-height: 78%;
+    /*position: relative;
+    top: 1px;*/
+    font-size: 32px;
+    /*-moz-box-flex:1.0; /* Firefox */
+    /*box-flex:1.0;*/
+
+}
+
+.pruebaspan {
+    transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    /*  for IE  */
+
+    /* 	for browsers supporting webkit (such as chrome, firefox, safari etc.). */
+    -webkit-transform: rotate(90deg);
+    display: inline-block;
+    /*background-color: yellow;*/
+}
+
+/*------------------------------------------------------------
+    PRELOAD BASE HTML (ALERTA2)
+------------------------------------------------------------*/
+
+/*Pagina Preload html */
+.loader-wrapper {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000;
+    background-color: #1B1C1C;
+    /*#343a40;*/
+}
+
+.logo-preloader {
+    position: absolute;
+    margin: auto;
+    background: url("../../../static/img/spd/logos/logo_alerta2_transparente.png") no-repeat center;
+    background-size: 200px;
+    /*background-position: bottom;*/
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+}
+
+.line {
+    background-color: white;
+    width: 7px;
+    height: 40px;
+    margin: 0px 5px;
+    border: none;
+    animation: size 0.8s infinite linear;
+    border-radius: 20px;
+}
+
+.line-1 {
+    animation-delay: 0.60s;
+}
+
+.line-2 {
+    animation-delay: 0.30s;
+}
+
+.line-3 {
+    animation-delay: 0s;
+}
+
+.line-4 {
+    animation-delay: 0.30s;
+}
+
+.line-5 {
+    animation-delay: 0.60s;
+}
+
+@keyframes size {
+    0% {
+        height: 40px;
+    }
+
+    25% {
+        height: 60px;
+    }
+
+    50% {
+        height: 90px;
+    }
+
+    75% {
+        height: 60px;
+    }
+
+    100% {
+        height: 40px;
+    }
+}
+
+
+
+/*--------------------------------------------------------------
+    PRELOAD ESPECIAL (ALERTA2)
+--------------------------------------------------------------*/
+
+.preloaderBg {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99900;
+}
+
+.preloader {
+    margin: auto;
+    background: url("../../../static/img/spd/logos/logo_alerta2_transparente.png") no-repeat center;
+    background-size: 180px;
+    scale: 0.7;
+    width: 100%;
+    height: 100%;
+    z-index: 99902;
+}
+
+.preloader p {
+    color: white;
+    font-size: 14px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    margin-top: 150px;
+    padding-left: 20px;
+    padding-right: 20px;
+    z-index: 99903;
+}
+
+.preloader2 {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #009CDD;
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+    animation: spin 1s ease-in-out infinite;
+    position: fixed;
+    margin: auto;
+    z-index: 99901;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/*------------------------------------------------------------
+    CONTROL TOP/BOTTTOM WHEN SCROLL
+-------------------------------------------------------------*/
+
+#scroll {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    background-color: aquamarine;
+    text-indent: -9999px;
+    display: none;
+    -webkit-border-radius: 60px;
+    -moz-border-radius: 60px;
+    border-radius: 60px;
+    z-index: 9999;
+}
+
+#scroll i,
+#scroll svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -12px;
+    height: 0;
+    width: 0;
+    border: 8px solid transparent;
+    border-bottom-color: #1B1C1C;
+    /*#343a40;*/
+}
+
+#scroll:hover {
+    background-color: rgba(27, 28, 28, 0.8);
+    /*#343a40;*/
+    opacity: 1;
+    filter: "alpha(opacity=100)";
+    -ms-filter: "alpha(opacity=100)";
+}
+
+#scroll:hover i,
+#scroll:hover svg {
+    border-bottom-color: aquamarine;
+}
+
+/*------------------------------------------------------------
+    SWEETALERT
+-------------------------------------------------------------*/
+.buttonClose-swal {
+    color: white !important;
+}
+
+.swal2-close {
+    box-shadow: none !important;
+}
+
+.buttonClose-swal:focus {
+    box-shadow: none !important;
+}
+
+
+
+
+
+
+
+/*-----------------------------------------------------------------------*/
+
+
+.modal-title {
+    font-family: 'Brush Script MT', cursive;
+    font-size: 35px;
+}
+
+/*body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) { overflow-y: visible !important; }*/
+
+.swal2-container {
+    z-index: 100000;
+}
+
+.swal2-title {
+    /*font-family: 'Brush Script MT', cursive;*/
+    font-family: 'Bradley Hand ITC';
+    font-weight: bold;
+    color: #49A1A4;
+}
+
+.swal2-html-container {
+    font-size: 14px;
+}
+
+
+.rolldate-container .rolldate-mask {
+    z-index: 300000;
+}
+
+.rolldate-container .rolldate-panel {
+    z-index: 300001;
+}
+
+/* posicion por encima de todo de los modales */
+.modal {
+    z-index: 20000;
+}
+
+/* En el Modal de Input File para que los titulos del Form se situen a la izquierda}*/
+.form-label {
+    float: left !important;
+}
+
+/*Swall pequeños mensajes*/
+.colored-toast.swal2-icon-success {
+    background-color: #a5dc86 !important;
+}
+
+.colored-toast.swal2-icon-error {
+    background-color: #f27474 !important;
+}
+
+.colored-toast.swal2-icon-warning {
+    background-color: #f8bb86 !important;
+}
+
+.colored-toast.swal2-icon-info {
+    background-color: #3fc3ee !important;
+}
+
+.colored-toast.swal2-icon-question {
+    background-color: #87adbd !important;
+}
+
+.colored-toast .swal2-title {
+    color: white;
+}
+
+.colored-toast .swal2-close {
+    color: white;
+}
+
+.colored-toast .swal2-html-container {
+    color: white;
+}

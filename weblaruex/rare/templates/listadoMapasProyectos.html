@@ -1,0 +1,176 @@
+{% extends "base/base_mapa.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+
+{% endblock %}
+{% block css %}
+    .leaflet-marker-icon .number{
+        position: relative;
+        top: 0px;
+        left: -8px;
+        font-size: 14px;
+        font-weight: bold;
+        width: 25px;
+        text-shadow: 0 0 1px #0f0;
+    }
+{% endblock %}
+{% block content %}      
+  <div id="mapid" class="w-100 h-100"></div>
+{% endblock %}
+
+{% block outMain %}             
+
+    <div id="sidebarMapaMedidas" class="leaflet-sidebar collapsed">
+      <!-- Nav tabs -->
+      <div class="leaflet-sidebar-tabs">
+          <ul role="tablist"> <!-- top aligned tabs -->
+            <li><a href="#home" role="tab"><i class="fas fa-bars fa-2x"></i></a></li>
+            <li><a href="#newProject" role="tab"><i class="fa-solid fa-square-plus fa-2x"></i></i></a></li>
+          </ul>
+      </div>
+  
+      <!-- Tab panes -->
+      <div class="leaflet-sidebar-content do-nicescrol">
+        <div class="leaflet-sidebar-pane" id="home">
+            <h1 class="leaflet-sidebar-header">
+                Listado de proyectos
+            </h1>
+            <div class="row py-4">
+              {% regroup proyectos by proyecto as proyectos_list %}
+              <ul class="list-group">
+                  {% for proyecto in proyectos_list %}
+                      <li class="list-group-item">
+                        <h3>{{ proyecto.grouper }} con {{ proyecto.list|length }} ubicaciones</h3><br>
+                        <div class="row">
+                          <button type="button" class="btn btn-info col-6" onclick="map.setView(new L.LatLng({{ proyecto.list.0.lat }}, {{ proyecto.list.0.lon }}), 18);"><i class="fas fa-location-arrow"></i></button>
+                          <a class="col-6" href="/private/rare/mapaMedidas/{{ proyecto.grouper }}/"><button type="button" class="btn btn-success w-100"><i class="fas fa-map-marked-alt"></i></button></a>
+                        </div>
+                      </li>
+                  {% endfor %}
+              </ul>
+            </div>
+        </div>
+        <div class="leaflet-sidebar-pane" id="newProject">
+            <h1 class="leaflet-sidebar-header">
+              Generar nuevo proyecto de medidas
+            </h1>
+            <div class="row border border-dark-rounded bg-white p-2">
+              <form id="formNuevoMapa" action="/private/rare/puntosMedida/" method="post" role="form" target="_blank">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="mapaInput">Latitud origen:</label>
+                  <input type="text" class="form-control" id="idPuntoCalculoLat" name="idPuntoLat" value="">
+                </div>
+                <div class="form-group">
+                  <label for="mapaInput">Longitud origen:</label>
+                  <input type="text" class="form-control" id="idPuntoCalculoLon" name="idPuntoLon" value="">
+                </div>
+                <div class="form-group">
+                  <label for="mapaInput">Id nuevo mapa:</label>
+                  <input type="text" class="form-control" id="mapaInput" name="mapa" placeholder="Id mapa">
+                </div>
+                <div class="form-group">
+                  <label for="numPuntosInput">Número de Puntos:</label>
+                  <input type="number" class="form-control" id="numPuntosInput" name="numPuntos" placeholder="Número de puntos">
+                </div>
+                <div class="form-group">
+                  <label for="lineaInput">Puntos por línea:</label>
+                  <input type="number" class="form-control" id="lineaInput" name="linea" placeholder="Puntos por línea">
+                </div>
+                <div class="form-group">
+                  <label for="metrosInput">Metros separación:</label>
+                  <input type="number" class="form-control" id="metrosInput" name="metros" placeholder="Metros">
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+              </form>
+            </div>
+        </div>
+      </div>
+    </div>
+    <script src="{% static 'js/rare/crearMapaRAREx.js' %}" crossorigin="anonymous"></script>
+    <script>
+      // nice scroll para los paneles de la tabla
+      $(".do-nicescrol").niceScroll();
+      
+      // layer_ArcgisSat, layer_OpenStreetMap, layer_OpenStreetMapMunicipios, layer_OpenTopMap, layer_StamenTerrain
+      layer_OpenStreetMap.addTo(map);
+
+      map.setView([40.301272,-3.945139], 7);
+      function ubicaciones(){
+           $.ajax({
+              type: 'GET',
+              url: "/private/rare/ubicacionesInteres/",
+              success: function (data) {
+                  data.forEach(function (item, index) {
+                      var icon;
+                      if (item.tipo == 'Central'){
+                          icon = L.icon({
+                              iconUrl: '{% static img %}'+'img/rare/nuclear-plant.png',
+                              iconSize:     [48, 48], // size of the icon
+                              iconAnchor:   [48, 48], // point of the icon which will correspond to marker's location
+                          });
+                          imagen = '{% static img %}'+'img/rare/nuclear-plant.png';
+                      }
+                      else if (item.tipo == 'Almacenamiento'){
+                          icon = L.icon({
+                              iconUrl: '{% static img %}'+'img/rare/container.png',
+                              iconSize:     [48, 48], // size of the icon
+                              iconAnchor:   [48, 48], // point of the icon which will correspond to marker's location
+                          });
+                          imagen = '{% static img %}'+'img/rare/container.png';
+                      }
+                      auxMarker = new L.marker([item.lat,item.lon], {icon: icon});
+                      ubicacionesInteres.addLayer(auxMarker);
+                  });
+              }
+          })
+      }
+      ubicaciones();
+      
+      //DEFINO EL BOTOM HOME (CENTRA EL MAPA EN EXTREMADURA)
+      var botonHome = L.easyButton({
+        states: [{
+                stateName: 'zoom-to', // nombre del estado
+                icon: '<i class="fas fa-home pt-1" style="font-size:20px;"></i>', // nombre del icono
+                title: 'Ajustar mapa', // titulo del boton
+                onClick: function(btn, map) { // evento del boton
+                    centerMap();
+                }
+        }]
+      });
+      map.addControl(botonHome);
+
+      function centerMap(){
+          map.flyTo([40.301272,-3.945139], 7, {
+              "animate": true,
+              "pan": {
+                  "duration": 10
+              }
+          });
+      }
+
+        var sidebar = L.control.sidebar({
+            autopan: true,       // whether to maintain the centered map point when opening the sidebar
+            closeButton: true,    // whether t add a close button to the panes
+            container: 'sidebarMapaMedidas', // the DOM container or #ID of a predefined sidebar container that should be used
+            position: 'right',     // left or right
+          }).addTo(map);
+        sidebar.open('home');
+        var posicionProyectos = L.layerGroup();
+        var redMarker = L.ExtraMarkers.icon({
+          icon: 'fa-solid fa-map',
+          markerColor: 'blue',
+          shape: 'square',
+          prefix: 'fa'
+        });
+        {% for proyecto in proyectos_list %}
+          L.marker([{{ proyecto.list.0.lat }},{{ proyecto.list.0.lon }}], {icon: redMarker}).addTo(map);
+        {% endfor %}
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,297 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: rgb(16, 108, 161);
+  }
+
+  .addImagen:hover {
+    color: rgb(10, 59, 99);
+  }
+
+  .imagen-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .form-check-input:checked {
+    background-color: #087B6C;
+    border-color: #087B6C;
+  }
+
+  .form-check-input:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(16, 223, 161, 0.432);
+  }
+
+</style>
+
+  <div>
+
+    <nav>
+      <ol class="breadcrumb" style="background-color:#fff !important">
+        <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+              class="bi bi-house-door"></i></a></li>
+        <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/objetos">Listado de
+            Objetos</a>
+        </li>
+        <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/tipoObjeto/Equipo/">Listado de
+            Equipos</a>
+        </li>
+        <li class="breadcrumb-item" style="font-size: large;"><a
+            href="\private/docLaruex/editarObjeto/{{ equipo.id.id }}/">Editar {{ equipo.id.nombre }}</a></li>
+      </ol>
+    </nav>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title my-4">Editar {{equipo.id.nombre}} </h5>
+
+      <form class="row g-3" id="formularioModal" action="/private/docLaruex/editarObjeto/{{equipo.id.id}}/" method="POST"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <div id="formularioEditarEquipo">
+          <!-- Multi Columns Form -->
+
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="nuevaHabilitacion">Habilitación</label>
+                <select class="form-select" data-rule="required" id="nuevaHabilitacion" name="nuevaHabilitacion">
+                  <option value="{{equipo.id.id_habilitacion.id}}" selected>
+                    {{equipo.id.id_habilitacion.titulo}}
+                  </option>
+                  {% for habilitacion in habilitaciones %}
+                  <option value="{{habilitacion.id}}">
+                    {{habilitacion.titulo}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row my-2">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="fechaAlta">Fecha de Alta</label>
+                <input type="date" id="fechaAlta" name="fechaAlta" class="form-control"
+                  value="{{equipo.fecha_alta|safe}}">
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="nuevoTipoEquipo">Tipo de Equipo</label>
+                <select class="form-select" id="nuevoTipoEquipo" name="nuevoTipoEquipo">
+
+                  <option value="{{equipo.tipo_equipo.id}}">{{equipo.tipo_equipo.nombre}}
+                  </option>
+                  {% for tipo_equipo in tipoEquipo %}
+                  <option value="{{tipo_equipo.id}}">
+                    {{tipo_equipo.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="nuevoFabricante">Fabricante</label>
+                <select class="form-select" id="nuevoFabricante" name="nuevoFabricante">
+                  <option value="{{equipo.fabricante.id}}">
+                    {{equipo.fabricante.nombre}}
+                  </option>
+                  {% for fab in fabricante %}
+                  <option value="{{fab.id}}">
+                    {{fab.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="grupoEquipoEditar">Grupo</label>
+                <select class="form-select" id="grupoEquipoEditar" name="grupoEquipoEditar">
+                  <option value="{{equipo.grupo.id}}" selected hidden>
+                    {{equipo.grupo.nombre}}
+                  </option>
+                  {% for grupo in gruposEquipos %}
+                  <option value="{{grupo.id}}">
+                    {{grupo.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row my-2">
+            <div class="col-md-8">
+              <label for="nuevoNombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" name="nuevoNombre" id="nuevoNombre" value="{{equipo.id.nombre}}">
+            </div>
+
+            <div class="col-md-2">
+              <label for="nuevoModelo" class="form-label">Modelo</label>
+              <input type="text" class="form-control" name="nuevoModelo" id="nuevoModelo" value="{{equipo.modelo}}">
+            </div>
+
+            <div class="col-md-2">
+              <label for="nuevoPrecio" class="form-label">Importe</label>
+              <input type="number" step="0.01" placeholder="{{equipo.precio}}" class="form-control" name="nuevoPrecio"
+                id="nuevoPrecio" value="{{equipo.precio|safe}}" oninput="calcularPrecioSinIva(this.value)">
+            </div>
+          </div>
+
+          <div class="row my-2">
+            <div class="col-md-4">
+              <label for="nuevoCodigoLaruex" class="form-label">Código Laruex</label>
+              {% if administrador %}
+              <input type="text" class="form-control" name="nuevoCodigoLaruex" id="nuevoCodigoLaruex"
+                value="{{equipo.cod_laruex}}" pattern="[a-zA-Z\w\s]{1,255}">
+              {% else %}
+              <input type="text" class="form-control" name="nuevoCodigoLaruex" id="nuevoCodigoLaruex"
+                value="{{equipo.cod_laruex}}" pattern="[a-zA-Z\w\s]{1,255}">
+              {% endif %}
+            </div>
+
+            <div class="col-md-4">
+              <label for="nuevoCodigoUex" class="form-label">Código Uex</label>
+
+              {% if administrador %}
+              <input type="text" class="form-control" name="nuevoCodigoUex" id="nuevoCodigoUex" value="{{equipo.cod_uex}}"
+                pattern="[a-zA-Z\w\s]{1,255}">
+              {% else %}
+              <input type="text" class="form-control" name="nuevoCodigoUex" id="nuevoCodigoUex" value="{{equipo.cod_uex}}"
+                pattern="[a-zA-Z\w\s]{1,255}">
+              {% endif %}
+            </div>
+
+            <div class="col-md-4">
+              <label for="nuevoNumSerie" class="form-label">S/N</label>
+              <input type="text" class="form-control" name="nuevoNumSerie" id="nuevoNumSerie"
+                value="{{equipo.num_serie}}">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <label for="nuevaDescripcion" class="form-label">Descripción</label>
+              <textarea type="text" class="form-control" name="nuevaDescripcion" id="nuevaDescripcion" rows="5"
+                placeholder="Añade aquí la descripción" style="white-space: pre-line;">{{equipo.descripcion}}</textarea>
+
+            </div>
+          </div>
+
+          <div class="row my-2">
+            <div class="col d-flex justify-content-center">
+              <div class="form-check my-auto">
+                <input class="form-check-input" type="checkbox" id="altaUexEditar" name="altaUexEditar">
+                <label class="form-check-label" for="altaUexEditar" style="font-size: 1.2rem; color: #195746;">
+                  <i class="fa-duotone fa-triangle-exclamation"></i>
+                  Marcar si hay que dar de alta el equipo en la Uex
+                </label>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row my-2">
+            <div class="col-12 d-flex justify-content-center">
+              <div class="form-group">
+                <label for="nuevaImagenEquipo">
+                  <i class="fa-duotone fa-image fa-6x addImagen"></i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="nuevaImagenEquipo" name="nuevaImagenEquipo" onchange="mostrarNombreImagen(this.value)" />
+                <div class="text-center"><strong id="mostrarNombreNuevaImagen"><br></strong>
+                  <spam id="imagen-name"></spam>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="row my-2">
+          <div class="text-center">
+            <button type="reset" class="btn btn-secondary"
+              onclick="location.href='/private/docLaruex/tipoObjeto/Equipo'">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+
+        </div>
+
+
+    </div>
+
+    </form><!-- End Multi Columns Form -->
+
+  </div>
+
+<script>
+
+// comprobamos si el equipo indica que deba ser dado de alta en la uex
+var altaUex = '{{equipo.alta_uex}}';
+if (altaUex == '1'){
+  document.getElementById('altaUexEditar').checked = true;
+}
+
+  // funcion para calcular el precio sin iva
+
+function calcularPrecioSinIva(value){
+    var precio = value;
+    var iva = 1.21;
+    var precioSinIva = precio / iva;
+    var descripcion = document.getElementById('nuevaDescripcion');
+    var info = descripcion.value;
+    console.log(info);
+    // eliminar la frase que incluya la palabra precio
+    info = info.replace(/.*precio sin.*/i, "");
+    var campo = "Precio sin IVA: " + precioSinIva.toFixed(2) + " €";
+    // añadimos la nueva frase
+    descripcion.value = info + campo;
+
+  }
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioEditarEquipo").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarObjeto/{{equipo.id.id}}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Equipo modificado con éxito', 'alert-success', 2000)
+      }
+    });
+  });
+
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+
+    document.getElementById('imagen-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreNuevaImagen').style.display = 'none';
+  }
+
+
+</script>
+
+{% endblock %}

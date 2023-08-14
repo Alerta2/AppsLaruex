@@ -1,0 +1,36 @@
+{% load static %}
+<!-- ======= About Section ======= -->
+<section id="about" class="about">
+  <div class="container" data-aos="fade-up">
+    {% if request.resolver_match.url_name == "home" %}
+      <div class="section-title">
+        <h2>Nosotros</h2>
+        <p>Quienes somos</p>
+      </div>
+    {% endif %}
+    <div class="row">
+      <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
+        <img src="{% static 'img/about-4.webp' %}" class="img-fluid" alt="">
+      </div>
+
+
+      <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content get">
+        <h3>El LARUEX o Laboratorio de Radiactividad  Ambiental de la Universidad de Extremadura es un grupo de investigación integrado en los Servicios de Apoyo a la Investigación de la citada Universidad, cuyo ámbito preferente de desarrollo se enmarca en la Protección Radiológica Ambiental.</h3>
+        <p class="font-italic">
+          En el LARUEX se llevan a cabo dos grandes grupos de actividades. Ambas se realizan bajo un estricto sistema de gestión de la calidad, estando de hecho sujetas la inmensa mayoría de las que se desarrollan en los Laboratorios de Ensayo, a los requisitos que impone la acreditación que el LARUEX posee en base a la norma UNE-EN ISO/IEC 17025. Por su parte, las actividades relativas a la de gestión de la Red de Alerta Radiológica de Extremadura, están sujetas a los requisitos que establece la certificación que el LARUEX posee en base a la norma UNE-EN ISO 9001 y algunas de sus actividades está acreditada por la precitada norma UNE-EN ISO/IEC 17025.
+        </p>
+        <ul>
+          <li><i class="icofont-check-circled"></i> "Laboratorios de Ensayo", en donde se llevan a cabo todos los
+            implicados en los estudios relativos al comportamiento de los
+            radionucleidos en la naturaleza, tanto la faceta de I+D, como en la de
+            prestación de servicios, que se realizan en el LARUEX. </li>
+          <li><i class="icofont-check-circled"></i> "Redes de Alertan Temprana", en donde se lleva a cabo el diseño, la puesta a punto y la gestión del equipamiento y software necesario, para la realización en tiempo cuasi real de medidas in situ, la gestión de dichas informaciones y la remisión de las mismas a los responsables de gestionar las posibles emergencias, tanto en el ámbito de la I+D, como en el de prestación de servicios. </li>
+          <li><i class="icofont-check-circled"></i> "Grupo de Investigación", en donde se realizan trabajos de investigación relativos a todos los ámbitos de trabajo del LARUEX mediante financiación autonómica, nacional e internacional. En ámbito autonómico Nº Expediente (GR21058) FQM001 - LABORATORIO DE RADIACTIVIDAD AMBIENTAL DE LA UNIVERSIDAD DE EXTREMADURA. </li>
+        </ul>
+        <p>
+          Siendo por tanto el LARUEX responsable del desarrollo y gestión de la Red de Alerta Radiológica de Extremadura o RAREx, así como de la de emergencias debido a inundaciones, o SPIDA.
+        </p>
+      </div>
+    </div>
+  </div>
+</section><!-- End About Section -->

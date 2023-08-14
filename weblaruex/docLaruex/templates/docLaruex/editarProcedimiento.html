@@ -1,0 +1,195 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: rgb(16, 108, 161);
+  }
+  
+  .addImagen:hover {
+    color: rgb(10, 59, 99);
+  }
+  
+  .imagen-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+  }  
+
+</style>  
+
+<div class="card-body">
+
+    <nav>
+      <ol class="breadcrumb" style="background-color:#fff !important">
+        <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+              class="bi bi-house-door"></i></a></li>
+        <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/objetos">Listado de
+            Objetos</a>
+        </li>
+        <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/tipoObjeto/Procedimiento/">Listado de
+            Procedimientos</a>
+        </li>
+        <li class="breadcrumb-item" style="font-size: large;"><a
+            href="\private/docLaruex/editarObjeto/{{ procedimiento.id_doc.id }}/">Editar {{ procedimiento.id_doc.nombre }}</a></li>
+      </ol>
+    </nav>
+</div>
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title my-4">Editar {{procedimiento.id_doc.nombre}} </h5>
+    
+
+    <form id="formularioModal" action="/private/docLaruex/editarObjeto/{{procedimiento.id_doc.id}}/" method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col">
+        <div class="form-group">
+          <label for="nuevaHabilitacion">Habilitación</label>
+          <select class="form-select" data-rule="required" id="nuevaHabilitacion" name="nuevaHabilitacion">
+            <option value="{{procedimiento.id_doc.id_habilitacion.id}}" selected hidden>
+              {{procedimiento.id_doc.id_habilitacion.titulo}}
+            </option>
+            {% for habilitacion in habilitaciones %}
+            <option value="{{habilitacion.id}}">
+              {{habilitacion.titulo}}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+    <!-- formulario de Procedimiento -->
+    <div id="formularioEditarProcedimiento">
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+          <label for="nuevoNombre">Nombre</label>
+          <input type="text" class="form-control" id="nuevoNombre" name="nuevoNombre" data-rule="required"
+            value="{{procedimiento.id_doc.nombre}}" />
+        </div>
+        </div>
+        <div class="col-3"> 
+          <div class="form-group">
+          <label for="nuevaVersion">Version</label>
+          <input type="number" class="form-control" id="nuevaVersion" name="nuevaVersion" data-rule="required"
+            value="{{procedimiento.version}}" />
+        </div>
+        </div>              
+        <div class="col-3">
+          <div class="form-group">
+            <label for="nuevaFechaVerificacion">Fecha de Verificación</label>
+            <input type="date" id="nuevaFechaVerificacion" name="nuevaFechaVerificacion" class="form-control"
+              value="{{procedimiento.fecha_verificacion.date|safe }}"/>
+          </div>
+        </div> 
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="nuevoTitulo">Titulo</label>
+            <input type="text" class="form-control" id="nuevoTitulo" name="nuevoTitulo" data-rule="required"
+              value="{{procedimiento.titulo}}" />
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="form-group">
+          <label for="nuevoResponsable">Responsable</label>
+          <select class="form-select" data-rule="required" id="nuevoResponsable" name="nuevoResponsable">
+            <option value="{{procedimiento.responsable.id}}" selected hidden> {{procedimiento.responsable.first_name}}
+              {{procedimiento.responsable.last_name}}</option>
+            {% for responsable in responsables %}
+            <option value="{{responsable.id}}">
+              {{responsable.first_name}} {{responsable.last_name}}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        </div>
+        <div class="col-3">
+          <div class="form-group">
+            <label for="nuevoRevisor">Revisor</label>
+            <select class="form-select" data-rule="required" id="nuevoRevisor" name="nuevoRevisor">
+              <option value="{{procedimiento.revisor.id}}" selected hidden> {{procedimiento.revisor.first_name}}
+                {{procedimiento.revisor.last_name}}</option>
+              {% for responsable in responsables %}
+              <option value="{{responsable.id}}">
+                {{responsable.first_name}} {{responsable.last_name}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+          <label for="nuevaModificacion">Modificaciones</label>
+          <textarea class="form-control" id="nuevaModificacion" name="nuevaModificacion" rows="3"
+            placeholder="Modificaciones realizadas">{{ procedimiento.modificaciones}}</textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer d-flex justify-content-center my-2">
+      <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" onclick="salir()">
+        Cerrar
+      </button>
+      <button id="reset" type="reset" class="btn btn-secondary" hidden>
+      </button>
+      <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('procedimientosGuardar', 'Procedimiento guardado con éxito', 'alert-success', 2000)">
+        Guardar
+      </button>
+    </div>
+  </form>
+
+  </div>
+</div>
+
+<script>
+// cambiamos la funcionalidad del boton submit del formulario
+$("#formularioEditarProcedimiento").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarObjeto/{{procedimiento.id_doc.id}}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Procedimiento editado con éxito', 'alert-success', 2000);
+        document.location.reload();
+      }
+    });
+  });
+
+  function salir(){
+    window.location.href = "/private/docLaruex/tipoObjeto/Procedimiento/";
+    crearAviso('procedimientoCerrar', 'No se ha podido modificar el procedimiento', 'alert-warning', 2000);
+  }
+
+      // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+
+    document.getElementById('imagen-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreNuevaImagen').style.display = 'none';
+  }
+
+
+</script>
+
+{% endblock %}

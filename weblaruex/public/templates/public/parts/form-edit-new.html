@@ -1,0 +1,168 @@
+{% load static %}{% load widget_tweaks %}
+
+<style>
+
+.card {
+ width: 70rem;
+ height: auto;
+ background: white;
+ border-radius: 10px;
+ transition: border-radius 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.shadow {
+ box-shadow: inset 0 -3em 3em rgba(0,0,0,0.1),
+             0 0  0 2px rgb(190, 190, 190),
+             0.3em 0.3em 1em rgba(0,0,0,0.3);
+}
+
+
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: #1d8896;
+  }
+  
+  .addImagen:hover {
+    color: rgba(29, 136, 150, 10);
+    filter: brightness(80%);
+  }
+
+  .imagenCargada{
+    color: #1d9649;
+  }
+
+  .sinBorde:focus {
+    outline: none;
+  }
+</style>
+
+<!-- ======= Contact Section ======= -->
+<section id="contact" class="contact"  >
+  <div class="container d-flex justify-content-center" data-aos="fade-up" >
+    <div class="card shadow">
+      <div class="card-body">
+        <div class="row d-flex justify-content-center">
+          <div class="col-10">
+            
+            <form action="{% url 'public:publicEditarNoticia' id=noticia.id %}" method="POST" role="form" class="php-email-form" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="row d-flex justify-content-end">
+                
+                <div class="col-lg-3 col-md-4 col-sm-12 form-group">
+                  <label for="fechaNoticiaEditar"><strong>Fecha de la noticia</strong></label>
+                  <input type="date" id="fechaNoticiaEditar" name="fechaNoticiaEditar" value="{{noticia.fecha|safe}}" class="form-control" required>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-12 form-group">
+                  <label for="categoriaNoticiaEditar"><strong>Categoría de la noticia</strong></label>
+                  <select type="form-select" id="categoriaNoticiaEditar" name="categoriaNoticiaEditar" class="form-control"  style="border-color: #1d8896;" required>
+                    <option value="{{noticia.categoria_noticia.id}}" hidden>{{noticia.categoria}}</option>
+                    {% for categoria in categorias %}
+                    <option value="{{categoria.id}}">{{categoria.categoria}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-12 form-group">
+                  <label for="visibleEditar"><strong>Publicar</strong></label>
+                  <select type="form-select" id="visibleEditar" name="visibleEditar" class="form-control"  style="border-color: #1d8896;">
+                    <option value="{{noticia.visible}}" hidden>{% if noticia.visible == 0 %} No {% else %}Si{% endif %}</option>
+                    
+                    <option value="1">Si</option>
+                    <option value="0">No</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                  <label for="tituloNoticiaEditar"><strong>Titulo de la noticia</strong></label>
+                  <input type="text" name="tituloNoticiaEditar" class="form-control" id="tituloNoticiaEditar" placeholder="Título de la noticia. Máximo 200 caracteres" data-rule="minlen:4" data-msg="Por favor introduce al menos 4 caracteres" value="{{noticia.titulo}}" required/>
+                  <div class="validate"></div>
+                </div>
+              </div>
+              
+              <div class="row my-2">
+                <div class="col-sm-12">
+                  <label for="resumenNoticia"><strong>Resumen de la noticia:</strong></label>
+                  <div class="text-center my-2">
+                    {{ formResumenNoticiaEditar.resumenNoticia }}
+                  </div>
+                </div>
+              </div>
+              <div class="row my-2">
+                <div class="col-sm-12">
+                  <label for="contenidoNoticia"><strong>Contenido de la noticia:</strong></label>
+                  <div class="text-center my-2">
+                    {{ formContenidoNoticiaEditar.contenidoNoticia  }}
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                  <label for="keywordsNoticiaEditar"><strong>Keywords de la noticia</strong><a href="" class="mx-1" title="obtener información sobre los keywords" data-toggle="modal" data-target="#modalInfoKeywordsNoticias" style="color: #eba43d"><i
+                    class="fa-solid fa-circle-info fa-lg"></i></a></label>
+                  <input type="text" name="keywordsNoticiaEditar" class="form-control" id="keywordsNoticiaEditar" placeholder="Introduce palabras separados por comas. Máximo 190 caracteres" data-rule="minlen:4" data-msg="Por favor introduce al menos 4 caracteres" value="{{noticia.meta_keywords}}" maxlength="190" required/>
+                  <div class="validate"></div>
+                </div>
+              </div>
+              <div class="row my-2">
+                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                  <label for="metaDescriptionNoticiaEditar"><strong>MetaDescrition de la noticia</strong><a href="" class="mx-1" title="obtener información sobre las metaDescriptions" data-toggle="modal" data-target="#modalInfoMetaDescriptionNoticias" style="color: #eba43d"><i
+                    class="fa-solid fa-circle-info fa-lg"></i></a></label>
+                  <input type="text" name="metaDescriptionNoticiaEditar" class="form-control" id="metaDescriptionNoticiaEditar" placeholder="MetaDescrition de la noticia. Máximo 150 caracteres" data-rule="minlen:4" data-msg="Por favor introduce al menos 4 caracteres" maxlength="150" value="{{noticia.meta_descripcion}}" required/>
+                  <div class="validate"></div>
+                </div>
+              </div>
+
+              
+              <div class="row my-2">
+                <div class="col-sm-12 d-flex justify-content-center">
+                  <div class="form-group">
+                    <label for="nuevaImagenNoticiaEditar">
+                      <i class="fa-duotone fa-image fa-6x addImagen" id="iconoImagen"></i>
+                    </label>
+                    <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                      id="nuevaImagenNoticiaEditar" name="nuevaImagenNoticiaEditar"
+                      onchange="mostrarNombreImagenNoticiaEditar(this.value)" />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="text-center"><strong id="mostrarNombreImagenNoticiaEditar"><br></strong>
+                    <spam id="imagen-name-new-edit"></spam>
+                  </div>
+                </div>
+              </div>
+              <div class="row my-4 ">
+                <div class="col">
+                  <div class="text-center"><button type="submit" class="sinBorde">Enviar</button></div>
+
+                </div>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section><!-- End Contact Section -->
+
+
+
+
+<script>
+  // mostramos el titulo de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagenNoticiaEditar(value) {
+    document.getElementById('imagen-name-new-edit').innerHTML = value;
+    document.getElementById('mostrarNombreImagenNoticiaEditar').style.display = 'none';   
+    var iconoImagen = document.getElementById('iconoImagen');
+    iconoImagen.classList.remove("fa-image", "fa-6x", "addImagen");
+    iconoImagen.classList.add("fa-circle-check", "fa-6x", "imagenCargada");
+  }
+</script>

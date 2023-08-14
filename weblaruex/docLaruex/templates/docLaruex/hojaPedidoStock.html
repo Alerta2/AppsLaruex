@@ -1,0 +1,302 @@
+{% extends "base/base_docLaruex.html" %} {% load static %} {% block content %}
+
+
+<style>
+
+  /**------------------ CSS Botón Imprimir ----------------------*/
+    .cta {
+  position: relative;
+  margin: auto;
+  padding: 12px 18px;
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  }
+
+  .cta:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border-radius: 50px;
+  background: #b1dae7;
+  width: 45px;
+  height: 45px;
+  transition: all 0.3s ease;
+  }
+
+  .cta span {
+  position: relative;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #234567;
+  }
+
+  .cta svg {
+  position: relative;
+  top: 0;
+  margin-left: 10px;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke: #234567;
+  stroke-width: 2;
+  transform: translateX(-5px);
+  transition: all 0.3s ease;
+  }
+
+  .cta:hover:before {
+  width: 100%;
+  background: #b1dae7;
+  }
+
+  .cta:hover svg {
+  transform: translateX(0);
+  }
+
+  .cta:active {
+  transform: scale(0.95);
+  }
+
+/*---------------------- FIN -------------------------------*/
+
+/*-----------------------------------------------------*/
+/*           Configuración de la página                */
+/*-----------------------------------------------------*/
+  .borderless tr,
+  .borderless td,
+  .borderless th {
+    border: none !important;
+  }
+  /*
+  @page { 
+      size: A4 landscape;
+  }
+  
+  */
+  @page {
+    size: A4;
+    margin: 0.5cm;
+    counter-increment: page;
+    @bottom-right {
+      content: "Página " counter(page) " de " counter(pages);
+    }
+  }
+  @media print {
+    html, body {
+      width: 210mm;
+      height: 297mm;    
+    }  
+
+  /*
+    @page {
+      size: A4 portrait;
+      margin: 10mm;
+    }
+
+    .page-number:before {
+      content: "Página " counter(page) " de " counter(pages);
+    }
+
+   #pagecounter {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      font-size: 10pt;
+    }
+  */
+      table {
+      table-layout: auto;
+      width: 100%;
+    }
+
+    .subir{
+      display: none;
+    }
+
+    #suma, #resta, #colEliminar, #colEliminar2, #imprimir  {
+      visibility: hidden;
+      display: none;
+    }
+  }
+
+</style>
+
+    <div class="row">
+      <div class="col-3 d-flex justify-content-end ">
+        <img src="{% static 'niceAdminAssets' %}/img/laruex.png" class="img-fluid" alt="Responsive image"
+          style="max-width: 50%; max-height: 80%;">
+      </div>
+      <div class="col-6 d-flex justify-content-center">
+        <h5 class="card-title" style="color: #005f73; text-align: center;">Procedimiento para el suministro, adquisición y reposición de materiales y reactivos</h5>
+
+      </div>
+
+      <div class="col-3 d-flex justify-content-start my-auto">
+        <img src="{% static 'niceAdminAssets' %}/img/Alerta2.png" class="img-fluid" alt="Responsive image"
+        style="max-width: 60%; ">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        {% if id_almacen %}  
+        <h5 class="card-title fst-italic" style="color: #0a9396; text-align: center;">{{ubicacionActual.id__nombre}}</h5>
+        {% endif %}
+
+        {% if id_categoria %}       
+        <h5 class="card-title fst-italic" style="color: #0a9396; text-align: center;">{{categoriaActual.categoria}}</h5>
+        {% endif %}       
+        <button id="imprimir" class="cta" onclick="window.print()">
+          <span>Imprimir</span>
+          <svg viewBox="0 0 13 10" height="10px" width="15px">
+            <path d="M1,5 L11,5"></path>
+            <polyline points="8 1 12 5 8 9"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <!-- Tabla con la información más destacada del inventario-->
+    <div class="row mx-auto">
+   
+      <div class="col">
+        <table class="table table-sm my-4" style="margin-left: auto; margin-right: auto;" id="tabla-pedidos">
+          <thead>
+            <tr>
+              <th scope="col" style="color: #005f73;" class="text-center">Cantidad</th>
+              <th scope="col" style="color: #005f73;" class="text-center">Formato</th>
+              <th scope="col" style="color: #005f73;" class="text-center">Material</th>              
+              <th scope="col" style="color: #005f73;" class="text-center">Referencias</th>
+
+              <th scope="col" style="color: #005f73;" class="text-center">Distribuidor</th>
+              <th scope="col" style="color: #005f73;" class="text-center">Precio</th>
+              <th scope="col" style="color: #005f73;" class="text-center">¿Es urgente?</th>
+              <th scope="col" style="color: #005f73;" class="text-center">Observaciones</th>
+              <th scope="col" style="color: #005f73;" class="text-center" id="colEliminar"> </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for itemStock in itemsAlmacenes %}
+            <tr id="fila_{{ itemStock.id }}">
+              <td class="text-center align-middle"> 
+                <div class="row">
+                  <div id="resta" class="col-md-1 offset-md-1" onclick="resta('cantidad_{{ itemStock.id }}')">
+                    <i class="fa-solid fa-minus"style="color:#001219"></i>
+                  </div>
+                  <div class="col-md-1 offset-md-1" id="cantidad_{{ itemStock.id }}">{{ itemStock.min_cantidad|floatformat }}
+                  </div>
+                  <div id="suma" class="col-md-1 offset-md-1" onclick="suma('cantidad_{{ itemStock.id }}')">
+                    <i class="fa-solid fa-plus" style="color:#005f73"></i>
+                  </div>
+                </div>
+                
+              </td>
+
+              <td class="text-center align-middle">{{ itemStock.unidad__nombre }}</td>
+
+              <td class="text-center align-middle">{{ itemStock.item }}</td>
+              <td class="text-center align-middle">{{ itemStock.referencia }}</td>
+              <td class="text-center align-middle">{{ itemStock.cod_laruex }}</td>
+              <td class="text-center align-middle">{{ itemStock.cod_uex }}</td>
+
+              {% if itemStock.urgente == "1" %}
+              <td class="text-center align-middle">Si</td>
+              {% else %}
+              <td class="text-center align-middle">No</td>
+              {% endif %}
+
+              {% if itemStock.descripcion == None %}
+              <td class="text-center align-middle"></td>
+              {% else %}
+              <td class="text-center align-middle">{{ itemStock.descripcion }}</td>
+              {% endif %}
+              
+              <td class="text-center align-middle" id="colEliminar2">
+                <div onclick="eliminarFila('fila_{{ itemStock.id }}')"><i class="fa-solid fa-trash" style="color:9B2226"></i></div>
+              </td>
+            </tr>            
+            {% endfor %}
+
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+    
+    <div class="row" >
+      <div class="col-8 d-flex align-items-end justify-content-start">
+        <h5>Fecha de propuesta del pedido <strong>{% now "d" %} de {% now "F" %} de {% now "Y" %}</strong></h5>
+      </div>
+      <div class="col-4 d-flex justify-content-end">
+        <img src="{% static 'niceAdminAssets' %}/img/Sello_laruex.png" class="img-fluid" alt="Responsive image"
+          style=" max-width: 50%;">
+      </div>
+    </div>
+  </div>
+<script>
+
+  function suma(id){
+    console.log(id);
+    idElemento= "#"+id;
+    valor = parseFloat($(idElemento).text(), 10);
+    valor = valor + 1.0;
+    $(idElemento).text(valor);
+  }
+  
+  function resta(id){
+    console.log(id);
+    idElemento= "#"+id;
+    valor = parseFloat($(idElemento).text(), 10);
+    if (valor > 0)
+      valor = valor - 1.0;
+    $(idElemento).text(valor);
+  }
+
+  function eliminarFila(id){
+    idElemento= "#"+id;
+    $(idElemento).remove();
+  }
+
+  // Obtener la tabla y los botones de agregar y eliminar
+  const tablaPedidos = document.getElementById("tabla-pedidos");
+  const botonesAgregar = document.querySelectorAll(".btn-agregar");
+  const botonesEliminar = document.querySelectorAll(".btn-eliminar");
+
+  // Función para agregar unidades a un pedido
+  function agregarUnidad(event) {
+    const filaPedido = event.target.closest("tr"); // Obtener la fila del pedido
+    const inputCantidad = filaPedido.querySelector("input[type='number']"); // Obtener el input de cantidad
+    const cantidadActual = parseInt(inputCantidad.value); // Obtener la cantidad actual
+    inputCantidad.value = cantidadActual + 1; // Agregar una unidad
+  }
+
+  // Función para eliminar unidades de un pedido
+  function eliminarUnidad(event) {
+    const filaPedido = event.target.closest("tr"); // Obtener la fila del pedido
+    const inputCantidad = filaPedido.querySelector("input[type='number']"); // Obtener el input de cantidad
+    const cantidadActual = parseInt(inputCantidad.value); // Obtener la cantidad actual
+    if (cantidadActual > 1) { // Solo eliminar si hay más de una unidad
+      inputCantidad.value = cantidadActual - 1; // Eliminar una unidad
+    }
+  }
+
+  // Agregar eventos de clic a los botones de agregar y eliminar
+  botonesAgregar.forEach((boton) => {
+    boton.addEventListener("click", agregarUnidad);
+  });
+
+  botonesEliminar.forEach((boton) => {
+    boton.addEventListener("click", eliminarUnidad);
+  });
+
+
+</script>
+
+  
+
+
+<!--collapse con listado de equipos asociados a la estación -->
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends "public/template.html" %}
+{% load static %}
+
+
+{% block meta %}
+  <title{{ curso.titulo }}></title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+<style>
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: #1d8896;
+  }
+  
+  .addImagen:hover {
+    color: rgba(29, 136, 150, 10);
+    filter: brightness(80%);
+  }
+  
+  .imagenCargada{
+    color: #1d9678;
+  }
+  
+  .close:focus {
+    outline: none;
+  }
+
+  .checkboxDiv input[type="checkbox"]:checked{
+    
+    background-color: #1d8896 !important;
+    border: 2px solid #1d8896 !important;
+    color: #fff;
+    accent-color: #1d8896;
+  }
+
+  .imagenGrande{
+      border-radius: 10%;
+      
+      box-shadow: 0 3px 6px rgba(10, 20, 21, 0.5);
+    }
+
+
+  </style>
+
+<div class="my-5"></div>
+<!-- ======= noticia completa ======= -->
+<section id="about" class="about">
+  
+
+
+
+  {% if alerta %}
+  {% if alerta.tipo == "success" %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fa-solid fa-circle-check"></i> {{ alerta.mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% else %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fa-sharp fa-solid fa-circle-exclamation"></i> {{ alerta.mensaje }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endif %}
+{% endif %}
+
+  <div class="container" data-aos="fade-up">
+    <nav aria-label="breadcrumb" class="my-3 mx-auto" >
+      <ol class="breadcrumb" style="background-color: transparent;">
+        <li class="breadcrumb-item"><a href="\">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="\idi">Investigaciones</a></li>
+        {% if publicacion.tipo == "Tesis" %}
+        <li class="breadcrumb-item"><a href="\idi\Tesis">{{publicacion.tipo}}</a></li>
+        {% endif %}
+        {% if publicacion.tipo == "Proyecto" %}
+        <li class="breadcrumb-item"><a href="\idi\Proyecto">{{publicacion.tipo}}</a></li>
+        {% endif %}
+        {% if publicacion.tipo == "Publicación" %}
+        <li class="breadcrumb-item"><a href="\idi\Publicacion">{{publicacion.tipo}}</a></li>
+        {% endif %}
+        {% if publicacion.tipo == "Intercomparación" %}
+        <li class="breadcrumb-item"><a href="\idi\Intercomparacion">{{publicacion.tipo}}</a></li>
+        {% endif %}
+        <li class="breadcrumb-item active" aria-current="page">{{publicacion.titulo}}</li>
+      </ol>
+    </nav>
+
+    
+    <div class="section-title">
+      <h2>{{publicacion.tipo}}</h2>
+      <p style="font-size:20px;">{{publicacion.titulo}}</p>
+    </div>
+    <div class="row d-flex justify-content-sm-center ">
+      <div class="col-lg-6 col-xs-12 col-sm-12 pb-sm-3 order-1 d-flex justify-content-sm-center justify-content-lg-end pt-4" data-aos="fade-left" data-aos-delay="100">
+        <div>
+          <img src="{% static 'img/investigaciones/' %}{{ publicacion.imagen }}" class="img-fluid rounded my-2 imagenGrande" alt="" style="max-width: auto; max-height: 300px;" >
+          {% if publicacion.resumen %}
+          <p class="font-italic"><strong>Resumen</strong></p>
+          <p class="font-italic">{{publicacion.resumen|safe}}</p>      
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-6 col-xs-12 col-sm-12 order-2 pt-4 content get d-flex justify-content-sm-center justify-content-lg-start" id="contenidoNoticiaDiv">
+        <div>
+          <p class="font-italic"><strong>Información destacada</strong></p>
+          <p class="font-italic"><i class="fa-duotone fa-calendar mx-2" style="color: #1d8896"></i>{{ publicacion.fecha}}</p>
+
+          {% if publicacion.autor %}
+          <p class="font-italic"><i class="fa-duotone fa-user-tie mx-2" style="color: #1d8896"></i>{{ publicacion.autor }}</p>
+          {% endif %}
+          {% if publicacion.revista %}
+          <p class="font-italic"><i class="fa-duotone fa-book mx-2" style="color: #1d8896"></i>{{ publicacion.revista }}</p>
+          {% endif %}
+          
+          {% if publicacion.entidad_financiadora %}
+          <p class="font-italic"><i class="fa-duotone fa-hand-holding-dollar mx-2" style="color: #1d8896"></i>{{ publicacion.entidad_financiadora }}</p>
+          {% endif %}
+
+          <p class="font-italic"><i class="fa-duotone fa-circle-check mx-2" style="color: #1d8896"></i>{{ publicacion.seccion|title }}</p>
+          
+          {% if publicacion.informacion %}
+          <p class="font-italic"><strong>Información adicional</strong></p>
+          <p class="font-italic">{{publicacion.informacion|safe}}</p>      
+          {% endif %}
+
+
+        </div>
+      </div>
+    </div>
+
+    <div class="row my-3">
+      <div class="col d-flex justify-content-center">
+              
+        {% if user.is_superuser %}
+            <a href="{% url 'public:publicEditarPublicacion' id=publicacion.id %}" class="btn btn-outline-info my-auto" title="Editar Responsable" target="_blank"><span>Editar</span></a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section><!-- noticia completa -->
+
+
+
+{% endblock %}

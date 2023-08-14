@@ -1,0 +1,32 @@
+{% extends "base/base2.html" %}
+{% load static %}
+{% block title %}
+    Profile
+{% endblock %}
+
+{% block imports %}
+
+{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="m-5">
+        <h1>Editar perfil</h1>
+        <br/><br/>
+        <div class="form-group">
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-secondary">Actualizar Perfil</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    $('.btnright').hide();
+    $('.btnleft').hide();
+{% endblock %}

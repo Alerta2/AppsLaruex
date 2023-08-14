@@ -1,0 +1,172 @@
+{% extends "base/base_veiex.html" %}
+
+{% load static %}
+
+{% block imports %}
+<!-- Custom css home -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/home.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/clouds.css' %}">
+
+
+
+{% endblock %}
+
+{% block content %}
+<div class="ag-smoke-block section-dark">
+
+  <!-- Humo -->
+  <!-- https://codepen.io/wikyware-net/pen/MWmQOGa -->
+  <picture>
+    <img src="{% static 'img/veiex/portada/smoke_pink.png' %}" alt="smoke-pink" class="ag-smoke_img ag-smoke_img__left"
+      width="1920" height="1080">
+  </picture>
+  <picture>
+    <img src="{% static 'img/veiex/portada/smoke_blue.png' %}" alt="smoke-blue" class="ag-smoke_img ag-smoke_img__right"
+      width="1920" height="1080">
+  </picture>
+
+
+  <!-- Titulo Portada -->
+  <!--
+      <div class="section-title-portada">
+
+    <p data-aos="zoom-in" data-aos-duration="3000">
+      <span class="title-portada">VEIEX</span>
+      <br>
+      <span style=" font-size: 6vh; padding-top: 2%; font-family: 'PhoenixSans'; color: white; font-weight: lighter;">
+        Vigilancia de Emisiones Industriales a la Atmósfera</span>
+      <br>
+      <span style="font-size: 4vh; padding-top: 2%; font-weight: bold;">
+        <span style="color:lightgreen">Comunidad</span>
+        <span style="color:white"> Autónoma de </span>
+        <span style="color:rgb(27, 28, 28)">Extremadura</span>
+      </span>
+      <br>
+      <img class="bandera" src="{% static 'img/veiex/portada/extremadura.png' %}" />
+      <br>
+      
+    </p>
+    <a class="btn btn-primary btn-xl text-uppercase js-scroll-trigger button-portada" href="{% url 'veiex:MapaVeiex' %}"
+    onclick="LoadingAlerta2();" data-aos="zoom-in" data-aos-duration="3000">Datos en Tiempo Real</a>
+    
+  </div>
+</div>
+  -->
+  <div class="section-title-portada">
+
+    <h1 class="title-portada" data-aos="zoom-in" data-aos-offset="50" data-aos-duration="3000">VEIEX</h1>
+
+    <h2 style=" font-size: 6vh; padding-top: 2%; font-family: 'PhoenixSans'; color: white;" data-aos="zoom-in"
+      data-aos-offset="70" data-aos-duration="3000" data-aos-delay="500">Vigilancia de Emisiones Industriales a la Atmósfera</h2>
+
+    <p style="font-size: 4vh; padding-top: 2%;" data-aos="zoom-in" data-aos-offset="-200" data-aos-duration="3000" data-aos-delay="1000">
+      <span style="color:lightgreen">Comunidad</span>
+      <span style="color:white"> Autónoma de </span>
+      <span style="color:rgb(27, 28, 28)">Extremadura</span>
+    </p>
+
+    <img class="bandera" src="{% static 'img/veiex/portada/extremadura.png' %}" data-aos="zoom-in" data-aos-offset="-200" data-aos-duration="3000" data-aos-delay="1000"/><br>
+
+    <a class="btn btn-primary btn-xl text-uppercase js-scroll-trigger button-portada" href="{% url 'veiex:MapaVeiex' %}"
+      onclick="LoadingAlerta2();" data-aos="zoom-in" data-aos-offset="-200" data-aos-duration="3000" data-aos-delay="1500">Datos en Tiempo Real</a>
+  </div>
+
+</div>
+
+<!-- ======= Section LOGOS ======= -->
+<section id="logos" class="logos">
+  <div class="row" data-aos="zoom-in" style="width:100%; height:100%;padding:0; margin:0">
+    <div class=" col-6 d-flex align-items-center justify-content-center"
+      style="width:100%; height:100%;padding:0; margin:0">
+      <img src="{% static 'img/spd/logos/logo_laruex.png' %}" alt="">
+    </div>
+    <div class=" col-6 d-flex align-items-center justify-content-center"
+      style="width:100%; height:100%;padding:0; margin:0">
+      <img src="{% static 'img/spd/logos/logo_junta_extremadura.png' %}" alt="">
+    </div>
+  </div>
+</section><!-- End Section LOGOS -->
+
+<!-- Seccion Lema Veiex-->
+<section id="defobjetivo" class="section-dark">
+  <div class='container-clouds'>
+    <div class='clouds-1'></div>
+    <div class='clouds-2'></div>
+    <div class='clouds-3'></div>
+  </div>
+  <div class="container">
+    <h1 class="title-portada" data-aos="zoom-in" ata-aos-offset="50" data-aos-duration="3000" style="padding-top:60px;">
+      VEIEX</h1>
+    <h1 style="padding-bottom:60px; font-weight: bold;" data-aos="zoom-in" ata-aos-offset="50" data-aos-duration="3000">
+      “Un aire más limpio, un futuro más sano ”</h1>
+  </div>
+</section>
+<!-- Seccion Lema Veiex-->
+
+
+<!-- Seccion Contacto SPIDA-->
+<section id="contacto" class="section-light">
+  <div class="container">
+    <div class="section-title">
+      <h2 class="cursive-brush" style="color: #343a40;">Contacto</h2>
+    </div>
+
+    <div class="contact-info">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3079.5611384646245!2d-6.349758684483658!3d39.479242120041526!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd15e09e238e696b%3A0xa866be3b8ff6e847!2sALERTA2!5e0!3m2!1ses!2ses!4v1633772580822!5m2!1ses!2ses"
+        width="100%" height="400px" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+      <!--data-aos="zoom-in" ata-aos-offset="50" data-aos-duration="3000"-->
+      <div class="card">
+        <i class="fas fa-envelope icon-contact"></i>
+        <!--<i class="icon fas fa-envelope"></i>-->
+        <div class="card-content">
+          <h3>Email</h3>
+          <span><a
+              href="mailto:redalertaspida@gmail.com?Subject=Contactar%20con%20el%20servicio%20tecnico%20de%20la%20web%20Spida"
+              style="color: white; font-family:'Roboto', sans-serif;">redalertaspida@gmail.com</a></span>
+          <!--<span>redalertaspida@gmail.com</span>-->
+        </div>
+      </div>
+
+      <div class="card">
+        <i class="fas fa-phone icon-contact"></i>
+        <div class="card-content">
+          <h3>Teléfono</h3>
+          <span><a href="tel:+34927251492 " style="color: white; font-family:'Roboto', sans-serif;">927 25 14
+              92</a></span>
+          <!--<span>+34 927 257 153</span>-->
+        </div>
+      </div>
+
+      <div class="card">
+        <i class="fas fa-map-marker-alt icon-contact"></i>
+        <div class="card-content">
+          <h3>Localización</h3>
+          <span style="font-family:'Roboto', sans-serif;">Cáceres, España</span>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</section><!-- End Section Contacto SPIDA -->
+
+
+<!-- Seccion Copyright SPIDA-->
+<section id="derechosautor" class="section-dark">
+  <div class="container">
+    <p style="line-height : 25px; font-size: 16px; font-family:'Roboto', sans-serif;">
+      © Copyright 2021
+      <span class="text-alerta2" style="font-size: 22px;">alerta<span style="font-size: 25px; top: 0px;">2</span></span>
+      . Todos los derechos reservados.
+    </p>
+  </div>
+</section><!-- End Section Copyright SPIDA -->
+
+
+
+<!-- Animacion nubes -->
+<script type="text/javascript" src="{% static 'js/spd/clouds_spd.js' %}"></script>
+
+
+{% endblock %}

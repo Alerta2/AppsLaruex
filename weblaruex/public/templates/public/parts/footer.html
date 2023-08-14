@@ -1,0 +1,79 @@
+{% load static %}
+
+<!-- ======= Footer ======= -->
+
+{% include "public/parts/modal.html" %}
+
+<footer id="footer" >
+
+  <div class="footer-top">
+    <div class="container">
+      <div class="row">
+
+        <div class="col-lg-3 col-md-6 footer-contact">
+          <h3>LARUEX</h3>
+          <p>
+            Facultad de Veterinaria<br>
+            Avda. Universidad S/N<br>
+            10003 Cáceres <br><br>
+            <strong>Teléfonos:</strong><br> +34 927 251 389<br>+34 927 257 170<br><br>
+            <strong>Email:</strong><br> laruexcaceres@gmail.com
+          </p>
+        </div>
+
+        <div class="col-lg-2 col-md-6 footer-links">
+          <h4><br></h4>
+          <ul>
+            <li><i class="bx bx-chevron-right"></i> <a href="{% url 'public:publicHome' %}">Inicio</a></li>
+            <li><i class="bx bx-chevron-right"></i> <a href="{% url 'public:publicNuestraHistoria' %}">Nuestra Historia</a></li>
+            <li><i class="bx bx-chevron-right"></i> <a href="{% url 'public:publicNosotros' %}">Sobre Nosotros</a></li>
+            <li><i class="bx bx-chevron-right"></i> <a href="{% url 'public:publicMedidas' %}">Medidas destacadas</a></li>
+            <li><i class="bx bx-chevron-right"></i> <a href="{% url 'public:publicNoticias' %}">Noticias</a></li>
+            <li><i class="bx bx-chevron-right"></i> <a href="{% url 'public:publicPublicaciones' %}">I+D+I</a></li>
+            <li><i class="bx bx-chevron-right"></i> <a href="{% url 'public:publicContacto' %}">Contacto</a></li>
+
+            <!-- <li><i class="bx bx-chevron-right"></i> <a href="{% url 'public:publicPublicaciones' %}">Blog</a></li> -->
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-6 footer-links">
+          <h4><br></h4>
+          <ul>
+            <li><i class="bx bx-chevron-right"></i> <a href="https://www.unex.es/aviso-legal" target="_blank">Política de privacidad</a></li>
+            <li><i class="bx bx-chevron-right"></i> <a href="http://rarex.laruex.com">Acceso a RAREX</a></li>
+            <li><i class="bx bx-chevron-right"></i> <a href="http://spida.laruex.com">Acceso a Spida</a></li>
+            <li><i class="bx bx-chevron-right"></i> <a href="http://vraex.laruex.com">Acceso a VRAEX</a></li>            
+            <li><i class="bx bx-chevron-right"></i> <a href="{% url 'public:publicCursos' %}">Cursos</a></li>
+
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-6 footer-newsletter">
+          <h4>Descarga de Informes</h4>
+          <p>Introduce el código del informe. Podrás encontrarlo en tu e-mail.</p>
+          <form>
+            <input id="inputInforme" type="text" name="informe" placeholder="Informe">
+            <button type="button" id="activarModal" data-toggle="modal" data-target="#ModalInforme">Enviar</button>
+          </form>
+          <br>
+          <p>Si tienes alg&uacuten problema, contacte con nosotros a trav&eacutes del correo laruexcaceres@gmail.com</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="container d-md-flex py-4">
+
+    <div class="mr-md-auto text-center text-md-left">
+      <div class="copyright my-auto">
+        &copy; Copyright <strong><span>LARUEX</span></strong>. Todos los derechos reservados.
+      </div>
+    </div>
+    <div class="social-links text-center text-md-right pt-3 pt-md-0 my-auto">
+      <a href="https://twitter.com/laruexcc" target="_blank" class="twitter"><i class="bx bxl-twitter"></i></a>
+      <a href="https://www.youtube.com/channel/UCKAAFl7X0a-xpPRvkWPDjYA" target="_blank" class="youtube"><i class="bx bxl-youtube"></i></a>
+    </div>
+  </div>
+</footer><!-- End Footer -->
+

@@ -1,0 +1,1400 @@
+{% extends "base/base_calendario_guardias.html" %}
+{% load static %}
+{% block imports %}
+
+<!-- FullCalendar 5.10.1 -->
+<!-- https://fullcalendar.io/docs/initialize-globals -->
+<link rel="stylesheet" href="{% static 'css/calendario_guardias/fullcalendar.css' %}" />
+<script src="{% static 'js/calendario_guardias/fullcalendar.js' %}"></script>
+<script src="{% static 'js/calendario_guardias/fullcalendar_es.js' %}"></script>
+
+<!-- Tooltip eventos calendario -->
+<!-- https://popper.js.org/ -->
+<script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+<script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js"></script>
+
+<!-- Rolldate -->
+<!-- https://www.cssscript.com/mobile-ios-date-picker-rolldate/ -->
+<script type="text/javascript" src="{% static 'js/calendario_guardias/rolldate.js' %}"></script>
+
+<!-- HTML2CANVAS -->
+<!-- https://html2canvas.hertzen.com/ -->
+<script type="text/javascript" src="{% static 'js/calendario_guardias/html2canvas.min.js' %}"></script>
+<!-- JSPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Tree checkbox -->
+<!-- https://gijgo.com/tree/events/checkboxChange -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+<link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+
+<!-- flatpickr -->
+<!-- https://flatpickr.js.org/ -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+
+<!-- Custom css nuevo calendario -->
+<link rel="stylesheet" href="{% static 'css/calendario_guardias/visor_calendario.css' %}" />
+
+
+{% endblock %}
+{% block content %}
+<!-- Obtengo el id del usuario logueado como variable -->
+{{ request.user.id|json_script:"id_user_logged" }}
+
+
+{% if perms.auth.calendario_guardias_supervisor %}
+{{ "true" |json_script:"supervisor" }}
+{% else %}
+{{ "false" |json_script:"supervisor" }}
+{% endif %}
+
+<!-- VISOR DEL CALENDARIO -->
+<div class="container" style="margin-bottom: 20px; height: 100%; padding-top: 10px; padding-bottom: 10px;">
+    <div id='calendar'></div>
+</div>
+
+<div class="container">
+    <!-- Leyenda del Calendario -->
+    <div class="row"
+        style="padding-top:20px;padding-right: 20px; padding-left: 20px; align-items: center; justify-content: center; text-align:center;">
+        <h1 class="title-calendar">Leyenda</h1>
+        <!--Linea divisoria-->
+        <hr class="linea-hr" />
+        <div class="row">
+            {% for area in Areas %}
+            <div class="col-12 col-lg-3 col-md-6">
+                <i class="fa-solid fa-circle" style="width:20px; height:20px; color:{{area.color}};"></i>
+                <p style="color: #fff;"> <i class="{{area.icono}}" style="color:#fff; width:20px; height:20px;"></i>
+                    {{area.area}} <br> <span style="font-size: 12px">{{area.info}}</span></p>
+            </div>
+            {% endfor%}
+        </div>
+    </div>
+    <!-- END Leyenda del Calendario -->
+</div>
+
+
+<!-- Personal que se encuentra de guardia -->
+<div class="row"
+    style="padding-top:20px;padding-right: 20px; padding-left: 20px; align-items: center; justify-content: center; text-align:center;">
+    <h1 class="title-calendar">Personal de guardia</h1>
+    <!--Linea divisoria-->
+    <hr class="linea-hr" /> {% for personal in Personal %}
+    <div class="col-xl-2 col-lg-3 col-md-4 colum_card">
+        <div class="card">
+            <img src="{{personal.avatar}}" alt="">
+            <h5>{{personal.nombre}}</h5>
+            <i class="{{personal.icono}} fa-fade"></i>
+            <p style="margin-bottom: 0;">{{personal.area}}</p>
+            <p style="margin-bottom: 0;"><i class="fa-duotone fa-clock"></i> {{personal.hora_entrada}} a
+                {{personal.hora_salida}}
+            </p>
+            <a href="tel:{{personal.telefono}}" style="color: dodgerblue;"><i class="fa-solid fa-phone-volume"></i></a>
+
+        </div>
+    </div>
+    {% endfor%}
+</div>
+<!-- END Personal que se encuentra de guardia -->
+
+
+<div class="container">
+    <!-- Filtraciones del Calendario -->
+    <div class="row"
+        style="padding-bottom: 20px; align-items: center; justify-content: center; text-align:center;margin-bottom: 20px;">
+        <h1 class="title-calendar">Filtrar Calendario</h1>
+        <!--Linea divisoria-->
+        <hr class="linea-hr" />
+        <div class="col col-lg-6">
+            <!--<h1 class="title-calendar">Personal</h1>-->
+            <div
+                style="align-items: left; justify-content: left; vertical-align:middle; text-align:left; border-radius:30px; background:#fff; width: 100%;">
+                <div id="tree"></div>
+                <!--<div id="tree"></div>-->
+            </div>
+        </div>
+    </div>
+    <!-- END Filtraciones del Calendario -->
+</div>
+
+
+<script type="text/javascript">
+
+    const idUserLogged = JSON.parse(document.getElementById('id_user_logged').textContent);
+
+    /*FUNCION PARA IMPRIMIR EL CALENDARIO EN PDF*/
+    var pdf, page_section, HTML_Width, HTML_Height, top_left_margin, PDF_Width, PDF_Height, canvas_image_width, canvas_image_height;
+
+    function calculatePDF_height_width(selector, index) {
+        page_section = $(selector).eq(index);
+        HTML_Width = page_section.width();
+        HTML_Height = page_section.height();
+        top_left_margin = 15;
+        PDF_Width = HTML_Width + (top_left_margin * 2);
+        PDF_Height = HTML_Height + (top_left_margin * 2);
+        canvas_image_width = HTML_Width;
+        canvas_image_height = HTML_Height;
+    }
+</script>
+
+
+<script type="text/javascript">
+    var supervisor = JSON.parse(document.getElementById('supervisor').textContent);
+
+    var tree = $('#tree').tree({
+        primaryKey: 'id',
+        uiLibrary: 'bootstrap4',
+        checkboxes: true,
+        imageCssClassField: 'faCssClass',
+        cascadeCheck: true,
+        autoLoad: true,
+        dataSource: '../../../../private/calendario/guardia/datos/treeview/',
+    });
+    tree.on('dataBound', function () {
+        tree.checkAll();
+    });
+    tree.on('checkboxChange', function (e, $node, record, state) {
+        if (record.id == null) {
+            calendario.refetchEvents();
+        }
+    });
+
+</script>
+
+<script type="text/javascript">
+
+    var ColoresTurnos, ColoresUsuarios = undefined;
+
+    $.ajax({    //obtengo un listado que identifica a cada usuario dado de alta en el calendario de guardias con un color aleatorio
+        type: 'get',
+        url: "{% url 'calendario_guardias:getColoresTurnos' %}",
+        dataType: "json",
+        cache: false,
+        success: function (data) {
+            ColoresTurnos = data
+        }
+    })
+
+    $.ajax({    //obtengo un listado que identifica a cada usuario dado de alta en el calendario de guardias con un color aleatorio
+        type: 'get',
+        url: "{% url 'calendario_guardias:getColoresUsuarios' %}",
+        dataType: "json",
+        cache: false,
+        success: function (data) {
+            ColoresUsuarios = data
+        }
+    })
+
+
+    /*DEFINO EL CALENDARIO*/
+    document.addEventListener('DOMContentLoaded', function () {
+
+
+        if ($(window).width() < 900) {
+            initialViews = 'dayGridMonth';
+            lefts = 'prev';
+            centers = 'title';
+            rights = 'next';
+            footer = 'btnColores refreshCalendario imprimirCalendario today';
+        } else {
+            initialViews = 'dayGridMonth';
+            lefts = 'prevYear,prev';
+            centers = 'title';
+            rights = 'next,nextYear';
+            footer = 'btnColores refreshCalendario imprimirCalendario today dayGridMonth,listWeek,dayGridWeek,dayGridDay,vistaAnual'
+        }
+
+
+        var calendarEl = document.getElementById('calendar');
+
+        calendario = new FullCalendar.Calendar(calendarEl, {
+            schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+            locale: 'es',
+            timeZone: 'Europe/Madrid',
+            initialView: initialViews,
+            eventLimit: true,
+            displayEventTime: false,
+            fixedWeekCount: false, //para en la vista de un mes mostrar siempre 6 semanas
+            //showNonCurrentDates: false, //para ocultar los dias que no son del mes
+            themeSystem: 'bootstrap5',
+            weekNumbers: true,
+            weekNumberFormat: {
+                week: 'numeric',
+            },
+            views: {
+                dayGridMonth: {
+                    eventLimit: 3 // adjust to 6 only for timeGridWeek/timeGridDay
+                },
+                vistaYear: {
+                    type: 'dayGrid',
+                    duration: { year: 1 },
+                    buttonText: 'Año'
+                }
+            },
+            headerToolbar: {
+                left: lefts,
+                center: centers,
+                right: rights,
+            },
+            footerToolbar: {
+                right: footer,
+            },
+            customButtons: {
+                btnColores: {
+                    text: '',
+                    /*click: async function () {
+                        console.log("prueba")
+                        console.log($('#customSwitchColores').is(':checked'))
+                    }*/
+                },
+                listWeek: {
+                    text: 'Agenda',
+                    click: async function () {
+                        calendario.changeView('listWeek');
+                        console.log("AGENDA")
+                        calendario.refetchEvents();
+                    }
+                },
+                vistaAnual: {
+                    text: 'Año',
+                    click: async function () {
+                        calendario.changeView('vistaYear');
+                    }
+                },
+                refreshCalendario: {
+                    text: '',
+                    click: async function () {
+                        calendario.refetchEvents();
+                    }
+                },
+                imprimirCalendario: {
+                    text: '',
+                    click: async function () {
+
+                        const { value: yearExport } = await Swal.fire({
+                            title: 'Selecciona el año',
+                            html: '<input class="form-control" type="text" id="input-year" name="year" placeholder="Selecciona el año">',
+                            didOpen: () => {
+                                new Rolldate({
+                                    el: '#input-year',
+                                    format: 'YYYY',
+                                    //beginYear: new Date().getFullYear() - 2,
+                                    //endYear: new Date().getFullYear() + 1,
+                                    value: new Date().getFullYear(),
+                                    lang: {
+                                        title: 'Año',
+                                        cancel: 'Cancelar',
+                                        confirm: 'Confirmar'
+                                    }
+                                })
+                            }
+                        })
+
+                        if (yearExport) {
+                            var year = parseInt($('#input-year').val()) //Obtengo el año en el que quiero exportar el calendario a PDF
+                            calendario.changeView('dayGridMonth');
+
+                            var mensaje = Swal.fire({
+                                title: "Exportando Calendario a PDF...",
+                                html: "<p id='porcentajeExportPdf'>0%</p>",
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    swalcontent = Swal.getHtmlContainer().querySelector('p')
+                                    Swal.showLoading()
+
+                                    tree.checkAll();
+                                },
+                            })
+
+                            calculatePDF_height_width("#calendar", 0);
+                            $('.fc-toolbar-title').removeClass("title-calendar");
+                            $('.fc-toolbar-title').css("font-size", "1.75em");
+
+
+                            for (i = 0; i < 12; i++) {
+                                calendario.gotoDate(moment().year(year).month(i).startOf('month').format('YYYY-MM-DD'))
+
+                                if (i == 0) {
+                                    await html2canvas($("#calendar")[0], {
+                                        scale: 5,
+                                        allowTaint: true
+                                    }).then(function (canvas) {
+                                        var imgData = canvas.toDataURL("image/jpeg", 1.0);
+                                        pdf = new jspdf.jsPDF('l', 'pt', [PDF_Width, PDF_Height]);
+                                        pdf.addImage(imgData, 'JPG', top_left_margin, top_left_margin, HTML_Width, HTML_Height);
+                                    });
+                                } else {
+                                    await html2canvas($("#calendar")[0], {
+                                        scale: 5,
+                                        allowTaint: true
+                                    }).then(function (canvas) {
+                                        var imgData = canvas.toDataURL("image/jpeg", 1.0);
+                                        pdf.addPage([PDF_Width, PDF_Height]);
+                                        pdf.addImage(imgData, 'JPG', top_left_margin, top_left_margin, HTML_Width, HTML_Height);
+                                    });
+                                }
+
+                                $('#porcentajeExportPdf').html(Math.ceil((100 / 12) * (i + 1)) + '%')
+
+                            }
+
+                            $('.fc-toolbar-title').addClass("title-calendar");
+                            $('.fc-toolbar-title').css("font-size", "40px");
+                            mensaje.close();
+                            pdf.save('CALENDARIO_GUARDIAS_' + year + '_ALERTA2.pdf')
+                        }
+                    }
+                }
+            },
+            eventResize: function (info) {
+                $(".tooltip").css('visibility', 'hidden');
+            },
+            dayCellClassNames: function (arg) {
+                if (calendario.view.type == 'vistaYear') {
+                    if (arg.date.getMonth() % 2 == 0) {
+                        return ['mespar']
+                    } else {
+                        return ['mesimpar']
+                    }
+                }
+            },
+            dayCellContent: function (e) {
+                if (calendario.view.type == 'vistaYear') {
+                    if (e.dayNumberText == "1") {
+                        e.dayNumberText = e.dayNumberText.replace('1', moment(e.date).format('MMM').toUpperCase() + " 1");
+                    }
+                }
+            },
+            windowResize: function (view) {
+                /*var current_view = view.type;
+                var expected_view = $(window).width() > 800 ? 'dayGridMonth' : 'listWeek';
+                if (current_view !== expected_view) {
+                    calendario.changeView(expected_view);
+                }*/
+                if ($(window).width() < 900) {
+                    calendario.setOption('headerToolbar', {
+                        left: 'prev',
+                        center: 'title',
+                        right: 'next'
+                    })
+                    calendario.setOption('footerToolbar', {
+                        right: "btnColores refreshCalendario imprimirCalendario today"
+                    })
+                } else {
+                    calendario.setOption('headerToolbar', {
+                        left: 'prevYear,prev',
+                        center: 'title',
+                        right: 'next,nextYear'
+                    })
+                    calendario.setOption('footerToolbar', {
+                        right: "btnColores refreshCalendario imprimirCalendario today dayGridMonth,listWeek,dayGridWeek,dayGridDay,vistaAnual"
+                    })
+                }
+            },
+
+            eventSources: [
+                // Evento que carga los dias festivos y los representa en color verde
+                {
+                    url: "{% url 'calendario_guardias:getFestivos' %}",
+                    method: 'get',
+                    failure: function () {
+                        createAlert(' Opps! ...', 'Días Festivos', 'Se ha producido un error al consultar los días festivos en la base de datos, por lo que no serán mostrados en el calendario.', 'danger', true, false, 'pageMessages')
+                    },
+                    display: 'background',
+                    color: '#00FF7F',
+                    textColor: 'white'
+                },
+                // Evento que carga las guardias
+                {
+                    url: "{% url 'calendario_guardias:getGuardias' %}",
+                    method: 'get',
+                    failure: function () {
+                        createAlert(' Opps! ...', 'Guardias', 'Se ha producido un error al consultar las guardias en la base de datos, por lo que no serán mostrados en el calendario.', 'danger', true, false, 'pageMessages')
+                    },
+                    display: 'block',
+                    borderColor: '#fff',
+                    textColor: '#000000'
+                }
+
+            ],
+            loading: function (isLoading) {
+                if (isLoading) {
+                    $(".tooltip").css('visibility', 'hidden');
+                    showPreloaderAlerta2();
+                } else {
+                    showPreloaderAlerta2();
+                }
+            },
+            eventDataTransform: function (arg) {
+
+                if ($('#customSwitchColores').is(':checked')) { //Colores para diferenciar Usuarios
+                    if (arg.group == 'guardias' || arg.group == "sustitucion") {
+                        const color = ColoresUsuarios.filter(function (element) {
+                            return element.idUser == arg.idUser;
+                        });
+                        if (color.length > 0) {
+                            arg.backgroundColor = color[0].color;
+                            if (calendario.view.type == "listWeek") {
+                                arg.borderColor = color[0].color;
+                            }
+                        }
+                    }
+                }
+                else { //Colores para diferenciar Turnos de trabajo 
+                    if (arg.group == 'guardias' || arg.group == "sustitucion") {
+                        const color = ColoresTurnos.filter(function (element) {
+                            return element.idTurno == arg.turno;
+                        });
+                        if (color.length > 0) {
+                            arg.backgroundColor = color[0].color;
+                            if (calendario.view.type == "listWeek") {
+                                arg.borderColor = color[0].color;
+                            }
+                        }
+                    }
+                }
+            },
+            eventContent: function (info) { //Cambio el texto que se muestra en el evento por ICONO AREA + NOMBRE ANALISTA
+                switch (info.event.extendedProps.group) {
+                    case 'guardias':
+                        return {
+                            html: '&nbsp<i class="' + info.event.extendedProps.icono + '"></i>&nbsp' +
+                                '<img src="' + info.event.extendedProps.avatar + '" alt="" ' +
+                                'style="width:20px; height:20px; border-radius:50%; object-fit: cover;"/>&nbsp' +
+                                info.event.extendedProps.nameUser
+                        };
+                    case 'sustitucion':
+                        return {
+                            html: '&nbsp<i class="' + info.event.extendedProps.icono + '"></i>&nbsp' +
+                                '<img src="' + info.event.extendedProps.avatar + '" alt="" ' +
+                                'style="width:20px; height:20px; border-radius:50%; object-fit: cover;"/>&nbsp' +
+                                info.event.extendedProps.nameUser
+                        };
+                    default:
+                        return {
+                            html: ''//info.event.title
+                        };
+                }
+            },
+
+            eventDidMount: function (info) {
+                if (info.event.extendedProps.group == "guardias" || info.event.extendedProps.group == "sustitucion") {
+                    var nodes = tree.getCheckedNodes();
+                    if (nodes.includes(info.event.extendedProps.idArea + "-" + info.event.extendedProps.idUser)) {
+                        info.event.setProp("display", "block");
+                    } else {
+                        info.event.setProp("display", "none");
+                    }
+                }
+
+                switch (info.event.extendedProps.group) {
+                    case 'guardias':
+                        var tooltip = new Tooltip(info.el, {
+                            title: '<img src="' + info.event.extendedProps.avatar + '" alt="" ' +
+                                'style="width:70px; height:70px; border-radius:50%; object-fit: cover;"/><br>' +
+                                info.event.extendedProps.nameUser +
+                                '<br><b><i class="' + info.event.extendedProps.icono + '"></i>&nbsp' +
+                                info.event.extendedProps.nameArea + '</b>' +
+                                '<br>' + moment(info.event.extendedProps.hora_inicio, 'HH:mm:ss').format('HH:mm') +
+                                ' a ' + moment(info.event.extendedProps.hora_fin, 'HH:mm:ss').format('HH:mm') + ' h',
+                            html: true,
+                            placement: 'top',
+                            trigger: 'hover',
+                            container: 'body'
+                        });
+                        break;
+                    case 'sustitucion':
+                        var tooltip = new Tooltip(info.el, {
+                            title: '<img src="' + info.event.extendedProps.avatar + '" alt="" ' +
+                                'style="width:70px; height:70px; border-radius:50%; object-fit: cover;"/><br>' +
+                                info.event.extendedProps.nameUser +
+                                '<br><b>(Sustituto)' +
+                                '<br><b><i class="' + info.event.extendedProps.icono + '"></i>&nbsp' +
+                                info.event.extendedProps.nameArea + '</b>' +
+                                '<br>' + moment(info.event.extendedProps.hora_inicio, 'HH:mm:ss').format('HH:mm') +
+                                ' a ' + moment(info.event.extendedProps.hora_fin, 'HH:mm:ss').format('HH:mm') + ' h',
+                            html: true,
+                            placement: 'top',
+                            trigger: 'hover',
+                            container: 'body'
+                        });
+                        break;
+                    default:
+                        var tooltip = new Tooltip(info.el, {
+                            title: info.event.title,
+                            placement: 'top',
+                            trigger: 'hover',
+                            container: 'body'
+                        });
+                        break;
+                }
+                /*if (info.event.extendedProps.group == "guardias") {
+                    var tooltip = new Tooltip(info.el, {
+                        title: '<img src="' + info.event.extendedProps.avatar + '" alt="" ' +
+                            'style="width:70px; height:70px; border-radius:50%; object-fit: cover;"/><br>' +
+                            info.event.extendedProps.nameUser +
+                            '<br><b><i class="' + info.event.extendedProps.icono + '"></i>&nbsp' +
+                            info.event.extendedProps.area + '</b>' +
+                            '<br>De ' + moment(info.event.extendedProps.hora_inicio, 'HH:mm:ss').format('HH:mm') +
+                            ' a ' + moment(info.event.extendedProps.hora_fin, 'HH:mm:ss').format('HH:mm') + ' h',
+                        html: true,
+                        placement: 'top',
+                        trigger: 'hover',
+                        container: 'body'
+                    });
+                }
+                else {
+                    var tooltip = new Tooltip(info.el, {
+                        title: info.event.title,
+                        placement: 'top',
+                        trigger: 'hover',
+                        container: 'body'
+                    });
+                }*/
+            },
+            eventClick: function (info) {
+                /*------------------- EVENTO CLICK SOBRE UNA GUARDIA ----------------------*/
+                /* Permito solicitar cambios (de semana o puntuales de un día) solo si el 
+                usuario de la guardia es el mismo que el logueado y solo si la fecha de comienzo
+                del evento es mayor que el día actual */
+
+                infoEventChange = info;
+
+                if (info.event.extendedProps.idUser == idUserLogged && info.event.end >= moment()) {
+                    if (info.event.extendedProps.group == "guardias") {
+                        var addButonCambio = ""
+                        if (info.event.start > moment()) {
+                            addButonCambio = '<button type="button" role="button" tabindex="0" class="btnCambio customSwalBtn">' + 'Solicitar cambio de semana' + '</button>'
+                        }
+                        Swal.fire({
+                            title: info.event.extendedProps.analista,
+                            color: "#000000",
+                            background: info.event.backgroundColor,
+                            html: '<img src="' + info.event.extendedProps.avatar + '" alt="" style="width:100px; height:100px; border-radius:50%; object-fit: cover;margin-bottom:10px"/>' +
+                                '<h3>' + info.event.extendedProps.nameUser + '</h3>' +
+                                'Analista de guardia' +
+                                ' desde el ' + moment(info.event.start).format('dddd, ll') +
+                                ' hasta el ' + moment(info.event.end).add(-1, 'days').format('dddd, ll') +
+                                ' en el área de ' + info.event.extendedProps.nameArea + '&nbsp<i class="' + info.event.extendedProps.icon + '"></i>' +
+                                ' en el turno de ' + moment(info.event.extendedProps.hora_inicio, "HH:mm").format('HH:mm') + 'h a ' + moment(info.event.extendedProps.hora_fin, "HH:mm").format('HH:mm') + 'h' +
+                                "<br>" +
+                                '<button type="button" role="button" tabindex="0" class="btnSustitucion customSwalBtn">' + 'Solicitar suplente' + '</button><br>' +
+                                addButonCambio,
+                            showConfirmButton: false,
+                            timer: 100000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        })
+                    }
+                }
+                if (((info.event.extendedProps.idUser == idUserLogged || info.event.extendedProps.idUserMod == idUserLogged) && info.event.end >= moment())) {
+
+                    if (info.event.extendedProps.group == "sustitucion") {
+
+                        Swal.fire({
+                            title: info.event.extendedProps.analista,
+                            color: "#000000",
+                            background: info.event.backgroundColor,
+                            html: '<img src="' + info.event.extendedProps.avatar + '" alt="" style="width:100px; height:100px; border-radius:50%; object-fit: cover;margin-bottom:10px"/>' +
+                                '<h3>' + info.event.extendedProps.nameUser + '</h3>' +
+                                'Analista de guardia' +
+                                ' el ' + moment(info.event.start).format('dddd, ll') +
+                                ' en el área de ' + info.event.extendedProps.nameArea + '&nbsp<i class="' + info.event.extendedProps.icon + '"></i>' +
+                                ' en el turno de ' + moment(info.event.extendedProps.hora_inicio, "HH:mm").format('HH:mm') + 'h a ' + moment(info.event.extendedProps.hora_fin, "HH:mm").format('HH:mm') + 'h' +
+                                "<br>" +
+                                '<button type="button" role="button" tabindex="0" class="btnEliminar customSwalBtn">' + 'Eliminar' + '</button><br>',
+                            showConfirmButton: false,
+                            timer: 100000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                            }
+                        })
+                    }
+                }
+                if (info.event.extendedProps.idUser != idUserLogged && supervisor == "true" && info.event.end >= moment()) {
+                    if (info.event.extendedProps.group == "guardias") {
+                        showPreloaderAlerta2()
+                        var addButonCambioSupervisor = ""
+                        var addButonSustitucionVoluntaria = ""
+                        console.log("INFO1", info.event.extendedProps, info.event.extendedProps.idArea)
+                        console.log("INFO2", infoEventChange.event.extendedProps, infoEventChange.event.extendedProps.idArea)
+
+                        $.ajax({
+                            url: "{% url 'calendario_guardias:getAnalistasArea'%}?a=" + info.event.extendedProps.idArea,
+                            type: "GET",
+                            dataType: "json",
+                            success: function (data) {
+
+                                //Obtengo si el usuario logueado pertenece al área en el que quiere hacer un cambio voluntario
+                                /*console.log(idUserLogged.toString())
+                                console.log(JSON.parse(data))
+                                console.log(JSON.stringify(JSON.parse(data), [idUserLogged]))*/
+                                if (JSON.stringify(JSON.parse(data), [idUserLogged]) != "{}") {
+                                    addButonSustitucionVoluntaria = '<button type="button" role="button" tabindex="0" class="btnSustitucionSupervisor customSwalBtn">' + 'Quiero hacerle un día' + '</button><br>'
+                                }
+
+                                if (info.event.start > moment()) {
+                                    addButonCambioSupervisor = '<button type="button" role="button" tabindex="0" class="btnCambioSupervisor customSwalBtn">' + 'Cambiar guardia' + '</button><br>'
+                                }
+
+                                showPreloaderAlerta2()
+
+                                if (addButonSustitucionVoluntaria != "" || addButonCambioSupervisor != "") {
+                                    Swal.fire({
+                                        title: info.event.extendedProps.analista,
+                                        color: "#000000",
+                                        background: info.event.backgroundColor,
+                                        html: '<img src="' + info.event.extendedProps.avatar + '" alt="" style="width:100px; height:100px; border-radius:50%; object-fit: cover;margin-bottom:10px"/>' +
+                                            '<h3>' + info.event.extendedProps.nameUser + '</h3>' +
+                                            'Analista de guardia' +
+                                            ' desde el ' + moment(info.event.start).format('dddd, ll') +
+                                            ' hasta el ' + moment(info.event.end).add(-1, 'days').format('dddd, ll') +
+                                            ' en el área de ' + info.event.extendedProps.nameArea + '&nbsp<i class="' + info.event.extendedProps.icon + '"></i>' +
+                                            ' en el turno de ' + moment(info.event.extendedProps.hora_inicio, "HH:mm").format('HH:mm') + 'h a ' + moment(info.event.extendedProps.hora_fin, "HH:mm").format('HH:mm') + 'h' +
+                                            "<br>" +
+                                            addButonSustitucionVoluntaria +
+                                            addButonCambioSupervisor,
+                                        showConfirmButton: false,
+                                        timer: 100000,
+                                        timerProgressBar: true,
+                                        didOpen: (toast) => {
+                                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                        }
+                                    })
+                                }
+                            }
+                        })
+
+                    }
+                }
+
+            }
+        });
+
+        calendario.render();
+
+        tree.checkAll();
+
+        /*MODIFICO EL ESTILO DEL TITULO DEL CALENDARIO*/
+        $('.fc-toolbar-title').addClass("title-calendar");
+        $('.fc-toolbar-title').css("font-size", "40px");
+
+        /*AÑADO EL ICONO PDF EN EL BOTON DE IMPRIMIR CALENDARIO*/
+        $(".fc-imprimirCalendario-button").html('<i class="fa-solid fa-file-pdf"></i>');
+
+        $(".fc-btnColores-button").html('<div class="custom-control custom-switch">' +
+            '<input type="checkbox" class="custom-control-input" id="customSwitchColores">' +
+            '<label class="custom-control-label" for="customSwitchColores">Colores</label>' +
+            '</div>');
+
+        /*AÑADO EL ICONO DE ACTUALIZAR EN EL BOTON DE ACTUALIZAR CALENDARIO*/
+        $(".fc-refreshCalendario-button").html('<i class="fa-solid fa-arrows-rotate"></i>');
+
+    });
+
+
+    $(document).on('change', 'input:checkbox[id^="customSwitchColores"]', function (event) {
+        calendario.refetchEvents();
+    });
+
+</script>
+
+
+<script type="text/javascript">
+    /*--------------------- PEDIR SUSTITUCIÖN DE UNA GUARDIA --------------------*/
+    //Pido la información necesaria para registrar/notificar la sustitución de una guardia
+    //1. Selecciono el día en el que quiero que me sustituyan
+    //2. Selecciono el analista que quiero que me sustituya
+    //3. Selecciono el turno de trabajo en el que deseo que me sustituya
+    //Finalmente registro en la base de datos la sustitución para que posteriormente sea
+    //aceptada por la persona requerida
+    /*------------------------------------------------------------------------------*/
+    $(document).on('click', '.btnSustitucion', function () {
+        (async () => {
+            const steps = ['1', '2', '3']
+            const Queue = Swal.mixin({
+                showCancelButton: true,
+                confirmButtonText: 'Siguiente <i class="fa-solid fa-circle-arrow-right"></i>',
+                cancelButtonText: '<i class="fa-solid fa-circle-left"></i> Atrás',
+                reverseButtons: true,
+                progressSteps: steps,
+                inputAttributes: {
+                    required: true
+                },
+                validationMessage: 'Este campo es requerido!'
+            })
+
+            const values = []
+            let currentStep
+
+            for (currentStep = 0; currentStep < steps.length;) {
+                var result = null
+
+                switch (currentStep) {
+                    case 0: //Selecciono el día de sustitucion
+                        result = await Queue.fire({
+                            title: 'Por favor selecciona un día',
+                            html: '<input class="swal2-input" id="expiry-date" style="display:none">',
+                            stopKeydownPropagation: false,
+                            showCancelButton: currentStep > 0,
+                            currentProgressStep: 0,
+                            inputValue: values[currentStep],
+                            preConfirm: () => {
+                                if (infoEventChange.event.start <= flatpickrInstance.selectedDates[0] && flatpickrInstance.selectedDates < infoEventChange.event.start) {
+                                    Swal.showValidationMessage('No puede solicitar un sustituto de guardia fuera del rango')
+                                }
+                                if (flatpickrInstance.selectedDates[0] == undefined) {
+                                    Swal.showValidationMessage(`Es obligatorio fijar el día que desea solicitar un sustituto de guardia`)
+                                }
+                            },
+                            willOpen: () => {
+                                flatpickrInstance = flatpickr(
+                                    Swal.getPopup().querySelector('#expiry-date'), {
+                                    minDate: (moment().format('YYYY-MM-DD') > moment(infoEventChange.event.start).format('YYYY-MM-DD')) ? moment().format('YYYY-MM-DD') : moment(infoEventChange.event.start).format('YYYY-MM-DD'),
+                                    maxDate: moment(infoEventChange.event.end).add(-1, 'days').format('YYYY-MM-DD'),
+                                    inline: true,
+                                    "locale": "es",
+                                }
+                                )
+                            }
+                        });
+                        break;
+                    case 1: //selecciono la persona que va a realizar la sustitución
+                        result = await Queue.fire({
+                            title: 'Selecciona la persona que va a realizar la sustitución',
+                            input: 'radio',
+                            inputOptions: new Promise(function (resolve) {
+                                $.getJSON("{% url 'calendario_guardias:getSustituto' %}?a=" + infoEventChange.event.extendedProps.idArea + "&u=" + infoEventChange.event.extendedProps.idUser, function (data) {
+                                    resolve(JSON.parse(data))
+                                });
+                            }),
+                            inputValidator: (value) => {
+                                if (!value) {
+                                    return 'Necesitas seleccionar un susituto'
+                                }
+                            },
+                            inputPlaceholder: 'Selecciona el sustituto',
+                            showCancelButton: currentStep > 0,
+                            currentProgressStep: 1,
+                            inputValue: values[currentStep],
+                        });
+                        break;
+                    case 2: //Selecciono el turno de trabajo de la sustitución
+                        result = await Queue.fire({
+                            title: 'Seleccione el turno de trabajo',
+                            input: 'select',
+                            inputOptions: new Promise(function (resolve) {
+                                $.getJSON("{% url 'calendario_guardias:getTurnosArea' %}?a=" + infoEventChange.event.extendedProps.idArea, function (data) {
+                                    resolve(JSON.parse(data))
+                                });
+                            }),
+                            inputPlaceholder: 'Selecciona el turno de permanencia',
+                            showCancelButton: currentStep > 0,
+                            currentProgressStep: 2,
+                            inputValue: values[currentStep],
+                        })
+                        break;
+                }
+
+
+
+                if (result.value) {
+                    if (currentStep == 0) {
+                        values[currentStep] = moment(flatpickrInstance.selectedDates[0]).format('YYYY-MM-DD')
+                    } else {
+                        values[currentStep] = result.value
+                    }
+                    currentStep++
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    currentStep--
+                } else {
+                    break
+                }
+            }
+
+            if (currentStep === steps.length) { //Registro la nueva petición de sustitución realizada
+                //Swal.fire(JSON.stringify(values))
+                $.ajax({
+                    url: "{% url 'calendario_guardias:setSustitucion'%}?g=" + infoEventChange.event.extendedProps.id_guardia + "&f=" + values[0] + "&u=" + values[1] + "&t=" + values[2],
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        Swal.fire({
+                            title: data.title,
+                            html: '<p style="font-size:15px"><i class="fa-solid fa-info fa-beat" style="--fa-beat-scale: 1.4;"></i> ' + data.text + '</p>',
+                            icon: data.icon,
+                            timer: 15000,
+                            timerProgressBar: true
+                        })
+                    }
+                })
+            }
+        })()
+
+    });
+</script>
+
+
+<script>
+    /*------------------- PEDIR UN CAMBIO DE GUARDIA COMPLETO --------------------
+    ------------------------------------------------------------------------------*/
+    $(document).on('click', '.btnCambio', function () {
+
+        Swal.fire({
+            title: 'Selecciona el cambio',
+            color: "#000000",
+            background: infoEventChange.event.backgroundColor,
+            html: '<div id="calendarCambios" style="width:100%"></div>',
+            showConfirmButton: false,
+            timer: 100000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                Swal.showLoading();
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+
+                var calendarioCambios = document.getElementById('calendarCambios');
+
+                var calendarCambios = new FullCalendar.Calendar(calendarioCambios, {
+                    schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+                    locale: 'es',
+                    timeZone: 'Europe/Madrid',
+                    initialView: 'dayGridMonth',
+                    eventDurationEditable: false,
+                    eventLimit: true,
+                    views: {
+                        dayGridMonth: {
+                            eventLimit: 1 // adjust to 6 only for timeGridWeek/timeGridDay
+                        }
+                    },
+                    fixedWeekCount: false,
+                    height: "auto",
+                    contentHeight: "auto",
+                    weekNumbers: false,
+                    weekNumberFormat: {
+                        week: 'numeric',
+                    },
+                    headerToolbar: {
+                        left: 'prev',
+                        center: 'title',
+                        right: 'next',
+                    },
+                    eventSources: [
+
+                        // Evento que carga los dias festivos y los representa en color verde
+                        {
+                            url: "{% url 'calendario_guardias:getFestivos' %}",
+                            method: 'get',
+                            failure: function () {
+                                createAlert(' Opps! ...', 'Días Festivos', 'Se ha producido un error al consultar los días festivos en la base de datos, por lo que no serán mostrados en el calendario.', 'danger', true, false, 'pageMessages')
+                            },
+                            display: 'background',
+                            color: '#00FF7F', // a non-ajax option
+                        },
+                        // Evento que carga las guardias
+                        {
+                            url: "{% url 'calendario_guardias:getGuardiasCambios' %}?a=" + infoEventChange.event.extendedProps.idArea + "&u=" + infoEventChange.event.extendedProps.idUser + "&t=" + infoEventChange.event.extendedProps.turno,
+                            method: 'get',
+                            failure: function () {
+                                createAlert(' Opps! ...', 'Guardias', 'Se ha producido un error al consultar mis guardias en la base de datos, por lo que no serán mostradas en el calendario.', 'danger', true, false, 'pageMessages')
+                            },
+                            display: 'block',
+                            borderColor: '#fff',
+                            textColor: '#000000'
+                        }
+
+                    ],
+                    loading: function (isLoading, view, info) {
+
+                        if (isLoading) {
+                            Swal.showLoading();
+                            $("#calendarCambios").css('visibility', 'hidden ')
+                        } else {
+                            Swal.hideLoading();
+                            $("#calendarCambios").css('visibility', 'visible')
+                        }
+                    },
+                    eventContent: function (info) { //Cambio el texto que se muestra en el evento por ICONO AREA + NOMBRE ANALISTA
+                        if (info.event.extendedProps.group == "guardias") {
+                            return {
+                                html: '&nbsp<img src="' + info.event.extendedProps.avatar + '" alt="" style="width:20px; height:20px; border-radius:50%; object-fit: cover;"/>&nbsp' + info.event.extendedProps.nameUser
+                            };
+                        }
+                        if (info.event.extendedProps.group == undefined) {
+                            return {
+                                //html: "&nbsp<i class='" + info.event.extendedProps.icon + "' ></i> &nbsp" + info.event.title
+                                html: ""
+                            };
+                        }
+                    },
+                    eventClick: function (info) {
+                        //Permito solicitar cambios solo si el usuario de la guardia es el mismo que el logueado
+
+                        if (info.event.extendedProps.group == "guardias") {
+                            Swal.fire({
+                                title: '¿Estas seguro?',
+                                icon: 'warning',
+                                color: "#000000",
+                                background: infoEventChange.event.backgroundColor,
+                                html: 'A continuación vas a solicitar a <b>' + info.event.extendedProps.nameUser +
+                                    '</b> un cambio de guardias perteneciente al área de ' + info.event.extendedProps.nameArea +
+                                    '&nbsp<i class="' + info.event.extendedProps.icon + '"></i>',
+                                showConfirmButton: true,
+                                confirmButtonText: 'Solicitar cambio',
+                                timer: 100000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
+                            }).then((result) => {
+                                //SI CONFIRMO QUE DESEO REALIZAR EL CAMBIO DE GUARDIA...
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        url: "{% url 'calendario_guardias:setCambioGuardia'%}?e=" + infoEventChange.event.extendedProps.id_guardia + "&r=" + info.event.extendedProps.id_guardia,
+                                        type: "GET",
+                                        dataType: "json",
+                                        success: function (data) {
+                                            Swal.fire({
+                                                title: data.title,
+                                                text: data.text,
+                                                icon: data.icon,
+                                                timer: 10000,
+                                                timerProgressBar: true
+                                            })
+                                        }
+                                    })
+                                }
+
+                            })
+                        }
+
+                    },
+                    validRange: {
+                        start: moment().format('YYYY-MM-DD'),
+                    }
+                });
+                calendarCambios.render();
+                $('.fc-toolbar-title').addClass("title-calendar");
+                $('.fc-toolbar-title').css("font-size", "40px");
+            }
+        })
+
+    });
+
+
+
+    /* Eliminar una sustitucion si soy el emisor o el receptor de la misma */
+    $(document).on('click', '.btnEliminar', function () {
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            icon: 'warning',
+            text: 'A continuación vas a eliminar una sustitucion del calendario de guardias no pudiendo revertir los cambios.',
+            showCancelButton: true,
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Continuar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            timer: 100000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        }).then((result) => {
+            //SI CONFIRMO QUE DESEO REALIZAR EL CAMBIO DE GUARDIA...
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{% url 'calendario_guardias:setEliminarSustitucion'%}?g=" + infoEventChange.event.extendedProps.id_guardia,
+                    type: "GET",
+                    dataType: "json",
+                    success: function (data) {
+                        calendario.refetchEvents();
+                        Swal.fire({
+                            title: data.title,
+                            text: data.text,
+                            icon: data.icon,
+                            timer: 10000,
+                            timerProgressBar: true
+                        })
+                    }
+                })
+            }
+        });
+    });
+
+    /*------ REALIZA UN CAMBIO DE GUARDIA SIN NECESIDAD DE PEDIR CONFIRMACION (SUPERVISOR) ------
+    --------------------------------------------------------------------------------------------*/
+    $(document).on('click', '.btnCambioSupervisor', function () {
+        Swal.fire({
+            title: 'Selecciona el cambio',
+            color: "#000000",
+            background: infoEventChange.event.backgroundColor,
+            html: '<div id="calendarCambios" style="width:100%"></div>',
+            showConfirmButton: false,
+            timer: 100000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                Swal.showLoading();
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+
+                var calendarioCambios = document.getElementById('calendarCambios');
+
+                var calendarCambios = new FullCalendar.Calendar(calendarioCambios, {
+                    schedulerLicenseKey: 'CC-Attribution-NonCommercial-NoDerivatives',
+                    locale: 'es',
+                    timeZone: 'Europe/Madrid',
+                    initialView: 'dayGridMonth',
+                    eventDurationEditable: false,
+                    eventLimit: true,
+                    views: {
+                        dayGridMonth: {
+                            eventLimit: 1 // adjust to 6 only for timeGridWeek/timeGridDay
+                        }
+                    },
+                    fixedWeekCount: false,
+                    height: "auto",
+                    contentHeight: "auto",
+                    weekNumbers: false,
+                    weekNumberFormat: {
+                        week: 'numeric',
+                    },
+                    headerToolbar: {
+                        left: 'prev',
+                        center: 'title',
+                        right: 'next',
+                    },
+                    eventSources: [
+
+                        // Evento que carga los dias festivos y los representa en color verde
+                        {
+                            url: "{% url 'calendario_guardias:getFestivos' %}",
+                            method: 'get',
+                            failure: function () {
+                                createAlert(' Opps! ...', 'Días Festivos', 'Se ha producido un error al consultar los días festivos en la base de datos, por lo que no serán mostrados en el calendario.', 'danger', true, false, 'pageMessages')
+                            },
+                            display: 'background',
+                            color: '#00FF7F', // a non-ajax option
+                        },
+                        // Evento que carga las guardias
+                        {
+                            url: "{% url 'calendario_guardias:getGuardiasCambios' %}?a=" + infoEventChange.event.extendedProps.idArea + "&u=" + infoEventChange.event.extendedProps.idUser + "&t=" + infoEventChange.event.extendedProps.turno,
+                            method: 'get',
+                            failure: function () {
+                                createAlert(' Opps! ...', 'Guardias', 'Se ha producido un error al consultar mis guardias en la base de datos, por lo que no serán mostradas en el calendario.', 'danger', true, false, 'pageMessages')
+                            },
+                            display: 'block',
+                            borderColor: '#fff',
+                            textColor: '#000000'
+                        }
+
+                    ],
+                    loading: function (isLoading, view, info) {
+
+                        if (isLoading) {
+                            Swal.showLoading();
+                            $("#calendarCambios").css('visibility', 'hidden ')
+                        } else {
+                            Swal.hideLoading();
+                            $("#calendarCambios").css('visibility', 'visible')
+                        }
+                    },
+                    eventContent: function (info) { //Cambio el texto que se muestra en el evento por ICONO AREA + NOMBRE ANALISTA
+                        if (info.event.extendedProps.group == "guardias") {
+                            return {
+                                html: '&nbsp<img src="' + info.event.extendedProps.avatar + '" alt="" style="width:20px; height:20px; border-radius:50%; object-fit: cover;"/>&nbsp' + info.event.extendedProps.nameUser
+                            };
+                        }
+                        if (info.event.extendedProps.group == undefined) {
+                            return {
+                                //html: "&nbsp<i class='" + info.event.extendedProps.icon + "' ></i> &nbsp" + info.event.title
+                                html: ""
+                            };
+                        }
+                    },
+                    eventClick: function (info) {
+                        
+
+                        if (info.event.extendedProps.group == "guardias") {
+                            Swal.fire({
+                                title: '¿Estas seguro?',
+                                icon: 'warning',
+                                color: "#000000",
+                                background: infoEventChange.event.backgroundColor,
+                                html: 'A continuación vas a realizar un cambio de guardia entre <b>' +
+                                    infoEventChange.event.extendedProps.nameUser + "</b> y <b>" + info.event.extendedProps.nameUser +
+                                    '</b>, analistas pertenecientes al área de ' + info.event.extendedProps.nameArea +
+                                    '&nbsp<i class="' + info.event.extendedProps.icon + '"></i>',
+                                showConfirmButton: true,
+                                confirmButtonText: 'Guardar cambio',
+                                timer: 100000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                }
+                            }).then((result) => {
+                                //SI CONFIRMO QUE DESEO REALIZAR EL CAMBIO DE GUARDIA...
+                                if (result.isConfirmed) {
+
+                                    $.ajax({
+                                        url: "{% url 'calendario_guardias:setCambioGuardiaDirecto'%}?e=" + infoEventChange.event.extendedProps.id_guardia + "&r=" + info.event.extendedProps.id_guardia,
+                                        type: "GET",
+                                        dataType: "json",
+                                        success: function (data) {
+                                            calendario.refetchEvents()
+
+                                            if (data.icon == 'success') {
+                                                Swal.fire({
+                                                    title: '',
+                                                    icon: 'question',
+                                                    html: '<p>¿Deseas notificar a los analistas el cambio de guardia efectuado?</p>',
+                                                    showCancelButton: true,
+                                                    cancelButtonColor: '#d33',
+                                                    confirmButtonText: 'Si',
+                                                    cancelButtonText: 'No',
+                                                    reverseButtons: true
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+
+                                                        text_mensaje = 'Se ha realizado un cambio de guardia en el área de ' + infoEventChange.event.extendedProps.nameArea
+                                                        descripcion = "El cambio de guardia efectuado es el siguiente \\n\\n <<35>> <b>" + infoEventChange.event.extendedProps.nameUser + '</b>\\nSemana ' + info.event.extendedProps.semana + ", " + moment(infoEventChange.event.start).format('MMM YYYY') + '\\n <<35>> <b>' + info.event.extendedProps.nameUser + '</b>\\nSemana ' + infoEventChange.event.extendedProps.semana + ", " + moment(infoEventChange.event.start).format('MMM YYYY')
+                                                        icono = "18"
+                                                        area_men_telegram = infoEventChange.event.extendedProps.idArea
+                                                        console.log(text_mensaje, descripcion)
+                                                        $.ajax({
+                                                            type: 'get',
+                                                            url: "../../../../private/calendario/guardias/mensaje/?m=" + text_mensaje + "&i=" + icono + "&d=" + descripcion + "a=" + area_men_telegram,
+                                                            dataType: "json",
+                                                            cache: false,
+                                                            success: function (data) {
+                                                                if (data) {//Si se ha enviado el mensaje de forma correcta...
+                                                                    createAlert('', ' Cambio de guardia!', ' Notificado vía Telegram el cambio de guardia efectuado.', 'success', true, true, 'pageMessages');
+                                                                }
+                                                                else {
+                                                                    Swal.fire({
+                                                                        title: 'Opps! ...',
+                                                                        text: 'No se ha podido notificar a los analistas de la generacion del nuevo calendario de guardias.',
+                                                                        icon: 'error',
+                                                                        timer: 5000,
+                                                                        timerProgressBar: true,
+                                                                    })
+                                                                }
+                                                            }
+                                                        })
+                                                    }
+                                                    else {
+                                                        Swal.fire({
+                                                            title: data.title,
+                                                            text: data.text,
+                                                            icon: data.icon,
+                                                            timer: 10000,
+                                                            timerProgressBar: true,
+                                                            didOpen: (toast) => {
+                                                                toast.addEventListener('mouseenter', Swal.stopTimer)
+                                                                toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                                            }
+                                                        })
+                                                    }
+                                                })
+
+                                            }
+                                            else {
+                                                Swal.fire({
+                                                    title: data.title,
+                                                    text: data.text,
+                                                    icon: data.icon,
+                                                    timer: 10000,
+                                                    timerProgressBar: true,
+                                                    didOpen: (toast) => {
+                                                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                                                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    })
+                                }
+
+                            })
+                        }
+
+                    },
+                    validRange: {
+                        start: moment().format('YYYY-MM-DD'),
+                    }
+                });
+                calendarCambios.render();
+                $('.fc-toolbar-title').addClass("title-calendar");
+                $('.fc-toolbar-title').css("font-size", "40px");
+            }
+        })
+
+    });
+
+
+    /* REALIZA UNA SUSTITUCION SIN NECESIDAD DE PEDIR CONFIRMACION (SUPERVISOR) */
+    $(document).on('click', '.btnSustitucionSupervisor', function () {
+        console.log("INFO", infoEventChange)
+
+        Swal.fire({
+            title: 'Por favor selecciona un día',
+            html: '<input class="swal2-input" id="expiry-date" style="display:none">',
+            stopKeydownPropagation: false,
+            confirmButtonText: 'Siguiente <i class="fa-solid fa-circle-arrow-right"></i>',
+            preConfirm: () => {
+                if (flatpickrInstance.selectedDates[0] == undefined) {
+                    Swal.showValidationMessage('Es obligatorio fijar el día que desea realizar')
+                }
+            },
+            willOpen: () => {
+                flatpickrInstance = flatpickr(
+                    Swal.getPopup().querySelector('#expiry-date'), {
+                    minDate: (moment().format('YYYY-MM-DD') > moment(infoEventChange.event.start).format('YYYY-MM-DD')) ? moment().format('YYYY-MM-DD') : moment(infoEventChange.event.start).format('YYYY-MM-DD'),
+                    maxDate: moment(infoEventChange.event.end).add(-1, 'days').format('YYYY-MM-DD'),
+                    inline: true,
+                    "locale": "es",
+                })
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: '¿Estás seguro {{request.user.first_name}}?',
+                    html: 'Si deseas continuar aceptarás sustituir al analista ' + infoEventChange.event.extendedProps.nameUser +
+                        ', el día <b>' + moment(flatpickrInstance.selectedDates[0]).format('ll') + '</b> en horario de ' +
+                        moment(infoEventChange.event.extendedProps.hora_inicio, 'HH:mm').format('HH:mm') +
+                        'h a ' + moment(infoEventChange.event.extendedProps.hora_fin, 'HH:mm').format('HH:mm') +
+                        'h, en el calendario de guardias perteneciente al área de ' + infoEventChange.event.extendedProps.nameArea + '.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Aceptar',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true,
+                    //confirmButtonText: 'Siguiente <i class="fa-solid fa-circle-arrow-right"></i>',
+                    //cancelButtonText: '<i class="fa-solid fa-circle-left"></i> Atrás',
+                    reverseButtons: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        $.ajax({
+                            url: "{% url 'calendario_guardias:setSustitucionSupervisor'%}?g=" + infoEventChange.event.extendedProps.id_guardia + "&f=" + moment(flatpickrInstance.selectedDates[0]).format('YYYY-MM-DD'),
+                            type: "GET",
+                            dataType: "json",
+                            success: function (data) {
+
+                                calendario.refetchEvents()
+
+                                if (data.icon == 'success') {
+                                    Swal.fire({
+                                        title: '',
+                                        icon: 'question',
+                                        html: '<p>¿Deseas notificar a los analistas el cambio efectuado?</p>',
+                                        showCancelButton: true,
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Si',
+                                        cancelButtonText: 'No',
+                                        reverseButtons: true
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            text_mensaje = infoEventChange.event.extendedProps.nameUser + ', el día ' + moment(flatpickrInstance.selectedDates[0]).format('ll') + ' te va a hacer la guardia {{request.user.first_name}} como supervisor del área de ' + infoEventChange.event.extendedProps.nameArea
+                                            icono = "16|17"
+                                            area_men_telegram = infoEventChange.event.extendedProps.idArea
+                                            $.ajax({
+                                                type: 'get',
+                                                url: "../../../../private/calendario/guardias/mensaje/?m=" + text_mensaje + "&i=" + icono + "&a=" + area_men_telegram,
+                                                dataType: "json",
+                                                cache: false,
+                                                success: function (data) {
+                                                    if (data) {//Si se ha enviado el mensaje de forma correcta...
+                                                        createAlert('', ' Sustitución de supervisor aceptada!', ' Notificado vía Telegram el cambio efectuado.', 'success', true, true, 'pageMessages');
+                                                    }
+                                                    else {
+                                                        Swal.fire({
+                                                            title: 'Opps! ...',
+                                                            text: 'No se ha podido notificar a los analistas el cambio efectuado.',
+                                                            icon: 'error',
+                                                            timer: 5000,
+                                                            timerProgressBar: true,
+                                                        })
+                                                    }
+                                                }
+                                            })
+                                        }
+                                        else {
+                                            Swal.fire({
+                                                title: data.title,
+                                                html: '<p style="font-size:15px"><i class="fa-solid fa-info fa-beat" style="--fa-beat-scale: 1.4;"></i> ' + data.text + '</p>',
+                                                icon: data.icon,
+                                                timer: 10000,
+                                                timerProgressBar: true,
+                                                didOpen: (toast) => {
+                                                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                                                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                                }
+                                            })
+                                        }
+                                    })
+
+                                }
+                                else {
+                                    Swal.fire({
+                                        title: data.title,
+                                        text: data.text,
+                                        icon: data.icon,
+                                        timer: 10000,
+                                        timerProgressBar: true,
+                                        didOpen: (toast) => {
+                                            toast.addEventListener('mouseenter', Swal.stopTimer)
+                                            toast.addEventListener('mouseleave', Swal.resumeTimer)
+                                        }
+                                    })
+                                }
+                            }
+                        })
+
+
+                    }
+                })
+            }
+        });
+
+
+
+
+
+        //Swal.fire(JSON.stringify(values))
+        /*$.ajax({
+            url: "{% url 'calendario_guardias:setSustitucion'%}?g=" + infoEventChange.event.extendedProps.id_guardia + "&f=" + values[0] + "&u=" + values[1] + "&t=" + values[2],
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                Swal.fire({
+                    title: data.title,
+                    html: '<p style="font-size:15px"><i class="fa-solid fa-info fa-beat" style="--fa-beat-scale: 1.4;"></i> ' + data.text + '</p>',
+                    icon: data.icon,
+                    timer: 10000,
+                    timerProgressBar: true
+                })
+            }
+        })*/
+
+
+    });
+
+
+</script>
+
+
+{% endblock %}

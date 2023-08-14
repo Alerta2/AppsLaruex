@@ -1,0 +1,68 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+
+
+{% block modal %}
+{% include "modal/modal_grafica_verificacion.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+  <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+      </ol>
+  </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Seleccione las determinaciones a analizar de la muestra {{ id_muestra }}</h5>
+            <!-- Multi Columns Form -->
+            <form class="g-3" action="{% url 'gestionmuestras:gestmuesInsertarDeterminaciones' %}" method="POST"> 
+                <input type="number" name="id_muestra" value="{{ id_muestra }}" hidden></input>
+                {% csrf_token %}
+                <div class="row">
+                    {% for d in determinaciones %}
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="{{ d.identificador }}" name="{{ d.identificador }}">
+                                <label class="form-check-label" for="{{ d.identificador }}">{{ d.nombre }}</label>
+                            </div>    
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="row">
+                    <div class="card-header my-4">Selecciones preconfiguradas</div>
+                    {% for p in predefinidas %}
+                        <div class="col-md-3 col-xs-6">
+                            <button type="button" onclick="activar('{{ p.analisis }}')" class="btn btn-primary">{{ p.nombrepaquete }}</button>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="text-center">
+                    <div class="card-header my-4"></div>
+                    <button type="submit" class="btn btn-primary">Insertar</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </div>
+            </form><!-- End Multi Columns Form -->
+        </div>
+    </div>
+</section>
+<!-- End Info programa -->
+
+<script>
+// Seleccion de packs de medidas
+    function activar(pack){
+        console.log(pack);
+        pack.split(',').forEach((x,i) => $("#"+x.toString()).prop('checked', true));
+    }
+</script>
+<!-- End Botones -->
+{% endblock %}

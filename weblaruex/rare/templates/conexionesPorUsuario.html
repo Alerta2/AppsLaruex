@@ -1,0 +1,134 @@
+{% extends "base/base_mapa.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    Conexiones Remotas
+{% endblock %}
+
+{% block imports %}
+
+{% endblock %}
+{% block css %}
+main { padding-top: 70px; }
+{% endblock %}
+
+{% block content %}
+    {% regroup conexiones by usuario.id as pcs_por_usuario %}
+    <div class="row border border-primary my-4 mx-1 p-2">
+        <h3 class="col-12">Acciones</h3>
+        <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#modalAgregarRelacion">
+            Agregar relación
+        </button>
+    </div>
+    {% for usuario in pcs_por_usuario %}
+        <section class="border border-info m-2">
+            <div class="row border border-primary my-4 mx-1 p-2">
+                <h3 class="col-12">Información del usuario para conexiones remotas VNC</h3>
+                <div class="col-md-auto">Usuario VNC: <input type="text" class="form-control" value="{{ usuario.list.0.usuario.username }}" readonly></div>
+                <div class="col-md-auto">Password VNC: <input type="password" class="form-control" value="" id="passwordVNC{{ usuario.grouper }}" readonly><div class="form-check"><input type="checkbox" class="form-check-input" onclick="mostrasPass('passwordVNC')" id="mostrarPassVNC{{ usuario.grouper }}"><label class="form-check-label" for="mostrarPassVNC{{ usuario.grouper }}">Mostrar</label></div></div>
+            </div>
+            <div id="heading{{ usuario.grouper }}" class="row border border-primary bg-primary text-white my-2 mx-1 p-2 collapsed" data-toggle="collapse" aria-expanded="false" data-target="#collapse{{ usuario.grouper }}">
+                <div class="col-sm-2 col-6">
+                    EQUIPO
+                </div>
+                <div class="col-sm-2 col-6">
+                    IP
+                </div>
+                <div class="col-sm-2 col-6">
+                    PUERTO VNC
+                </div>
+                <div class="col-sm-2 col-6">
+                    USUARIO-PASS PC
+                </div>
+                <div class="col-sm-2 col-6 text-right">
+                    ACCIONES
+                </div>
+            </div>
+            <div id="collapse{{ usuario.grouper }}" class="collapse" aria-labelledby="heading{{ usuario.grouper }}">
+                {% for conexion in usuario.list %}
+                    <div class="row border border-primary my-2 mx-1 p-2">
+                        <div class="col-sm-2 col-6">
+                            {{ conexion.id_ordenador.equipo }}
+                        </div>
+                        <div class="col-sm-2 col-6">
+                            {{ conexion.id_ordenador.ip }}
+                        </div>
+                        <div class="col-sm-2 col-6">
+                            {{ conexion.id_ordenador.puerto_vnc }}
+                        </div>
+                        <div class="col-sm-2 col-6">
+                            <input type="text" class="form-control" value="{{ conexion.id_ordenador.usuario }}" readonly>
+                            <input type="password" class="form-control" value="{{ conexion.id_ordenador.password }}" id="password{{ usuario.grouper }}{{ conexion.id_ordenador.id }}" readonly><div class="form-check"><input type="checkbox" class="form-check-input" onclick="mostrasPass('password{{ usuario.grouper }}{{ conexion.id_ordenador.id }}')" id="mostrarPass{{ usuario.grouper }}{{ conexion.id_ordenador.id }}"><label class="form-check-label" for="mostrarPass{{ usuario.grouper }}{{ conexion.id_ordenador.id }}">Mostrar</label></div>
+                        </div>
+                        <div class="col-sm-2 col-6 text-right">
+                            <a href="/private/laruex/devolverConexionVNC/{{ conexion.id_ordenador.id }}/" data-toggle="tooltip" data-placement="bottom" title="Descargar conexion VNC para importar en VNC Address Book" download><i class="btn btn-info fa-light fa-house-laptop fa-2x"></i></a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endfor %}
+    <div class="modal fade" id="modalAgregarRelacion" tabindex="-1" role="dialog" aria-labelledby="modalAgregarRelacionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalAgregarRelacionLabel">Agregar relación</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="formAgregarRelacion">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="selectUsuario">Selección de usuario</label>
+                        <select class="form-control" id="selectUsuario" name="selectUsuario">
+                          {% for usuario in usuarios %}
+                            <option>{{usuario}}</option>
+                          {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row mx-4">
+                        {% for ordenador in ordenadores %}
+                            <div class="col-sm-3 col-4">
+                                <input class="form-check-input" type="checkbox" value="{{ordenador}}" id="checkPC{{ordenador}}" name="checkPC{{ordenador}}">
+                                <label class="form-check-label" for="checkPC{{ordenador}}">
+                                    {{ordenador}}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="submit" value="submit" class="btn btn-primary">Enviar</button>
+                </div>
+            </form>
+          </div>
+        </div>
+    </div>       
+    
+
+    <script type="text/javascript">
+        function mostrasPass(id) {
+            var x = document.getElementById(id);
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+        $( "#formAgregarRelacion" ).on( "submit", function(e) {
+            var dataString = $(this).serialize();        
+            $.ajax({
+                type: "POST",
+                url: "/private/laruex/nuevaRelacionEquiposRemotosParaUser/",
+                data: dataString,
+                success: function () {
+                    crearAviso("avisoInsercion", "Información insertada correctamente en la base de datos, actualice la página para visualizarla");
+                }
+            });
+            e.preventDefault();
+          });
+    </script>
+{% endblock %}

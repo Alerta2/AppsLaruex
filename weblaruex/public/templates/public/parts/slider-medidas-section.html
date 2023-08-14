@@ -1,0 +1,164 @@
+{% load static %}
+<style>
+.card {
+  height: 254px;
+  transition: all 0.4s;
+  border-radius: 10px;
+  box-shadow: 0px 0px 6px 4px  rgba(11, 66, 76, 0.251);   
+  background-color: rgba(255, 255, 255, 0.074);
+  border: 1px solid rgba(255, 255, 255, 0.222);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-radius: .7rem;
+}
+
+.card:hover {
+  border-radius: 15px;
+  cursor: pointer;
+  transform: scale(1.1);
+  box-shadow: 0px 0px 10px 5px  rgba(11, 66, 76, 0.251);
+    
+
+}
+
+.first-content {
+  height: 100%;
+  transition: all 0.4s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  border-radius: 15px;
+}
+
+.card:hover .first-content {
+  height: 0px;
+  opacity: 0;
+}
+
+.second-content {
+  height: 0%;
+  width: 100%;
+  opacity: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  transition: all 0.4s;
+  font-size: 0px;
+  transform: rotate(90deg) scale(-1);
+}
+
+.card:hover .second-content {
+  opacity: 1;
+  height: 100%;
+  font-size: 1.8rem;
+  transform: rotate(0deg);
+}
+
+.learn-more-btn{
+  background-color: #fff;
+  color: #17695d;
+  border-radius: 5px;
+  padding: 5px 10px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: all 0.4s;
+}
+
+.visualizador{
+  height: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  padding: 0px 0px;
+
+}
+.card__image {
+  z-index: 1;
+  position: absolute;
+  top: -50px;
+  width: 55%;
+  max-width: 165px;
+  max-height: 165px;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.content-container {
+  margin-top: auto; /* Ajusta el valor del margen según tus necesidades */
+}
+</style>
+
+<!-- ======= Medidas Section ======= -->
+<section id="medidas" class="medidas" data-aos="fade-up">
+  <div class="visualizador">
+    {% for medida in medidas %}
+    <div class="card mx-4 my-5">
+      <div class="first-content ">
+        <meta content="{{medida.meta_descripcion}}" name="descriptison">
+        <meta content="{{medida.meta_keywords}}" name="keywords">
+        <div class="content-container d-flex justify-content-center">
+          <img class="card__image mb-2" src="{% static 'img/medidas/' %}{{ medida.imagen }}" alt="" style="border-radius: 15px;">
+          <div class="text-center">
+            <h2 class="text-muted"><strong>{{medida.nombre}}</strong></h2>
+            <p class="font-italic mb-2 mx-3" >{{medida.resumen_tarjeta}}</p>
+          </div>
+        </div>        
+      </div>
+      <div class="second-content">
+        <p class="font-italic text-center mb-2 mx-3" >Obtenga más información sobre <a href="{% url 'public:publicMedidaInfo' url=medida.url %}">{{medida.nombre}}</a></p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="my-3 d-flex justify-content-center"> 
+    {% if request.get_full_path == "/" %}
+    <div class="d-flex justify-content-center my-4">
+      <button class="btnVerTodo"><a href="{% url 'public:publicMedidas' %}"> Ver todas las medidas</a></button>
+    </div>
+    {% endif %}
+
+</div>
+
+</section><!-- End Medidas Section -->
+
+
+<script>
+  function decirAlgo(value){
+    alert(value);
+  }
+
+  $(document).ready(function() {
+    $('.visualizador').slick({
+      slidesToShow: 3,
+      slidesToScroll: 1,
+      prevArrow: '<a class="carousel-control-prev rounded-circle my-auto" href="#" role="button" data-slide="prev" style="background-color: rgba(9, 113, 130, 0.5); width: 40px; height: 40px; text-align: center; line-height: 40px;"><i class="fa-solid fa-angle-left"></i></a>',
+      nextArrow: '<a class="carousel-control-next rounded-circle my-auto" href="#" role="button" data-slide="next" style="background-color: rgba(9, 113, 130, 0.5); width: 40px; height: 40px; text-align: center; line-height: 40px;"><i class="fa-solid fa-angle-right"></i></a>',
+      responsive: [  
+
+    {
+      breakpoint: 992, // Tamaño para pantallas medianas
+      settings: {
+        slidesToShow: 2
+      }
+    },
+    {
+      breakpoint: 576, // Tamaño para pantallas pequeñas
+      settings: {
+        slidesToShow: 1
+      }
+    }
+  ]
+    });
+  });
+
+
+
+</script>

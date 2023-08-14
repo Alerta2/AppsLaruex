@@ -1,0 +1,123 @@
+{% extends "base/base_spida.html" %}
+
+{% load static %}
+
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/spida/documentsSpida.css' %}" />
+
+{% endblock %}
+
+{% block content %}
+<section>
+
+
+<!-- Visit https://codepen.io/nicolaskadis/full/brQEOd/ for the latest, no js version! -->
+<div class="container">
+  <h2 class="text-center" id="titulo">Documentación</h2>
+  <div class="row text-center">
+
+    <div class="col-md-4 card-container">
+      <div class="card card-flip">
+        <div class="front card-block">
+          <!-- To add FontAwesome Icons use Unicode characters and to set size use font-size instead of fa-*x because when calculating the height (see js), the size of the icon is not calculated if using classes -->
+            <!--<p><img class=" img-fluid" src="https://sunlimetech.com/portfolio/boot4menu/assets/imgs/team/img_01.png" alt="card image"></p>-->
+            <span class="card-img-top fa" style="font-size: 4em; color:#343a40"><i class="fa fa-users-cog"></i></span>
+          <h4 class="card-title">Mantenimiento</h4>
+          <p class="card-text">Constituye la principal herramienta para la evaluación de la consecución de objetivos de la Red SPIDA.</p>
+          <a class="btn btn-primary btn-sm"><i class="fa fa-plus"></i></a>
+        </div>
+
+        <div class="back card-block">
+          <h4 class="card-title">Mantenimiento</h4>
+          <p class="card-text">
+              En esta sección podreis consultar los informes trimestrales que describen por un lado,
+              la verificación	de la existencia, idoneidad y funcionalidad de las infraestructuras básicas para el
+              funcionamiento de la Red SPIDA así como las actuaciones realizadas o iniciadas, que hayan
+              contribuido significativamente a la reducción de las consecuencias adversas de las inundaciones.
+          </p>
+          <a href="{% url 'spida:InformesTrimestrales' %}" class="btn btn-primary btn-sm"><i class="fa fa-paste"></i></a>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="col-md-4 card-container">
+      <div class="card card-flip">
+        <div class="front card-block">
+          <!-- To add FontAwesome Icons use Unicode characters and to set size use font-size instead of fa-*x because when calculating the height (see js), the size of the icon is not calculated if using classes -->
+          <!--<p><img class=" img-fluid" src="https://sunlimetech.com/portfolio/boot4menu/assets/imgs/team/img_01.png" alt="card image"></p>-->
+          <span class="card-img-top fa" style="font-size: 4em; color:#343a40"><i class="fa fa-hands-helping"></i></span>
+            <!--<span class="card-img-top fa" style="font-size: 4em">&#xf118;</span>-->
+          <h4 class="card-title">Protocolo</h4>
+          <p class="card-text">Establece el procedimiento de actuacion y comunicación ante un evento de inundación.</p>
+          <a class="btn btn-primary btn-sm"><i class="fa fa-plus"></i></a>
+        </div>
+
+        <div class="back card-block">
+          <h4 class="card-title">Protocolo</h4>
+          <p class="card-text">
+              En esta sección podreis consultar el protocolo de actuacion y comunicación entre El Centro Logístico de
+              Operaciones de la Red Spida y la dirección General de Emergencias, Protección Civil e Interior de la Junta
+              de Extremadura, integrante de la Dirección del Plan Especial de Protección Civil de Riesgo de Inundaciones.
+          </p>
+          <a href="{% url 'spida:OpenProtocolo' %}" class="btn btn-primary btn-sm" target="_blank"><i class="fa fa-file-pdf"></i></a>
+        </div>
+      </div>
+    </div>
+
+        <div class="col-md-4 card-container">
+      <div class="card card-flip">
+        <div class="front card-block">
+          <!-- To add FontAwesome Icons use Unicode characters and to set size use font-size instead of fa-*x because when calculating the height (see js), the size of the icon is not calculated if using classes -->
+          <!--<p><img class=" img-fluid" src="https://sunlimetech.com/portfolio/boot4menu/assets/imgs/team/img_01.png" alt="card image"></p>-->
+          <span class="card-img-top fa" style="font-size: 4em; color:#343a40"><i class="fas fa-tint"></i></span>
+            <!--<span class="card-img-top fa" style="font-size: 4em">&#xf118;</span>-->
+          <h4 class="card-title">Eventos</h4>
+          <p class="card-text">Medio por el cual se comparte toda la documentación perteneciente a los distintos grupos
+            implicados en la Red Spida.</p>
+          <a class="btn btn-primary btn-sm"><i class="fa fa-plus"></i></a>
+        </div>
+
+        <div class="back card-block">
+          <h4 class="card-title">Eventos</h4>
+          <p class="card-text">
+              En esta sección podreis consultar así como adjuntar toda aquella documentación de interés que se reciba o
+              se envíe respecto a un evento adverso que conlleve a una evolución desfavorable del nivel de río de cuañquier
+              municipio perteneciente o no a la Red Spida.
+          </p>
+          <a href="{% url 'spida:DocumentsEventos' %}" class="btn btn-primary btn-sm"><i class="fas fa-file-medical"></i></a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</section>
+<script>
+    $(document).ready(function() {
+  var front = document.getElementsByClassName("front");
+  var back = document.getElementsByClassName("back");
+
+  var highest = 0;
+  var absoluteSide = "";
+
+  for (var i = 0; i < front.length; i++) {
+    if (front[i].offsetHeight > back[i].offsetHeight) {
+      if (front[i].offsetHeight > highest) {
+        highest = front[i].offsetHeight;
+        absoluteSide = ".front";
+      }
+    } else if (back[i].offsetHeight > highest) {
+      highest = back[i].offsetHeight;
+      absoluteSide = ".back";
+    }
+  }
+  $(".front").css("height", highest);
+  $(".back").css("height", highest);
+  $(absoluteSide).css("position", "absolute");
+});
+
+</script>
+
+{% endblock %}

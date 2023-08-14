@@ -1,0 +1,41 @@
+{% extends "base/base2.html" %}
+{% load static %}
+
+{% block content %}
+<div class="wrapper bg-lighter h-75">
+    <div class="row h-50 m-2">
+        <div class="col-sm-12 my-auto p-3 mb-2 bg-lighter text-dark">
+            <div class="lead text-center mb-5">Límites máximos definidos.</div>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">MUESTRA</th>
+                        <th scope="col">ISOTOPO</th>
+                        <th scope="col">ANALISIS</th>
+                        <th scope="col">MASA</th>
+                        <th scope="col">LÍMITE MÁXIMO</th>
+                        <th scope="col">UNIDADES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dato in datos %}
+                        <tr>
+                            <th scope="col">{{dato.muestra_codmuestra}}</th>
+                            <th scope="col">{{dato.isotopo_codisotopo}}</th>
+                            <th scope="col">{{dato.isotopo_analisis_codanalisis}}</th>
+                            <th scope="col">{{dato.masa}}</th>
+                            <th scope="col">{{dato.limite_maximo}}</th>
+                            <th scope="col">{{dato.unidad}}</th>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+    $('.btnright').hide();
+    $('.btnleft').hide();
+{% endblock %}

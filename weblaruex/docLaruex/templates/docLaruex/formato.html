@@ -1,0 +1,2195 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+
+
+.nav-tabs-bordered .nav-link {
+    margin-bottom: -2px;
+    border: none;
+    color: #2c384e;
+}
+  .nav-tabs-bordered .nav-link.active {
+    background-color: #fff;
+    color: #4154f1;
+    border-bottom: 2px solid #4154f1;
+}
+.nav-tabs {
+    --bs-nav-tabs-border-color: #dee2e6;
+    --bs-nav-tabs-border-radius: 0.375rem;
+    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
+    --bs-nav-tabs-link-active-color: #495057;
+    --bs-nav-tabs-link-active-bg: #fff;
+    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+}
+  /*===========================
+    Section Title One CSS
+  ===========================*/
+  .section-title-one {
+    text-align: center;
+    max-width: 750px;
+    margin: auto;
+    margin-bottom: 50px;
+    position: relative;
+    z-index: 5;
+    color: rgb(16, 110, 134);
+  }
+
+  @media only screen and (min-width: 768px) and (max-width: 991px) {
+    .section-title-one {
+      margin-bottom: 45px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .section-title-one {
+      margin-bottom: 35px;
+    }
+  }
+
+  .section-title-one h2 {
+    margin-bottom: 15px;
+  }
+
+  @media only screen and (min-width: 768px) and (max-width: 991px) {
+    .section-title-one h2 {
+      font-size: 2rem;
+      line-height: 2.8rem;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .section-title-one h2 {
+      font-size: 1.5rem;
+      line-height: 1.9rem;
+    }
+  }
+
+  /*===========================
+    Otros CSS
+  ===========================*/
+
+  hr {
+    height: 10px;
+    width: 20%;
+    margin: auto;
+    background-color: rgb(5, 215, 243);
+    color: rgb(5, 215, 243);
+  }
+
+  h6 {
+    font-family: 'Poppins', sans-serif;
+    color: #394747;
+    font-size: 36px;
+  }
+
+
+
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+
+  .addFicheroEditable {
+    color: rgb(9, 58, 65);
+  }
+
+  .addFicheroEditable:hover {
+    color: rgb(133, 198, 228);
+  }
+
+  /* estilo añadirFichero PDF*/
+  .addFicheroPDF {
+    color: rgb(161, 16, 32);
+  }
+
+  .addFicheroPDF:hover {
+    color: rgb(99, 10, 20);
+  }
+
+
+  /* hover de los botones*/
+  .enlace:hover {
+    color: #064061;
+  }
+
+
+  .descargaWord:hover {
+    color: #064061;
+  }
+
+  .modificarObjeto:hover {
+    color: #bb3e03;
+  }
+
+  .descargaPDF:hover {
+    color: rgb(99, 10, 20);
+  }
+
+  .descargaExcel:hover {
+    color: #094b1b;
+  }
+
+  .verObjeto:hover {
+    color: #134f3f;
+  } 
+
+  .enviarNotificacion:hover {
+    color: #064061;
+  }
+
+
+  /* estilo añadirFichero PDF*/
+  .addFicheroActualizado {
+    color: #0a9663;
+  }
+
+  .file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+
+        /*--------------------------------------------------------------
+    # Botón editar
+    --------------------------------------------------------------*/
+    .cta {
+    position: relative;
+    margin: auto;
+    padding: 12px 18px;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    }
+
+    .cta:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    border-radius: 50px;
+    background: #d4e4e2;
+    width: 45px;
+    height: 45px;
+    transition: all 0.3s ease;
+    }
+
+    .cta span {
+    position: relative;
+    font-family: "Ubuntu", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #087B6C;
+    }
+
+
+
+    .cta:hover:before {
+    width: 100%;
+    background: #d4e4e2;
+    }
+
+    .cta:active {
+    transform: scale(0.95);
+    }
+
+</style>
+
+  {% if formato.id_doc.id_estado.id == 5 %}
+  <div class="jumbotron jumbotron-fluid" style="background-image: linear-gradient(to bottom right, #FFA13B, #cb0f0f); border-radius: 10px; padding: 2rem;">
+    <h1 class="display-3" style="color: #ffffff; text-align: center;"><strong>¡Cuidado!</strong></h1>
+    <h3  style="color: #ffffff; text-align: center;">El formato que está visualizando está obsoleto</h3>
+  </div>
+
+  {% elif formato.id_doc.id_estado.id == 3 %}
+  <div class="jumbotron jumbotron-fluid" style="background-image: linear-gradient(to bottom right, #D9AFD9, #97D9E1);border-radius: 10px; padding: 2rem;">
+    <h1 class="display-3" style="color: #ffffff; text-align: center;"><strong>¡Cuidado!</strong></h1>
+    <h3  style="color: #ffffff; text-align: center;">El formato que está visualizando está en mantenimiento</h3>
+  </div>
+
+  {% elif formato.id_doc.id_estado.id == 4 %}
+  <div class="jumbotron jumbotron-fluid" style="background-image: linear-gradient(to bottom right, #4e73df, #4baea0); border-radius: 10px; padding: 2rem;">
+    <h1 class="display-3" style="color: #ffffff; text-align: center;"><strong>¡Cuidado!</strong></h1>
+    <h3  style="color: #ffffff; text-align: center;">El formato que está visualizando está en revisión</h3>
+  </div>
+  {% endif %}
+<!-- breadcrumb   -->
+<div class="card-body">
+  <nav>
+    {% if formato.plantilla == 1 %}  
+        
+      <div class="jumbotron jumbotron-fluid" style="background-image: linear-gradient(to bottom right, #13547a, #80d0c7); border-radius: 10px; padding: 2rem;">
+        <div class="container">
+          <div class="row d-flex justify-content-center">
+            <div class="col">
+              <h1 class="display-6" style="color: #ffffff; text-align: center;"><strong>
+                Plantilla</strong>
+                {% if formato.id_doc.id_estado.id == 1 or formato.id_doc.id_estado.id == 2 %}
+                  <span class="badge text-white"
+                      style="background-color: #21b563; vertical-align:middle">{{formato.id_doc.id_estado.nombre}}</span>
+                {% elif formato.id_doc.id_estado.id == 3 or formato.id_doc.id_estado.id == 4 %}
+                <span class="badge text-white"
+                    style="background-color: #EB8E34; vertical-align:middle">{{formato.id_doc.id_estado.nombre}}</span>
+                {% elif formato.id_doc.id_estado.id == 5 %}
+                <span class="badge text-white "
+                    style="background-color: #524e4e; vertical-align:middle">{{formato.id_doc.id_estado.nombre}}</span>
+                {% else %}
+                <span class="badge text-white "
+                    style="background-color: #b52121; vertical-align:middle">{{formato.id_doc.id_estado.nombre}}</span>
+                {% endif %}
+                
+                {% if formato.editable == 1 %}
+                <i class="fa-duotone fa-lock-open"></i>
+                {% endif %}
+              </h1>
+              <h4 style="color: #ffffff; text-align: center;">{{ formato.procedimiento }} {{ formato.id_doc.nombre }} {{ formato.titulo }}</h4>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center">
+            <div class=" card col-md-auto shadow-lg rounded">
+              <h6  class="pt-2 d-flex justify-content-center" style="background-color: #ffffff;">   
+              
+                {% if cargo == "Técnico" or cargo == "Responsable" or administrador%}
+                  {% if formato.editable == 1 %}
+                    <!-- Boton que actualizar el formato  -->
+                    <a href="" title="Rellenar formato actual" class="mx-1" data-toggle="modal"
+                      data-target="#modalActualizarFormato" style="color: #001219"><i
+                        class="fa-duotone fa-file-signature enlace"></i></a>
+                  {% endif %}
+                  {% if formato.plantilla == 1 %}
+                    <!-- Boton que permite rellenar un documento  -->
+                    <a href="" title="Rellenar Formato" class="mx-1" data-toggle="modal" data-target="#modalRellenarFormato"
+                      style="color: #005f73"><i class="fa-duotone fa-pen-to-square enlace"></i></a>
+                  {% endif %}
+                  {% if formato.plantilla == 0 or cargo == "Responsable" or administrador %}
+                    <!-- boton que permite la carga de nuevas versiones del formato -->
+                    <a href="/archivos/{{ documento.id_doc.tipo }}/{{ documento.id_doc.ruta }}" title="Añadir Archivo Asociado"
+                      class="mx-1" data-toggle="modal" data-toggle="tooltip" data-target="#modalAsociarArchivo"
+                      style="color: #005f73;"><i class="fa-duotone fa-link  enlace"></i></a>
+                  {% endif %}
+                  <!-- boton que permite la descarga del formato que estamos visualizando-->
+                  <a href="{{ media }}/{{ formato.id_doc.tipo }}/{{ formato.id_doc.ruta }}" title="download" class="mx-1"
+                    style="color: #ae2012; align-items: md-center" download><i
+                      class="fa-duotone fa-file-pdf descargaPDF"></i></a>
+                  {% if  tarea %}
+                    <a href="/private/docLaruex/verTarea/{{tarea.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento" style="color:#511f31"><i class="fa-duotone fa-screwdriver-wrench enviarNotificacion"></i></a>
+                  {% endif %}
+                {% endif %}
+                {% if cargo == "Responsable" or administrador%}
+                  {% if formato.id_doc.ruta_editable %}
+                    <a href="{{ media }}/{{ formato.id_doc.tipo }}/{{ formato.id_doc.ruta_editable }}" title="download"
+                      class="mx-1" style="color: #1d6893; align-items: md-center" download><i
+                        class="fa-solid fa-file-word descargaWord"></i></a>
+                  {% endif %}
+                  <a title="cambiar estado" class="mx-1" data-target="#modalFormularioCambiarEstado" data-toggle="modal"
+                    style="color: #001219; align-items: md-center"><i
+                      class="fa-duotone fa-sign-hanging  descargaWord"></i></a>
+                {% endif %} <!-- if tecnico -> responsable-->
+        
+              </h6>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center">
+            <div class="col">
+              <ol class="breadcrumb" style="background-color: transparent;">
+                <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/" style="color: #ffffff;"><i
+                      class="bi bi-house-door"></i></a></li>
+                <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/objetos"  style="color: #ffffff;">Listado de Archivos</a>
+                </li>
+                <li class="breadcrumb-item" style="font-size: large;"><a
+                    href="\private/docLaruex/tipoObjeto/Procedimiento/"  style="color: #ffffff;">Procedimientos</a></li>
+                <li class="breadcrumb-item" style="font-size: large;"><a
+                    href="\private/docLaruex/verObjeto/{{ procedimiento.id_doc.id }}/"  style="color: #ffffff;">{{ formato.procedimiento}}</a></li>
+                <li class="breadcrumb-item active" style="font-size: large; color: #022939;">{{ formato.id_doc.nombre }} {{ formato.titulo }}</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>  
+    {% else %} 
+      
+    <div class="container">
+      <div class="row d-flex justify-content-center">
+        <div class="col">
+          
+          <h1 class="display-6" style=" color: #899bbd; text-align: center;"><strong>Relleno</strong>
+            {% if formato.id_doc.id_estado.id == 1 or formato.id_doc.id_estado.id == 2 %}
+              <span class="badge text-white"
+                  style="background-color: #21b563; vertical-align:middle">{{formato.id_doc.id_estado.nombre}}</span>
+            {% elif formato.id_doc.id_estado.id == 3 or formato.id_doc.id_estado.id == 4 %}
+            <span class="badge text-white"
+                style="background-color: #EB8E34; vertical-align:middle">{{formato.id_doc.id_estado.nombre}}</span>
+            {% elif formato.id_doc.id_estado.id == 5 %}
+            <span class="badge text-white "
+                style="background-color: #524e4e; vertical-align:middle">{{formato.id_doc.id_estado.nombre}}</span>
+            {% else %}
+            <span class="badge text-white "
+                style="background-color: #b52121; vertical-align:middle">{{formato.id_doc.id_estado.nombre}}</span>
+            {% endif %}
+            {% if formato.editable == 1 %}
+            <i class="fa-duotone fa-lock-open" style="color: #f3773e"></i>
+            {% endif %}
+          </h1>
+                
+          <h3 class="card-title" style="color: #899bbd; text-align: center; ">{{ formato.procedimiento }} {{ formato.id_doc.nombre }} {{ formato.titulo }}</h3>
+        </div>
+      </div>
+      <div class="row d-flex justify-content-center">
+        <div class=" card col-md-auto shadow-lg rounded">
+          <h6  class="pt-2 d-flex justify-content-center" style="background-color: #ffffff;">   
+          
+            {% if cargo == "Técnico" or cargo == "Responsable" or administrador%}
+              {% if formato.editable == 1 %}
+                <!-- Boton que actualizar el formato  -->
+                <a href="" title="Rellenar formato actual" class="mx-1" data-toggle="modal"
+                  data-target="#modalActualizarFormato" style="color: #001219"><i
+                    class="fa-duotone fa-file-signature enlace"></i></a>
+              {% endif %}
+              {% if formato.plantilla == 1 %}
+                <!-- Boton que permite rellenar un documento  -->
+                <a href="" title="Rellenar Formato" class="mx-1" data-toggle="modal" data-target="#modalRellenarFormato"
+                  style="color: #005f73"><i class="fa-duotone fa-pen-to-square enlace"></i></a>
+              {% endif %}
+              {% if formato.plantilla == 0 or cargo == "Responsable" or administrador %}
+                <!-- boton que permite la carga de nuevas versiones del formato -->
+                <a href="/archivos/{{ documento.id_doc.tipo }}/{{ documento.id_doc.ruta }}" title="Añadir Archivo Asociado"
+                  class="mx-1" data-toggle="modal" data-toggle="tooltip" data-target="#modalAsociarArchivo"
+                  style="color: #005f73;"><i class="fa-duotone fa-link  enlace"></i></a>
+              {% endif %}
+              <!-- boton que permite la descarga del formato que estamos visualizando-->
+              <a href="{{ media }}/{{ formato.id_doc.tipo }}/{{ formato.id_doc.ruta }}" title="download" class="mx-1"
+                style="color: #ae2012; align-items: md-center" download><i
+                  class="fa-duotone fa-file-pdf descargaPDF"></i></a>
+                  
+              {% if  tarea %}
+                <a href="/private/docLaruex/verTarea/{{tarea.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento" style="color:#511f31"><i class="fa-duotone fa-screwdriver-wrench enviarNotificacion"></i></a>
+              {% endif %}
+            {% endif %}
+            {% if cargo == "Responsable" or administrador%}
+              {% if formato.id_doc.ruta_editable %}
+                <a href="{{ media }}/{{ formato.id_doc.tipo }}/{{ formato.id_doc.ruta_editable }}" title="download"
+                  class="mx-1" style="color: #1d6893; align-items: md-center" download><i
+                    class="fa-solid fa-file-word descargaWord"></i></a>
+              {% endif %}
+              <a title="cambiar estado" class="mx-1" data-target="#modalFormularioCambiarEstado" data-toggle="modal"
+                style="color: #001219; align-items: md-center"><i
+                  class="fa-duotone fa-sign-hanging  descargaWord"></i></a>
+            {% endif %} <!-- if tecnico -> responsable-->
+    
+          </h6>
+        </div>
+      </div>
+      <div class="row d-flex justify-content-center">
+        <div class="col">
+          <ol class="breadcrumb" style="background-color:transparent !important">
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                  class="bi bi-house-door"></i></a></li>
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/objetos">Listado de Archivos</a>
+            </li>
+            <li class="breadcrumb-item" style="font-size: large;"><a
+                href="\private/docLaruex/tipoObjeto/Procedimiento/">Procedimientos</a></li>
+            <li class="breadcrumb-item" style="font-size: large;"><a
+                href="\private/docLaruex/verObjeto/{{ procedimiento.id_doc.id }}/">{{ formato.procedimiento}}</a></li>
+            <li class="breadcrumb-item active" style="font-size: large;">{{ formato.id_doc.nombre }}</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+  </nav>
+  <div class="d-flex justify-content-end">
+    <a class="mx-1" title="Enviar nota relacionada con {{ formato.id_doc.nombre }}" data-toggle="modal"
+      data-target="#modalFormularioEnviarNota" style="color: #001219; align-items: md-center"><i
+        class="fa-duotone fa-message-pen fa-2x enviarNotificacion"></i></a>
+    <a class="mx-1" title="Notas relacionadas con {{ formato.id_doc.nombre }}" data-toggle="modal"
+      data-target="#modalFormularioVerNotas" style="color: #001219; align-items: md-center"><i
+        class="fa-duotone fa-messages fa-2x enviarNotificacion"></i></a>
+  </div>
+</div>
+
+
+
+<!-- ========== Modal Enviar Notificacion ================= -->
+<div id="modalFormularioEnviarNota" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Generar notificación asociada a {{ procedimiento.id_doc.nombre}} {{
+          formato.id_doc.nombre}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioModalEnviarNota" action="/private/docLaruex/agregarNotificacion/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <input type="text" class="form-control" id="id_doc" name="id_doc" data-rule="required"
+                  value="{{ formato.id_doc.id }}" hidden />
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" id="estadoNotificacion" name="estadoNotificacion"
+                  data-rule="required" value="1" hidden />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="form-group">
+                <label for="tituloNotificacion">Título</label>
+                <input type="text" class="form-control" id="tituloNotificacion" name="tituloNotificacion"
+                  data-rule="required" required />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="form-group">
+                <label for="resumenNotificacion">Resumen</label>
+                <textarea class="form-control" id="resumenNotificacion" name="resumenNotificacion" rows="5"
+                  data-rule="required" placeholder="Escriba un comentario" required></textarea>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Modal Ver Notas ================= -->
+<div id="modalFormularioVerNotas" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Notas del {{ procedimiento.id_doc.nombre}} {{ formato.id_doc.nombre}}
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioModalEnviarNota" action="/private/docLaruex/agregarNotificacion/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col">
+              <table class="table-sm table-hover" id="tabla_notificaciones" data-search="true"
+                data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10]"
+                data-toolbar="#toolbar"></table>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Modal Cambiar Estado ================= -->
+<div id="modalFormularioCambiarEstado" class="modal fade" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalCambiarEstado">Cambiar estado del {{ procedimiento.id_doc.nombre}} {{
+          formato.id_doc.nombre}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioCambiarEstado" action="/private/docLaruex/editarEstado/{{ formato.id_doc.id}}/"
+          method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <input type="text" class="form-control" id="id_doc" name="id_doc" data-rule="required"
+                  value="{{ formato.id_doc.id }}" hidden />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-4">
+              <div class="form-group">
+                <label>Estado actual</label>
+                <input type="text" value="{{formato.id_doc.id_estado.nombre}}" class="form-control" disabled>
+
+              </div>
+            </div>
+            <div class="col-8">
+              <div class="form-group">
+                <label for="nuevoEstado">Nuevo estado</label>
+                <select class="form-select my-auto" id="nuevoEstado" name="nuevoEstado">
+                  {% for estado in estados %}
+                  <option value="{{estado.id}}">
+                    {{estado.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Modal con el formulario para Actualizar ========== -->
+
+<div id="modalActualizarFormato" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+  aria-labelledby="modalActualizarFormato" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- Boton que bloquea el formato  -->
+        <a title="Bloquear formato Actual" class="mx-2 my-auto" onclick="bloquearFormato()" style="color: #f3773e"><i
+            id="bloquearFormato" class="fa-duotone fa-lock-open fa-3x"></i></a>
+
+        <h5 class="modal-title" id="TituloModal">
+          <strong>
+            Actualizar {{formato.id_doc.nombre}}
+            <h5 class="modal-title">{{formato.titulo}}</h5>
+          </strong>
+        </h5>
+
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+      </div>
+      <!-- END Cabecera del ModalActualizarFormato -->
+
+      <!-- Body del ModalActualizarFormato -->
+      <div class="modal-body">
+        <form id="formularioActualizarFormato" action="/private/docLaruex/actualizarFormato/{{formato.id_doc.id}}"
+          method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="text" class="form-control col-md-auto" id="creador" value="{{user.id}}" readonly hidden
+            name="creador" data-rule="required" />
+
+          <div class="row">
+            <div class="col-4">
+              <div class="form-group">
+                <input class="form-select" data-rule="required" id="editable" name="editable" hidden value="1"></input>
+              </div>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center">
+
+            <div class="col-md-auto" id="adjuntoEditable">
+              <div class="form-group">
+                <label for="ficheroAdjuntoFormatoModificado"><i
+                    class="fa-solid fa-file-signature fa-4x addFicheroEditable"></i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="ficheroAdjuntoFormatoModificado" name="ficheroAdjuntoFormatoModificado"
+                  onchange="mostrarNombreArchivo(this.value)" />
+                <spam class="text-center"><strong id="mostrarNombreArchivo"></strong>
+                  <spam id="file-name"></spam>
+                </spam>
+
+              </div>
+            </div>
+          </div>
+          <!-- END Body del ModalActualizarFormato -->
+
+          <!-- Footer del ModalActualizarFormato -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary">
+              Guardar
+            </button>
+          </div>
+          <!-- END Footer del ModalActualizarFormato -->
+        </form>
+      </div>
+    </div>
+  </div>
+</div><!-- END ModalActualizarFormato -->
+
+<!-- ========== Modal con el formulario para añadir un formato relleno ========== -->
+
+<div id="modalRellenarFormato" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+  aria-labelledby="modalRellenarFormato" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">
+          <strong>
+            Añadir {{formato.id_doc.nombre}} relleno
+            <h5 class="modal-title">{{formato.titulo}}</h5>
+          </strong>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+      </div>
+      <!-- END Cabecera del ModalAñadirFormatoRelleno -->
+
+      <!-- Body del ModalAñadirFormatoRelleno -->
+      <div class="modal-body">
+        <form id="formularioAsociarFormato" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="text" class="form-control" id="habilitacion" name="habilitacion" data-rule="required" readonly
+            hidden value="{{formato.id_doc.id_habilitacion.id}}" />
+          <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly hidden
+            value="Formato" />
+            <input type="text" class="form-control" id="procedimientoAsociado" name="procedimientoAsociado"
+              data-rule="required" readonly hidden value="{{formato.procedimiento}}" />
+              <input type="text" class="form-control" id="padre" name="padre"
+                data-rule="required" readonly hidden value="{{formato.id_doc.padre.id}}" />
+
+          <!-- 0 - relleno 1- plantilla -->
+          <input type="text" class="form-control" id="plantilla" name="plantilla" data-rule="required" readonly hidden
+            value="0" />
+
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="fechaEdicion">Fecha de edición</label>
+                <input type="date" id="fechaEdicion" name="fechaEdicion" class="form-control" required />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="editable">¿Es rellenable?</label>
+                <select class="form-select" data-rule="required" id="editable" name="editable"
+                  onchange="mostrarFicheroFormato(this.value)">
+                  <option value="0" selected>No</option>
+                  <option value="1">Si</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="infoMuestra">Código de Muestra / Referencia *</label>
+                  <input type="text" id="infoMuestra" name="infoMuestra" class="form-control" required />
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="infoAlicuota">Código reducido</label>
+                  <input type="text" id="infoAlicuota" name="infoAlicuota" class="form-control" />
+                </div>
+              </div>
+              <input type="text" class="form-control" id="nombreObjeto" name="nombreObjeto" readonly hidden
+                data-rule="required" value={{formato.id_doc.nombre}} />
+            </div>
+            <input type="text" class="form-control col-md-auto" id="tituloFormato" value="{{formato.titulo}}" readonly
+              hidden name="tituloFormato" data-rule="required" />
+            <input type="text" class="form-control col-md-auto" id="version" value="{{formato.version}}" readonly hidden
+              name="versionFormato" data-rule="required" />
+            <input type="text" class="form-control col-md-auto" id="editor" value="{{user.id}}" readonly hidden
+              name="editor" data-rule="required" />
+
+            <div class="row d-flex justify-content-center">
+              <div class="col-md-auto" id="adjuntoEditable">
+                <div class="form-group">
+                  <label for="ficheroAdjuntoFormato"><i id="iconoFormato"
+                      class="fa-solid fa-file-pdf fa-4x addFicheroEditable"></i>
+                  </label>
+                  <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                    id="ficheroAdjuntoFormato" name="ficheroAdjuntoFormato" data-rule="required"
+                    onchange="mostrarNombreFormatoRellenable(this.value)" re />
+                  <spam class="text-center"><strong id="mostrarNombreFormatoRellenable"></strong>
+                    <spam id="file-name-formatoRellenable"></spam>
+                  </spam>
+
+                </div>
+              </div>
+            </div>
+            <!-- END Body del ModalAsociarFormato -->
+
+            <!-- Footer del ModalAsociarFormato -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                Cerrar
+              </button>
+              <button type="submit" value="submit" class="btn btn-primary">
+                Guardar
+              </button>
+            </div>
+            <!-- END Footer del ModalAsociarFormato -->
+        </form>
+      </div>
+    </div>
+  </div>
+</div><!-- END ModalAsociarFormato -->
+
+
+
+</div> <!-- END modalAsociarArchivo -->
+
+<!-- ================== Modal Editar Formato ==================== -->
+<div id="modalEditarFormato" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+  aria-labelledby="modalEditarFormato" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal"><strong> Editar
+            {{procedimiento.id_doc.nombre}} {{formato.id_doc.nombre}}</strong>
+
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <!-- END Cabecera del ModalEditarProcedimiento -->
+
+      <!-- Body del ModalEditarProcedimiento -->
+      <div class="modal-body">
+        <form id="formularioEditarFormato" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row divFormularioEditarFormato">
+            <div class="col">
+              <div class="form-group">
+                <label for="nuevaHabilitacion">Habilitación</label>
+                <select class="form-select" data-rule="required" id="nuevaHabilitacion" name="nuevaHabilitacion">
+                  <option value="{{formato.id_doc.id_habilitacion.id}}" selected hidden>
+                    {{formato.id_doc.id_habilitacion.titulo}}
+                  </option>
+                  {% for habilitacion in habilitaciones %}
+                  <option value="{{habilitacion.id}}">
+                    {{habilitacion.titulo}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="nuevoNombre">Nombre</label>
+                <input type="text" class="form-control" id="nuevoNombre" name="nuevoNombre" data-rule="required"
+                  value="{{formato.id_doc.nombre}}" />
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                <label for="nuevaVersion">Version</label>
+                <input type="number" class="form-control" id="nuevaVersion" name="nuevaVersion" data-rule="required"
+                  value="{{formato.version}}" />
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="nuevaFechaEdicion">Fecha de Edición</label>
+                <input type="date" id="nuevaFechaEdicion" name="nuevaFechaEdicion" class="form-control"
+                  value="{{formato.fecha_edicion.date|safe }}" />
+              </div>
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col" hidden>
+              <div class="form-group">
+                <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required"
+                  value="{{formato.id_doc.tipo}}" />
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="nuevoTitulo">Titulo</label>
+                <input type="text" class="form-control" id="nuevoTitulo" name="nuevoTitulo" data-rule="required"
+                  value="{{formato.titulo}}" />
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-9">
+              <div class="form-group">
+                <label for="nuevoProcedimiento">Procedimiento</label>
+                <select class="form-select" data-rule="required" id="nuevoProcedimiento" name="nuevoProcedimiento">
+                  <option value="{{formato.procedimiento}}" selected hidden>{{formato.procedimiento}}</option>
+                  {% for procedimiento in procedimientos %}
+                  <option value="{{procedimiento.titulo}}">
+                    {{procedimiento.id_doc__nombre}} - Revisión: {{procedimiento.version}} {{procedimiento.titulo}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="nuevoEditor">Editor</label>
+                <select class="form-select" data-rule="required" id="nuevoEditor" name="nuevoEditor">
+                  <option value="{{formato.editor.id}}" selected hidden>{{formato.editor.first_name}}
+                    {{formato.editor.last_name}}</option>
+                  {% for editor in editores %}
+                  <option value="{{editor.id}}">
+                    {{editor.first_name}} {{editor.last_name}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label for="nuevaPlantilla">¿Es Plantilla?</label>
+              <select class="form-control" id="nuevaPlantilla" name="nuevaPlantilla">
+                <option value="{{formato.plantilla}}" selected hidden>
+                  {% if formato.plantilla == 0 %}
+                  No
+                  {% else %}
+                  Si
+                  {% endif %}
+                </option>
+                <option value="0">No
+                </option>
+                <option value="1">Si
+                </option>
+              </select>
+            </div>
+            <div class="col">
+              <label for="nuevoEditable">¿Es Editable?</label>
+              <select class="form-control" id="nuevoEditable" name="nuevoEditable">
+                <option value="{{formato.editable}}" selected hidden>
+                  {% if formato.editable == 0 %}
+                  No
+                  {% else %}
+                  Si
+                  {% endif %}
+                </option>
+                <option value="0">No
+                </option>
+                <option value="1">Si
+                </option>
+              </select>
+            </div>
+          </div>
+
+      </div>
+
+
+      <!-- END Body del ModalAsociarFormato -->
+
+      <!-- Footer del ModalAsociarFormato -->
+      <div class="modal-footer">
+        <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cerrar
+        </button>
+        <button type="submit" value="submit" class="btn btn-primary">
+          Guardar
+        </button>
+      </div>
+      <!-- END Footer del ModalAsociarFormato -->
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===================== Tablas e información del formato ===================== -->
+<section class="section profile">
+  <div class="row">
+    <div class="col">
+
+      <div class="card">
+        <div class="card-body pt-3">
+          <!-- Bordered Tabs -->
+          <ul class="nav nav-tabs nav-tabs-bordered">
+
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Información</button>
+            </li>  
+
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-formatos">Formatos Rellenos</button>
+            </li> 
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-historial-formato">Historial de versiones del formato {{formato.id_doc.nombre}}</button>
+            </li>
+
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-referencias-asociadas">Documentos y Referencias</button>
+            </li>
+           
+            {% if administrador %}
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-editar">
+                Editar
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-eliminar">Eliminar</button>
+            </li>
+            {% endif %}
+
+          </ul>
+
+          <div class="tab-content pt-2">
+
+            <!-- Información destacada del formato -->
+            <div class="tab-pane fade show active profile-overview" id="profile-overview">
+              <h5 class="card-title">Información del {{formato.procedimiento}} {{formato.id_doc.nombre}}</h5>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Fecha</div>
+                <div class="col-lg-9 col-md-8">{{ formato.fecha_edicion.date }}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Título</div>
+                <div class="col-lg-9 col-md-8">{{formato.titulo}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Versión</div>
+                <div class="col-lg-9 col-md-8">{{ formato.version }}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Editor</div>
+                <div class="col-lg-9 col-md-8">
+                  {{ formato.editor.first_name }} {{formato.editor.last_name}}</div>
+              </div>
+
+              
+              <h5 class="card-title">Otra información</h5>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Habilitación:</div>
+                <div class="col-lg-9 col-md-8">{{formato.id_doc.id_habilitacion.titulo}}</div>
+              </div>
+              
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Fecha de subida:</div>
+                <div class="col-lg-9 col-md-8">{{ formato.id_doc.fecha_subida }}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Subido por:</div>
+                <div class="col-lg-9 col-md-8">{{ formato.id_doc.creador.first_name }} {{ formato.id_doc.creador.last_name }}</div>
+              </div>
+
+            </div>
+
+            <!-- Formatos rellenos -->
+            <div class="tab-pane fade profile-formatos pt-3" id="profile-formatos">
+
+
+              <h5 class="card-title">{{formato.procedimiento}} {{formato.id_doc.nombre}} rellenos</h5> 
+              <table id="tabla_historial_formatos" data-toggle="table" data-search="true" data-show-columns="true"
+              data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+              data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+              data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+              </table>
+                          
+            </div>
+
+            <!-- Historial de versiones del formato -->
+            <div class="tab-pane fade profile-historial-formato pt-3" id="profile-historial-formato">
+
+              <h5 class="card-title">Histórico de plantillas del {{formato.id_doc.padre.nombre}} {{formato.id_doc.nombre}}</h5>
+              <table id="tabla_historial_versiones" data-toggle="table" data-search="true" data-show-columns="true"
+              data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+              data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+              data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+              </table>
+
+            </div>
+
+            <!-- Referencias Asociadas -->
+            <div class="tab-pane fade profile-referencias-asociadas pt-3" id="profile-referencias-asociadas">
+
+              <!-- Tabla de referencias Asociadas -->
+              <table id="tabla_referencias_asociadas" data-toggle="table" data-search="true" data-show-columns="true"
+              data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+              data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+              data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+
+            </div>
+
+
+            <!-- Editar Procedimiento -->
+            <div class="tab-pane fade profile-editar pt-3" id="profile-editar">
+
+              <!-- Edit Form -->
+              <form id="formularioEditarFormato" action="/private/docLaruex/editarObjeto/{{formato.id_doc.id}}/" method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+                  <div class="row divFormularioEditarFormato">
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="nuevaHabilitacion">Habilitación</label>
+                        <select class="form-select" data-rule="required" id="nuevaHabilitacion" name="nuevaHabilitacion">
+                          <option value="{{formato.id_doc.id_habilitacion.id}}" selected hidden>
+                            {{formato.id_doc.id_habilitacion.titulo}}
+                          </option>
+                          {% for habilitacion in habilitaciones %}
+                          <option value="{{habilitacion.id}}">
+                            {{habilitacion.titulo}}
+                          </option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="nuevoNombre">Nombre</label>
+                        <input type="text" class="form-control" id="nuevoNombre" name="nuevoNombre" data-rule="required"
+                          value="{{formato.id_doc.nombre}}" />
+                      </div>
+                    </div>
+                    <div class="col-2">
+                      <div class="form-group">
+                        <label for="nuevaVersion">Version</label>
+                        <input type="number" class="form-control" id="nuevaVersion" name="nuevaVersion" data-rule="required"
+                          value="{{formato.version}}" />
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <div class="form-group">
+                        <label for="nuevaFechaEdicion">Fecha de Edición</label>
+                        <input type="date" id="nuevaFechaEdicion" name="nuevaFechaEdicion" class="form-control"
+                          value="{{formato.fecha_edicion.date|safe }}" />
+                      </div>
+                    </div>
+        
+                  </div>
+                  <div class="row">
+                    <div class="col" hidden>
+                      <div class="form-group">
+                        <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required"
+                          value="{{formato.id_doc.tipo}}" />
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="form-group">
+                        <label for="nuevoTitulo">Titulo</label>
+                        <input type="text" class="form-control" id="nuevoTitulo" name="nuevoTitulo" data-rule="required"
+                          value="{{formato.titulo}}" />
+                      </div>
+                    </div>
+                  </div>
+        
+                  <div class="row">
+                    <div class="col-9">
+                      <div class="form-group">
+                        <label for="nuevoProcedimiento">Procedimiento</label>
+                        <select class="form-select" data-rule="required" id="nuevoProcedimiento" name="nuevoProcedimiento">
+                          <option value="{{formato.procedimiento}}" selected hidden>{{formato.procedimiento}}</option>
+                          {% for procedimiento in procedimientos %}
+                          <option value="{{procedimiento.titulo}}">
+                            {{procedimiento.id_doc__nombre}} - Revisión: {{procedimiento.version}} {{procedimiento.titulo}}
+                          </option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-3">
+                      <div class="form-group">
+                        <label for="nuevoEditor">Editor</label>
+                        <select class="form-select" data-rule="required" id="nuevoEditor" name="nuevoEditor">
+                          <option value="{{formato.editor.id}}" selected hidden>{{formato.editor.first_name}}
+                            {{formato.editor.last_name}}</option>
+                          {% for editor in editores %}
+                          <option value="{{editor.id}}">
+                            {{editor.first_name}} {{editor.last_name}}
+                          </option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <label for="nuevaPlantilla">¿Es Plantilla?</label>
+                      <select class="form-control" id="nuevaPlantilla" name="nuevaPlantilla">
+                        <option value="{{formato.plantilla}}" selected hidden>
+                          {% if formato.plantilla == 0 %}
+                          No
+                          {% else %}
+                          Si
+                          {% endif %}
+                        </option>
+                        <option value="0">No {{formato.plantilla}}
+                        </option>
+                        <option value="1">Si
+                        </option>
+                      </select>
+                    </div>
+                    <div class="col">
+                      <label for="nuevoEditable">¿Es Editable?</label>
+                      <select class="form-control" id="nuevoEditable" name="nuevoEditable">
+                        <option value="{{formato.editable}}" selected hidden>
+                          {% if formato.editable == 0 or formato.editable == None %}
+                          No 
+                          {% else %}
+                          Si
+                          {% endif %}
+                        </option>
+                        <option value="0">No
+                        </option>
+                        <option value="1">Si
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row my-4">
+                    
+                  
+                    <div class="col-md-6 col-lg-6  d-flex justify-content-end">
+                        <div class="form-group">
+                          <label for="nuevoAdjuntoFormato"><i class="fa-solid fa-file-pdf fa-4x addFicheroPDF">
+                            </i>
+                          </label>
+                          <input type="file" class="form-control-file" style="display: none; visibility: none;" id="nuevoAdjuntoFormato"
+                            name="nuevoAdjuntoFormato" onchange="mostrarNombreArchivoNuevo(this.value)" />
+                          <spam class="text-center"><strong id="mostrarNombreArchivoNuevo"><br></strong>
+                            <spam id="nuevo-file-name"></spam>
+                        </div>
+                      
+                    </div>
+                    <div class="col-md-6 col-lg-6  d-flex justify-content-start">
+  
+                        <div class="form-group">
+                          <label for="nuevoAdjuntoEditableFormato"><i class="fa-solid fa-file-signature fa-4x addFicheroEditable">
+                            </i>
+                          </label>
+                        
+                          <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                            id="nuevoAdjuntoEditableFormato" name="nuevoAdjuntoEditableFormato"
+                            onchange="mostrarNombreArchivoEditableNuevo(this.value)" />
+                        
+                        
+                          <spam class="text-center"><strong id="mostrarNombreArchivoEditableNuevo"><br></strong>
+                            <spam id="nuevo-file-name-editable"></spam>
+                          </spam>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="text-center my-4">
+                    <button class="col-2 cta" type="submit">
+                      <span>Guardar</span>
+                    </button>  
+                    
+                  </div>
+                  
+        
+        
+              <!-- END Body del ModalAsociarFormato -->
+
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+            <!-- Eliminar Procedimiento -->
+            <div class="tab-pane fade profile-edit pt-3" id="profile-eliminar">
+
+              <!-- Formulario eliminar Procedimiento -->
+              <form form id="fomularioEliminarObjeto" action="/private/docLaruex/eliminarObjeto/{{ formato.id_doc.id }}/"
+              method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label class="text-center">¿Estás seguro de eliminar el formato {{formato.procedimiento}} {{formato.id_doc.nombre}} versión {{formato.version}} ({{formato.titulo}})?</label>
+                </div>
+                <div class="text-center">
+                  <button id="eliminarProcedimiento" type="submit" class="btn btn-danger" onclick="crearAviso('guardarEliminarProcedimiento', 'Procedimiento {{ procedimiento.nombre }} eliminado con éxito', 'alert-success', 3000)">Eliminar</button>
+
+                  <button  id="canclearEliminarStock" type="reset" class="btn btn-secondary" onclick="crearAviso('cerrarEliminarProcedimiento', 'No se ha podido eliminar el procedimiento {{ procedimiento.id_doc.nombre }}{{ procedimiento.version }}', 'alert-warning', 3000); location.reload()">Cancelar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+          </div><!-- End Bordered Tabs -->
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============= Modal Eliminar Asociacion ====================-->
+
+<div id="modalEliminarAsociacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarAsociacion"><strong>¿Estas seguro que deseas eliminar esta
+            asociación?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+
+      <form id="formularioModalEliminarAsociacion" action="/private/docLaruex/eliminarAsociacion/0/" method="POST"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- indica el tipo de objeto se que va a añadir -->
+        <div class="modal-footer d-flex justify-content-center">
+          <button id="cerrarEliminarAsociacion" type="button" class="btn btn-secondary" data-dismiss="modal"
+            hidden>Cerrar</button>
+          <button class="btn btn-secondary" data-dismiss="modal" id="cancelEliminarAsociacion" name="cancel"
+            onclick="crearAviso('eliminarObjetoCancelar', 'No se ha podido eliminar la referencia', 'alert-warning', 3000)">Cancelar</button>
+          <button type="submit" value="submit" class="btn btn-danger"
+            onclick="crearAviso('eliminarObjetoGuardar', 'Referencia  eliminada', 'alert-success', 3000)">
+            Eliminar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Modal para asociar Archivos al Formato ========== -->
+<div id="modalAsociarArchivo" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+  aria-labelledby="modalAsociarArchivo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">
+          <strong>
+            Seleccione los archivos que desea asociar.
+          </strong>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+      </div>
+      <!-- END Cabecera del ModalAsciarFormato -->
+
+      <!-- Body del modalAsociarArchivo -->
+      <div class="modal-body">
+        <form id="formularioAsociarArchivo" enctype="multipart/form-data">
+          {% csrf_token %}
+
+
+          <div class="row justify-content-center">
+            <div class="col-lg-5">
+              <div class="card card p-4 ">
+                <h5 class="card-title text-center">Archivos</h5>
+                <table class="table-sm table-hover" id="tabla_objetos_para_asociar" data-search="true"
+                  data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10]"
+                  data-toolbar="#toolbar"></table>
+              </div>
+            </div>
+            {% if device_info.type == 'phone' %}
+
+
+            {% else %}
+            <div class="col-lg-1 col-12 my-auto text-center">
+              <i id="flechas" class="fa-solid fa-arrow-right-arrow-left fa-3x" style="color: rgb(41,68,87)"></i>
+            </div>
+            {% endif %}
+
+            <div class="col-lg-5">
+              <div class="card p-4">
+                <h5 class="card-title text-center">Archivos Seleccionados</h5>
+                <table id="tabla_objetos_para_asociar_seleccionados" class="table-sm table-hover" data-search="true"
+                  data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10]"
+                  data-toolbar="#toolbar"></table>
+              </div>
+            </div>
+          </div>
+      </div>
+
+
+      <input type="text" id="idFormatoActual" value="{{ formato.id_doc.id }}" hidden name="idFormatoActual"
+        data-rule="required" />
+      <input type="text" id="idArchivosSeleccionados" hidden name="idArchivosSeleccionados" data-rule="required" />
+
+      <!-- Footer del ModalAsociarFormato -->
+      <div class="modal-footer d-flex">
+
+        <button id="cerrarAsociar" type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cerrar
+        </button>
+        <button type="submit" value="submit" class="btn btn-primary">
+          Guardar
+        </button>
+      </div>
+      <!-- END Footer del ModalAsociarFormato -->
+    
+    </form>
+    </div>
+  </div>
+</div><!-- END Body del ModalAsociarFormato -->
+
+
+
+<!-- ################################ Scripts ################################ -->
+
+<script type="text/javascript">
+  $(".accordion").collapse();
+
+  // ===================== Tabla con lista de notificaciones =====================
+  $("#tabla_notificaciones").bootstrapTable({
+    method: "get",
+    url: "/private/docLaruex/notificacionesDatos/{{ formato.id_doc.id }}/",
+    cache: false,
+    locale: navigator.language,
+    columns: [
+      {
+        title: "Fecha",
+        field: "fecha",
+        sortable: "true",
+        align: "center",
+        formatter: function (value, row) {
+          var fecha = new Date(row.fecha);
+          return (
+            $.datepicker.formatDate("dd-mm-yy", fecha)
+          );
+        },
+      },
+      {
+        title: "Título",
+        field: "titulo",
+        align: "center",
+      },
+      {
+        title: "Resumen",
+        field: "resumen",
+        align: "center",
+      },
+      {
+        title: "Creador",
+        field: "creador",
+        align: "center",
+        formatter: function (value, row) {
+          return row.creador__first_name + " " + row.creador__last_name;
+        },
+      },
+      {
+        title: "Estado",
+        field: "estado_notificacion__nombre",
+        align: "center",
+        formatter: function (value, row) {
+          var defecto = '<span class="badge" style="background-color: #524e4e;">Enviada</span>';
+          switch (row.estado_notificacion__id) {
+            case 1:
+              estado = '<span class="badge badge-success" style="background-color: #524e4e;">Enviada</span>';
+              return estado;
+              break;
+            case 2:
+              estado = '<span class="badge" style="background-color: #0A9396;">Recibida</span>';
+              return estado;
+              break;
+
+            case 3:
+              estado = '<span class="badge" style="background-color: #EB8E34;">En tramite</span>';
+              return estado;
+              break;
+            case 4:
+              estado = '<span class="badge" style="background-color: #21b563;">Cerrada</span>';
+              return estado;
+              break;
+            case 5:
+              estado = '<span class="badge" style="background-color: #b52121;">No atendida</span>';
+              return estado;
+              break;
+
+            default:
+              return defecto;
+
+          }
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "desc",
+  });
+
+
+  // --------------- Tabla historial de formatos rellenos ---------------
+  $('#tabla_historial_formatos').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/historialFormatoRellenos/{{ formato.id_doc.nombre }}/{{formato.procedimiento}}/",
+    cache: false,
+    locale: navigator.language,
+    columns: [{
+      title: 'ID',
+      field: 'id_doc',
+      align: 'center',
+    }, {
+      title: 'Código',
+      field: 'id_doc__nombre',
+      align: 'center',
+      formatter: function (value, row) {
+        return row.id_doc__padre__nombre + ' ' + row.id_doc__nombre;
+      }
+    }, {
+      title: 'Título',
+      field: 'titulo',
+      align: 'center',
+      
+      formatter: function (value, row) {
+        if (row.info_adicional){
+          return row.titulo + ' ' + row.info_adicional;
+        }else{
+          return row.titulo;
+        }
+        
+      }
+    }, {
+      title: 'Versión',
+      field: 'version',
+      align: 'center',
+    }, {
+      title: 'Editor',
+      field: 'editor',
+      align: 'center',
+      formatter: function (value, row) {
+        return row.editor__first_name + ' ' + row.editor__last_name;
+      }
+    }, {
+      title: 'Fecha',
+      field: 'fecha_edicion',
+      sortable: 'true',
+      align: 'center',
+      formatter: function (value, row) {
+        var fecha = new Date(row.fecha_edicion);
+        return $.datepicker.formatDate('dd-mm-yy', fecha) + " " + addZero(fecha.getHours()) + ":" + addZero(fecha.getMinutes());
+      }
+    }, {
+      title: 'Acciones',
+      field: 'action',
+      align: 'center',
+      formatter: function (value, row) {
+
+        //Definimos los botones e iconos
+        var botonVerFormatoRelleno = '<a href="/private/docLaruex/verObjeto/' + row.id_doc + '/" class="mx-1" style="color:#68B29E" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg verObjeto" ></i></a>';
+        var botonDescargarFormatoRelleno = '<a href="/private/docLaruex/consultarArchivo/' + row.id_doc + '/' + '"class="mx-1" style="color:#AE2012" download><i class="fa-duotone fa-file-pdf fa-lg descargaPDF" ></i></a>';
+        var botonDescargarFormatoRellenoExcel = '<a href="/private/docLaruex/consultarArchivo/' + row.id_doc + '/' + '"class="mx-1" style="color:#128C33" download><i class="fa-duotone fa-file-excel fa-lg descargaExcel" ></i></a>';
+        var candadoAbierto = '<i class="fa-duotone fa-lock-open fa-lg" style="color:#f3773e"></i>';
+        var candadoCerrado = '<i class="fa-duotone fa-lock fa-lg" style="color:#001219"></i>';
+
+        // Definimos las variables  
+        var admin = '{{administrador}}';
+      
+
+
+        if (row.id_doc__ruta){
+
+          extension = row.id_doc__ruta.split(".").pop();
+        }
+
+        if (admin == 'True') {
+          if (row.editable == 1) {
+            if (extension == "xlsx" || extension == "xls"){
+            return (botonVerFormatoRelleno + botonDescargarFormatoRellenoExcel + candadoAbierto);
+
+            }else{
+
+            return (botonVerFormatoRelleno + botonDescargarFormatoRelleno + candadoAbierto);
+            }
+          }else {
+           if (extension == "xlsx" || extension == "xls"){
+            return (botonVerFormatoRelleno + botonDescargarFormatoRellenoExcel + candadoCerrado);
+
+           }else{
+
+            return (botonVerFormatoRelleno + botonDescargarFormatoRelleno + candadoCerrado);
+           }
+          }
+        }
+        else {
+          if (row.editable == 1) {
+            if (extension == "xlsx" || extension == "xls"){
+              return (botonVerFormatoRelleno + botonDescargarFormatoRellenoExcel + candadoAbierto);
+            }
+            else{
+              return (botonVerFormatoRelleno + botonDescargarFormatoRelleno + candadoAbierto);
+            }
+          }          
+          else {
+           if (extension == "xlsx" || extension == "xls"){
+            return (botonVerFormatoRelleno + botonDescargarFormatoRellenoExcel + candadoCerrado);
+           }else{
+            return (botonVerFormatoRelleno + botonDescargarFormatoRelleno + candadoCerrado);
+           }
+          }
+      }
+      }
+    }],
+    search: true,
+    sortName: 'fecha_subida',
+    sortOrder: 'desc',
+
+  });
+
+  /*
+  $('#tabla_historial_formatos').on('click-row.bs.table', function (e, row, $element) {
+      window.location.href = "/private/docLaruex/verObjeto/"+ row.id_doc + "/" ;
+  }); 
+  */
+  // fin del historial de los formatos rellenos
+
+
+  // inicio  HISTORIAL DE VERSIONES DE LOS FORMATOS
+  $('#tabla_historial_versiones').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/historialFormato/{{ formato.id_doc.nombre }}/{{formato.procedimiento}}/",
+    cache: false,
+    locale: navigator.language,
+    columns: [{
+      title: 'ID',
+      field: 'id_doc',
+      align: 'center',
+    }, {
+      title: 'Código',
+      field: 'id_doc__nombre',
+      align: 'center',
+      
+      formatter: function (value, row) {
+          return row.procedimiento + ' ' + row.id_doc__nombre;
+      }
+    }, {
+      title: 'Título',
+      field: 'titulo',
+      align: 'center',
+    }, {
+      title: 'Versión',
+      field: 'version',
+      align: 'center',
+    }, {
+      title: 'Editor',
+      field: 'editor',
+      align: 'center',
+      formatter: function (value, row) {
+        return row.editor__first_name + ' ' + row.editor__last_name;
+      }
+    }, {
+      title: 'Fecha',
+      field: 'fecha_edicion',
+      sortable: 'true',
+      align: 'center',
+      formatter: function (value, row) {
+        var fecha = new Date(row.fecha_edicion);
+        return $.datepicker.formatDate('dd-mm-yy', fecha) + " " + addZero(fecha.getHours()) + ":" + addZero(fecha.getMinutes());
+      }
+    }, {
+      title: 'Editable',
+      field: 'editable',
+      align: 'center',
+      formatter: function (value, row) {
+          if (row.editable == null) {
+            row.editable = 0;
+          }
+          var defecto = '<span class="badge" style="background-color: #524e4e;">No editable</span>';
+          switch (row.editable) {
+            case 0:
+              estado = '<span class="badge" style="background-color: #524e4e;">No editable</span>';
+              return estado;
+              break;
+            case 1:
+              estado = '<span class="badge" style="background-color: #21b563;">Editable</span>';
+              return estado;
+              break;
+            default:
+              console.log("No se ha encontrado el estado", row.editable)
+              return defecto;
+
+          }
+        
+
+      }
+    }, {
+      title: 'Acciones',
+      field: 'action',
+      align: 'center',
+      formatter: function (value, row) {
+        var extension = "";
+        //Definimos los botones e iconos
+        var botonVerVersionFormato = '<a href="/private/docLaruex/verObjeto/' + row.id_doc + '/" class="mx-1" title="Abrir" style="color:#68B29E" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg verObjeto" ></i></a>';
+        var botonDescargarVersionFormatoExcel = '<a href="/private/docLaruex/consultarArchivo/' + row.id_doc + '/' + '"class="mx-1" style="color:#128C33" download><i class="fa-duotone fa-file-excel fa-lg" ></i></a>';
+        var botonDescargarVersionFormatoPdf = '<a href="/private/docLaruex/consultarArchivo/' + row.id_doc + '/' + '"class="mx-1" style="color:#A11020" download><i class="fa-solid fa-file-pdf fa-lg descargaPDF" ></i></a>';
+
+        var candadoAbierto = '<i class="fa-duotone fa-lock-open fa-lg" style="color:#f3773e"></i>';
+        var candadoCerrado = '<i class="fa-duotone fa-lock fa-lg" style="color:#001219"></i>';
+
+        // Definimos las variables  
+        var admin = '{{administrador}}';
+      
+        if (row.id_doc__ruta){
+          extension = row.id_doc__ruta.split(".").pop();
+        }
+
+        if (row.editable == 1) {
+          if (extension == "xlsx" || extension == "xls"){
+            return (botonVerVersionFormato + botonDescargarVersionFormatoExcel + candadoAbierto);
+          }else{
+
+            return (botonVerVersionFormato + botonDescargarVersionFormatoPdf + candadoAbierto);
+          }
+        }else{
+          
+          if (extension == "xlsx" || extension == "xls"){
+            return (botonVerVersionFormato + botonDescargarVersionFormatoExcel + candadoCerrado);
+          }else{
+            return (botonVerVersionFormato + botonDescargarVersionFormatoPdf + candadoCerrado);
+          }
+        }
+
+      }
+    }],
+    search: true,
+    sortName: 'fecha_subida',
+    sortOrder: 'desc',
+
+  });
+
+  /*
+  $('#tabla_historial_versiones').on('click-row.bs.table', function (e, row, $element) {
+      window.location.href = "/private/docLaruex/verObjeto/"+ row.id_doc + "/" ;
+  });
+  */
+  // Table de documentos asociados al formato que se está visualizando
+  $("#tabla_referencias_asociadas").bootstrapTable({
+    method: "get",
+    url: "/private/docLaruex/archivosAsociados/{{ formato.id_doc.id }}/",
+    cache: false,
+    locale: navigator.language,
+    columns: [
+      {
+        title: "ID",
+        field: "id_relacionado",
+        align: "center",
+      },
+      {
+        title: "Nombre",
+        field: "id_relacionado__nombre",
+        align: "center",
+      },
+      {
+        title: "Tipo",
+        field: "id_relacionado__tipo",
+        align: "center",
+      },
+      {
+        title: "Creador",
+        field: "creador",
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            row.id_relacionado__creador__first_name +
+            " " +
+            row.id_relacionado__creador__last_name
+          );
+        },
+      },
+      {
+        title: "Fecha",
+        field: "id_relacionado__fecha_subida",
+        sortable: "true",
+        align: "center",
+        formatter: function (value, row) {
+          var fecha = new Date(row.id_relacionado__fecha_subida);
+          return (
+            $.datepicker.formatDate("dd-mm-yy", fecha) +
+            " " +
+            addZero(fecha.getHours()) +
+            ":" +
+            addZero(fecha.getMinutes())
+          );
+        },
+      },
+      {
+        title: "Estado",
+        field: "estado",
+        align: "center",
+        formatter: function (value, row) {
+          var defecto = '<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+          switch (row.id_relacionado__id_estado__id) {
+            case 1:
+              estado = '<span class="badge badge-success" style="background-color: #21b563;">Operativo</span>';
+              return estado;
+              break;
+            case 2:
+              estado = '<span class="badge" style="background-color: #21b563;">En Vigor</span>';
+              return estado;
+              break;
+
+            case 3:
+              estado = '<span class="badge" style="background-color: #EB8E34;">En Mantenimiento</span>';
+              return estado;
+              break;
+            case 4:
+              estado = '<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+              return estado;
+              break;
+            case 5:
+              estado = '<span class="badge" style="background-color: #524e4e;">Obsoleto</span>';
+              return estado;
+              break;
+            case 6:
+              estado = '<span class="badge" style="background-color: #b52121;">No operativo</span>';
+              return estado;
+              break;
+            case 7:
+              estado = '<span class="badge" style="background-color: #b52121;">Baja</span>';
+              return estado;
+              break;
+
+            default:
+              console.log("No se ha encontrado el estado", row.id_relacionado__id)
+              return defecto;
+
+          }
+        },
+      },
+      {
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+
+          // Definimos las variables  
+          var admin = '{{administrador}}';
+          var objeto = '{{formato.id_doc.id}}';
+          var rol = "{{rol}}";
+
+
+          var botonDescargarDocumentoPDF = '<a href="/private/docLaruex/consultarArchivo/' + row.id_relacionado + '/' + '" class="mx-1" title="Descargar" style="color:#A11020" download><i class="fa-solid fa-file-pdf fa-lg" ></i></a>';
+          var botonDescargarDocumentoWord = '<a href="/private/docLaruex/consultarArchivoEditable/' + row.id_relacionado + '/' + '" class="mx-1" title="Descargar" style="color:#266353" download><i class="fa-duotone fa-file-signature fa-lg" ></i></a>';
+
+          var botonEliminarReferencia = '<a href="/private/docLaruex/eliminarAsocicion/' + row.id_relacionado + '/' +  objeto + '/" class="mx-1" title="Eliminar Asociacion" data-toggle="modal" data-target="#modalEliminarAsociacion" onclick="$('+"'#formularioModalEliminarAsociacion').attr('action', '/private/docLaruex/eliminarAsocicion/"+ row.id_relacionado +"/"+ objeto + "/');"+'"  style="color:#AE2012"><i class="fa-duotone fa-link-slash" ></i></a>';
+
+          // Definimos los botones
+          var botonVerDocumento = '<a href="/private/docLaruex/verObjeto/' + row.id_relacionado + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+
+
+          if (row.id_relacionado__ruta_editable){
+            if (admin == 'True') {
+              return (botonVerDocumento + botonDescargarDocumentoPDF + botonDescargarDocumentoWord + botonEliminarReferencia);
+            } else if (rol == 'Responsable'  || rol == 'Director') {
+              return (botonVerDocumento + botonDescargarDocumentoPDF + botonDescargarDocumentoWord);
+            } else {
+              return (botonVerDocumento + botonDescargarDocumentoPDF);
+            }
+          }else{
+            if (admin == 'True') {
+            return (botonVerDocumento + botonDescargarDocumentoPDF  + botonEliminarReferencia);
+          } else if (rol == 'Responsable'  || rol == 'Director') {
+            return (botonVerDocumento + botonDescargarDocumentoPDF );
+          } else {
+            return (botonVerDocumento + botonDescargarDocumentoPDF);
+          }
+          }
+        },
+      },
+    ],
+    search: true,
+    sortOrder: "desc",
+  });
+  /*
+  $("#tabla_referencias_asociadas").on(
+    "click-row.bs.table",
+    function (e, row, $element) {
+      window.location.href =
+        "/private/docLaruex/verObjeto/" + row.id_relacionado + "/";
+    }
+  );*/
+
+
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+
+  function addZero(i) {
+    if (i < 10) { i = "0" + i }
+    return i;
+  }
+
+  // cambiamos la funcionalidad del boton submit del formulario de envio de notificaciones
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  $("#formularioModalEnviarNota").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarNotificacion/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Notificacion guardado con éxito', 'alert-success', 2000)
+        $('#tabla_notificaciones').bootstrapTable('refresh');
+        $(".divFormularios").remove();
+        $("#reset").trigger("click");
+        $('#cerrar').trigger('click');
+
+      }
+    });
+  });
+
+
+  /*
+    ------------ TABLAS Y FUNCIONES DEL MODAL ASOCIAR OBJETOS ------------
+  */
+
+  //tabla del modal asociar objetos
+  $("#tabla_objetos_para_asociar").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/docLaruex/objetosDatosAsociar",
+    cache: false,
+    columns: [
+      {
+        title: "Nombre",
+        align: "center",
+        formatter: function (value, row) {
+          if (row.nombre == null)
+            return row.id_doc__nombre;
+          else
+            return row.nombre;
+        }
+      },
+      {
+        title: "Version",
+        align: "center",
+        formatter: function (value, row) {
+          if (row.version == null)
+            return "-";
+          else
+            return row.version;
+        }
+      },
+      {
+        title: "Tipo",
+        align: "center",
+        formatter: function (value, row) {
+          if (row.tipo == null)
+            return row.id_doc__tipo;
+          else
+            return row.tipo;
+        }
+      },
+      {
+        title: "",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          if (row.id == null) {
+            row.id = row.id_doc__id;
+            row.nombre = row.id_doc__nombre;
+            row.tipo = row.id_doc__tipo;
+          }
+          else {
+            row.version = "-";
+          }
+          return (
+
+            '<div onclick="addValueTable(' + row.id + ',&apos;' + row.nombre + '&apos;,&apos;' + row.version + '&apos;,&apos;' + row.tipo + '&apos;)" class="mx-1" title="select"><i class="fa-solid fa-angles-right fa-lg" style="color:#68B29E"></i></div>'
+          );
+        },
+      },
+    ],
+    search: true,
+    sortName: "fecha_subida",
+    sortOrder: "desc",
+  });
+
+  function addValueTable(id, nombre, version, tipo) {
+    $("#tabla_objetos_para_asociar_seleccionados").bootstrapTable('insertRow', {
+      index: 0,
+      row: {
+        id: id,
+        nombre: nombre,
+        id__version: version,
+        tipo: tipo
+      }
+    });
+  }
+  function addZero(i) {
+    if (i < 10) {
+      i = "0" + i;
+    }
+    return i;
+  }
+
+  // tatbla de elementos seleccionados
+  $("#tabla_objetos_para_asociar_seleccionados").bootstrapTable({
+    locale: navigator.language,
+    cache: false,
+    columns: [
+      {
+        title: "Nombre",
+        field: "nombre",
+        align: "center",
+      },
+      {
+        title: "Version",
+        field: "id__version",
+        align: "center",
+      },
+      {
+        title: "Tipo",
+        field: "tipo",
+        align: "center",
+      },
+      {
+        title: "",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            '<div onclick="deleteValue(' + row.id + ')" class="mx-1" ><i class="fa-solid fa-xmark fa-lg" style="color:#F52220"></i></div>'
+
+          );
+        },
+      },
+    ],
+    search: true,
+    sortName: "fecha_subida",
+    sortOrder: "desc",
+  });
+
+  function deleteValue(id) {
+    $("#tabla_objetos_para_asociar_seleccionados").bootstrapTable('remove', {
+      field: 'id',
+      values: [id]
+    })
+  }
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioAsociarArchivo").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    $table = $("#tabla_objetos_para_asociar_seleccionados");
+    var idSeleccionado = "";
+    for (let value of $table.bootstrapTable('getData')) {
+      idSeleccionado = idSeleccionado + value["id"] + "#";
+    }
+    console.log(idSeleccionado);
+    $("#idArchivosSeleccionados").val(idSeleccionado);
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/asociarArchivos/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        $table.bootstrapTable('removeAll');
+        $("#idArchivosSeleccionados").val("");
+        $('#tabla_referencias_asociadas').bootstrapTable('refresh');
+        $('#cerrarAsociar').trigger('click');
+      }
+    });
+  });
+
+  $("#formularioAsociarArchivo").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    $table = $("#tabla_objetos_para_asociar_seleccionados");
+    var idSeleccionado = "";
+    for (let value of $table.bootstrapTable('getData')) {
+      idSeleccionado = idSeleccionado + value["id"] + "#";
+    }
+    $("#idArchivosSeleccionados").val(idSeleccionado);
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/asociarArchivos/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        $table.bootstrapTable('removeAll');
+        $("#idArchivosSeleccionados").val("");
+        $('#cerrarAsociar').trigger('click');
+      }
+    });
+  });
+
+
+  $("#formularioAsociarFormato").submit(function (e) {
+    console.log("envio el formato");
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function (data) {
+        console.log("He agregado el formato");
+        console.log(data);
+      }
+    });
+  });
+  // onclick del boton bloquearFormato  del modal asociar objetos
+  // funcion que cambia la class dado un id
+  function bloquearFormato() {
+    // eliminar class dado un id
+    $("#bloquearFormato").removeClass("fa-duotone fa-lock-open");
+
+    // agregar class dado un 
+    $("#bloquearFormato").addClass("fa-duotone fa-lock");
+    // cambiar el valor del input editable del modalActualizarFormato
+    $("#editable").val("0");
+  }
+
+  // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreArchivo(value) {
+
+    document.getElementById('file-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreArchivo').style.display = 'none';
+  }
+
+  // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreFormatoRellenable(value) {
+
+    document.getElementById('file-name-formatoRellenable').innerHTML = value;
+
+    document.getElementById('mostrarNombreFormatoRellenable').style.display = 'none';
+  }
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  $("#formularioEditarFormato").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarObjeto/{{formato.id_doc.id}}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Formato modificado con éxito', 'alert-success', 2000);
+        $("#reset").trigger("click");
+        $('#cerrar').trigger('click');
+        location.reload();
+
+      }
+    });
+  });
+
+
+  function mostrarFicheroFormato(value) {
+
+    if (value == "1") {
+      const elemento = document.getElementById('iconoFormato')
+      const nuevoElemento = document.createElement("i");
+      nuevoElemento.className = "fa-duotone fa-file-excel fa-4x addFicheroActualizado";
+      elemento.replaceWith(nuevoElemento);
+    } else {
+      $("#tituloObjetoNombre").html("Añadir Documento");
+    }
+  }
+
+
+      // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+      function mostrarNombreArchivoNuevo(value) {
+
+      document.getElementById('nuevo-file-name').innerHTML = value;
+
+      document.getElementById('mostrarNombreArchivoNuevo').style.display = 'none';
+    }
+
+    // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+    function mostrarNombreArchivoEditableNuevo(value) {
+
+      document.getElementById('nuevo-file-name-editable').innerHTML = value;
+
+
+      document.getElementById('mostrarNombreArchivoEditableNuevo').style.display = 'none';
+
+    }
+
+</script>
+{% endblock %}

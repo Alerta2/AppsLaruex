@@ -1,0 +1,113 @@
+{% load static %}
+
+
+<input id="hamburger" class="hamburger" type="checkbox" />
+<label for="hamburger" class="hamburger">
+    <i></i>
+    <text>
+        <close>menu</close>
+        <open>menu</open>
+    </text>
+</label>
+<nav class="primnav" id="primnav">
+    <ul>
+        <li>
+            <a href="{% url 'veiex:HomeVeiex' %}" class="menu" onclick="LoadingAlerta2();">
+                <i class="fas fa-home fa-lg iconMenu"></i> Inicio
+                <span class="tooltip">INICIO</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="{% url 'veiex:MapaVeiex' %}" class="menu" onclick="LoadingAlerta2();">
+                <i class="fas fa-map-marked-alt fa-lg iconMenu"></i> Datos en tiempo real
+                <span class="tooltip">DATOS EN TIEMPO REAL</span>
+            </a>
+        </li>
+
+        <li>
+            {% if user.is_authenticated %}
+            <a href="{% url 'structure:logout' %}?next={% url 'veiex:LoginVeiex' %}?next={% url 'veiex:MapaVeiex' %}"
+                class="menu" onclick="LoadingAlerta2();">
+                <i class="fas fa-power-off fa-lg iconAcces"></i> Cerrar sesión
+                <span class="tooltip">Cerrar sesión</span>
+            </a>
+            {% else %}
+            <a href="{% url 'veiex:LoginVeiex' %}?next={% url 'veiex:MapaVeiex' %}" class="menu"
+                onclick="LoadingAlerta2();">
+                <i class="fa fa-user fa-lg iconAcces fa-fade"></i> Acceso
+                <span class="tooltip">Iniciar sesión</span>
+            </a>
+            {% endif %}
+        </li>
+    </ul>
+</nav>
+
+
+<nav class="navbar navbar-expand-custom navbar-dark encabezado" style="background-color: #1B1C1C;">
+    <a class="navbar-brand" href="#" onclick="LoadingAlerta2();">VEIEX</a>
+    {% if user.is_authenticated %}
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-user-cog"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <user>
+            <section>
+                <img id="ImageUser" src="../../../../media/profile/default.png" style="object-fit: cover;"
+                    onclick="viewAvatar(this.src)" />
+                <section>
+                    <name>{{user.get_full_name}}</name>
+                    <actions><a href="{% url 'veiex:PerfilVeiex' %}" onclick="LoadingAlerta2();"><i class="fas fa-cog"
+                                style="padding-right: 4px;"></i>Configuración</a> | <a
+                            href="{% url 'structure:logout' %}?next={% url 'veiex:LoginVeiex' %}?next={% url 'veiex:MapaVeiex' %}" onclick="LoadingAlerta2();"><i
+                                class="fas fa-power-off" style="padding-right: 4px;"></i>Cerrar sesión </a></actions>
+                </section>
+            </section>
+        </user>
+    </div>
+    {% endif %}
+</nav>
+
+<script>
+    function viewAvatar(path) {
+        Swal.fire({
+            imageUrl: path,
+            showConfirmButton: false
+        })
+    }
+
+
+    var photoavatar = "{{ user.profile.image.url }}" //Foto
+    if (photoavatar != "") {
+        $('#ImageUser').attr("src", photoavatar);
+    }
+</script>
+
+<script>
+    $(".primnav li a.submenu").on("click", function () {
+        $(this).parent().parent().parent().find('a[class="menu"]').addClass('active')
+    });
+
+    $(".primnav li a.menu").on("click", function () {
+        $(this).addClass('active');/*.siblings().removeClass('active');*/
+    });
+
+    $(document).ready(function () {
+        if ($('.primnav li a[href$="' + location.pathname + '"]').hasClass('menu')) {
+            $('.primnav li a[href$="' + location.pathname + '"]').addClass('active');
+        }
+        else if ($('.primnav li a[href$="' + location.pathname + '"]').hasClass('submenu')) {
+            $('.primnav li a[href$="' + location.pathname + '"]').parent().parent().parent().find('a[class="menu"]').addClass("active")
+        }
+    });
+
+
+    /*Para que cuando hago click sobre los submenus se esconda el menu navbar*/
+    const navLinks = document.querySelectorAll('.submenu')
+    const menuToggle = document.getElementById('primnav')
+    const bsCollapse = new bootstrap.Collapse(menuToggle, { toggle: false })
+    navLinks.forEach((l) => {
+        l.addEventListener('click', () => { $("#hamburger").click(); })
+    })
+</script>

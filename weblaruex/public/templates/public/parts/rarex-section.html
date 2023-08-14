@@ -1,0 +1,66 @@
+{% load static %}
+
+
+
+<section id="rarex" class="map">
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+        <h2>Red de alerta radiológica</h2>
+        <p>RAREX</p>
+    </div>
+    <div class="text-center">
+      <p>
+        <strong>RAREX</strong>, recopila para todas las estaciones fijas de la citada red, los valores de tasa de dosis registrados en cada una de ellas para el último mes de su funcionamiento. Así mismo se compara la posible máxima alteración de la dosis registrada en todas las estaciones sometidas a control con la que se recibe por la realización de actividades mas o menos frecuentes en nuestra vida cotidiana, como es un vuelo en avión o determinadas prácticas médicas.
+      </p>
+    </div>
+
+    <div id="accordion" class="my-4 ">
+      <div class="card cardAcordion">
+        <div class="card-header cardAcordion" id="headingRarex">
+          
+            <button class="btnColapseAcordion" data-toggle="collapse" data-target="#collapseRarex" aria-expanded="false" aria-controls="collapseRarex" onclick="modificarIcono('iconRarex')">
+              <div class="ml-2 my-2 d-flex justify-content-start "><i id="iconRarex" class="fa-solid fa-square-plus fa-lg fa-beat my-auto" style="color:#1d8896"></i><h4><strong>&nbsp; ¿Qué es RAREx?</strong></h4>
+              </div>
+              
+            </button>
+        </div>
+    
+        <div id="collapseRarex" class="collapse show cardAcordionShow my-2" aria-labelledby="headingRarex" data-parent="#accordion">
+          <div class="card-body">
+            <p>
+              La red de Alerta Radiológica de Extremadura, RAREx, inició su funcionamiento en 1989, siendo diseñada y gestionada por el Laboratorio de Radiactividad Ambiental de la Universidad de Extremadura, LARUEX y costeada su funcionamiento tanto por la Junta de Extremadura, JEx, como por el Consejo de Seguridad Nuclear, CSN.
+            </p>
+            <p>  
+              Su objetivo es detectar e informar de forma automática y en tiempo cuasi-real, tanto la Junta de Extremadura, como al Consejo de Seguridad Nuclear, de cualquier alteración radiológica que pueda producirse en los entornos definidos como especialmente sensibles. Por ello, la RAREx está integrada por 17 estaciones fijas, una estación / laboratorio móvil y un drone, con los que se registran e informan dichas alteraciones. 
+            </p>
+            <p>
+              El mayor número de las estaciones fijas, concretamente 9, se encuentran alrededor de la central nuclear de Almaraz. En particular, siete de estas estaciones están destinadas a monitorizar posibles alteraciones radiométricas o dosimétricas que puedan producirse en el aire del entorno a la citada instalación nuclear, mientras que otras dos monitorizan las posibles alteraciones radiactivas que puedan experimentar las aguas del río Tajo.         
+            </p>
+            <p>
+              Fuera de dicho entorno hay, otras dos estaciones fijas al sur de la provincia de Badajoz, estando una de ellas próxima al almacén de residuos radiactivos de baja y media actividad de El Cabril, provincia de Córdoba. Otra, en Badajoz capital, sobre las aguas del río Guadiana y una más en Santiago de Alcántara, cerca de la frontera con Portugal.En este País hay otras tres estaciones en poblaciones que integran con Extremadura la región Euroace.         
+            </p>
+            <p>
+              Por último, la estación / laboratorio móvil es capaz de desplazarse a cualquier emplazamiento susceptible de verse afectado por algún tipo de alteración radiológica, detectar dicha alteración y remitir automáticamente la información obtenida al CSN y al GE. Ésta se complementa con un drone que posee la capacidad de localizar, identificar y cuantificar las alteraciones radiológicas existentes, remitiendo de forma automática dichos valores.        
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="row">
+      <div class="col-md-6 col-sm-12 col-xs-12 d-md-flex justify-content-md-end  d-sm-flex justify-content-sm-center d-xs-flex justify-content-xs-center">
+        <button class="btnVerTodo mb-2"><a href="http://rarex.laruex.com" target="_blank" style="font-size: 22px;">Ir a la página</a></button>
+      </div>
+      <div class="col-md-6 col-sm-12 col-xs-12 d-md-flex justify-content-md-start d-sm-flex justify-content-sm-center d-xs-flex justify-content-xs-center">
+        <button class="btnVerTodo mb-2"><a onclick="scrollSeccion('redes','nuestras-redes');" target="_blank" style="font-size: 22px; color: #fff;">Ver mapa de estaciones</a></button>
+      </div>
+    </div>
+
+  </div>
+</section><!-- End Trainers Section -->
+<script type="text/javascript">
+ $('.collapse').collapse()
+
+
+</script>

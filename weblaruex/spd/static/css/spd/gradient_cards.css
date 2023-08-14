@@ -1,0 +1,68 @@
+/*Iconos ICA*/
+.icon-description-ICA {
+    text-align: left;
+    font-size: 14px;
+}
+
+.icon-description-ICA b{
+    padding: 5px;
+    border-radius: 15px;
+    color: white;
+    box-shadow: none !important;
+}
+
+
+
+/*Sin riesgo (verde)*/
+.card-green {
+    background: linear-gradient(45deg, #00ACC1 0%, #29f499 100%);
+    box-shadow: 0 5px 20px rgba(41, 244, 153, 0.3);
+}
+
+/*N1 (amarillo)*/
+.card-yellow {
+    background: linear-gradient(45deg, #CDDC39 0%, #FDD835 100%);
+    box-shadow: 0 5px 20px rgba(253, 216, 53, 0.3);
+}
+
+/*N2 (rojo)*/
+.card-orange {
+    background: linear-gradient(45deg, #FF4500 0%, #FFA500 100%);
+    box-shadow: 0 5px 20px rgba(255, 165, 0, 0.3);
+}
+
+/*N3 (rojo)*/
+.card-red {
+    background: linear-gradient(45deg, #C62828 0%, #E57373 100%);
+    box-shadow: 0 5px 20px rgba(229, 115, 115, 0.3);
+}
+
+/*No identificado (violeta)*/
+.card-purple {
+    background: linear-gradient(45deg, #7B68EE 0%, #fa81e8 100%);
+    box-shadow: 0 5px 20px rgba(250, 129, 232, 0.3);
+}
+
+/*No Identificado, sin datos (gris)*/
+.card-grey {
+    background: linear-gradient(45deg, #455A64 0%, #CFD8DC 100%);
+    box-shadow: 0 5px 20px rgba(207, 216, 220, 0.3);
+}
+
+.card {
+    border: 0;
+    border-radius: 10px;
+}
+
+.card-body {
+    padding: 15px 20px 15px 20px;
+}
+
+.card-number {
+    text-align: left;
+}
+
+.card-charts {
+    display: none;
+    margin: 20px;
+}

@@ -1,0 +1,244 @@
+{% extends "public/template.html" %}
+{% load static %}
+
+
+{% block meta %}
+  <title{{ curso.titulo }}></title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+<style>
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: #1d8896;
+  }
+  
+  .addImagen:hover {
+    color: rgba(29, 136, 150, 10);
+    filter: brightness(80%);
+  }
+  
+  .imagenCargada{
+    color: #1d9678;
+  }
+  
+  .close:focus {
+    outline: none;
+  }
+
+  .checkboxDiv input[type="checkbox"]:checked{
+    
+    background-color: #1d8896 !important;
+    border: 2px solid #1d8896 !important;
+    color: #fff;
+    accent-color: #1d8896;
+  }
+
+
+
+  </style>
+
+<div class="my-5"></div>
+<!-- ======= noticia completa ======= -->
+<section id="about" class="about">
+  
+
+
+
+  {% if alerta %}
+  {% if alerta.tipo == "success" %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fa-solid fa-circle-check"></i> {{ alerta.mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% else %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fa-sharp fa-solid fa-circle-exclamation"></i> {{ alerta.mensaje }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endif %}
+{% endif %}
+
+  <div class="container" data-aos="fade-up">
+    <nav aria-label="breadcrumb" class="my-3 mx-auto" >
+      <ol class="breadcrumb" style="background-color: transparent;">
+        <li class="breadcrumb-item"><a href="\">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="\empleados">Empleados</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{empleado.nombre}}</li>
+      </ol>
+    </nav>
+    <div class="section-title">
+      <div class="row">
+        <div class="col col-sm-12 col-md-12 col-lg-7">
+          
+        <h2>{{ empleado.nombre }}</h2>
+        <p>{{ empleado.puesto }}</p>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-5 d-flex justify-content-sm-center justify-content-lg-start">
+          
+        {% if user.is_superuser %}
+            <a href="" class="btn btn-outline-info my-auto" title="Editar Empleado" data-toggle="modal"
+              data-target="#modalEditarEmpleado"><span>Editar</span></a>
+
+        {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="row d-flex justify-content-sm-center">
+      <div class="col-lg-6 col-xs-12 col-sm-12 pb-sm-3 order-1 d-flex justify-content-sm-center justify-content-lg-end" data-aos="fade-left" data-aos-delay="100">
+        <img src="{% static 'img/personal/trabajadores/' %}{{ empleado.imagen }}" class="img-fluid" alt="" style="max-width: auto; max-height: 300px;" >
+      </div>
+      <div class="col-lg-6 col-xs-12 col-sm-12 order-2 pt-4 content get d-flex justify-content-sm-center justify-content-lg-start" id="contenidoNoticiaDiv">
+        <div>
+          <h3>{{ empleado.nombre }}</h3>
+          <p>
+            {{ empleado.puesto }}
+          </p>
+          <p class="font-italic"><strong>Grupos</strong></p>
+            {% for g in empleado.grupo_trabajo %}
+            {% if not g.strip  == "" %}
+              <p class="font-italic"><i class="fa-duotone fa-circle-check mx-2" style="color: #1d8896"></i>{{ g }}</p>
+             {% endif %}
+            {% endfor %}
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</section><!-- noticia completa -->
+
+<div id="modalEditarEmpleado" class="modal fade pt-5" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalEditarEmpleado">Editar datos de {{empleado.nombre}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioEditarEmpleado" action="\editarEmpleado/" method="POST" enctype="multipart/form-data" class="php-email-form"  role="form">
+          {% csrf_token %}
+
+          {% for g in empleado.grupo_trabajo %}
+            <input type="text" class="form-control" id="idGrupoTrabajo{{g}}" data-rule="required" value="{{g}}"  hidden/>            
+          {% endfor %}
+          <input type="text" class="form-control" id="idEmpleadoEditar" name="idEmpleadoEditar" data-rule="required" value="{{empleado.id}}" hidden />
+          <div class="row">
+            <div class="col form-group">
+              <label for="nuevoNombreEmpleado" class="text-secondary"><strong>Nombre del empleado</strong></label>
+              <input type="text" class="form-control" id="nuevoNombreEmpleado" name="nuevoNombreEmpleado" data-rule="required" value="{{empleado.nombre}}" required/>
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col form-group">
+              <label for="nuevoPuestoEmpleado" class="text-secondary"><strong>Puesto del empleado</strong></label>
+              <input type="text" class="form-control" id="nuevoPuestoEmpleado" name="nuevoPuestoEmpleado" data-rule="required" value="{{empleado.puesto}}" required/>
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col form-group">
+              <div>
+                <label for="gruposEmpleadoEditar" class="text-secondary"><strong>Grupos</strong></label>
+              </div>
+              <div>
+                
+              <div class="checkboxDiv form-check-inline">
+                <div class="mx-2 ">
+                  <input class="form-check-input" type="checkbox" id="nuevoGrupoSeleccionadoLaboratorio" name="checkbox"  value="laboratorios">
+                  <label class="form-check-label" for="nuevoGrupoSeleccionadoLaboratorio">Laboratorios</label></div>
+                <div class="mx-2">
+                  <input class="form-check-input" type="checkbox" id="nuevoGrupoSeleccionadoRedes" name="checkbox"  value="redes">
+                  <label class="form-check-label" for="nuevoGrupoSeleccionadoRedes">Redes</label></div>
+                <div class="mx-2">
+                  <input class="form-check-input" type="checkbox" id="nuevoGrupoSeleccionadoInformatica" name="checkbox" value="informatica">
+                  <label class="form-check-label" for="nuevoGrupoSeleccionadoInformatica">Informática</label></div>
+                <div class="mx-2">
+                  <input class="form-check-input" type="checkbox" id="nuevoGrupoSeleccionadoDireccion" name="checkbox"  value="direccion">
+                  <label class="form-check-label" for="nuevoGrupoSeleccionadoDireccion">Dirección</label></div>
+              </div>
+              </div>
+            </div>
+          </div>
+        <div class="row my-2">
+          <div class="col-sm-12 d-flex justify-content-center">
+            <div class="form-group">
+              <label for="nuevaImagenEmpleado">
+                <i class="fa-duotone fa-image fa-6x addImagen" id="iconoImagen"></i>
+              </label>
+              <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                id="nuevaImagenEmpleado" name="nuevaImagenEmpleado"
+                onchange="mostrarNombreImagen(this.value)"/>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+              <spam id="imagen-name"></spam>
+            </div>
+          </div>
+        </div>
+          
+          <div class="modal-footer">
+            <button type="submit" value="submit" class="btn btn-info">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+  
+  // obtener el valor de los input con id="idGrupoTrabajo*" y marcar los checkbox correspondientes
+  var grupos = document.querySelectorAll('[id^="idGrupoTrabajo"]');
+  
+  for (var i = 0; i < grupos.length; i++) {
+    var grupo = grupos[i].value;
+    if (grupo == "laboratorios"){
+      document.getElementById("nuevoGrupoSeleccionadoLaboratorio").checked = true;
+    }
+    if (grupo == "redes"){
+      document.getElementById("nuevoGrupoSeleccionadoRedes").checked = true;
+    }
+    if (grupo == "informatica"){
+      document.getElementById("nuevoGrupoSeleccionadoInformatica").checked = true;
+    }
+    if (grupo == "direccion"){
+      document.getElementById("nuevoGrupoSeleccionadoDireccion").checked = true;
+    }
+  }
+
+  
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+    document.getElementById('imagen-name').innerHTML = value;
+    document.getElementById('mostrarNombreImagen').style.display = 'none';
+    var iconoImagen = document.getElementById('iconoImagen');
+
+    iconoImagen.classList.remove("fa-image", "fa-6x", "addImagen");
+    iconoImagen.classList.add("fa-circle-check", "fa-6x", "imagenCargada");
+  }
+
+
+
+
+</script>
+
+{% endblock %}

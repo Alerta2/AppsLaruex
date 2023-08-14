@@ -1,0 +1,417 @@
+{% extends "base/base_spd.html" %}
+
+{% load static %}
+
+{% block imports %}
+<!-- Custom css login -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/login_spd.css' %}">
+<!-- intlTelInput (Input Telefono Internacional) -->
+<!-- https://old.formvalidation.io/examples/validating-international-phone-numbers/-->
+<link rel="stylesheet" type="text/css" href="{% static 'intlTelInput/intlTelInput.css' %}">
+
+
+<style>
+    .input100 {
+        height: 45px;
+    }
+
+    .alert-validate::before {
+        min-height: 45px;
+    }
+
+    .btn-hide-validate {
+        height: 45px;
+    }
+
+    .true-validate::after {
+        height: 45px;
+    }
+
+    .wrap-login100 {
+        width: 500px;
+    }
+
+    .drop {
+        width: 650px;
+        height: 650px;
+        border-radius: 51% 49% 33% 67% / 39% 48% 52% 61%;
+        background: transparent;
+        box-shadow: inset 15px 15px 30px #00000020, inset -15px -15px 30px #fff,
+            20px 60px 40px #00000010;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.5s ease;
+    }
+
+    .drop p {
+        color: #333;
+        font-size: 30px;
+        font-family: sans-serif;
+        font-weight: 600;
+    }
+
+    .drop:hover {
+        border-radius: 50%;
+    }
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="container-login100" style="background-color: rgba(27,28,28,0.7);">
+    <div class="drop">
+        <div class=" p-l-55 p-r-55 p-t-40 p-b-30">
+            <!--wrap-login100-->
+
+            <form id="FormPerfilUsuario" class="login100-form validate-form" method="post"
+                style="font-family: 'Bradley Hand ITC';">
+                <!--<span class="login100-form-title p-b-15">
+                <i class="fas fa-users-cog color-animate" style="font-size: 70px"></i>
+            </span>-->
+                {% csrf_token %}
+
+                <span class="login100-form-title m-b-20" id="prueba">
+                    <div id="avatar" style=" width: 150px; height: 150px; position: relative;  margin: auto;">
+                        <input type="file" name="avatar" accept="image/*" id="imageInput" style="display: none;">
+                        <label for="imageInput" class="btnEditFoto"><i class="fa-solid fa-pen-to-square"
+                                style="color:#eee"></i></label>
+                        <img id="fotoavatar" src="../../../../media/profile/default.png" class="image-preview"
+                            alt="Foto del Usuario" onclick="viewAvatar(this.src)">
+                    </div>
+                </span>
+
+                <span class="login100-form-title p-b-20">
+                    Perfil del usuario
+                </span>
+
+                <div class="wrap-input100 validate-input m-b-16" data-validate="Introduce el nombre">
+                    <input id="first_name" class="input100" type="text" name="first_name" placeholder="Nombre">
+                    <span class="focus-input100"></span>
+                </div>
+
+                <div class="wrap-input100 validate-input m-b-16" data-validate="Introduce los apellidos">
+                    <input id="last_name" class="input100" type="text" name="last_name" placeholder="Apellidos"
+                        value="{{user.last_name}}">
+                    <span class="focus-input100"></span>
+                </div>
+
+                <div class="wrap-input100 validate-input m-b-16" data-validate="Introduce el e-mail">
+                    <input id="email" class="input100" type="email" name="email" placeholder="E-mail"
+                        value="{{user.email}}">
+                    <span class="focus-input100"></span>
+                </div>
+
+                <div class="wrap-input100 validate-input m-b-16" data-validate="Prueba" style="z-index: 1000;">
+                    <input id="phonenumber" class="input100" type="tel" name="tel" autocomplete="on"
+                        onkeypress="return (event.charCode >= 48 && event.charCode <= 57)">
+                    <input type="text" id="phonenumberCompleto" name="phonenumberCompleto" maxlength="8" size="10"
+                        hidden>
+                    <span class="focus-input100"></span>
+                </div>
+
+
+                <div class="container-login100-form-btn">
+                    <button id="btnsave" class="login100-form-btn" type="submit">
+                        GUARDAR CAMBIOS
+                    </button>
+                </div>
+
+            </form>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<script src="{% static 'intlTelInput/intlTelInput.js' %}"></script>
+<script>
+
+    /*-------------------------------------------------------------------------
+    --------------- CARGO EL INPUT DEL NUMERO DE TELEFONO ---------------------
+    -------------------------------------------------------------------------*/
+
+    var inputTel = document.querySelector("#phonenumber");
+    var iti = window.intlTelInput(inputTel, {
+        defaultCountry: "es",
+        initialCountry: "es",
+        preferredCountries: ["es"],
+        separateDialCode: true,
+        customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
+            return '' + selectedCountryPlaceholder.replace(/[0-9]/g, 'X') + " (Teléfono)";
+        },
+        utilsScript: "{% static 'intlTelInput/utils.js' %}",
+    });
+
+</script>
+
+
+
+<script>
+
+    /*-------------------------------------------------------------------------
+    -------- CARGO LA INFORMACIÓN DEL USUARIO EN LOS INPUTS -------------------
+    -------------------------------------------------------------------------*/
+
+    $('document').ready(function () {
+        $('#first_name').val('{{user.first_name}}'); //Nombre
+        $('#last_name').val('{{user.last_name}}'); //Apellidos
+        $('#email').val('{{user.email}}'); //Email
+        var photoavatar = "{{ user.profile.image.url }}" //Foto
+        if (photoavatar != "") {
+            $('#fotoavatar').attr("src", photoavatar);
+        }
+        var numUser = "{{user.profile.telefono}}"; //Telefono
+        if (numUser != "None") {
+            $('#phonenumber').val(numUser);
+            iti.setNumber(numUser);
+        }
+    })
+
+
+    /*-------------------------------------------------------------------------
+    -------- EVENTO PARA VER LA IMAGEN DEL USUARIO EN GRANDE ------------------
+    -------------------------------------------------------------------------*/
+    function viewAvatar(path) {
+        Swal.fire({
+            imageUrl: path,
+            //confirmButtonText: 'Cerrar'
+            showConfirmButton: false
+        })
+    }
+
+</script>
+
+<script>
+    /*-------------------------------------------------------------------------
+    ------------- EVENTO PARA CUANDO CAMBIO EL INPUT DEL AVATAR ---------------
+    -------------------------------------------------------------------------*/
+    $('#imageInput').on('change', function () {
+        $input = $(this);
+        if ($input.val().length > 0) {
+            fileReader = new FileReader();
+            fileReader.onload = function (data) {
+                $('.image-preview').attr('src', data.target.result);
+            }
+            fileReader.readAsDataURL($input.prop('files')[0]);
+        }
+    });
+</script>
+
+<script>
+
+    /*-------------------------------------------------------------------------
+    ---------- FUNCIONES DEL FORMULARIO (VALIDACIONES Y SUBMIT) ---------------
+    -------------------------------------------------------------------------*/
+
+    (function ($) {
+        "use strict";
+
+        /*==================================================================
+        [ Validate after type ]*/
+        $('.validate-input .input100').each(function () {
+            $(this).on('blur', function () {
+                if (validate(this) == false) {
+                    showValidate(this);
+                }
+                else {
+                    if ($(this)[0].id == "phonenumber") {
+                        $(this).parent().parent().addClass('true-validate');
+                    }
+                    else {
+                        $(this).parent().addClass('true-validate');
+                    }
+                }
+            })
+        })
+
+
+        /*==================================================================
+        [ Validate ]*/
+        var input = document.getElementsByClassName("input100");//$('.validate-input .input100');
+
+
+        /*$('.validate-form').on('submit',function(e){
+            var check = true;
+            for(var i=0; i<input.length; i++) {
+                if(validate(input[i]) == false){
+                    showValidate(input[i]);
+                    check=false;
+                }
+            }
+            return check;
+        });*/
+
+
+        $('.validate-form .input100').each(function () {
+            $(this).focus(function () {
+                hideValidate(this);
+                if ($(this)[0].id == "phonenumber") {
+                    $(this).parent().parent().removeClass('true-validate');
+                }
+                else {
+                    $(this).parent().removeClass('true-validate');
+                }
+
+            });
+        });
+
+        $('#btnsave').on('click', function (e) {
+            var form = $(this).parents('form');
+            var check = true;
+            for (var i = 0; i < input.length; i++) {
+                if (validate(input[i]) == false) {
+                    check = false;
+                }
+            }
+
+            console.log("CHEK", check);
+
+            if (check == true) {
+                e.preventDefault();
+                Swal.fire({
+                    title: '¿Desea guardar los cambios?',
+                    text: "Usted podrá actualizar la información del perfil en cualquier momento",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonText: 'Guardar cambios'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        LoadingAlerta2();
+                        form.submit();
+                    }
+                    else {
+                        return false;
+                    }
+                })
+            }
+            return false;
+
+        });
+
+        $('#FormPerfilUsuario').submit(function (e) {
+            e.preventDefault();
+            var form_data = new FormData(this);
+            console.log("HACE SUBMIT")
+            $.ajax({
+                type: 'post',
+                url: "{% url 'spd:updatePerfilUsuario' %}",
+                data: form_data,
+                dataType: "json",
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (answ) {
+                    LoadingAlerta2();
+                    /*-------------------------------------------------------------------------
+                    -------- MUESTRO UN MENSAJE AL HACER SUBMIT DEL FORMULARIO ----------------
+                    -------------------------------------------------------------------------*/
+                    Swal.fire({
+                        icon: answ.icon,
+                        title: answ.title,
+                        showConfirmButton: false,
+                        timer: answ.timer,
+                        text: answ.text,
+                        /*willClose: () => {
+                            window.location = "{% url 'calendario_guardias:VisorCalendarioGuardias' %}";
+                        }*/
+                    })
+                }
+            })
+        })
+
+
+        function validate(input) {
+
+            hideValidate($(input));
+            if ($(input).id == "phonenumber") {
+                $(input).parent().parent().removeClass('true-validate');
+            }
+            else {
+                $(input).parent().removeClass('true-validate');
+            }
+
+
+
+            console.log("INPUT", input);
+            if ($(input).attr('type') == 'email' || $(input).attr('name') == 'email') {
+                if ($(input).val().trim().match(/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{1,5}|[0-9]{1,3})(\]?)$/) == null) {
+                    console.log("EMAIL ERRONEO");
+                    showValidate($(input));
+                    return false;
+                }
+            }
+            else if ($(input).attr('type') == 'tel' || $(input).attr('name') == 'tel') {
+
+                document.getElementById("phonenumberCompleto").setAttribute('value', String(iti.getNumber()));
+
+                if (!iti.isValidNumber()) {
+                    //console.log("NUMERO ERRONEO", iti.getNumber());
+                    showValidate($(input));
+                    return false;
+                }
+            }
+            else {
+                if ($(input).val().trim() == '') {
+                    console.log($(input).type, "correcto")
+                    showValidate($(input));
+                    return false;
+                }
+            }
+
+
+
+            if ($(input).id == "phonenumber") {
+                $(input).parent().parent().addClass('true-validate');
+            }
+            else {
+                $(input).parent().addClass('true-validate');
+            }
+        }
+
+        function showValidate(input) {
+            var thisAlert = $(input).parent();
+            if ($(input).id == "phonenumber") {
+                thisAlert = $(input).parent().parent();
+            }
+            $(thisAlert).addClass('alert-validate');
+
+            $(thisAlert).append('<span class="btn-hide-validate"><i class="fa-solid fa-exclamation fa-fade"></i></span>');
+            $('.btn-hide-validate').each(function () {
+                $(this).on('click', function () {
+                    hideValidate(this);
+                });
+            });
+        }
+
+        function hideValidate(input) {
+            var thisAlert = $(input).parent();
+            if ($(input).id == "phonenumber") {
+                thisAlert = $(input).parent().parent();
+            }
+            $(thisAlert).removeClass('alert-validate');
+            $(thisAlert).find('.btn-hide-validate').remove();
+        }
+
+    })(jQuery);
+
+
+
+    /* Para no volver a enviar el formulario cuando se actualiza la pagina */
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+</script>
+
+{% endblock %}

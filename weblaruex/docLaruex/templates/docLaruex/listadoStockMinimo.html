@@ -1,0 +1,165 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    ul.pagination li .page-link {
+      background-color: rgb(255, 255, 255) !important;
+      color: rgb(41, 68, 87);
+  
+    }
+  
+    ul.pagination li.active .page-link {
+      background-color: rgb(41, 68, 87) !important;
+      border-color: rgb(41, 68, 87) !important;
+    }
+  
+    ul.pagination li .page-link:hover {
+      filter: brightness(85%);
+  
+    }
+  
+    ul.pagination li.active .page-link:hover {
+      filter: brightness(120%);
+  
+    }
+  
+    .btn-light {
+      color: rgb(41, 68, 87);
+    }
+  
+    th {
+      color: rgb(41, 68, 87);
+    }
+     /* estilo añadirFichero PDF*/
+     .addFicheroPDF {
+        color: rgb(161, 16, 32);
+    }
+
+    .addFicheroPDF:hover {
+        color: rgb(99, 10, 20);
+    }
+    .add:hover {
+    color: #ce8312;
+  }
+
+    .file-upload {
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+    }
+  </style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+    <h5 class="card-title">Listado de Stock en mínimos</h5>
+    <nav>
+        <ol class="breadcrumb" style="background-color:#fff !important">
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                        class="bi bi-house-door"></i></a></li>
+            <li class="breadcrumb-item active" style="font-size: large;">Listado de Stock en mínimos</li>
+        </ol>
+    </nav>
+</div>
+
+<table id="tabla_stock" data-toggle="table" data-search="true" data-show-columns="true"
+data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+</table>
+
+
+<script type="text/javascript">
+    $('#tabla_stock').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/listadoStockMinimoDatos",
+        cache: false,
+        columns: [ {
+            title: 'Unidades para pedir',
+            field: 'min_cantidad',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              cantidadPedida = row.min_cantidad - row.cantidad;
+              if (cantidadPedida > 0) {
+                return (
+                    Math.round(cantidadPedida)
+                );
+              }
+              }
+        },{
+            title: 'Unidad',
+            field: 'unidad__nombre',
+            align: "center",
+            sortable: "true",
+        }, {
+            title: 'Artículo',
+            field: 'item',
+            align: "center",
+        },{
+            title: 'Tipo de Inventario',
+            field: 'categoria__categoria',
+            align: "center",
+            sortable: "true",
+        },{
+            title: '',
+            field: 'min_cantidad',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              if (row.cantidad > row.min_cantidad) {
+                return (
+                  '<span class="badge badge-pill badge-success">Stock Suficiente</span>'
+                  
+                );
+                }else{
+                  return (
+                  '<span class="badge badge-pill badge-warning">Stock Minimo</span>'
+                  );
+                };
+              }
+        },
+    ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'id',
+        sortOrder: 'desc',
+
+    });
+
+    function addZero(i) {
+        if (i < 10) { i = "0" + i }
+        return i;
+    }
+    
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioAddStock").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarStock",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Item guardado con éxito', 'alert-success', 2000)
+        $(".divFormularios").remove();
+        $("#reset").trigger("click");
+        $('#tabla_stock').bootstrapTable('refresh');
+        $('#cerrar').trigger('click');
+      }
+    });
+  });
+
+
+
+
+</script>
+{% endblock %}

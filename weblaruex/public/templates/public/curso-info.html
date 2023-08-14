@@ -1,0 +1,31 @@
+{% extends "public/template.html" %}
+
+{% block meta %}
+  <title{{ curso.titulo }}></title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+  <main id="main">
+    
+    <div class="breadcrumbs" data-aos="fade-in"></div>
+    {% include "public/parts/descripcion-curso.html" %}
+    
+    {% if curso.mapa %}
+      {% include "public/parts/curso-mapa-section.html" %}
+    {% endif %}
+
+    {% include "public/parts/patrocinadores-section.html" %}
+
+    {% include "public/parts/triptico-section.html" %}
+
+    {% include "public/parts/formulario-curso-section.html" %}
+
+    {% include "public/parts/contenido-curso.html" %}
+
+
+  </main><!-- End #main -->
+
+{% endblock %}

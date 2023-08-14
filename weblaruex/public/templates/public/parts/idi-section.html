@@ -1,0 +1,157 @@
+{% load static %}
+
+<!-- ======= idi Section ======= -->
+<div id="blog" class="blog-area">
+  <div class="blog-inner area-padding">
+    <div class="blog-overly"></div>
+    <div class="container" data-aos="fade-up">
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+
+          <div class="section-title">
+            <h2>I + D + I</h2>
+            <p>Nuestros desarrollos e investigaciones</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="font-italic">Uno de los pilares de nuestra actividad como laboratorio Universitario es nuestra participación activa en proyectos y programas de investigación. La intensidad de nuestra actividad en esta faceta puede valorarse a partir de los proyectos que al respecto se nos ha financiado, de los resultados que como consecuencia hemos obtenido, tanto en publicaciones en revistas indexadas en el Journal of Citation Reports, como en Tesis realizadas. Seguidamente se presentan los últimos trabajos.</p>
+        <br>
+      </div>
+      <div class="row " data-aos="zoom-in" data-aos-delay="100">
+        <!-- Start investigaciones  -->
+        <div class="col-md-4 col-sm-4 col-xs-12">
+
+          <div class="single-blog">
+            <div class="single-blog-img">
+              <a href="#investigaciones{{ publicacion.id }}">
+                <img src="{% static 'img/investigaciones/' %}{{ publicacion.imagen }}" alt="">
+              </a>
+            </div>
+            <div class="blog-meta">
+              <span class="comments-type">
+                <i class="fas fa-file"></i>
+                <a href="#">{{ publicacion.tipo }}</a>
+              </span>
+              <span class="date-type">
+                <i class="icofont-ui-calendar"></i>{{ publicacion.fecha }}
+              </span>
+            </div>
+            <div class="blog-text">
+              <h4>
+                <a href="#{{ publicacion.id }}">{{ publicacion.titulo }}</a>
+              </h4>
+              <p>
+                Revista: {{ publicacion.revista }}
+              </p>
+            </div>
+
+            <span>
+              {% if proyecto.resumen|length > 200 %}
+              <a href="/idi/{{ publicacion.id }}" class="ready-btn">Leer más</a>
+              {% endif %}
+            </span>
+
+          </div>
+
+          <!-- Start single  -->
+        </div>
+        <!-- End Left -->
+        <!-- Start investigaciones  -->
+        <div class="col-md-4 col-sm-4 col-xs-12">
+
+          <div class="single-blog">
+            <div class="single-blog-img">
+              <a href="#investigaciones{{ proyecto.id }}">
+                <img src="{% static 'img/investigaciones/' %}{{ proyecto.imagen }}" alt="">
+              </a>
+            </div>
+            <div class="blog-meta">
+              <span class="comments-type">
+                <i class="fas fa-file"></i>
+                <a href="#">{{ proyecto.tipo }}</a>
+              </span>
+              <span class="date-type">
+                <i class="icofont-ui-calendar"></i>{{ proyecto.fecha }}
+              </span>
+            </div>
+            <div class="blog-text">
+              <h4>
+                <a href="#{{ proyecto.id }}">{{ proyecto.titulo }}</a>
+              </h4>
+              <p>
+                {{ proyecto.entidad_financiadora|slice:"0:200" }}
+                {% if proyecto.entidad_financiadora|length > 200 %}
+                    ...
+                {% endif %}
+              </p>
+            </div>
+
+            <span>
+              {% if proyecto.resumen|length > 200 %}
+                <a href="/idi/{{ proyecto.id }}" class="ready-btn">Leer más</a>
+              {% endif %}
+            </span>
+
+          </div>
+
+          <!-- Start single  -->
+        </div>
+        <!-- End Left -->
+        <!-- Start investigaciones  -->
+        <div class="col-md-4 col-sm-4 col-xs-12">
+
+          <div class="single-blog">
+            <div class="single-blog-img">
+              <a href="#investigaciones{{ tesis.id }}">
+                <img src="{% static 'img/investigaciones/' %}{{ tesis.imagen }}" alt="">
+              </a>
+            </div>
+            <div class="blog-meta">
+              <span class="comments-type">
+                <i class="fas fa-file"></i>
+                <a href="#">{{ tesis.tipo }}</a>
+              </span>
+              <span class="date-type">
+                <i class="icofont-ui-calendar"></i>{{ tesis.fecha }}
+              </span>
+            </div>
+            <div class="blog-text">
+              <h4>
+                <a href="#{{ tesis.id }}">{{ tesis.titulo }}</a>
+              </h4>
+              <p>
+                {{ tesis.autor|slice:"0:200" }}
+                {% if tesis.autor|length > 200 %}
+                    ...
+                {% endif %}
+              </p>
+            </div>
+            <span>
+              {% if tesis.resumen|length > 200 %}
+                <a href="/idi/{{ tesis.id }}" class="ready-btn">Leer más</a>
+              {% endif %}
+            </span>
+          </div>
+          <!-- Start single  -->
+        </div>
+        <!-- End Left -->
+
+    </div>
+    <div class="row d-flex justify-content-center my-4">
+      {% if apartado == 'Laboratorios' %}
+      <div class="d-flex justify-content-center my-4">
+        <button class="btnVerTodo" style="height: 70px;"><a href="{% url 'public:publicPublicacionesLaboratorios' %}" style="font-size: 22px;">Ver todas las investigaciones del laboratorio</a></button>
+      </div>
+      {% elif apartado == 'Redes' %}
+
+            
+        <div class="d-flex justify-content-center my-4">
+          
+        <button class="btnVerTodo" style="height: 70px;"><a href="{% url 'public:publicPublicacionesRedes' %}" style="font-size: 22px;">Ver todas las investigaciones de las redes</a></button>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div><!-- End idi Section -->
+

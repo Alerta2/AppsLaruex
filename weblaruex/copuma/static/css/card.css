@@ -1,0 +1,310 @@
+
+.card{
+    min-width: 300px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.card-front{
+    min-height: 470px;
+    min-width: 300px;
+    margin-top: auto;
+    margin-bottom: auto;
+    color: white;
+    background-color: rgba(0, 177, 64, 0.6) !important;
+}
+
+.card-registration{
+    min-height: 200px;
+}
+
+.social_icon span{
+    font-size: 60px;
+    margin-left: 10px;
+    color: #780000;
+}
+
+.social_icon span:hover{
+    color: #006600;
+    cursor: pointer;
+}
+
+.card-header{
+    width: 100%;
+    background-color: rgba(0, 110, 66, 0.6) !important;
+}
+
+.card-body{
+    background-color: rgba(0, 177, 64, 0.6) !important;
+}
+
+.card-footer{
+    background-color: rgba(0, 177, 64, 0.6) !important;
+}
+
+.card-header h3{
+    color: white;
+}
+
+.social_icon{
+    position: absolute;
+    right: 20px;
+    top: -45px;
+}
+
+.input-group-prepend span{
+    width: 50px;
+    background-color: #780000;
+    color: white;
+    border:0 !important;
+}
+
+.card-body input{
+    width: 200px;
+    border:0 !important;
+}
+
+input:focus{
+    outline: 0 0 0 0  !important;
+    box-shadow: 0 0 0 0 !important;
+
+}
+
+.remember{
+    color: white;
+}
+
+.remember input
+{
+    width: 20px;
+    height: 20px;
+    margin-left: 15px;
+    margin-right: 5px;
+}
+
+.login_btn{
+    color: white;
+    background-color: #780000;
+    width: 100px;
+}
+
+.login_btn:hover{
+    color: black;
+    background-color: white;
+}
+
+.links{
+    color: white;
+}
+
+.links a{
+    margin-left: 4px;
+}
+
+.card-station{
+    margin-top: auto;
+    margin-bottom: auto;
+    color: white;
+    background-color: rgba(0,0,0,0.5) !important;
+}
+
+.card-station .card-header{
+    margin-top: auto;
+    margin-bottom: auto;
+    color: white;
+    background-color: rgba(0, 177, 64, 0.6) !important;
+}
+
+.station_icon span{
+    font-size: 60px;
+    margin-left: 10px;
+    color: #780000;
+}
+
+.station_icon span:hover{
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+.station_icon{
+    position: absolute;
+    right: 20px;
+    top: 0px;
+}
+
+.drone_icon_r span{
+    font-size: 30px;
+    margin-left: 10px;
+    color: #FFFFFF;
+}
+
+.drone_icon_r span:hover{
+    color: #780000;
+    cursor: pointer;
+}
+
+.drone_icon_r{
+    position: absolute;
+    right: 20px;
+    top: 10px;
+}
+
+.drone_icon_l span{
+    font-size: 30px;
+    margin-left: 10px;
+    color: #FFFFFF;
+}
+
+.drone_icon_l span:hover{
+    color: #780000;
+    cursor: pointer;
+}
+
+.drone_icon_l{
+    position: absolute;
+    left: 20px;
+    top: 10px;
+}
+
+.card-icon{
+    min-height: 30px;
+    min-width: 30px;
+    height: 50px;
+    width: 50px;
+    margin-top: auto;
+    margin-bottom: auto;
+    color: white;
+    background-color: rgba(0, 177, 64, 0.6) !important;
+}
+
+.drone_icon_mini_r span{
+    font-size: 30px;
+    margin-left: 10px;
+    color: #FFFFFF;
+}
+
+.drone_icon_mini_r span:hover{
+    color: #780000;
+    cursor: pointer;
+}
+
+.drone_icon_mini_r{
+    position: absolute;
+    right: 5px;
+    top: 10px;
+}
+
+.drone_icon_mini_l span{
+    font-size: 30px;
+    margin-left: 10px;
+    color: #FFFFFF;
+}
+
+.drone_icon_mini_l span:hover{
+    color: #780000;
+    cursor: pointer;
+}
+
+.drone_icon_mini_l{
+    position: absolute;
+    left: 0px;
+    top: 10px;
+}
+
+.card-caption{
+    min-width: 200px;
+    max-width: 400px;
+    max-height: 700px;
+    margin-bottom: auto;
+    color: white;
+    background-color: transparent;
+    border: 0px;
+}
+
+.card-left{
+    margin-top: 100px;
+    margin-left: 5px;
+}
+
+.card-right{
+    margin-top: 100px;
+    margin-right: 5px;
+}
+
+.card-captionbody{
+    background-color: rgba(0, 177, 64, 0.6) !important;
+    min-height: 100px;
+    max-height: 600px;
+}
+
+.card-right .card-captionbody{
+    overflow-y: auto;
+}
+.card-right .card-captionbody::-webkit-scrollbar {
+    width: 10px;
+    background-color: rgba(0, 177, 64, 0.6);
+}
+
+.card-right .card-captionbody::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: rgba(0, 110, 66, 0.6);
+    border-radius: 10px;
+}
+
+.card-right .card-captionbody::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-image: -webkit-gradient(linear,
+           left bottom,
+           left top,
+           color-stop(0.44, rgb(122,217,153)),
+           color-stop(0.72, rgb(73,189,125)),
+           color-stop(0.86, rgb(28,148,10)));
+}
+
+#captionbodyl .list-group-item{
+    background-color: rgba(0,10,100,0.5) !important;
+}
+
+
+.container-fluid{
+    padding-top: 140px;
+}
+.card{
+    padding-right: 0px;
+    padding-left: 0px;
+}
+.row .float-left{
+    margin-left: 10px;
+}
+.row .float-right{
+    margin-right: 10px;
+}
+.ficheros h2:hover{
+    color: #00B1E5;
+}
+.modal-dialog{
+    max-width: 100%;
+}
+/*
+Full screen Modal
+*/
+.fullscreen-modal .modal-dialog {
+  margin: 0;
+  margin-right: auto;
+  margin-left: auto;
+  width: 1040px;
+}
+
+.custom-zoom{
+    bottom: .5em;
+    left: .5em;
+}
+.custom-zoom button{
+    background-color: rgba(40, 40, 40, .7);
+    border-radius: 50%;
+}
+
+#listado_verificaciones{
+    max-height: 100%;
+    overflow-y: auto;
+}

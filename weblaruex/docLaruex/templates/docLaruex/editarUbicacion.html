@@ -1,0 +1,175 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: rgb(16, 108, 161);
+  }
+  
+  .addImagen:hover {
+    color: rgb(10, 59, 99);
+  }
+  
+  .imagen-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+  }  
+
+</style>  
+
+<div class="card-body">
+
+    <nav>
+      <ol class="breadcrumb" style="background-color:#fff !important">
+        <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+              class="bi bi-house-door"></i></a></li>
+        <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/objetos">Listado de
+            Objetos</a>
+        </li>
+        <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/tipoObjeto/Ubicacion/">Listado de
+            Ubicaciones</a>
+        </li>
+        <li class="breadcrumb-item" style="font-size: large;"><a
+            href="\private/docLaruex/editarObjeto/{{ ubicacion.id.id }}/">Editar {{ ubicacion.id.nombre }}</a></li>
+      </ol>
+    </nav>
+</div>
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title my-4">Editar {{ubicacion.id.nombre}} </h5>
+    
+
+    <form id="formularioModal" action="/private/docLaruex/editarObjeto/{{ubicacion.id.id}}/" method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col">
+        <div class="form-group">
+          <label for="nuevaHabilitacion">Habilitación</label>
+          <select class="form-select" id="nuevaHabilitacion" name="nuevaHabilitacion">
+            
+            <option value="{{ubicacion.id.id_habilitacion.id}}" selected hidden>{{ubicacion.id.id_habilitacion.titulo}}
+            </option>
+            {% for habilitacion in habilitaciones %}
+            <option value="{{habilitacion.id}}">
+              {{habilitacion.titulo}}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+    <!-- formulario de Ubicación -->
+    <div id="formularioEditarUbicacion" class="divFormulariosUbicacion">
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="nuevoTipoUbicacion">Tipo de Ubicación</label>
+            <select class="form-select" data-rule="required" id="nuevoTipoUbicacion" name="nuevoTipoUbicacion">
+              <option value="{{ ubicacion.tipo_ubicacion.id }}" selected hidden>{{ ubicacion.tipo_ubicacion.nombre }}
+              </option>
+              {% for tipoUbicacion in tiposUbicaciones %}
+              <option value="{{tipoUbicacion.id}}">
+                {{tipoUbicacion.nombre}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="form-group">
+            <label for="nuevaLatitud">Latitud</label>
+            <input type="text" class="form-control" id="nuevaLatitud" placeholder="41.40338"
+              name="nuevaLatitud" data-rule="required" value="{{ubicacion.latitud|safe}}" />
+          </div>
+        </div>              
+        <div class="col-3">
+          <div class="form-group">
+            <label for="nuevaLongitud">Longitud</label>
+            <input type="text" class="form-control" id="nuevaLongitud" placeholder="-2.17403 " value="{{ubicacion.longitud|safe}}"
+              name="nuevaLongitud" data-rule="required" />
+          </div>
+        </div> 
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="nuevoNombreUbicacion">Nombre de la Ubicación</label>
+            <input type="text" class="form-control" id="nuevoNombreUbicacion" placeholder="Alerta2" value="{{ubicacion.id.nombre|safe}}"
+              name="nuevoNombreUbicacion" data-rule="required"  title="No permite guiones ni otros caracteres que no sean espacios" />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="form-group">
+            <label for="nuevoAlias">Alias</label>
+            <input type="text" class="form-control" id="nuevoAlias" placeholder="Edificio Departamentos, Planta 0 Dependencia 12"
+              name="nuevoAlias" data-rule="required"  title="No permite guiones ni otros caracteres que no sean espacios" value="{{ubicacion.alias|safe}}" />
+          </div>
+        </div>
+      </div>
+
+      </div>
+
+    <div class="modal-footer d-flex justify-content-center my-2">
+      <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" onclick="salir()">
+        Cerrar
+      </button>
+      <button id="reset" type="reset" class="btn btn-secondary" hidden>
+      </button>
+      <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('ubicacionesGuardar', 'Ubicación editada con éxito', 'alert-success', 2000)">
+        Guardar
+      </button>
+    </div>
+  </form>
+
+  </div>
+</div>
+
+<script>
+// cambiamos la funcionalidad del boton submit del formulario
+$("#formularioEditarUbicacion").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarObjeto/{{ubicacion.id.id}}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Ubicacion editada con éxito', 'alert-success', 2000)
+
+        document.location.reload();
+      }
+    });
+  });
+
+  function salir(){
+    window.location.href = "/private/docLaruex/tipoObjeto/Ubicacion/";
+    crearAviso('ubicacionesCerrar', 'No se ha podido añadir ubicación', 'alert-warning', 2000);
+  }
+
+      // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+
+    document.getElementById('imagen-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreNuevaImagen').style.display = 'none';
+  }
+
+
+</script>
+
+{% endblock %}

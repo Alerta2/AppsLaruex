@@ -1,0 +1,360 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+
+    /*--------------------------------------------------------------
+    # Añadir Imagen
+    --------------------------------------------------------------*/
+    .addImagen {
+      color: rgb(16, 108, 161);
+    }
+
+    .addImagen:hover {
+      color: rgb(10, 59, 99);
+    }
+
+    .imagen-upload {
+      border: 1px solid #ccc;
+      display: inline-block;
+      padding: 6px 12px;
+      cursor: pointer;
+    }     
+    
+
+    /*--------------------------------------------------------------
+    # Añadir Fichero PDF
+    --------------------------------------------------------------*/
+  .addFicheroPDF {
+    color: rgb(161, 16, 32);
+  }
+
+  .addFicheroPDF:hover {
+    color: rgb(99, 10, 20);
+  }
+    .add:hover {
+    color: #ce8312;
+  }
+
+  .file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+
+      /* ===============================
+  *  Estilo del los botones
+  =================================*/
+  
+  .agregarFormacion:hover {
+    color: #032031;
+  }
+  
+  .descargaPDF:hover {
+    color: #c36d0b;
+  }
+  .retirarStock:hover{
+    color: #492160;
+  }
+  .retirarStockUbicacion:hover{
+    color: #042e37;
+  }
+  .entrar:hover{
+    color: #195746;
+  }
+
+</style>
+
+
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Listado de Equipos por Tipo</h5>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Listado de Equipos por Tipo</li>
+    </ol>
+  </nav>
+</div>
+<!-- breadcrumb   -->
+
+<div class="select col-4" >
+  <label for="tipoEquipo"><strong>Seleccione el tipo de equipo</strong></label>
+  <select class="form-control form-select" id="tipoEquipo" name="tipoEquipo" onchange="getSelecionados()">
+    {% for tipo in tipoEquipoExistentes %}
+        <option value="{{tipo.id}}">{{tipo.nombre}}</option>
+    {% endfor %}
+  </select>
+</div>
+
+
+<table id="tabla_equipos_tipo" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
+  data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+  data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+  data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-row-style="rowStyle"></table>
+
+
+<!-- ============= FORMULARIO CAMBIAR UBICACIÓN DEL EQUIPO ============= -->
+<!-- formulario cambiar Ubicación  -->
+<div id="modalCambiarUbicacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModal"><strong>Cambiar Ubicación del Equipo </strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalCambiarUbicacion" action="/private/docLaruex/cambiarUbicacionEquipo/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="form-group">
+            <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+              value="Documento" style="display: none;" />
+          </div><!-- fin tipoObjeto -->
+
+          <div class="row">
+            <!-- Fecha de baja  -->
+            <div class="col-4">
+              <div class="form-group">
+                <label for="fechaCambioUbicacion" id="tituloFechaCambioUbicacion">Fecha de Actual</label>
+                <input type="date" id="fechaCambioUbicacion" name="fechaCambioUbicacion" class="form-control"
+                  required />
+              </div>
+            </div><!-- Fin fecha del documento  -->
+            <div class="col">
+              <div class="form-group">
+                <label for="nuevaUbicacion">Nueva Ubicación</label>
+                <select class="form-select" id="nuevaUbicacion" name="nuevaUbicacion">
+                  {% for ubicacion in ubicaciones %}
+                  <option value="{{ubicacion.id}}">
+                    {% if ubicacion.id__padre %} [{{ ubicacion.id__padre__nombre}}] {% endif %} {{ubicacion.id__nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancel" name="cancel" onclick="crearAviso('cambiarUbicacionEquipoCerrar', 'No se ha podido cambiar de ubicación el equipo {{ equipo.id.nombre }}', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('cambiarUbicacionEquipoGuardar', 'Equipo {{ equipo.id.nombre }} cambiado de ubicación', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- END formulario Cambiar Ubicación  -->
+
+<!-- ============= Modal Eliminar ====================-->
+
+<div id="modalEliminarObjeto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarObjeto"><strong>¿Estas seguro que deseas eliminar el objeto?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarObjeto" action="/private/docLaruex/eliminarObjeto/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarObjeto" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarObjeto" name="cancel" onclick="crearAviso('eliminarObjetoCancelar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarObjetoGuardar', 'Objeto  eliminado', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  var tipoEquipo = document.getElementById("tipoEquipo");
+  $("#tabla_equipos_tipo").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/docLaruex/equiposDatosTipo/" + tipoEquipo.value + "/",
+    cache: false, 
+    columns: [
+      {
+        title: "",
+        field: "id__icono",
+        align: "center",
+      },
+      {
+        title: "Código Laruex",
+        field: "cod_laruex",
+        align: "center",
+        sortable: "true",
+        formatter: function (value, row) {
+          var codigo = row.cod_laruex;
+          var fecha = new Date(row.fecha_alta);
+          return (
+            codigo + '/' + fecha.getFullYear()
+          );
+        },
+      },
+      {
+        title: "Código Uex",
+        field: "cod_uex",
+        align: "center",
+        sortable: "true",
+      },
+      {
+        title: "Nombre",
+        field: "id__nombre",
+        align: "center",
+      },
+      {
+        title: "Modelo",
+        field: "modelo",
+        align: "center",
+      },
+      {
+        title: "No Serie",
+        field: "num_serie",
+        align: "center",
+      },
+      {
+        title: "Tipo",
+        field: "tipo_equipo__nombre",
+        align: "center",
+      },
+      {
+        title: "Ubicación",
+        field: "ubicacion_actual__id__nombre",
+        align: "center",
+      },
+      {
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+        var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+        var botonEditar = '<a href="/private/docLaruex/editarObjeto/' + row.id + '/' + '" class="mx-1" title="Editar" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen agregarFormacion" ></i></a>';
+
+        var botonCambiarUbicacion = '<a href="" title="Cambiar Ubicacion" data-toggle="modal" data-target="#modalCambiarUbicacion" onclick="$('+"'#formularioModalCambiarUbicacion').attr('action', '/private/docLaruex/cambiarUbicacionEquipo/"+ row.id +"/');"+'" class="mx-1" style="color: #eba43d"><i class="fa-duotone fa-cart-flatbed-boxes descargaPDF"></i></a>';
+
+        var botonReportEquipo = '<a href="/private/docLaruex/reportEquipo/' + row.id + '/" class="mx-1" title="report Equipo"  style="color: #405BDE;" ><i class="fa-duotone fa-file-chart-column fa-lg agregarFormacion"></i></a>';
+
+        var botonEliminar = '<a href="/private/docLaruex/eliminarObjeto/' + row.id + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarObjeto" onclick="$('+"'#formularioModalEliminarObjeto').attr('action', '/private/docLaruex/eliminarObjeto/"+ row.id +"/');"+'"style="color:#AE2012" ><i class="fa-solid fa-x" ></i></a>';
+
+        var admin = '{{administrador}}';
+        var secretaria = '{{secretaria}}';
+        var direccion = '{{direccion}}';
+      
+        if (admin == 'True') {
+          return(botonVer + botonCambiarUbicacion + botonReportEquipo+ botonEditar + botonEliminar)
+        }else if (direccion == 'True' || secretaria == 'True'){
+          return(botonVer + botonCambiarUbicacion + botonReportEquipo)
+        }else{
+          return(botonVer + botonCambiarUbicacion)
+        }
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+
+    /* obtiene el id de la row y accede al elemento
+  $("#tabla_objetos").on("click-row.bs.table", function (e, row, $element) {
+    window.location.href = "/private/docLaruex/verObjeto/" + row.id + "/";
+  });*/
+
+  
+  // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreArchivo(value) {
+
+    document.getElementById('file-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreArchivo').style.display = 'none';
+  }
+
+
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+
+    document.getElementById('imagen-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreImagen').style.display = 'none';
+  }
+
+
+  function mostrarRowSeleccionada (){
+    console.log($("#tabla_equipos_tipo").bootstrapTable('getSelections'))
+  }
+
+
+  function getSelecionados (){
+    // get value of selected  element in select box
+    var tipoEquipo = document.getElementById("tipoEquipo").value;
+
+    // actualizar la tabla con los seleccionados
+    $("#tabla_equipos_tipo").bootstrapTable('refresh', {url: "/private/docLaruex/equiposDatosTipo/" + tipoEquipo + "/"});
+  }
+
+
+ // cambiamos la funcionalidad del boton submit del formulario
+ addEventListener('reset', function() {
+    $(".modalFormulario").reset();
+  });
+
+
+
+
+</script>
+{% endblock %}

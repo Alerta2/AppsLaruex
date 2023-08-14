@@ -1,0 +1,123 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Editar Llave {{llave.nombre}}</h5>
+    
+    <!-- Edit Form -->
+    <form id="formularioEditarLlave"  action="/private/docLaruex/editarLlave/{{llave.id}}/" method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+
+      <div class="row mb-3">
+        <label for="nuevoNombre" class="col-md-4 col-lg-3 col-form-label">Nombre</label>
+        <div class="col-md-8 col-lg-9">
+          <input name="nuevoNombre" type="text" class="form-control" id="nuevoNombre" value="{{llave.nombre}}">
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="nuevoResponsable" class="col-md-4 col-lg-3 col-form-label">Responsable</label>
+        <div class="col-md-8 col-lg-9"><select class="form-control" id="nuevoResponsable" name="nuevoResponsable">
+          <option value="{{ llave.responsable.id}}" selected hidden>{{llave.responsable.first_name}}
+            {{llave.responsable.last_name}}</option>
+          {% for responsable in responsables %}
+          <option value="{{responsable.id}}">
+            {{responsable.first_name}} {{responsable.last_name}}
+          </option>
+          {% endfor %}
+        </select>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="nuevoColor" class="col-md-4 col-lg-3 col-form-label">Color</label>
+        <div class="col-md-2 col-lg-2">
+          <input name="nuevoColor" type="color" class="form-control form-control-color" id="nuevoColor" value="{{llave.color}}" >
+          
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="nuevaFecha" class="col-md-4 col-lg-3 col-form-label">Fecha</label>
+        <div class="col-md-3 col-lg-3">
+          <input name="nuevaFecha" type="datetime-local" class="form-control" id="nuevaFecha" value="{{ llave.fecha|date:'Y-m-d\TH:i' }}" >
+          
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <label for="nuevaHabilitacion" class="col-md-4 col-lg-3 col-form-label">Habilitación</label>
+        <div class="col-md-8 col-lg-9"><select class="form-control" id="nuevaHabilitacion" name="nuevaHabilitacion">
+          <option value="{{llave.id_habilitacion.id}}" selected hidden>{{llave.id_habilitacion.titulo}}</option>
+          {% for habilitacion in habilitaciones %}
+          <option value="{{habilitacion.id}}">
+            {{habilitacion.titulo}}
+          </option>
+          {% endfor %}
+        </select>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="nuevaUbicacion" class="col-md-4 col-lg-3 col-form-label">¿Qué abre?</label>
+        <div class="col-md-8 col-lg-9"><select class="form-control" id="nuevaUbicacion" name="nuevaUbicacion">
+          <option value="{{llave.id_ubicacion.id}}" selected hidden>
+            {% if llave.ubicacion.id.padre %}
+            [{{ llave.ubicacion.id.padre.nombre }}] {{ llave.ubicacion.id.nombre }}
+            {% else %}
+            {{ llave.ubicacion.id.nombre }}
+            {% endif %}
+              
+          </option>
+          {% for ubicacion in ubicaciones %}
+          <option value="{{ubicacion.id}}">
+            {% if ubicacion.id__padre %}
+            [{{ ubicacion.id__padre__nombre }}] {{ubicacion.id__nombre}}
+            {% else %}
+            {{ubicacion.id__nombre}}
+            {% endif %}
+          </option>
+          {% endfor %}
+        </select>
+        </div>
+      </div> 
+
+      <div class="row mb-3">
+        <label for="nuevaLocalizacion" class="col-md-4 col-lg-3 col-form-label">Nueva localización</label>
+        <div class="col-md-8 col-lg-9"><select class="form-control" id="nuevaLocalizacion" name="nuevaLocalizacion">
+          {% with ubicacionesLlave|first as ultimaUbicacion %}
+          <option value="{{ultimaUbicacion.id_ubicacion__id}}" selected hidden>
+            {% if ultimaUbicacion.id_ubicacion__id__padre %}
+              [{{ ultimaUbicacion.id_ubicacion__id__padre__nombre }}] {{ ultimaUbicacion.id_ubicacion__id__nombre }}
+            {% else %}
+              {{ ultimaUbicacion.id_ubicacion__id__nombre }}
+            {% endif %}
+          </option>
+          {% endwith %}
+          {% for ubicacion in ubicaciones %}
+          <option value="{{ubicacion.id}}">
+            {% if ubicacion.id__padre %}
+            [{{ ubicacion.id__padre__nombre }}] {{ubicacion.id__nombre}}
+            {% else %}
+            {{ubicacion.id__nombre}}
+            {% endif %}
+          </option>
+          {% endfor %}
+        </select>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary" onclick="crearAviso('llaveEditar', 'LLave modificada con éxito', 'alert-success', 2000);">Guardar</button>
+      </div>
+    </form><!-- End Profile Edit Form -->
+
+  </div>
+</div>
+
+<script>
+
+</script>
+
+{% endblock %}

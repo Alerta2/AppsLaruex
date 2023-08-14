@@ -1,0 +1,270 @@
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+
+/* ---------------------------------------------------
+    SIDEBAR BUTTONS
+----------------------------------------------------- */
+
+.btnleft{
+    position:absolute;
+    top:100;
+    left: 20;
+    background-color: rgba(0, 110, 66, 0.6) !important;
+    boder-color: rgba(0, 110, 66, 0.6) !important;
+}
+
+.btnright{
+    position:absolute;
+    top:100;
+    right: 20;
+    background-color: rgba(0, 110, 66, 0.6) !important;
+    boder-color: rgba(0, 110, 66, 0.6) !important;
+}
+
+/* Tablet portrait */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .btnleft{
+        top:100;
+    }
+
+    .btnright{
+        top:100;
+    }
+}
+
+/* Tablet landscape */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    .btnleft{
+        top:100;
+    }
+
+    .btnright{
+        top:100;
+    }
+}
+
+/* Smartphone landscape */
+@media (min-width: 481px) and (max-width: 767px) {
+    .btnleft{
+        top:300;
+    }
+
+    .btnright{
+        top:300;
+    }
+}
+
+/* Smartphone portrait */
+@media (min-width: 320px) and (max-width: 480px) {
+    .btnleft{
+        top:300;
+    }
+
+    .btnright{
+        top:300;
+    }
+}
+
+/* ---------------------------------------------------
+    SIDEBAR STYLE
+----------------------------------------------------- */
+.sidebar {
+    margin-top: 20px;
+    margin-bottom: 60px;
+    padding-top:60px;
+    width: 400px;
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    z-index: 999;
+    background-color: rgba(0, 177, 64, 0.5) !important;
+    color: #fff;
+    transition: all 0.3s;
+    overflow-y: auto;
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 998;
+    opacity: 0;
+    transition: all 0.5s ease-in-out;
+}
+.overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+.sidebar .sidebar-header {
+    padding: 20px;
+    height: 90%;
+    overflow-y: auto;
+}
+
+.sidebar ul.components {
+    padding: 20px 0;
+    border-bottom: 1px solid #47748b;
+}
+
+.sidebar ul p {
+    color: #fff;
+    padding: 10px;
+}
+
+.sidebar ul li a {
+    padding: 10px;
+    font-size: 1.1em;
+    display: block;
+}
+
+.sidebar ul li a:hover {
+    color: #7386D5;
+    background: #fff;
+}
+
+.sidebar ul li.active>a,
+a[aria-expanded="true"] {
+    color: #fff;
+    background: #6d7fcc;
+}
+
+a[data-toggle="collapse"] {
+    position: relative;
+}
+
+ul ul a {
+    font-size: 0.9em !important;
+    padding-left: 30px !important;
+    background: #6d7fcc;
+}
+
+ul.CTAs {
+    padding: 20px;
+}
+
+ul.CTAs a {
+    text-align: center;
+    font-size: 0.9em !important;
+    display: block;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+a.download {
+    background: #fff;
+    color: #7386D5;
+}
+
+a.article,
+a.article:hover {
+    background: #6d7fcc !important;
+    color: #fff !important;
+}
+
+/* Tablet portrait */
+@media (min-width: 768px) and (max-width: 1024px) {
+    #sidebar {
+        width: 50%;
+    }
+}
+
+/* Tablet landscape */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    #sidebar {
+        width: 50%;
+    }
+}
+
+/* Smartphone landscape */
+@media (min-width: 481px) and (max-width: 767px) {
+    #sidebar {
+        width: 50%;
+    }
+}
+
+/* Smartphone portrait */
+@media (min-width: 320px) and (max-width: 480px) {
+    #sidebar {
+        width: 100%;
+    }
+}
+
+/* ---------------------------------------------------
+    SIDEBARS DIF STYLE
+----------------------------------------------------- */
+
+#sidebar {
+    left: -400px;
+}
+
+#sidebar.active {
+    left: 0;
+}
+
+#sidebar2 {
+    right: -400px;
+}
+
+#sidebar2.active {
+    right: 0;
+}
+
+/* Tablet portrait */
+@media (min-width: 768px) and (max-width: 1024px) {
+    #sidebar2 {
+        width: 50%;
+    }
+    #sidebar {
+        left: -500px;
+    }
+    #sidebar2 {
+        right: -500px;
+    }
+}
+
+/* Tablet landscape */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    #sidebar2 {
+        width: 50%;
+    }
+    #sidebar {
+        left: -500px;
+    }
+    #sidebar2 {
+        right: -500px;
+    }
+}
+
+/* Smartphone landscape */
+@media (min-width: 481px) and (max-width: 767px) {
+    #sidebar2 {
+        width: 50%;
+    }
+    #sidebar {
+        left: -500px;
+    }
+    #sidebar2 {
+        right: -500px;
+    }
+}
+
+/* Smartphone portrait */
+@media (min-width: 320px) and (max-width: 480px) {
+    #sidebar2 {
+        width: 100%;
+    }
+    #sidebar {
+        left: -500px;
+    }
+    #sidebar2 {
+        right: -500px;
+    }
+}
+
+/* ---------------------------------------------------
+    DROPDOWN
+----------------------------------------------------- */
+

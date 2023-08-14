@@ -1,0 +1,29 @@
+{% for d in dispositivos %}
+    <div class="dispositivo_movil col-12 my-2 py-4 border border-info rounded" data-id="{{ d.id }}" data-base_lat="{{ d.base_lat }}" data-base_lon="{{ d.base_lon }}" data-tipo="{{ d.tipo }}" data-activo="{{ d.activo }}" data-id_estacion="{{ d.id_estacion }}">
+        <div class="row">
+            <div class="col-3">
+                <h3>
+                    {% if d.tipo == 'FURGONETA' %}
+                        <i class="fal fa-truck"></i>                
+                    {% elif d.tipo == 'DRONE' %}
+                        <i class="fal fa-drone-alt"></i>
+                    {% elif d.tipo == 'COCHE' %}
+                        <i class="fal fa-car"></i>
+                    {% elif d.tipo == 'DETECTOR' %}
+                        <i class="fal fa-tablet-rugged"></i>
+                    {% endif %}
+                </h3>
+            </div>
+            <div class="col-6">
+                <h5>{{ d.nombre }}</h5>
+            </div>
+            <div class="col-3">
+                <div class="custom-control custom-switch rounded">
+                    <input id="activar_{{ d.id }}" onclick="cambioCheckMovil({{ d.id }})" type="checkbox" class="checkbox_disp_moviles custom-control-input" {% if d.activo %}checked{% endif %}>
+                    <label class="custom-control-label" for="activar_{{ d.id }}"></label>
+                </div>
+            </div>
+            <div id="parametros_{{ d.id_estacion }}" class="col-12"></div>
+        </div>
+    </div>
+{% endfor %}

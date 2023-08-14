@@ -1,0 +1,22 @@
+{
+  "name": "VRAEX Web App",
+  "short_name": "LARUEX",
+  "description": "App del Laboratorio de Radiactividad Ambiental de la Universidad de Extremadura para el seguiminento de las redes de alerta que gestiona.",
+  "icons": [
+    {
+      "src": "img/icons_app/icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    // ...
+    {
+      "src": "img/icons_app/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "fullscreen",
+  "theme_color": "#009933",
+  "background_color": "#009933"
+}

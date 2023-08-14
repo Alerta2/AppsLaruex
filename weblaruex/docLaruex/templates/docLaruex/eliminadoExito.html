@@ -1,0 +1,91 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+{% block content %}
+
+
+
+<style>
+      /*--------------------------------------------------------------
+    # Ir a Archivos
+    --------------------------------------------------------------*/
+    .cta {
+    position: relative;
+    margin: auto;
+    padding: 12px 18px;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    }
+
+    .cta:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    border-radius: 50px;
+    background: #d4e4e2;
+    width: 45px;
+    height: 45px;
+    transition: all 0.3s ease;
+    }
+
+    .cta span {
+    position: relative;
+    font-family: "Ubuntu", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #087B6C;
+    }
+
+
+
+    .cta:hover:before {
+    width: 100%;
+    background: #d4e4e2;
+    }
+
+    .cta:active {
+    transform: scale(0.95);
+    }
+
+</style>
+
+<div class="row">
+
+  <div class="col">
+    <div class="align-middle">
+        <img class="mx-auto d-block" src="{% static 'niceAdminAssets' %}/img/successful.svg" alt="Eliminado con éxito"
+        style="max-width: 30em; max-height: 30em;  margin: 0 auto;" >
+    </div>
+  </div>
+
+
+</div>
+<div class="row mx-auto my-2">  
+  <div class="col">
+      <h3 class="display-3 font-weight-bold text-center " style="color: #087B6C;">Eliminado con éxito</h3>
+  </div>
+</div>
+<div class="row">
+  <button class="col-2 cta" title="Ir a Archivos" onclick="irArchivo()">
+    <span>Ir a Archivos</span>
+  </button>  
+  <!--  <button class="col-2 cta"  id="botonIrArchivo" title="Ir a Archivos" onclick="irArchivo('Documento')">
+    <span>Ir a Archivos</span>
+  </button> -->
+
+</div>
+
+<script>
+  function irArchivo(){
+      location.href="{% url 'docLaruex:docLaruexObjeto' %}";
+  
+  }
+
+  
+
+</script>
+
+{% endblock %}

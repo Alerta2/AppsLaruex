@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Static Template</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <style>
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #333;
+  transition:opacity 1000ms;
+    opacity:1;
+}
+body.fadeout{
+    opacity:0;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background:#475d62 url(../../static/img/spida/presentacion/fondo.JPG);
+  background-size:cover;
+}
+
+h1 {
+  display: block;
+  position: relative;
+  margin: 0 auto;
+  padding: 0 10px;
+  font-family: "Brush Script MT", cursive;
+  font-size: 300px;
+  color: rgba(255, 255, 255, 0.5);
+  word-wrap: break-word;
+  -webkit-text-stroke-width: 4px;
+ -webkit-text-stroke-color: #fff;
+}
+
+h1 span {
+  display: inline-block;
+  opacity: 0;
+  animation: 0.5s fadeIn forwards;
+  letter-spacing: 1.7px;
+}
+
+/*h1::before {
+  content: "";
+  position: absolute;
+  background-color: #fff;
+  height: 100%;
+  width: 0%;
+  margin: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  transition: .6s cubic-bezier(0.755, 0.05, 0.855, 0.06);
+}*/
+
+/*.animation--step-2::before {
+  width: 100%;
+}*/
+
+/*.animation--step-3 span {
+  opacity: 0;
+  animation: none;
+}
+
+.animation--step-3::before {
+  margin-left: auto;
+  width: 0%;
+}*/
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  } 
+  to {
+    opacity: 1;
+  }
+}
+
+
+
+
+
+  </style>
+  <body>
+    <div class="container">
+        <h1 id="titulo">
+          Spida
+        </h1>
+      </div>
+      
+      
+  </body>
+  <script type="text/javascript">
+        var spanText = function spanText(text) {
+  var string = text.innerText;
+  var spaned = '';
+  for (var i = 0; i < string.length; i++) {
+    if (string.substring(i, i + 1) === ' ') spaned += string.substring(i, i + 1);
+    else spaned += '<span>' + string.substring(i, i + 1) + '</span>';
+  }
+  text.innerHTML = spaned;
+}
+
+let headline = document.querySelector("h1");
+
+spanText(headline);
+
+let animations = document.querySelectorAll('h1');
+
+animations.forEach(animation => {
+  let letters = animation.querySelectorAll('span');
+  letters.forEach((letter, i) => {
+    letter.style.animationDelay = (i * 0.1) + 's';
+  })
+});
+
+
+function fadeIn(element, duration = 600) {
+  element.style.display = '';
+  element.style.opacity = 0;
+  var last = +new Date();
+  var tick = function() {
+    element.style.opacity = +element.style.opacity + (new Date() - last) / duration;
+    last = +new Date();
+    if (+element.style.opacity < 1) {
+      (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+    }
+  };
+  tick();
+}
+
+
+let animationStep2 = document.querySelector('h1 span:last-of-type');
+let animationStep3 = document.querySelector('h1::before');
+animationStep2.addEventListener('animationend', () => {
+  /*headline.classList.add('animation--step-2');
+  setTimeout(() => {
+    headline.classList.remove('animation--step-2');
+    headline.classList.add('animation--step-3');
+  }, 1000);*/
+   /*var texto= document.getElementById("titulo");
+   texto.addEventListener("animationend", function(){ window.location.pathname = "/spida/inicio/";});*/
+   
+   
+   
+   /* document.body.classList.add("fadeout"); */
+        /* window.setTimeout(function(){ */
+            /*window.location.pathname = "/spida/inicio/";*/
+            /* window.location.replace("/spida/inicio/").fadeIn(3000); */
+            /*Materialize.fadeInImage('/spida/inicio/');*/
+        /* },500) */
+          
+        /*caja.addEventListener("animationend", function(){ window.location.pathname = "/spida/inicio/";});*/
+
+        transitionToPage("/spida/inicio/");
+
+});
+
+
+window.transitionToPage = function(href) {
+    document.querySelector('body').style.opacity = 0
+    setTimeout(function() { 
+        window.location.href = href
+    }, 500)
+}
+
+document.addEventListener('DOMContentLoaded', function(event) {
+    document.querySelector('body').style.opacity = 1
+})
+
+       
+        /*var caja= document.getElementById("box");*/
+        /*console.log("hola");*/
+        /*caja.addEventListener("animationend", function(){ window.location.pathname = "/spida/inicio/";});*/
+  </script>
+</html>
+
+
+
+

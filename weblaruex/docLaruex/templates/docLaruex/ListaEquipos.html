@@ -1,0 +1,861 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+{% block content %}
+
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+
+    /*--------------------------------------------------------------
+    # Añadir Imagen
+    --------------------------------------------------------------*/
+    .addImagen {
+      color: rgb(16, 108, 161);
+    }
+
+    .addImagen:hover {
+      color: rgb(10, 59, 99);
+    }
+
+    .imagen-upload {
+      border: 1px solid #ccc;
+      display: inline-block;
+      padding: 6px 12px;
+      cursor: pointer;
+    }     
+    
+
+    /*--------------------------------------------------------------
+    # Añadir Fichero PDF
+    --------------------------------------------------------------*/
+  .addFicheroPDF {
+    color: rgb(161, 16, 32);
+  }
+
+  .addFicheroPDF:hover {
+    color: rgb(99, 10, 20);
+  }
+    .add:hover {
+    color: #ce8312;
+  }
+
+  .file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+
+    /* ===============================
+  *  Estilo del los botones
+  =================================*/
+  
+  .agregarFormacion:hover {
+    color: #032031;
+  }
+  
+  .descargaPDF:hover {
+    color: #c36d0b;
+  }
+  .retirarStock:hover{
+    color: #492160;
+  }
+  .retirarStockUbicacion:hover{
+    color: #042e37;
+  }
+  .entrar:hover{
+    color: #195746;
+  }
+
+
+  
+  /*--------------------------------------------------------------
+# Ir a Eventos
+--------------------------------------------------------------*/
+.cta {
+position: relative;
+margin: auto;
+padding: 12px 18px;
+transition: all 0.2s ease;
+border: none;
+background: none;
+}
+
+.cta:before {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+display: block;
+border-radius: 50px;
+background: #d4e4e2;
+width: 45px;
+height: 45px;
+transition: all 0.3s ease;
+}
+
+.cta span {
+position: relative;
+font-family: "Ubuntu", sans-serif;
+font-size: 18px;
+font-weight: 700;
+letter-spacing: 0.05em;
+color: #087B6C;
+}
+
+
+
+.cta:hover:before {
+width: 100%;
+background: #d4e4e2;
+}
+
+.cta:active {
+transform: scale(0.95);
+}
+
+
+.form-check-input:checked {
+    background-color: #087B6C;
+    border-color: #087B6C;
+}
+
+.form-check-input:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(16, 223, 161, 0.432);
+}
+.select:hover{
+  color: #94d2bd;
+}
+
+</style>
+
+
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Listado de Equipos
+    <a href="" class="mx-1" title="equipos por etiquetar" data-toggle="modal" data-target="#modalListadoSinEtiqueta" style="color: #ca6702"><i class="fa-duotone fa-list-dropdown add"></i></a></h5>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Listado de Equipos</li>
+    </ol>
+  </nav>
+</div>
+<!-- breadcrumb   -->
+
+
+
+{% if administrador or secretaria or direccion %}
+<div id="toolbar">
+  <a href="" class="mx-1" title="Añadir Equipo" data-toggle="modal" data-target="#modalFormularioAddEquipo" style="color: #eba43d"><i
+      class="fa-solid fa-square-plus fa-2x add"></i></a>
+</div>
+
+{% endif %}
+<table id="tabla_equipos" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
+  data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+  data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+  data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-row-style="rowStyle"></table>
+
+
+
+
+
+<!-- formulario añadir equipo  -->
+<div id="modalFormularioAddEquipo" class="modal fade" tabindex="1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Equipo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioModalAddEquipo" action="/private/docLaruex/agregarArchivo/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group">
+            <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+              value="Equipo" style="display: none;" />
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="habilitacion">Habilitación</label>
+                <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                  {% for habilitacion in habilitaciones %}
+                  <option value="{{habilitacion.id}}">
+                    {{habilitacion.titulo}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="ubicacion">Ubicación</label>
+                <select class="form-select" data-rule="required" id="ubicacion" name="ubicacion">
+                  {% for ubicacion in ubicaciones %}
+                  <option value="{{ubicacion.id}}">{% if ubicacion.id__padre %} [{{ ubicacion.id__padre__nombre}}] {% endif %} 
+                    {{ubicacion.id__nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="cod_laruex">Código Laruex</label>
+                <input required type="text" class="form-control" id="cod_laruex" placeholder="2331 " name="cod_laruex"
+                  data-rule="required" pattern="[0-9]{4,6}" title="No es necesario añadir /2021" value="{{ ultimoCodigo }}"/>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="cod_uex">Código Uex</label>
+                <input type="text" class="form-control" id="cod_uex" value="00000" name="cod_uex"
+                   pattern="[0-9]{5,6}"/>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="fechaAlta">Fecha de Alta</label>
+                <input type="date" id="fechaAlta" name="fechaAlta" class="form-control" required />
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="importe">Importe con iva</label>
+                <input type="number" step="0.01" class="form-control" id="importe" placeholder="4,16" name="importe"
+                  data-rule="required" oninput="calcularPrecioSinIva(this.value)"/>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="nombreObjeto">Nombre del Equipo</label>
+                <input required type="text" class="form-control" id="nombreObjeto" placeholder="Monitor 4k 60Hz"
+                  name="nombreObjeto" data-rule="required" title="No permite guiones ni otros caracteres que no sean espacios"/>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="modeloEquipo">Modelo</label>
+                <input type="text" class="form-control" id="modeloEquipo" placeholder="MK-H210"
+                  name="modeloEquipo" />
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="form-group">
+                <label for="num_serie">S/N</label>
+                <input required type="text" class="form-control" id="num_serie" placeholder="201520724 " name="num_serie"
+                  data-rule="required"  title="No permite guiones ni otros caracteres que no sean espacios"/>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="tipo_equipo">Tipo de Equipo</label>
+                <select class="form-select" data-rule="required" id="tipo_equipo" name="tipo_equipo">
+                  {% for tipo_equipo in tipoEquipo %}
+                  <option value="{{tipo_equipo.id}}">
+                    {{tipo_equipo.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="proveedor">Proveedor</label>
+                <select class="form-select" data-rule="required" id="proveedor" name="proveedor">
+                  {% for proveedor in proveedores %}
+                  <option value="{{proveedor.id}}">
+                    {{proveedor.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            
+            <div class="col">
+              <div class="form-group">
+                <label for="fabricante">Fabricante</label>
+                <select class="form-select" data-rule="required" id="fabricante" name="fabricante">
+                  {% for fabricante in fabricantes %}
+                  <option value="{{fabricante.id}}">
+                    {{fabricante.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="form-group">
+                <label for="grupoEquipo">Grupo</label>
+                <select class="form-select" data-rule="required" id="grupoEquipo" name="grupoEquipo">
+                  {% for grupo in gruposEquipos %}
+                    <option value="{{grupo.id}}">{{grupo.nombre}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="descripcion">Descripción del Equipo</label>
+                <textarea type="text" class="form-control" id="descripcion" placeholder="Características: 1376L/min"
+                  name="descripcion" data-rule="required"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col d-flex justify-content-center">
+              <div class="form-check my-auto">
+                <input class="form-check-input" type="checkbox" id="altaUex" name="altaUex" >
+                <label class="form-check-label" for="altaUex" style="font-size: 1.2rem; color: #195746;">
+                  <i class="fa-duotone fa-triangle-exclamation"></i>
+                  Marcar si hay que dar de alta el equipo en la Uex
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row" >
+            <div class="col d-flex justify-content-center">
+              <div class="form-group">
+                <label for="imagenEquipo">
+                  <i class="fa-duotone fa-image fa-4x addImagen"></i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="imagenEquipo" name="imagenEquipo"
+                  onchange="mostrarNombreImagen(this.value)" />
+                <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+                  <spam id="imagen-name"></spam>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div><!-- END formulario añadir equipo  -->
+
+
+
+
+<!-- ============= FORMULARIO CAMBIAR UBICACIÓN DEL EQUIPO ============= -->
+<!-- formulario cambiar Ubicación  -->
+<div id="modalCambiarUbicacion" class="modal fade" tabindex="2" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModal"><strong>Cambiar Ubicación del Equipo </strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalCambiarUbicacion" action="/private/docLaruex/cambiarUbicacionEquipo/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="form-group">
+            <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+              value="Documento" style="display: none;" />
+          </div><!-- fin tipoObjeto -->
+
+          <div class="row">
+            <!-- Fecha de baja  -->
+            <div class="col-4">
+              <div class="form-group">
+                <label for="fechaCambioUbicacion" id="tituloFechaCambioUbicacion">Fecha de Actual</label>
+                <input type="datetime-local" id="fechaCambioUbicacion" name="fechaCambioUbicacion" class="form-control"
+                  required />
+              </div>
+            </div><!-- Fin fecha del documento  -->
+            <div class="col">
+              <div class="form-group">
+                <label for="nuevaUbicacion">Nueva Ubicación</label>
+                <select class="form-select"  id="nuevaUbicacion" name="nuevaUbicacion">
+                  {% for ubicacion in ubicaciones %}
+                  <option data-tokens="{{ubicacion.id__nombre}}" value="{{ubicacion.id}}">
+                    {% if ubicacion.id__padre %} [{{ ubicacion.id__padre__nombre}}] {% endif %} {{ubicacion.id__nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancel" name="cancel" onclick="crearAviso('cambiarUbicacionEquipoCerrar', 'No se ha podido cambiar de ubicación el equipo {{ equipo.id.nombre }}', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('cambiarUbicacionEquipoGuardar', 'Equipo {{ equipo.id.nombre }} cambiado de ubicación', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- END formulario Cambiar Ubicación  -->
+
+
+
+<!-- ============= Modal Eliminar Equipo ====================-->
+<div id="modalEliminarObjeto" class="modal fade" tabindex="3" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarObjeto"><strong>¿Estas seguro que deseas eliminar el objeto?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarObjeto" action="/private/docLaruex/eliminarObjeto/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarObjeto" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarObjeto" name="cancel" onclick="crearAviso('eliminarObjetoCancelar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarObjetoGuardar', 'Objeto  eliminado', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="modalListadoSinEtiqueta" tabindex="4" role="dialog" aria-labelledby="modalListadoSinEtiquetaTitle" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalListadoSinEtiquetaTitle">Equipos sin etiqueta UEx</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+        <table id="tabla_equipos_sin_etiqueta" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
+        data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+        data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+        data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-row-style="rowStyle" ></table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ============= FORMULARIO AGREGAR COD_UEX DEL EQUIPO ============= -->
+<!-- formulario agregar cod_uex equipo  -->
+<div id="modalAgregarCodUex" class="modal fade" tabindex="5" 
+role="dialog" aria-labelledby="modalAgregarCodUexLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalAgregarCodUex"><strong>Agregar Código Uex</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalAgregarCodUex" action="/private/docLaruex/agregarCodUex/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="row">
+            <!-- Fecha de baja  -->
+            <div class="col d-flex justify-content-center">
+              <div class="form-group">
+                <label for="nuevoCodUex">Código Uex</label>
+                <input type="text" class="form-control" id="nuevoCodUex" name="nuevoCodUex" data-rule="required" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="cerrarAgregarCodUex" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancelAgregarCodUex" name="cancelAgregarCodUex" onclick="crearAviso('agregarCodUexCerrar', 'No se ha podido agregar el código de la uex al equipo.', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('agregarCodUexGuardar', 'Coódigo Uex del equipo {{ equipo.id.nombre }} modificado con éxito', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- END formulario Cambiar Ubicación  -->
+
+
+
+
+<script type="text/javascript">
+
+  $(function() {
+    $('.selectpicker').selectpicker();
+  });
+
+
+  $("#tabla_equipos").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/docLaruex/equiposDatos",
+    cache: false, 
+    columns: [
+      {
+        title: "",
+        field: "id__icono",
+        align: "center",
+      },
+      {
+        title: "Ubicación",
+        field: "ubicacion_actual__id__nombre",
+        align: "center",
+      },
+      {
+        title: "Código Laruex",
+        field: "cod_laruex",
+        align: "center",
+        sortable: "true",
+        formatter: function (value, row) {
+          var codigo = row.cod_laruex;
+          var fecha = new Date(row.fecha_alta);
+          return (
+            codigo + '/' + fecha.getFullYear()
+          );
+        },
+      },
+      {
+        title: "Código Uex",
+        field: "cod_uex",
+        align: "center",
+        sortable: "true",
+      },
+      {
+        title: "Nombre",
+        field: "id__nombre",
+        align: "center",
+      },
+      {
+        title: "Modelo",
+        field: "modelo",
+        align: "center",
+      },
+      {
+        title: "No Serie",
+        field: "num_serie",
+        align: "center",
+      },
+      {
+        title: "Fabricante",
+        field: "fabricante__nombre",
+        align: "center",
+      },
+      {
+        title: "Tipo",
+        field: "tipo_equipo__nombre",
+        align: "center",
+      },{
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+
+                  
+        var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+        var botonEditar = '<a href="/private/docLaruex/editarObjeto/' + row.id + '/' + '" class="mx-1" title="Editar" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen agregarFormacion" ></i></a>';
+
+        var botonCambiarUbicacion = '<a href="" title="Cambiar Ubicacion" data-toggle="modal" data-target="#modalCambiarUbicacion" onclick="$('+"'#formularioModalCambiarUbicacion').attr('action', '/private/docLaruex/cambiarUbicacionEquipo/"+ row.id +"/');"+'" class="mx-1" style="color: #eba43d"><i class="fa-duotone fa-cart-flatbed-boxes descargaPDF"></i></a>';
+
+        var botonReportEquipo = '<a href="/private/docLaruex/reportEquipo/' + row.id + '/" class="mx-1" title="report Equipo"  style="color: #405BDE;" ><i class="fa-duotone fa-file-chart-column fa-lg agregarFormacion"></i></a>';
+
+        var botonEliminar = '<a href="/private/docLaruex/eliminarObjeto/' + row.id + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarObjeto" onclick="$('+"'#formularioModalEliminarObjeto').attr('action', '/private/docLaruex/eliminarObjeto/"+ row.id +"/');"+'"style="color:#AE2012" ><i class="fa-solid fa-x" ></i></a>';
+
+        var admin = '{{administrador}}';
+        var secretaria = '{{secretaria}}';
+        var direccion = '{{direccion}}';
+      
+        if (admin == 'True') {
+          return(botonVer + botonCambiarUbicacion + botonReportEquipo+ botonEditar + botonEliminar)
+        }else if (direccion == 'True'){
+          return(botonVer + botonCambiarUbicacion + botonReportEquipo)
+        }else{
+          return(botonVer + botonReportEquipo)
+        }
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+
+
+  $("#tabla_equipos_sin_etiqueta").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/docLaruex/equiposDatosSinEtiqueta",
+    cache: false, 
+    columns: [
+      {
+        title: "Código Laruex",
+        field: "cod_laruex",
+        align: "center",
+        sortable: "true",
+        formatter: function (value, row) {
+          var codigo = row.cod_laruex;
+          var fecha = new Date(row.fecha_alta);
+          return (
+            codigo + '/' + fecha.getFullYear()
+          );
+        },
+      },
+      {
+        title: "Código Uex",
+        field: "cod_uex",
+        align: "center",
+        sortable: "true",
+      },
+      {
+        title: "Nombre",
+        field: "id__nombre",
+        align: "center",
+      },
+      {
+        title: "Modelo",
+        field: "modelo",
+        align: "center",
+      },
+      {
+        title: "No Serie",
+        field: "num_serie",
+        align: "center",
+      },
+      {
+        title: "Tipo",
+        field: "tipo_equipo__nombre",
+        align: "center",
+      },{
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+
+        var agregarCodUex = '<a href="" title="Agregar Codigo Uex" data-toggle="modal" data-target="#modalAgregarCodUex" onclick="$('+"'#formularioModalAgregarCodUex').attr('action', '/private/docLaruex/agregarCodUex/"+ row.id +"/');"+'" class="mx-1" style="color: #eba43d"><i class="fa-kit fa-solid-barcode-circle-plus descargaPDF"></i></a>';
+        var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+        var botonEditar = '<a href="/private/docLaruex/editarObjeto/' + row.id + '/' + '" class="mx-1" title="Editar" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen agregarFormacion" ></i></a>';
+        var admin = '{{administrador}}';
+        var secretaria = '{{secretaria}}';
+        var direccion = '{{direccion}}';
+      
+        if (admin == 'True') {
+          return(botonVer + botonEditar + agregarCodUex)
+        }else if (direccion == 'True'){
+          return(botonVer + agregarCodUex)
+        }else{
+          return(botonVer)
+        }
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+    /* obtiene el id de la row y accede al elemento
+  $("#tabla_objetos").on("click-row.bs.table", function (e, row, $element) {
+    window.location.href = "/private/docLaruex/verObjeto/" + row.id + "/";
+  });*/
+
+
+  function rowStyle(row, index) {
+        if (row.fecha_baja == null ) {
+            return {
+                css: {
+                    'color': 'black'
+                }
+            }
+        } else {
+            return {
+                css: {
+                    'color': 'black',
+                    // background color light red
+                    'background-color': '#f5c6cb'
+                }
+            }
+        }
+    }
+
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+
+    document.getElementById('imagen-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreImagen').style.display = 'none';
+  }
+
+  function mostrarRowSeleccionada (){
+    console.log($("#tabla_equipos").bootstrapTable('getSelections'))
+  }
+
+  function calcularPrecioSinIva(value){
+    var precio = value;
+    var iva = 1.21;
+    var precioSinIva = precio / iva;
+    descripcion = document.getElementById('descripcion')
+    descripcion.value = "Precio sin IVA: " + precioSinIva.toFixed(2) + " €";
+  }
+
+
+
+
+
+
+
+ // cambiamos la funcionalidad del boton submit del formulario
+ addEventListener('reset', function() {
+    $(".modalFormularioAddEquipo").reset();
+  });
+
+
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioModalAddEquipo").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Equipo guardado con éxito', 'alert-success', 2000)
+
+        $(".modalFormularioAddEquipo").remove();
+        $("#reset").trigger("click");
+        $('#tabla_equipos').bootstrapTable('refresh');
+        $('#modalFormularioAddEquipo').modal('toggle');
+        $('#cerrar').trigger('click');
+        
+        location.reload(true);
+        
+      }
+    });
+    
+  });
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioModalTipoEquipo").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarTipoEquipo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        $(".modalTipoEquipo").remove();
+        $("#reset").trigger("click");
+        $('#cerrar').trigger('click');
+      }
+    });
+    
+  });
+
+  
+
+
+
+
+
+
+</script>
+{% endblock %}

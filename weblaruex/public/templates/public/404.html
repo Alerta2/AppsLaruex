@@ -1,0 +1,26 @@
+{% extends "public/template.html" %}
+{% load static %}
+
+{% block meta %}
+  <title>Error 404</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs" data-aos="fade-in">
+      <div class="container">
+        <h1 class="text-danger">Upps!</h1>
+        <h4 class="text-danger">Ha ocurrido un error, intentelo de nuevo m&aacutes tarde.</h4>
+      </div>
+    </div><!-- End Breadcrumbs -->
+
+    <img src="{% static 'img/images/mensajes/error-404.png' %}" alt="" class="img-fluid" style="width: 50%; height: 50%; margin-left: auto; margin-right: auto; display: block;" >
+
+  </main><!-- End #main -->
+
+{% endblock %}

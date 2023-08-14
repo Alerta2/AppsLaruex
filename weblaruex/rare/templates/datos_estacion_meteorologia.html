@@ -1,0 +1,39 @@
+{% load static %}
+{% load i18n %}
+{% if meteorologias_maximas %}
+    <section class="p-3">
+        <div class="row m-2 p-2">
+            {% for meteorologia in meteorologias_maximas %}
+                <div class="col-lg-1 col-md-2 col-sm-3 col-xs4 col-4 rounded border border-dark p-3">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-2">
+                            {{meteorologia.hora}}:00
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-2">
+                            <img src="{% static 'img/rare/iconomet' %}/{{meteorologia.icometeo|safe}}.png" width="64px"/>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-2">
+                            {{meteorologia.maxima_temperatura}}&deg;C
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-2">
+                            {{meteorologia.maxima_presion}}mm
+                        </div>
+                        {% if estacion.id == 4 or estacion.id == 53 %}
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-2">
+                                <img src="{% static 'img/rare/' %}/container.png" width="64px"/>
+                            </div>
+                        {% else %}
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-2">
+                                <img src="{% static 'img/rare/' %}/nuclear-plant.png" width="64px"/>
+                            </div>
+                        {% endif %}
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-2">
+                            <div><i class="fas fa-arrow-up fa-3x" style="transform: rotate({{meteorologia.direccion_viento|safe}}deg);"></i></div>
+                            <div><b>{{meteorologia.velocidad_viento}}m/s</b></div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}

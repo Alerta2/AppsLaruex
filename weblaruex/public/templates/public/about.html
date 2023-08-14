@@ -1,0 +1,31 @@
+{% extends "public/template.html" %}
+
+{% block meta %}
+  <title>Nosotros - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+  <main id="main">
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs" data-aos="fade-in">
+      <div class="container">
+      </div>
+    </div><!-- End Breadcrumbs -->
+    
+    <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>¿Quíenes somos?</h2>
+        <p>LARUEX</p>
+      </div>
+
+      {% include "public/parts/about-section.html" %}
+
+      {% include "public/parts/testimonials-section.html" %}
+    </div>
+
+  </main><!-- End #main -->
+
+{% endblock %}

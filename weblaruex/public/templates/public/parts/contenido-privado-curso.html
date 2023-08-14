@@ -1,0 +1,55 @@
+{% load static %}
+    <section id="streaming" class="trainers">
+        <div class="container">
+            <div class="row" >
+            {% for stream in streaming %}
+                {% if stream.visible == 1 %}         
+                <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
+                    <div class="member">
+                        <a href="{{ stream.url }}" target="_blank"><img class="card-img-top img-fluid" src="{% static 'img/videos/reproducion.png' %}" alt=""></a>
+                        <div class="member-content">
+                            <h4>Emisión d&iacutea {{ stream.fecha|date:"j" }} de {{ stream.fecha|date:"F" }} a las {{ stream.fecha|time:"h:i" }}</h4> 
+                            <h6>{{ stream.nombre }}</h6> 
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </div>
+   </section>
+
+
+{% regroup contenidos by fecha_contenido|date:"Y-m-d" as contenidos_por_dia %}
+<div id="accordion">
+    {% for grupo in contenidos_por_dia %}
+    <div class="card">
+        <div class="card-header" id="heading{{ grupo.grouper }}">
+        <h5 class="mb-0">
+            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse{{ grupo.grouper }}" aria-expanded="true" aria-controls="collapse{{ grupo.grouper }}" style="color: #1d8896;">
+                <h5><strong>
+                {% with grupo.list|first as first_content %}{{ first_content.fecha_contenido|date:"l" }} día {{ first_content.fecha_contenido|date:"j" }}{% endwith %}
+                </h5></strong>
+            </button>
+        </h5>
+        </div>
+
+        <div id="collapse{{ grupo.grouper }}" class="collapse show" aria-labelledby="heading{{ grupo.grouper }}" data-parent="#accordion">
+        <div class="card-body">
+            {% for contenido in grupo.list %}
+                {% if contenido.visible == 1 %}
+                    <h4><strong>{{ contenido.fecha_contenido|date:"H:i" }} - {{ contenido.nombre }} {% if contenido.url %}</strong><a href="/solicitar-contenido/{{ contenido.id_curso }}/{{ contenido.codigo }}/" target="_blank" class="fas fa-arrow-alt-circle-down" style="color: #1d8896;"></a>{% endif%}</h4>
+                    <h5 >{{ contenido.ponente }}</h5>
+                    <hr>
+                    
+                {% endif %}
+            {% endfor %}
+        </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+    
+<script type="text/javascript">
+    $('.collapse').collapse();
+</script>

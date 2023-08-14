@@ -1,0 +1,268 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+
+      /* ===============================
+  *  Estilo del los botones
+  =================================*/
+  
+  .agregarFormacion:hover {
+    color: #032031;
+  }
+  .entrar:hover{
+    color: #195746;
+  }
+
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Notificaciones</h5>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Notificaciones</li>
+    </ol>
+  </nav>
+</div>
+
+
+
+<!-- ============= Tablas ============= -->
+
+<!-- Tabla con lista de proyectos -->
+
+    <table id="tabla_notificaciones" data-toggle="table" data-search="true" data-show-columns="true"
+      data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+      data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+      data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+    </table>
+
+
+
+    
+<!-- ============= Modal Eliminar ====================-->
+
+<div id="modalEliminarNotificacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarNotificacion"><strong>¿Estas seguro que deseas eliminar la notificación?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarNotificacion" action="/private/docLaruex/eliminarNotificacion/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarNotificacion" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarNotificacion" name="cancel" onclick="crearAviso('eliminarNotificacionCancelar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarNotificacionGuardar', 'Notificación eliminada', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+
+  $('#tabla_notificaciones').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/notificacionesDatos",
+    cache: false,
+    columns: [{
+      title: 'Título',
+      field: 'titulo',
+      align: "center"
+    },{
+      title: 'Resumen',
+      field: 'resumen',
+      align: "center",        
+      formatter: function (value, row) {
+          return (
+            row.resumen.substring(0, 70) + ' ...'
+          );
+        },
+    },{
+      title: 'Fecha',
+      field: 'fecha',
+      align: 'center',
+      sortable: 'true',
+      formatter: function (value, row) {
+          var fecha = new Date(row.fecha);
+          return $.datepicker.formatDate('dd-mm-yy', fecha);
+      }
+    },{
+      title: 'Creador',
+      field: 'creador',
+      align: 'center',
+      sortable: 'true',        
+      formatter: function (value, row) {
+          return (
+            row.creador__first_name + " " + row.creador__last_name
+          );
+        },
+    },{
+      title: 'Archivo Asociado',
+      field: 'id_doc__nombre',
+      align: 'center',
+    },{
+      title: 'Estado',
+      field: 'estado_notificacion__id',
+      align: "center",
+        formatter: function (value, row) {
+          var defecto = '<span class="badge" style="background-color: #524e4e;">En Revisión</span>';
+          switch (row.estado_notificacion__id) {
+            case 1:
+              estado = '<span class="badge badge-success" style="background-color: #524e4e;">Enviada</span>';
+              return estado;
+              break;
+            case 2:
+              estado = '<span class="badge" style="background-color: #EB8E34;">Recibida</span>';
+              return estado;
+              break;
+
+            case 3:
+              estado = '<span class="badge" style="background-color: #21b563;">En trámite</span>';
+              return estado;
+              break;
+            case 4:
+              estado = '<span class="badge" style="background-color: #2186b5;">Cerrada</span>';
+              return estado;
+              break;
+            case 5:
+              estado = '<span class="badge" style="background-color: #b52121;">No atendida</span>';
+              return estado;
+              break;
+
+
+            default:
+              console.log("No se ha encontrado el estado", row.id__id_estado__id)
+              return defecto;
+
+          }
+        },
+    },{
+      title: "Acciones",
+      field: "action",
+      align: "center",
+      formatter: function (value, row) {
+
+
+        var botonVerNotificacion = '<a href="/private/docLaruex/verNotificacion/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+        var botonEditarNotificacion = '<a href="/private/docLaruex/editarNotificacion/' + row.id + '/' + '" class="mx-1" title="Editar" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen agregarFormacion" ></i></a>';
+        var botonEliminar = '<a href="/private/docLaruex/eliminarNotificacion/' + row.id + '/' + '" class="mx-1" title="Eliminar Notificación" data-toggle="modal" data-target="#modalEliminarNotificacion" onclick="$('+"'#formularioModalEliminarNotificacion').attr('action', '/private/docLaruex/eliminarNotificacion/"+ row.id +"/');"+'" ><i class="fa-solid fa-x" style="color:#AE2012"></i></a>';
+        var admin = '{{administrador}}';
+        if (admin == 'True') { 
+            return (botonVerNotificacion + botonEditarNotificacion + botonEliminar);
+        }
+        else{
+            return (botonVerNotificacion);
+        }
+      },
+  },
+    ],
+    locale: "es-ES",
+    search: true,
+    sortName: 'id',
+    sortOrder: 'desc',
+
+  });
+
+  // Función para mostrar el nombre del colaborador en el modal
+  function mostrarColaboradores(value) {
+    $('#colaboradoresProyectoSelect option[value="' + value + '"]').attr("selected", "selected");
+  }
+
+  // Función para mostrar el nombre del financiador en el modal
+  function mostrarFinanciadores(value) {
+    $('#financiadoresProyectoSelect option[value="' + value + '"]').attr("selected", "selected");
+  }
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioProyecto").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarProyecto/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Proyecto guardado con éxito', 'alert-success', 2000);
+        document.getElementById('formularioProyecto').remove();
+        $('#tabla_proyectos').bootstrapTable('refresh');
+        $('#modalFormularioProyecto').trigger('reset');
+        $('#cerrarProyecto').trigger('click');
+        location.reload(true);
+
+      }
+    });
+  });
+
+    // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+    function mostrarNombreArchivo(value) {
+
+      document.getElementById('file-name').innerHTML = value;
+
+      document.getElementById('mostrarNombreArchivo').style.display = 'none';
+    }    
+    function mostrarNombreArchivoEditable(value) {
+
+      document.getElementById('file-name-editable').innerHTML = value;
+
+      document.getElementById('mostrarNombreArchivoEditable').style.display = 'none';
+
+    }
+
+
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,229 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    ul.pagination li .page-link {
+      background-color: rgb(255, 255, 255) !important;
+      color: rgb(41, 68, 87);
+  
+    }
+  
+    ul.pagination li.active .page-link {
+      background-color: rgb(41, 68, 87) !important;
+      border-color: rgb(41, 68, 87) !important;
+    }
+  
+    ul.pagination li .page-link:hover {
+      filter: brightness(85%);
+  
+    }
+  
+    ul.pagination li.active .page-link:hover {
+      filter: brightness(120%);
+  
+    }
+  
+    .btn-light {
+      color: rgb(41, 68, 87);
+    }
+  
+    th {
+      color: rgb(41, 68, 87);
+    }
+     /* estilo añadirFichero PDF*/
+     .addFicheroPDF {
+        color: rgb(161, 16, 32);
+    }
+
+    .addFicheroPDF:hover {
+        color: rgb(99, 10, 20);
+    }
+    .add:hover {
+    color: #ce8312;
+  }
+
+    .file-upload {
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+    }
+  </style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+    <h5 class="card-title">Usuarios</h5>
+    <nav>
+        <ol class="breadcrumb" style="background-color:#fff !important">
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                        class="bi bi-house-door"></i></a></li>
+            <li class="breadcrumb-item active" style="font-size: large;">Listado de Usuarios</li>
+        </ol>
+    </nav>
+</div>
+
+<table id="tabla_Usuarios" data-toggle="table" data-search="true" data-show-columns="true"
+data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+</table>
+
+
+
+<script type="text/javascript">
+    $('#tabla_Usuarios').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/usuariosDatos",
+        cache: false,
+        columns: [{
+            title: 'Nombre',
+            field: '',
+            align: "center",
+            formatter: function (value, row) {
+                return (
+                        row.first_name + " " + row.last_name
+             );
+            },
+        }, {
+            title: 'Nombre de usuario',
+            field: 'username',
+            align: "center",
+            sortable: "true",
+        }, {
+            title: 'Estado',
+            field: 'is_active',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              if (row.is_active == 1) {
+                return (
+                  '<span class="badge badge-pill badge-success">Activo</span>'
+                );
+                }else{
+                  return (
+                    '<span class="badge badge-pill badge-danger">Inactivo</span>'
+                  );
+                };
+              }
+        }, {
+            title: 'Staff',
+            field: 'is_staff',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              if (row.is_staff == 1) {
+                return (
+                  '<span class="badge badge-pill badge-success">Activo</span>'
+                );
+                }else{
+                  return (
+                    '-'
+                  );
+                };
+              }
+        },{
+            title: 'SuperUser',
+            field: 'is_superuser',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              if (row.is_superuser == 1) {
+                return (
+                  '<span class="badge badge-pill badge-success">Activo</span>'
+                );
+                }else{
+                  return (
+                    '-'
+                  );
+                };
+              }
+        }, {
+            title: 'Última conexión',
+            field: 'last_login',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              var hora = new Date(row.last_login).toLocaleString();
+              return (
+                 hora
+              );
+            },
+        },{
+                title: "Acciones",
+                field: "action",
+                align: "center",
+                formatter: function (value, row) {
+                  var admin = '{{administrador}}';
+                  var id_usuario = '{{id_usuario}}';
+
+                  var verUsuario = '<a href="/private/docLaruex/verUsuario/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+                  var inhabilitarUsuario = 
+                  '<a href="/private/docLaruex/inhabilitarUsuario/' + row.id + '/" class="mx-1" title="Inhabilitar Usuario" ><i class="fa-solid fa-ban fa-lg" style="color:#9b2226"></i></a>';
+
+                  var editarUsuario = '<a href="/private/docLaruex/editarUsuario/' + row.id + '/" class="mx-1" title="Editar" ><i class="fa-solid fa-money-check-pen" style="color:#9768b2"></i></a>';
+
+                  if (admin == 'True'){
+                    return ( verUsuario + editarUsuario + inhabilitarUsuario
+                    );
+                  }else{
+                    return ( verUsuario );
+                  }        
+                },
+            },
+    ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'id_doc__nombre',
+        sortOrder: 'desc',
+
+    });
+
+    /*
+    $('#tabla_Curriculums').on('click-row.bs.table', function (e, row, $element) {
+        window.location.href = "/private/docLaruex/verObjeto/"+ row.id_doc + "/" ;
+    });*/
+
+    function addZero(i) {
+        if (i < 10) { i = "0" + i }
+        return i;
+    }
+    
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioModal").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Archivo guardado con éxito', 'alert-success', 2000)
+        $(".divFormularios").remove();
+        $("#reset").trigger("click");
+        $('#tabla_Documentos').bootstrapTable('refresh');
+        $('#cerrar').trigger('click');
+      }
+    });
+  });
+
+      // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+      function mostrarNombreArchivo(value) {
+
+        document.getElementById('file-name').innerHTML = value;
+
+        document.getElementById('mostrarNombreArchivo').style.display = 'none';
+      }
+
+
+
+
+</script>
+{% endblock %}

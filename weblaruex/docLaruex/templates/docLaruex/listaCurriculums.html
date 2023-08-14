@@ -1,0 +1,290 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    ul.pagination li .page-link {
+      background-color: rgb(255, 255, 255) !important;
+      color: rgb(41, 68, 87);
+    }
+  
+    ul.pagination li.active .page-link {
+      background-color: rgb(41, 68, 87) !important;
+      border-color: rgb(41, 68, 87) !important;
+    }
+  
+    ul.pagination li .page-link:hover {
+      filter: brightness(85%);
+  
+    }
+  
+    ul.pagination li.active .page-link:hover {
+      filter: brightness(120%);
+  
+    }
+  
+    .btn-light {
+      color: rgb(41, 68, 87);
+    }
+  
+    th {
+      color: rgb(41, 68, 87);
+    }
+
+    /* estilo añadirFichero PDF*/
+    .addFicheroPDF {
+      color: rgb(161, 16, 32);
+    }
+  </style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+    <h5 class="card-title">Curriculums</h5>
+    <nav>
+        <ol class="breadcrumb" style="background-color:#fff !important">
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                        class="bi bi-house-door"></i></a></li>
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/objetos">Listado de
+                    Archivos</a>
+            <li class="breadcrumb-item active" style="font-size: large;">Curriculums</li>
+        </ol>
+    </nav>
+</div>
+
+<div id="toolbar">
+    <a href="" class="mx-1" title="upload" data-toggle="modal" data-target="#modalFormulario" style="color: #eba43d"><i
+            class="fa-solid fa-square-plus fa-2x"></i></a>
+</div>
+<table id="tabla_Curriculums" data-toggle="table" data-search="true" data-show-columns="true"
+data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+</table>
+
+
+<div id="modalFormulario" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Archivo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioModal" action="/private/docLaruex/agregarArchivo/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row" hidden>
+            <div class="col">
+                <div class="form-group">
+                  <label for="tipoObjeto">Tipo de Archivo</label>
+                  <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+                    value="Curriculum" />
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="habilitacion">Habilitación</label>
+                    <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                        {% for habilitacion in habilitaciones %}
+                        <option value="{{habilitacion.id}}">
+                            {{habilitacion.titulo}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="col">
+              <div class="form-group">
+                <label for="estado">Estado</label>
+                <select class="form-select" data-rule="required" id="estado" name="estado">
+                  {% for estado in estados %}
+                  <option value="{{estado.id}}" >
+                    {{estado.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+        </div>
+        <div id="formularioCurriculum" class="divFormularios">
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="nombreObjeto">Nombre del Archivo</label>
+                <input type="text" class="form-control" id="nombreObjeto"
+                  placeholder="Ejemplo: Solicitud de permisos " pattern="[a-zA-Z\w\s]{1,255}"
+                  title="No permite guiones ni otros caracteres que no sean espacios" name="nombreObjeto"
+                  data-rule="required" />
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="propietario">Propietario</label>
+                <select class="form-select" data-rule="required" id="Propietario"
+                  name="propietario">
+                  {% for propietario in propietarios %}
+                  <option value="{{propietario.id}}">
+                    {{propietario.first_name}} {{propietario.last_name}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            
+          
+            <div class="col-3">
+              <div class="form-group">
+                <label for="idContacto">Info de contacto</label>
+                <select class="form-select" data-rule="required" id="idContacto"
+                  name="idContacto">
+                  {% for contacto in contactos %}
+                  <option value="{{contacto.id}}">
+                    {{contacto.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row d-flex justify-content-center">
+            <div class="col-md-auto" id="adjuntoNoEditable">
+              <div class="form-group">
+                <label for="ficheroAdjuntoCurriculum"><i id="pdf-file"
+                    class="fa-solid fa-file-pdf fa-4x addFicheroPDF">
+                  </i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="ficheroAdjuntoCurriculum" name="ficheroAdjuntoCurriculum"
+                  onchange="mostrarNombreArchivo(this.value)" />
+                <spam class="text-center"><strong id="mostrarNombreArchivo"><br></strong>
+                  <spam id="file-name"></spam>
+                </spam>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+        
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+  // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreArchivo(value) {
+
+      document.getElementById('file-name').innerHTML = value;
+
+      document.getElementById('mostrarNombreArchivo').style.display = 'none';
+  }
+
+    // cambiamos la funcionalidad del boton submit del formulario
+    
+    $("#habilitacion").val(69)
+    $("#estado").val(1)
+    $("#formularioModal").submit(function (e) {
+
+// cancelamos el funcionamiento por defecto del boton submit
+e.preventDefault();
+// capturamos la información del formulario 
+var data = new FormData(this);
+// ejecuta una url/action con la capacidad de gestionar la salida
+$.ajax({
+  url: "/private/docLaruex/agregarArchivo/",
+  type: "POST",
+  data: data,
+  cache: false,
+  contentType: false,
+  processData: false,
+  // gestiono el return del view
+  success: function () {
+    crearAviso('objetoGuardar', 'Curriculum guardado con éxito', 'alert-success', 2000)
+    $(".divFormularios").remove();
+    $("#reset").trigger("click");
+    $('#tabla_Curriculums').bootstrapTable('refresh');
+    $('#cerrar').trigger('click');
+    $("#modalFormulario").trigger('reset');
+    location.reload(true);
+  }
+});
+});
+    $('#tabla_Curriculums').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/curriculumsDatos",
+        cache: false,
+        columns: [{
+            title: 'Nombre',
+            field: 'id_usuario',
+            align: "center",
+            formatter: function (value, row) {
+                return (
+                        row.id_usuario__first_name + " " + row.id_usuario__last_name
+             );
+            },
+        }, {
+            title: 'Puesto',
+            field: 'id_contacto__puesto',
+            align: "center"
+        },{
+            title: "Acciones",
+            field: "action",
+            align: "center",
+            formatter: function (value, row) {
+              var admin = '{{administrador}}';
+              var direccion = '{{direccion}}';
+              
+              // Botones
+              const botonVerObjeto = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+              const botonConsultarObjeto = '<a href="/private/docLaruex/consultarArchivo/' + row.id + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-lg" style="color:#A11020"></i></a>';
+
+              
+            if (admin == 'True' || direccion=='True' ) { 
+              return (botonVerObjeto + botonConsultarObjeto);
+            }
+            else{
+              return (botonVerObjeto);
+            }
+            },
+        },
+    ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'id_doc__nombre',
+        sortOrder: 'desc',
+
+    });
+
+    /*
+    $('#tabla_Curriculums').on('click-row.bs.table', function (e, row, $element) {
+        window.location.href = "/private/docLaruex/verObjeto/"+ row.id_doc + "/" ;
+    });*/
+
+    function addZero(i) {
+        if (i < 10) { i = "0" + i }
+        return i;
+    }
+
+
+</script>
+{% endblock %}

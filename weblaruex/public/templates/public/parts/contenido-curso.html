@@ -1,0 +1,64 @@
+{% load static %}
+
+<!-- ======= Trainers Section ======= -->
+<section id="contenido-curso" class="trainers">
+  <div class="container" data-aos="fade-up">
+
+    <div class="section-title" >
+        <h2>Contenido del curso</h2>
+        <p>Descargar contenido del curso</p>
+    </div>
+    <div id="acceso-contenido" align="center" >
+      <div class="get-started-btn">
+        <a style="background: #1d8896; color: white;" onclick="$('#acceso-contenido').hide();$('#form-password').fadeIn();"  class="learn-more-btn">Acceder al contenido</a>
+      </div>
+    </div>
+    <div id="form-password" class="contact">
+
+      <form id="content-form" method="post" role="form" class="php-email-form">
+        {% csrf_token %}
+        <div class="form-row justify-content-center">
+          <div class="col-md-2 form-group">
+            <input type="password" name="password" class="form-control" id="password" placeholder="password" data-rule="minlen:4" data-msg="Contraseña del contenido del curso" />
+            <div class="validate"></div>
+          </div>
+          <div class="col-md-2 form-group">
+            <button type="submit">Enviar</button>
+          </div>
+          <div id="pass-incorrecta" class="col-md-12 form-group text-center text-danger">
+            <p>La contraseña no es válida</p>
+          </div>
+      </form>
+    </div>
+  </div>
+  <div id="privado-curso"></div>
+</section><!-- End Trainers Section -->
+
+<script type="text/javascript">
+  $('#form-password').hide();
+  $('#pass-incorrecta').hide();
+  $("#content-form").submit(function (e) {
+        // preventing from page reload and default actions
+        e.preventDefault();
+        // serialize the data for sending the form data.
+        var serializedData = $(this).serialize();
+        // make POST ajax call
+        $.ajax({
+            type: 'POST',
+            url: "/solicitar-info/{{ curso.id }}/",
+            data: serializedData,
+            success: function (data) {
+              if (data == ""){
+                $('#pass-incorrecta').fadeIn();
+              }
+              else{
+                $('#form-password').fadeOut();
+                $('#privado-curso').html(data);
+              }
+            },
+            error: function (data) {
+                alert("Formulario fallido" + data);
+            }
+        })
+    })
+</script>

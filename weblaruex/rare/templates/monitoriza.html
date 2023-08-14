@@ -1,0 +1,418 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+{% endblock %}
+{% block css %}
+
+.zoom:hover {
+    transform: scale(1.3); 
+}
+{% endblock %}
+
+{% block content %}
+<section class="">
+    <div class="col-12">
+        <h1 class="text-center">Visualizador del Monitoriza</h1>
+    </div>
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <table class="table"
+            id="table"
+            data-toggle="table"
+            data-pagination="true"
+            data-page-size="10"
+            data-search="true"
+            data-show-columns="true"
+            data-show-refresh="true"
+            data-show-columns-toggle-all="true"
+            data-show-fullscreen="true"
+            data-row-style="rowStyle"
+            data-buttons="buttons"
+            data-buttons-class="light"
+            data-show-export="true">
+        </table>
+    </div>
+    <!-- End Grid cards -->
+
+    <!-- modal envio mensajes -->
+    <button id="botonModalMensajes" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEnvioMensaje" hidden>
+    </button>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="modalEnvioMensaje" tabindex="-1" role="dialog" aria-labelledby="modalEnvioMensajeTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEnvioMensajeLongTitle">Envío de mensajes a analistas RAREx</h5>
+                    <button id="cerrarModal" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="formEnvioMensajes">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="TextAreaMensajeEnvio">Escribe tu mensaje:</label>
+                            <textarea class="form-control" id="TextAreaMensajeEnvio" name="TextAreaMensajeEnvio" maxlength="140" rows="3"></textarea>
+                            <span class="pull-right label label-default" id="count_message"></span>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="checkboxCanalTelegram" name="checkboxCanalTelegram" checked>
+                            <label class="form-check-label" for="checkboxCanalTelegram">Telegram</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="checkboxCanalSMS" name="checkboxCanalSMS">
+                            <label class="form-check-label" for="checkboxCanalSMS">SMS</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" value="submit" class="btn btn-primary">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- end modal envio mensajes -->
+
+    <!-- modal mensajes predeterminados -->
+    <button id="botonModalMensajesPredeterminados" type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalEnvioMensajePredeterminados" hidden>
+    </button>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="modalEnvioMensajePredeterminados" tabindex="-1" role="dialog" aria-labelledby="modalEnvioMensajePredeterminadosTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEnvioMensajePredeterminadosLongTitle">Envío de mensajes a analistas RAREx</h5>
+                    <button id="cerrarModalPredeterminados" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="formEnvioMensajesPredeterminados">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="lugarOperacion">Estación de operación:</label>
+                            <input type="text" class="form-control" id="lugarOperacion" placeholder="Estación">
+                        </div>
+                        <div class="form-group">
+                            <label for="mensajePredefinido">Mensaje a enviar</label>
+                            <select class="form-control" id="MensajePredefinido">
+                                <option>Seleccione una opción</option>
+                                <option>Cambio de papel</option>
+                                <option>Toma de fondo</option>
+                                <option>Verificación</option>
+                                <option>Mantenimiento</option>
+                                <option>Pruebas de monitoriza</option>
+                                <option>Fin de pruebas</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="TextAreaMensajeEnvioPrefefinido">Mensaje a enviar</label>
+                            <textarea class="form-control" id="TextAreaMensajeEnvioPrefefinido" name="TextAreaMensajeEnvio" maxlength="140" rows="3" readonly></textarea>
+                            <span class="pull-right label label-default" id="count_message"></span>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="checkboxCanalTelegram" name="checkboxCanalTelegram" checked>
+                            <label class="form-check-label" for="checkboxCanalTelegram">Telegram</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="checkboxCanalSMS" name="checkboxCanalSMS" checked>
+                            <label class="form-check-label" for="checkboxCanalSMS">SMS</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" value="submit" class="btn btn-primary">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- end modal envio mensajes -->
+
+</section>
+<link rel="stylesheet" href="https://s3-us-west-2.amazonaws.com/colors-css/2.2.0/colors.min.css">
+<script>
+    $('.btnright').hide();
+    $('.btnleft').hide();
+    $('#table').bootstrapTable({
+        method: 'get',
+        url : "/private/rare/monitorizaDatos", 
+        cache: false,
+        columns: [{
+                title: 'RETRASO',
+                sortable: 'true',
+                field: 'minutos_sd',
+                formatter: function (value, row) {
+                    return "<div class='d-flex justify-content-center'>"+iconoTiempo(row) +"</div>"
+                }
+            },{
+                title: 'NIVEL',
+                sortable: 'true',
+                field: 'sms_enviado',
+                formatter: function (value, row) {
+                    return "<div class='d-flex justify-content-center'>"+iconoNivel(row);+"</div>"
+                }
+            },{
+                title: 'ESTACION',
+                field: 'estacion_id__nombre',
+                sortable: "true"
+            },{
+                title: 'PARAMETRO',
+                sortable: 'true',
+                formatter: function (value, row) {
+                    if (row.can_det_est__nombre == null)
+                        return row.can_det_est__dir_datos;
+                    else
+                        return  row.can_det_est__nombre;
+                }
+            },{
+                title: 'ISOTOPO',
+                field: 'isotopo_id__n_iso',
+                sortable: "true"
+            },{
+                title: 'MIN ÚLTIMO DATO',
+                field: 'minutos_sd',
+                sortable: "true"
+            },{
+                title: 'TIEMPO INFORMADO',
+                sortable: "true",
+                formatter: function (value, row) {
+                    if (row.sd_sms_env == null || row.sd_sms_env == 0)
+                        return "Datos en tiempo";
+                    else if (row.sd_sms_env == 1)
+                        return  "1 hora SD";
+                    else if (row.sd_sms_env == 2)
+                        return  "2 horas SD";
+                    else if (row.sd_sms_env == 3)
+                        return  "8 horas SD";
+                    else
+                        return  "Opción no definida";
+                    return "No contemplado";
+                }
+            },{
+                title: 'NIVEL INFORMADO',
+                sortable: "true",
+                formatter: function (value, row) {
+                    if (row.sms_enviado == null || row.sms_enviado == 0)
+                        return "Sin nivel";
+                    else if (row.sms_enviado == 4)
+                        return  "Fin de nivel";
+                    else if (row.sms_enviado == 5)
+                        return  "Nivel detectado";
+                    else if (row.sms_enviado == 6)
+                        return  "Nivel persistente";
+                    else
+                        return  "Opción no definida";
+                    return "No contemplado";
+                }
+            },{
+                title: 'MEDIA VALOR/ACT',
+                field: 'med_anio_ant',
+                sortable: "true"
+            },{
+                title: 'MEDIA AMD',
+                field: 'med_amd_anio_ant',
+                sortable: "true"
+            },{
+                title: 'NIVEL 1',
+                field: 'factor_n1',
+                sortable: "true"
+            },{
+                title: 'NIVEL 2',
+                field: 'factor_n2',
+                sortable: "true"
+            },{
+                title: 'NIVEL 3',
+                field: 'factor_n3',
+                sortable: "true"
+            }],
+        locale: "es-ES",
+        search: true,
+        sortName: 'doc',
+        sortOrder: 'asc',
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+        onClickRow: function (row, $element) {
+            //window.location.href = '';
+        }
+    });
+    
+    function iconoTiempo(row){
+        if (row.sd_activo == 0)
+            return "<div {% if request.user.is_superuser %}onclick='cambiarTiempo(1,"+row.estacion_id+","+row.can_det_est+","+row.isotopo_id+");'{% endif %}><i class='zoom fa-solid fa-clock' style='color: darkgray;'></i></div>";
+        else{
+            if (row.minutos_sd > 480){
+                return "<div {% if request.user.is_superuser %}onclick='cambiarTiempo(0,"+row.estacion_id+","+row.can_det_est+","+row.isotopo_id+");'{% endif %}><i class='zoom fa-solid fa-clock' style='color: red;'></i></div>";
+            }
+            else if (row.minutos_sd > 120){
+                return "<div {% if request.user.is_superuser %}onclick='cambiarTiempo(0,"+row.estacion_id+","+row.can_det_est+","+row.isotopo_id+");'{% endif %}><i class='zoom fa-solid fa-clock' style='color: orange;'></i></div>";
+
+            }
+            else if (row.minutos_sd > 60){
+                return "<div {% if request.user.is_superuser %}onclick='cambiarTiempo(0,"+row.estacion_id+","+row.can_det_est+","+row.isotopo_id+");'{% endif %}><i class='zoom fa-solid fa-clock' style='color: #948B00;'></i></div>";
+                
+            }
+            else{
+                return "<div {% if request.user.is_superuser %}onclick='cambiarTiempo(0,"+row.estacion_id+","+row.can_det_est+","+row.isotopo_id+");'{% endif %}><i class='zoom fa-solid fa-clock' style='color: green;'></i></div>";
+            } 
+        }
+    }
+
+    function cambiarTiempo(valor, estacion, canal, isotopo){
+        cambiarEstado("tiempo", valor, estacion, canal, isotopo);
+    }
+
+    function iconoNivel(row){
+        if (row.niveles_activo == 0)
+            return "<div {% if request.user.is_superuser %}onclick='cambiarNivel(1,"+row.estacion_id+","+row.can_det_est+","+row.isotopo_id+");'{% endif %}><i class='zoom fa-regular fa-sensor-on' style='color: darkgray;'></i></div>";
+        else{
+            if (row.sms_enviado == 6){
+                return  "<div {% if request.user.is_superuser %}onclick='cambiarNivel(0,"+row.estacion_id+","+row.can_det_est+","+row.isotopo_id+");'{% endif %}><i class='zoom fa-regular fa-sensor-triangle-exclamation' style='color: red;'></i></div>";
+            }
+            else if (row.sms_enviado == 5){
+                return  "<div {% if request.user.is_superuser %}onclick='cambiarNivel(0,"+row.estacion_id+","+row.can_det_est+","+row.isotopo_id+");'{% endif %}><i class='zoom fa-regular fa-sensor-on' style='color: orange;'></i></div>";
+            }
+            else if (row.sms_enviado == 4){
+                return  "<div {% if request.user.is_superuser %}onclick='cambiarNivel(0,"+row.estacion_id+","+row.can_det_est+","+row.isotopo_id+");'{% endif %}><i class='zoom fa-regular fa-sensor-on' style='color: green;'></i></div>";                
+            }
+            else{
+                return  "<div {% if request.user.is_superuser %}onclick='cambiarNivel(0,"+row.estacion_id+","+row.can_det_est+","+row.isotopo_id+");'{% endif %}><i class='zoom fa-regular fa-sensor-cloud' style='color: green;'></i></div>";
+            } 
+        }
+    }
+    
+    function cambiarNivel(valor, estacion, canal, isotopo){
+        cambiarEstado("nivel", valor, estacion, canal, isotopo);
+    }
+
+    function cambiarEstado(parametro, valor, estacion, canal, isotopo){
+        $.ajax({
+            type: "GET",
+            url: "/private/rare/modificarSeguimiento/"+parametro+"/"+valor.toString()+"/"+estacion.toString()+"/"+canal.toString()+"/"+isotopo.toString()+"/",
+            success: function(result) {
+                window.console.log('Successful');
+                //$('#table').bootstrapTable('refresh')
+                if (valor == 1){
+                    crearAviso(new Date().getMilliseconds(), "Habilitado del seguimiento de "+parametro+" correctamente. Recuerde refrescar la tabla para comprobar los nuevos valores.");
+                }
+                else if (valor == 0){
+                    crearAviso(new Date().getMilliseconds(), "Deshabilitado del seguimiento de "+parametro+" correctamente. Recuerde refrescar la tabla para comprobar los nuevos valores.");
+                }
+            }
+        });
+    }
+
+    function buttons () {
+        return {
+            btnMensajeAdd: {
+                text: 'Enviar mensaje',
+                icon: 'fa-regular fa-message-text',
+                event: function () {
+                $("#botonModalMensajesPredeterminados").click();
+                },
+                attributes: {
+                title: 'Envía un mensaje al Telegram de control de las estaciones'
+                }
+            },
+            btnAdd: {
+                text: 'Enviar mensaje',
+                icon: 'fa-regular fa-message-pen',
+                event: function () {
+                $("#botonModalMensajes").click();
+                },
+                attributes: {
+                title: 'Envía un mensaje al Telegram de control de las estaciones'
+                }
+            }
+        }
+    }
+
+    $( "#formEnvioMensajes" ).on( "submit", function(e) {
+        var dataString = $(this).serialize();        
+        $.ajax({
+            type: "POST",
+            url: "/private/rare/enviarMensajeMonitoriza/",
+            data: dataString,
+            success: function () {
+                $('#formEnvioMensajes')[0].reset();
+                $('#cerrarModal').click();
+            }
+        });
+        e.preventDefault();
+    });
+    
+    $( "#formEnvioMensajesPredeterminados" ).on( "submit", function(e) {
+        var dataString = $(this).serialize();        
+        $.ajax({
+            type: "POST",
+            url: "/private/rare/enviarMensajeMonitoriza/",
+            data: dataString,
+            success: function () {
+                $('#formEnvioMensajesPredeterminados')[0].reset();
+                $('#cerrarModalPredeterminados').click();
+            }
+        });
+        e.preventDefault();
+    });
+    
+    $('#MensajePredefinido').change(function() {
+        var estacion = $("#lugarOperacion").val();
+        var val = $("#MensajePredefinido option:selected").text();
+        $('#TextAreaMensajeEnvioPrefefinido').val(getMensaje(val, estacion));
+    });
+    
+    function getMensaje(opcion, estacion){
+        switch (opcion){
+            case "Cambio de papel":
+                return "Cambio de papel en "+estacion+". Pueden verse afectados los valores recogidos que deben comprobarse al finalizar.";
+            case "Toma de fondo":
+                return "Toma de fondos en "+estacion+". Esta operación durará aproximadamente 1 día. Se desactivará de monitoriza.";
+            case "Verificación":
+                return "Verificación en "+estacion+". Pueden verse afectados los valores recogidos que deben comprobarse al finalizar.";
+            case "Mantenimiento":
+                return "Mantenimiento en "+estacion+". Pueden verse afectados los valores recogidos que deben comprobarse al finalizar.";
+            case "Pruebas de monitoriza":
+                return "Pruebas de monitoriza en "+estacion+".Puede conllevar niveles elevados, desactivar envio CSN en PC EXTERIOR y limpiar al concluir.";
+            case "Fin de pruebas":
+                return "Han finalizado las tareas en "+estacion+", la estación continúa su funcionamiento normal.";
+            default:
+                return "Seleccione estación y mensaje a enviar.";
+        }
+    }
+
+    var text_max = 140;
+    $('#count_message').html('0 / ' + text_max );
+
+    $('#TextAreaMensajeEnvio').keyup(function() {
+    var text_length = $('#TextAreaMensajeEnvio').val().length;
+    var text_remaining = text_max - text_length;
+    
+    $('#count_message').html(text_length + ' / ' + text_max);
+    });
+    function rowStyle(row, index) {
+        if (row.sd_activo == 0 && row.niveles_activo == 0) {
+            return {
+                css: {
+                    'color': 'lightgrey',
+                }
+            }
+        } else if (row.sd_activo == 0 || row.niveles_activo == 0) {
+            return {
+                css: {
+                    'color': 'grey'
+                }
+            }
+        } else {
+            return {
+                css: {
+                    'color': 'black'
+                }
+            }
+        }
+    }
+</script>
+{% endblock %}

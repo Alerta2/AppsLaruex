@@ -1,0 +1,41 @@
+{% extends "public/template.html" %}
+{% load static %}
+{% block meta %}
+  <title>Laboratorios - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+<!-- ======= Normal Section ======= -->
+<section id="normal" class="about">
+  <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>Modos de Funcionamiento</h2>
+        <p>Normal</p>
+      </div>
+
+
+    <div class="row">
+      <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
+        <img src="{% static 'img/funcionamiento_normal.jpg' %}" class="img-fluid" alt="">
+      </div>
+      <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content">
+        <h3>En el modo NORMAL de funcionamiento, el Centro Logístico de la RARE, sito en Cáceres, recibe con la periodicidad programada (del orden de unos pocos minutos por cada estación), los últimos valores registrados, que son automáticamente analizados e incorporados a las bases de datos que se generan. Desde dichas bases de datos, el Consejo de Seguridad Nuclear y el Gobierno de Extremadura obtienen cuantos datos precisan y con la periodicidad que desean. No obstante lo anterior, un resumen de los datos obtenidos son hechos públicos diariamente, tanto en esta página web, como en la de los dos anteriormente mencionados Organismos ( Gobierno de Extremadura, Consejo de Seguridad Nuclear ).</h3>
+        <p class="font-italic">
+          ---------------------------------------1
+        </p>
+        <ul>
+          <li><i class="icofont-check-circled"></i> ------------------------------2 </li>
+          <li><i class="icofont-check-circled"></i> ------------------------------3 </li>
+        </ul>
+        <p>
+           ---------------------------------------4
+        </p>
+        {% if request.get_full_path == "/" %}<a href="{% url 'public:publicNosotros' %}" class="learn-more-btn">Saber más</a>{% endif %}
+      </div>
+    </div>
+
+  </div>
+</section><!-- End About Section -->
+{% endblock %}

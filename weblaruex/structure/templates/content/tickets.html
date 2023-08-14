@@ -1,0 +1,26 @@
+{% extends "base/base2.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    Web LARUEX - Tickets
+{% endblock %}
+{% block css %}
+    background-image: url('https://cdn.pixabay.com/photo/2016/04/04/10/15/meander-1306617_960_720.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+{% endblock %}
+{% block content %}
+    <div class="row text-center">
+        <div class="col-12 my-5">
+            <h1>PORTALES DE TICKETING</h1>
+        </div>
+        <div class="row col-12 my-5 justify-content-center">
+            <a class="col-5 rounded border m-2" href="http://158.49.111.220" target="_blank">Tickets ALERTA2</a>
+            <a class="col-5 rounded border m-2" href="http://158.49.111.94" target="_blank">Tickets LARUEX</a>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    $('.btnright').hide();
+    $('.btnleft').hide();
+{% endblock %}

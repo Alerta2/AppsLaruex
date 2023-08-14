@@ -1,0 +1,64 @@
+/*Color de los iconos de la columna Acciones del Bootstrap table */
+td a i {
+    color:white;
+}
+
+/* Color de Bootstrap table */
+table#tablaInformesTrimestrales {
+     color: transparent; /*rgba(255,255,255,0.7);*/
+}
+
+/* Color de letra del encabezado de la tabla */
+.th-inner{
+    color: rgba(255,255,255,0.7);
+}
+
+/* Color de letra de las rows de la tabla */
+td{
+    color: white;
+}
+
+/* colores del bootstrao table */
+/*.table-dark {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: #2c3034;
+    --bs-table-striped-color: #fff;
+    --bs-table-active-bg: #373b3e;
+    --bs-table-active-color: #fff;
+    --bs-table-hover-bg: #323539;
+    --bs-table-hover-color: #fff;
+    color: #fff;
+    border-color: #373b3e;
+}*/
+.table-dark {
+    background-color: #1B1C1C;
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: rgba(27,28,28,0.1);
+    --bs-table-striped-color: #fff;
+    --bs-table-active-bg: rgba(27,28,28,0.1);
+    --bs-table-active-color: #fff;
+    --bs-table-hover-bg: rgba(27,28,28,0.1);
+    --bs-table-hover-color: #fff;
+    color: #fff;
+    border-color: rgba(27,28,28,0.1);
+}
+
+@media (min-width: 650px) {
+    /*Todas las columnas del bootstrap table con el mismo ancho*/
+    table {
+        table-layout: fixed;
+    }
+}
+
+/*Colores de la numeracion de paginas*/
+.page-item.active .page-link {
+    z-index: 1;
+    color: #1B1C1C;
+    background-color: aquamarine;
+    border-color: #dee2e6;;
+}
+.page-link {
+    color: aquamarine;
+    background-color: #1B1C1C;
+    border: #95999c;
+}

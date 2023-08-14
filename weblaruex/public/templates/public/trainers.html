@@ -1,0 +1,27 @@
+{% extends "template.html" %}
+
+{% set page="trainers" %}
+
+{% block meta %}
+  <title>Responsables - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+  <main id="main" data-aos="fade-in">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+      <div class="container">
+        <h2>Responsables</h2>
+        <p>Todos somos un equipo y trabajamos dia a dia por hacer que LARUEX siga creciendo sin perder sus estandares de calidad. </p>
+      </div>
+    </div><!-- End Breadcrumbs -->
+
+    {% include "parts/trainers-section.html" %}
+
+  </main><!-- End #main -->
+
+{% endblock %}

@@ -1,0 +1,1220 @@
+{% extends "base/base2.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+    <link rel="stylesheet" href="{% static 'js/ol/ol.css' %}" type="text/css">
+    <script src="{% static 'js/ol/ol.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jsonmuestras.js' %}"></script>
+    <!-- scripts de grafica -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="{% static 'js/rare/apexcharts.js' %}"></script>{% endblock %}
+
+{% block css %}
+        /* Zoom In #1 */
+        .hoverZoomIn figure img {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            -webkit-transition: .3s ease-in-out;
+            transition: .3s ease-in-out;
+        }
+        .hoverZoomIn figure:hover img {
+            -webkit-transform: scale(1.3);
+            transform: scale(1.3);
+        }
+        .grafica{
+            min-height: 200px;
+        }
+        .graficaGrande{
+            min-height: 700px;
+        }
+        .load-more:hover{
+            color: #000;
+            background-color: #FFF;
+            border-color: #ced4da;
+        }
+        fa-expand-alt, fa-compress-alt{
+            width: 64px;
+            height: 64px;
+        }
+
+        #body-row {
+            margin-left:0;
+            margin-right:0;
+        }
+        #sidebar-container {
+            min-height: 100vh;
+            background-color: #333;
+            padding: 0;
+        }
+
+        /* Sidebar sizes when expanded and expanded */
+        .sidebar-expanded {
+            width: 230px;
+        }
+        .sidebar-collapsed {
+            width: 60px;
+        }
+
+        /* Menu item*/
+        #sidebar-container .list-group a {
+            height: 50px;
+            color: white;
+        }
+
+        /* Submenu item*/
+        #sidebar-container .list-group .sidebar-submenu a {
+            height: 45px;
+            padding-left: 30px;
+        }
+        .sidebar-submenu {
+            font-size: 0.9rem;
+        }
+
+        /* Separators */
+        .sidebar-separator-title {
+            background-color: #333;
+            height: 35px;
+        }
+        .sidebar-separator {
+            background-color: #333;
+            height: 25px;
+        }
+        .logo-separator {
+            background-color: #333;
+            height: 60px;
+        }
+
+        /* Closed submenu icon */
+        #sidebar-container .list-group .list-group-item[aria-expanded="false"] .submenu-icon::after {
+          content: " \f107";
+          font-family: "Font Awesome 5 Free";
+          font-weight: 900;
+          display: inline;
+          text-align: right;
+          padding-left: 10px;
+        }
+        /* Opened submenu icon */
+        #sidebar-container .list-group .list-group-item[aria-expanded="true"] .submenu-icon::after {
+          content: " \f106";
+          font-family: "Font Awesome 5 Free";
+          font-weight: 900;
+          display: inline;
+          text-align: right;
+          padding-left: 10px;
+        }
+
+
+        #carga{
+            position: absolute;
+            top: 50px;
+            font-size: 30px;
+            left: 45%;
+            color: rgba(255, 255, 255, 0.9);
+            z-index: 9700;
+        }
+        #carga i {
+            display: block;
+            width: 100px;
+            font-size: 50px;
+            float: left;
+            text-align: center;
+            margin-right: 20px;
+            padding-right: 20px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        @media only screen and (max-width : 800px) {
+            #carga{
+                left: 100px;
+            }
+        }
+        .fondo-blanco{
+            background-color: #FFFFFF;
+        }
+        .fondo-rojo{
+            background-color: #FCCAC0;
+        }
+        .fondo-amarillo{
+            background-color: #FCF6C0;
+        }
+{% endblock %}
+
+{% block content %}
+    <div id="carga">
+        <div class="row rounded bg-info p-1 progress-bar progress-bar-striped progress-bar-animated text-center">
+            <h3><strong>Cargando gráficas...</strong></h3>
+        </div>
+    </div>
+    <div class="row" id="body-row">
+        <div id="sidebar-container" class="sidebar-expanded ">
+            <ul class="list-group">
+                <a href="#" id="boton_collapse_sidebar" data-toggle="sidebar-colapse" class="bg-dark list-group-item list-group-item-action d-flex align-items-center">
+                    <div class="d-flex w-100 justify-content-start align-items-center">
+                        <span id="collapse-icon" class="fa fa-2x mr-3"></span>
+                        <span id="collapse-text" class="menu-collapsed">Minimizar</span>
+                    </div>
+                </a>
+                {% for boton in listaBotones %}
+                    <a href="#submenu{{ boton.id_boton }}" id="{{ boton.id_boton }}" data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start" onclick="consultaBloque({{ boton.id_boton }})">
+                        <div class="d-flex w-100 justify-content-start align-items-center">
+                            <span id="visible_{{ boton.id_boton }}" class="fas fa-eye mr-3"  onclick="ocultarMostrarBloque({{ boton.id_boton }})"></span>
+                            <span class="menu-collapsed">{{ boton.nombre_boton }}</span>
+                            <span class="submenu-icon ml-auto"></span>
+                        </div>
+                    </a>
+                    <div id='submenu{{ boton.id_boton }}' class="collapse sidebar-submenu">
+                        {% for subboton in boton.subbotones %}
+                            <a id="{{ boton.id_boton }}_{{ subboton.id_subseccion }}" class="list-group-item list-group-item-action bg-dark text-white" onclick="consultaSubBloque({{ boton.id_boton }}, {{ subboton.id_subseccion }})">
+                                <span class="menu-collapsed">{{ subboton.nombre_subseccion }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+        <div id="ventana_principal" class="col">
+            <section id="title" class="justify-content-center row mt-5 mb-5">
+                <div><h3>{% translate "Revisión diaria" %}
+                    {% if red == "rvra" %}
+                        <img src="{% static 'img/rare/logo_rarex.png' %}" alt="Logo" title="Centro Hispano-luso de Alerta Temprana" height="24px"/>
+                    {% elif red == "csn" %}
+                        <img src="{% static 'img/rare/logo_csn.gif' %}" alt="Logo" title="Consejo de Seguridad Nuclear" height="60px"/>
+                    {% elif red == "spida" %}
+                        <img src="{% static 'img/rare/logo_spida.png' %}" alt="Logo" title="Centro Hispano-luso de Alerta Temprana" height="120px"/>
+                    {% endif %}
+                    <b id="dia_actual"></b></h3></div>
+
+                    {% if simulacro %}
+                        <div id="desactivarSimulacro" class="m-4 p-3 justify-content-center row border border-danger rounded">
+                            <h4>Existe un simulacro activo. Por favor, pulse el siguiente botón para desactivarlo y emitir el informe.</h4><br>
+                            <a href="{% url 'rare:rarexDesactivarSimulacro' %}"><button type="button" class="btn btn-outline-danger">Finalizar simulacro</button></a>
+                        </div>
+                    {% endif %}
+            </section>
+            <section id="inicio" class="text-center">
+                <h1><a class="badge badge-pill badge-primary" href="{% static 'docs/guiaBuenasPracticas.pdf' %}" download>Buenas prácticas RAREx</a></h1>
+                <h1><a class="badge badge-pill badge-primary" href="{% static 'docs/PR-01 F01.pdf' %}" download>Descargar formato PR-01 F01</a></h1>
+                <h3>¡IMPORTANTE!: Tras finalizar las gráficas, tanto RAREx como CSN, al imprimir el resumen se debe abrir automáticamente una nueva ventana con un mensaje que informa que se ha realizado correctamente. Si esta ventana no se abre hay que aceptar los elementos emergentes en la barra de navegación del navegador y volver a pulsar en imprimir (aunque no se imprima de nuevo). Los informes se deben guardar en su sitio en el ordenador de Gráficas.</h3>
+                <button class="btn btn-primary btn-sm active" onclick="activarBloque();">{% translate "Comenzar revisión" %}</button>
+                {% if request.user.is_superuser %}
+                    <button class="btn btn-primary btn-sm active" onclick="desbloquearTodo();">{% translate "Desbloquear todo" %}</button>
+                {% endif %}
+                <ul class="list-group text-left">
+                    <li class="list-group-item">
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </div>
+    <form id="formInforme" name="formInforme" target="hiddenFrame" method="post" hidden>
+        {% csrf_token %}
+        <input type="hidden" id="formComentarios" name="comentarios"/>
+        <input type="hidden" id="formOperatividad" name="operatividad"/>
+        <input type="hidden" id="formIntegridad" name="integridad"/>
+        <input type="hidden" id="formNiveles" name="niveles"/>
+        <input type="hidden" id="formRed" name="red"/>
+    </form>
+{% endblock %}
+
+{% block js %}
+    $('.btnright').hide();
+    $('.btnleft').hide();
+    $('#carga').hide();
+
+
+    // Scripts del navegador de la izquierda
+    $('#body-row .collapse').collapse('hide');
+
+    // Collapse/Expand icon
+    $('#collapse-icon').addClass('fa-angle-double-left');
+
+    // Collapse click
+    $('[data-toggle=sidebar-colapse]').click(function() {
+        SidebarCollapse();
+    });
+
+    function SidebarCollapse () {
+        $('.menu-collapsed').toggleClass('d-none');
+        $('.sidebar-submenu').toggleClass('d-none');
+        $('.submenu-icon').toggleClass('d-none');
+        $('#sidebar-container').toggleClass('sidebar-expanded sidebar-collapsed');
+
+        // Treating d-flex/d-none on separators with title
+        var SeparatorTitle = $('.sidebar-separator-title');
+        if ( SeparatorTitle.hasClass('d-flex') ) {
+            SeparatorTitle.removeClass('d-flex');
+        } else {
+            SeparatorTitle.addClass('d-flex');
+        }
+
+        // Collapse/Expand icon
+        $('#collapse-icon').toggleClass('fa-angle-double-left fa-angle-double-right');
+    }
+
+    function checkMobile(){
+        if( window.innerWidth < 1024)
+            $("#boton_collapse_sidebar").click();
+    }
+    checkMobile();
+
+    // Cargo la fecha de hoy
+    n =  new Date();
+    y = n.getFullYear();
+    m = n.getMonth() + 1;
+    d = n.getDate();
+    document.getElementById("dia_actual").innerHTML = "|" + d + "/" + m + "/" + y;
+    var charts = [];
+    var dataPrecargados = {};
+
+    var listaBotones = [];
+    {% for boton in listaBotones %}
+        listaBotones.push({id_boton: "{{ boton.id_boton }}", nombre_boton: "{{ boton.nombre_boton }}", estado: "apagado"});
+    {% endfor %}
+
+    {% if desbloqueo == 1 %}
+        desbloquearTodo();
+    {% endif %}
+
+    function activarBloque(){
+        $("#inicio").hide();
+        activo = 0;
+        for (i = 0; i < listaBotones.length; i++) {
+            if ( listaBotones[i].estado == "apagado" ){
+                $("#" + listaBotones[i].id_boton).removeClass('bg-dark disabled').addClass('bg-info');
+                listaBotones[i].estado = "encendido";
+                activo = i;
+                break;
+            }
+        };
+        if(activo > 0){
+            activo = activo - 1;
+            if ($("#" + listaBotones[activo].id_boton).hasClass('show')){
+                $("#" + listaBotones[activo].id_boton).removeClass('show');
+            }
+        }
+    }
+
+    function ocultarMostrarBloque(elemento){
+        var boton;
+        var id_lista;
+        for (i = 0; i < listaBotones.length; i++) {
+            if ( listaBotones[i].id_boton == elemento ){
+                id_lista = i;
+                boton = listaBotones[i];
+                break;
+            }
+        };
+
+        switch(boton.estado) {
+            case "consultado":
+                if($("#seccion"+boton.id_boton).is(":visible")){
+                    $("#seccion"+boton.id_boton).hide();
+                } else{
+                    $("#seccion"+boton.id_boton).show();
+                    $("#seccion"+boton.id_boton).children().show();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    function consultaBloque(elemento){
+
+        var boton;
+        var id_lista;
+        for (i = 0; i < listaBotones.length; i++) {
+            if ( listaBotones[i].id_boton == elemento ){
+                id_lista = i;
+                boton = listaBotones[i];
+                break;
+            }
+        };
+        switch(boton.estado) {
+            case "apagado":
+                break;
+            case "encendido":
+                $("#carga").show();
+                crearSeccion("seccion"+boton.id_boton);
+                llamadaGraficas(boton.id_boton, 0);
+                boton.estado = "consultado";
+                break;
+            default:
+                break;
+        }
+    }
+
+    function consultaSubBloque(id_boton, id_subseccion){
+        if ({{ desbloqueo }} == 1){
+            if(document.getElementById("seccion"+id_boton+"_"+id_subseccion) == null){
+                $("#carga").show();
+                llamadaGraficas(id_boton, id_subseccion);
+            }
+        }
+        if($("#seccion"+id_boton+"_"+id_subseccion) !== null){
+            if($("#seccion"+id_boton+"_"+id_subseccion).is(":visible")){
+                $("#seccion"+id_boton+"_"+id_subseccion).hide();
+            } else{
+                $("#seccion"+id_boton+"_"+id_subseccion).show();
+                $("#seccion"+id_boton+"_"+id_subseccion).children().show();
+            }
+        }
+    }
+
+    function precarga(){
+        {% for boton in listaBotones %}
+            {% for subboton in boton.subbotones %}
+                var key = "{{ boton.id_boton }}_{{ subboton.id_subseccion }}";
+                if (key != "1_0"){
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        url:"/private/rare/guardia/"+{{ boton.id_boton }}+"/"+{{ subboton.id_subseccion }}+"/",
+                        success: function(data)
+                        {
+                            crearAviso("alert_{{ boton.id_boton }}_{{ subboton.id_subseccion }}","Gráficas del grupo {{ boton.id_boton }} y del subgrupo {{ subboton.id_subseccion }} precargado");
+                            dataPrecargados["{{ boton.id_boton }}_{{ subboton.id_subseccion }}"] = data;
+                        },
+                    })
+                }
+            {% endfor %}
+        {% endfor %}
+    }
+
+    function recargarMediasDiariasDosis(){
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url:"/private/rare/guardia/recalculoMedias/",
+            success: function(data)
+            {
+                console.log("medias recalculadas");
+                crearAviso("alert_recalculoMedias","Recalculo de medias diarias de dosis realizado (medias intactas: " + data.mediasIntactas + ", medias recalculadas: " + data.
+                mediasRecalculadas + ", medias ruevas: " + data.mediasNuevas + ", medias nulas: " + data.mediasNull + ")");
+            },
+        })
+    }
+
+    function llamadaGraficas(grupo, subgrupo){
+        var key = grupo + "_" + subgrupo;
+        if (key in dataPrecargados){
+            completarSubseccion(grupo, subgrupo, dataPrecargados[key]);
+        }
+        else{
+            jQuery('html,body').animate({scrollTop:0},1000);
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url:"/private/rare/guardia/"+grupo+"/"+subgrupo+"/",
+                success: function(data)
+                {
+                    completarSubseccion(grupo, subgrupo, data);
+                    if ( ( (grupo==1)||(grupo==20) ) && (subgrupo==0) && (!(key in dataPrecargados)) ){
+                        dataPrecargados[grupo+"_"+subgrupo] = data;
+                        precarga();
+                    }
+                },
+            })
+        }
+    }
+
+    function completarSubseccion(grupo, subgrupo, data){
+        crearSubSeccion(data[0].tituloSubSeccion,grupo, subgrupo);
+        if (data[0].tamanio == 2){
+            crearDivChartGrande("#seccion"+grupo+"_"+subgrupo, "chartid_"+data[1].id_chart);
+            dibujarGraficaLineasGrande("chartid_"+data[1].id_chart, data[1].id_chart, data[1].fechas, data[1].series, data[1].ejes);
+        }
+        else{
+            for (j = 1; j < data.length; j++) {
+                /// id_parent, titulo, idchart, textoIzq, textoDer
+                crearDivChart("#seccion"+grupo+"_"+subgrupo, data[j].estacion.nombre, "chartid_"+data[j].id_chart, data[j].tiempo, data[j].estacion.nombre, data[j].ejes[0].title.text, data[j].fondoDiv, data[j].alerta, data[j].tramoSinDatos);
+                // div, id, titulo, fechas, series)
+                var serieChart = [];
+                var ejeChart = [];
+                dibujarGraficaLineas("chartid_"+data[j].id_chart, data[j].id_chart, data[j].estacion.nombre, data[j].fechas, data[j].series, data[j].ejes);
+            }
+        }
+
+        crearCuadroTexto("#seccion"+grupo+"_"+subgrupo, data[0].tituloSubSeccion);
+        if (data[0].siguienteSubgrupo != 0){
+            crearBotonCargarMas("#seccion"+grupo+"_"+subgrupo, data[0].siguienteGrupo, data[0].siguienteSubgrupo);
+        }
+        else if (data[0].siguienteGrupo != 0){
+            crearBotonCerrarBloque("#seccion"+grupo+"_"+subgrupo);
+        }
+        else{
+            crearBotonAcabarRevision("#seccion"+grupo+"_"+subgrupo);
+        }
+        $("#carga").fadeOut(1000);
+    }
+
+    function desbloquearTodo(){
+        $("#inicio").hide();
+        for (i = 0; i < listaBotones.length; i++) {
+            if ( listaBotones[i].estado == "apagado" ){
+                $("#" + listaBotones[i].id_boton).removeClass('bg-dark disabled').addClass('bg-info');
+                listaBotones[i].estado = "encendido";
+            }
+        };
+    }
+
+    function crearSeccion(idGrupo){
+        var section = document.createElement("section");
+        section.id = idGrupo;
+        $('#ventana_principal').append(section);
+    }
+
+    function crearSubSeccion(tituloSubSeccion, idGrupo, idSubgrupo){
+        var h4 = document.createElement("h4");
+        h4.classList.add('col-lg-12','col-md-12','col-sm-12','col-xs-12');
+        var textTitulo = document.createTextNode(tituloSubSeccion);
+        h4.appendChild(textTitulo);
+        var div = document.createElement("section");
+        div.id = "seccion"+idGrupo+"_"+idSubgrupo;
+        div.classList.add('row');
+        div.appendChild(h4);
+        $('#seccion'+idGrupo).append(div);
+    }
+
+    function crearDivChart(id_parent, titulo, idchart, tiempo, nombreChart, nombreEje, fondoDiv, alerta, tramoSinDatos){
+        var botonComent = document.createElement("div");
+        botonComent.classList.add('btn','btn-outline-info','btn-sm', 'm-1');
+        var spanComent = document.createElement("span");
+        spanComent.classList.add('fas','fa-edit');
+        botonComent.onclick = function() {
+            jQuery('html,body').animate({scrollTop:$(document).height() + $(window).height()},1000);
+            document.getElementById("comentario_" + id_parent).value += nombreChart +", "+ nombreEje + "[Comentario] ";
+        };
+        botonComent.title = idchart;
+        botonComent.append(spanComent);
+
+        var botonTool = document.createElement("a");
+        botonTool.classList.add('btn','btn-outline-warning','btn-sm', 'm-1');
+        var spanTool = document.createElement("span");
+        spanTool.classList.add('fas','fa-eraser');
+
+        {% if red == "rvra" %}
+            botonTool.href = "/private/rare/invalidarDatos/"+idchart.replace("chartid_","")+"/0/";
+        {% else %}
+            botonTool.href = "/private/rare/invalidarDatosCSN/"+idchart.replace("chartid_","")+"/0/";
+        {% endif %}
+        botonTool.target = "_blank";
+        botonTool.append(spanTool);
+
+        var botonTicket = document.createElement("a");
+        botonTicket.classList.add('btn','btn-'+tramoSinDatos,'btn-sm', 'm-1');
+        if (alerta != null)
+            botonTicket.title = alerta;
+        botonTicket.href = "{% url 'structure:serviciosTickets' %}";
+        botonTicket.target = "_blank";
+        var spanTicket = document.createElement("span");
+        spanTicket.classList.add('fas','fa-clipboard-list');
+        botonTicket.append(spanTicket);
+
+        var botonConexion = document.createElement("div");
+        botonConexion.classList.add('btn','btn-'+tiempo,'btn-sm', 'm-1');
+        var spanConexion = document.createElement("span");
+        spanConexion.classList.add('fas','fa-wifi');
+        botonConexion.append(spanConexion);
+
+        var botonReload = document.createElement("div");
+        botonReload.classList.add('btn','btn-outline-info','btn-sm', 'm-1');
+        var spanReload = document.createElement("span");
+        spanReload.classList.add('fas','fa-sync');
+        botonReload.onclick = function() { renovarChart(idchart); };
+        botonReload.append(spanReload);
+
+        var botonS = document.createElement("div");
+        botonS.classList.add('btn','btn-primary','btn-sm','active', 'm-1');
+        var spanS = document.createElement("span");
+        spanS.classList.add('fas','fa-compress');
+        botonS.onclick = function() { $(this).parent().parent().parent().removeClass('col-lg-11 col-md-11 col-sm-11 col-xs-11');$(this).parent().parent().parent().addClass('col-lg-4 col-md-5 col-sm-11 col-xs-11');$(this).parent().parent().find('*').removeClass('active');$(this).addClass('active');$('.grafica').css('min-height', '200');redrawCharts();};
+        botonS.append(spanS);
+
+        var botonXL = document.createElement("div");
+        botonXL.classList.add('btn','btn-primary','btn-sm', 'm-1');
+        var spanXL = document.createElement("span");
+        spanXL.classList.add('fas','fa-expand');
+        botonXL.onclick = function() { $(this).parent().parent().parent().removeClass('col-lg-4 col-md-5 col-sm-11 col-xs-11');$(this).parent().parent().parent().addClass('col-lg-11 col-md-11 col-sm-11 col-xs-11');$(this).parent().parent().find('*').removeClass('active');$(this).addClass('active');$('.grafica').css('min-height', '400');redrawCharts();};
+        botonXL.append(spanXL);
+
+        var divTitulo = document.createElement("div");
+        divTitulo.classList.add('col-lg-4','col-md-4','col-sm-4','col-xs-4');
+        var textTitulo = document.createTextNode("");
+        divTitulo.appendChild(textTitulo);
+
+        var divIDChart = document.createElement("div");
+        divIDChart.id = idchart;
+
+        var divParentButtons = document.createElement("div");
+        divParentButtons.classList.add('flex-container');
+        {% if desbloqueo == 0 %}
+            divParentButtons.appendChild(botonComent);
+        {% endif %}
+        divParentButtons.appendChild(botonTool);
+        divParentButtons.appendChild(botonTicket);
+        divParentButtons.appendChild(botonConexion);
+        divParentButtons.appendChild(botonReload);
+        divParentButtons.appendChild(botonS);
+        divParentButtons.appendChild(botonXL);
+
+        var divParentChart = document.createElement("div");
+        divParentChart.classList.add('grafica','w-100','m-1','rounded','col-lg-12','col-md-12','col-sm-12','col-xs-12');
+        divParentChart.appendChild(divIDChart);
+
+        var divRow = document.createElement("div");
+        divRow.classList.add('row','d-flex','justify-content-center');
+        divRow.append(divParentButtons);
+        divRow.append(divParentChart);
+
+        var divChild = document.createElement("div");
+        divChild.classList.add('col-lg-4','col-md-6','col-sm-10','col-xs-10','w-100','border','rounded','fondo-'+fondoDiv);
+
+        divChild.append(divRow);
+
+        $(id_parent).append(divChild);
+    }
+
+    function crearDivChartGrande(id_parent, idchart){
+        var divTitulo = document.createElement("div");
+        divTitulo.classList.add('col-lg-12','col-md-12','col-sm-12','col-xs-12');
+        var textTitulo = document.createTextNode("");
+        divTitulo.appendChild(textTitulo);
+
+        var divIDChart = document.createElement("div");
+        divIDChart.id = idchart;
+
+        var divParentChart = document.createElement("div");
+        divParentChart.classList.add('graficaGrande','w-100','rounded','col-lg-12','col-md-12','col-sm-12','col-xs-12');
+        divParentChart.appendChild(divIDChart);
+
+        var divRow = document.createElement("div");
+        divRow.classList.add('row','d-flex','justify-content-center');
+        divRow.append(divParentChart);
+
+        var divChild = document.createElement("div");
+        divChild.classList.add('col-lg-12','col-md-12','col-sm-12','col-xs-12','w-100','border','rounded');
+        divChild.append(divRow);
+
+        $(id_parent).append(divChild);
+    }
+
+    function crearCuadroTexto(id_parent, name){
+        var spanComentario = document.createElement("span");
+        spanComentario.classList.add('input-group-text');
+        var textSpan = document.createTextNode("Comentario");
+        spanComentario.appendChild(textSpan);
+
+        var divPrepend = document.createElement("div");
+        divPrepend.classList.add('input-group-prepend');
+        divPrepend.append(spanComentario);
+
+        var textArea = document.createElement("textarea");
+        textArea.id = "comentario_" + id_parent;
+        textArea.classList.add('textComentarios', 'form-control');
+        textArea.setAttribute('aria-label', 'With textarea');
+        textArea.setAttribute('name', name);
+
+        var divInputGroup = document.createElement("div");
+        divInputGroup.classList.add('input-group');
+        divInputGroup.append(divPrepend);
+        divInputGroup.append(textArea);
+        if ( {{ desbloqueo }} == 1 )
+            divInputGroup.style.display = "none";
+
+        $(id_parent).append(divInputGroup);
+    }
+
+    function crearBotonCargarMas(id_parent, grupo, subgrupo){
+        var botonCargarMas = document.createElement("button");
+        botonCargarMas.classList.add('load-more','btn','btn-primary','w-100','mt-3','mb-3');
+        botonCargarMas.type = 'button';
+        var textBotonCargarMas = document.createTextNode("Cargar más...");
+        botonCargarMas.append(textBotonCargarMas);
+        botonCargarMas.onclick = function() {
+            if ((document.getElementById("comentario_" + id_parent).value.length == 0)&&({{ desbloqueo }} == 0)){
+                document.getElementById("comentario_" + id_parent).classList.add('is-invalid');
+            }
+            else{
+                $(this).parent().hide();
+                $("#carga").fadeIn();
+                llamadaGraficas(grupo, subgrupo);
+                $(this).remove();
+                jQuery('html,body').animate({scrollTop:0},1000);
+            }
+        };
+        if ( {{ desbloqueo }} == 1 )
+            botonCargarMas.style.display = "none";
+        $(id_parent).append(botonCargarMas);
+    }
+
+    function crearBotonCerrarBloque(id_parent){
+        var botonCargarMas = document.createElement("button");
+        botonCargarMas.classList.add('load-more','btn','btn-primary','w-100','mt-3','mb-3');
+        botonCargarMas.type = 'button';
+        var textBotonCargarMas = document.createTextNode("Cerrar bloque");
+        botonCargarMas.append(textBotonCargarMas);
+        botonCargarMas.onclick = function() {
+            if (document.getElementById("comentario_" + id_parent).value.length == 0){
+                document.getElementById("comentario_" + id_parent).classList.add('is-invalid');
+            }
+            else{
+                $(this).parent().hide();
+                activarBloque();
+                $(this).remove();
+                jQuery('html,body').animate({scrollTop:0},1000);
+            }
+        };
+        if ( {{ desbloqueo }} == 1 )
+            botonCargarMas.style.display = "none";
+        $(id_parent).append(botonCargarMas);
+    }
+
+    function crearBotonAcabarRevision(id_parent){
+        jQuery('html,body').animate({scrollTop:$(document).height() + $(window).height()},1000);
+        var botonAcabar = document.createElement("button");
+        botonAcabar.classList.add('load-more','btn','btn-primary','w-100','mt-3','mb-3');
+        botonAcabar.type = 'button';
+        var textBotonAcabar = document.createTextNode("Acabar revision");
+        botonAcabar.append(textBotonAcabar);
+        botonAcabar.onclick = function() {
+            if (document.getElementById("comentario_" + id_parent).value.length == 0){
+                document.getElementById("comentario_" + id_parent).classList.add('is-invalid');
+            }
+            else{
+                $(this).parent().hide();
+                $(this).remove();
+                if ( {{ desbloqueo }} == 0 ){
+                    jQuery('html,body').animate({scrollTop:0},1000);
+                    if("{{ red }}" == "rvra")
+                        finalizarGuardiaRare($(id_parent).parent());
+                    else
+                        mostrarComentarios($(id_parent).parent());
+                }
+            }
+        };
+        if ( {{ desbloqueo }} == 1 )
+            botonAcabar.style.display = "none";
+        $(id_parent).append(botonAcabar);
+    }
+
+    function mostrarComentarios(parent){
+        botonImprimir(parent);
+        $( "textarea" ).each(function( index ) {
+            agregarTexto(parent, $( this ).attr('name'), $( this ).val());
+        });
+    }
+
+    function finalizarGuardiaRare(parent){
+        $("#carga").show();
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url:"/private/rare/informeGuardiaRARE/",
+            success: function(data)
+            {
+                var divInforme = document.createElement("div");
+                divInforme.classList.add('col-lg-12','col-md-12','col-sm-12','col-xs-12','border','bg-white','p-2','m-3');
+
+                var divComTitleFotos = document.createElement("div");
+                divComTitleFotos.classList.add('col-lg-12','col-md-12','col-sm-12','col-xs-12','border','border-info','mb-2');
+                var divCamaras = document.createElement('a');
+                divCamaras.href = "http://alerta2.es/private/rare/consultaCamarasPapel/";
+                divCamaras.target = "_blank";
+                divCamaras.innerHTML = "Pulsa aquí para consultar las cámaras de las estaciones";
+                divComTitleFotos.appendChild(divCamaras);
+                divInforme.append(divComTitleFotos);
+
+                var divComTitleOperatividades = document.createElement("div");
+                divComTitleOperatividades.classList.add('col-lg-12','col-md-12','col-sm-12','col-xs-12','border-bottom','border-info','mb-2');
+                var textTitleOperatividades = document.createTextNode("Operatividades");
+                divComTitleOperatividades.appendChild(textTitleOperatividades);
+                divInforme.append(divComTitleOperatividades);
+
+                var divOperatividades = document.createElement("div");
+                divOperatividades.classList.add('row', 'm-3');
+                for (var i = 0; i < data.OperatividadEstaciones.length; i++){
+                    var divOperatividadEstacion = document.createElement("div");
+                    divOperatividadEstacion.classList.add('col-6', 'row', 'py-1');
+                    var divOpEstacionNombre = document.createElement("div");
+                    divOpEstacionNombre.classList.add('col-6');
+                    var textNombreEstacion = document.createTextNode(data.OperatividadEstaciones[i].Estacion);
+                    divOpEstacionNombre.appendChild(textNombreEstacion);
+                    var divOpEstacionBarra = document.createElement("div");
+                    divOpEstacionBarra.classList.add('col-6');
+                    var divOpEstacionProgreso = document.createElement("div");
+                    divOpEstacionProgreso.classList.add('progress');
+                    var divOpEstacionProgresoValores = document.createElement("div");
+                    if(data.OperatividadEstaciones[i].Operatividad >= 90)
+                        divOpEstacionProgresoValores.classList.add('progress-bar','bg-success');
+                    else if(data.OperatividadEstaciones[i].Operatividad >= 60)
+                        divOpEstacionProgresoValores.classList.add('progress-bar','bg-warning');
+                    else
+                        divOpEstacionProgresoValores.classList.add('progress-bar','bg-danger');
+                    divOpEstacionProgresoValores.setAttribute("role", "progressbar");
+                    divOpEstacionProgresoValores.setAttribute("style", "width: "+data.OperatividadEstaciones[i].Operatividad+"%");
+                    divOpEstacionProgresoValores.setAttribute("aria-valuenow", data.OperatividadEstaciones[i].Operatividad);
+                    divOpEstacionProgresoValores.setAttribute("aria-valuemin", "0");
+                    divOpEstacionProgresoValores.setAttribute("aria-valuemax", "100");
+                    var textOperatividadEstacion = document.createTextNode(data.OperatividadEstaciones[i].Operatividad +"%");
+                    divOpEstacionProgresoValores.appendChild(textOperatividadEstacion);
+                    divOpEstacionProgreso.appendChild(divOpEstacionProgresoValores);
+                    divOpEstacionBarra.appendChild(divOpEstacionProgreso);
+                    divOperatividadEstacion.appendChild(divOpEstacionNombre);
+                    divOperatividadEstacion.appendChild(divOpEstacionBarra);
+                    divOperatividades.appendChild(divOperatividadEstacion);
+                }
+
+                var divOperatividadEstacion = document.createElement("div");
+                divOperatividadEstacion.classList.add('col-12', 'row', 'rounded', 'border', 'border-dark' );
+                var divOpEstacionNombre = document.createElement("div");
+                divOpEstacionNombre.classList.add('col-4');
+                var textNombreEstacion = document.createTextNode("Operatividad Media");
+                divOpEstacionNombre.appendChild(textNombreEstacion);
+                var divOpEstacionBarra = document.createElement("div");
+                divOpEstacionBarra.classList.add('col-8');
+                var divOpEstacionProgreso = document.createElement("div");
+                divOpEstacionProgreso.classList.add('progress');
+                var divOpEstacionProgresoValores = document.createElement("div");
+                if(data.OperatividadTotalGamma >= 90)
+                    divOpEstacionProgresoValores.classList.add('progress-bar','bg-success');
+                else if(data.OperatividadOperatividadTotalGamma >= 60)
+                    divOpEstacionProgresoValores.classList.add('progress-bar','bg-warning');
+                else
+                    divOpEstacionProgresoValores.classList.add('progress-bar','bg-danger');
+                divOpEstacionProgresoValores.setAttribute("role", "progressbar");
+                divOpEstacionProgresoValores.setAttribute("style", "width: "+data.OperatividadTotalGamma+"%");
+                divOpEstacionProgresoValores.setAttribute("aria-valuenow", data.OperatividadTotalGamma);
+                divOpEstacionProgresoValores.setAttribute("aria-valuemin", "0");
+                divOpEstacionProgresoValores.setAttribute("aria-valuemax", "100");
+                var textOperatividadEstacion = document.createTextNode(data.OperatividadTotalGamma +"%");
+                divOpEstacionProgresoValores.id = "operatividad_total";
+                divOpEstacionProgresoValores.appendChild(textOperatividadEstacion);
+                divOpEstacionProgreso.appendChild(divOpEstacionProgresoValores);
+                divOpEstacionBarra.appendChild(divOpEstacionProgreso);
+                divOperatividadEstacion.appendChild(divOpEstacionNombre);
+                divOperatividadEstacion.appendChild(divOpEstacionBarra);
+                divOperatividades.appendChild(divOperatividadEstacion);
+
+                divInforme.append(divOperatividades);
+
+                var divComTitleComunicaciones = document.createElement("div");
+                divComTitleComunicaciones.classList.add('col-lg-12','col-md-12','col-sm-12','col-xs-12','border-bottom','border-info','mb-2');
+                var textTitleComunicaciones = document.createTextNode("Comunicaciones");
+                divComTitleComunicaciones.appendChild(textTitleComunicaciones);
+                divInforme.append(divComTitleComunicaciones);
+
+                var divComSMS = document.createElement("div");
+                divComSMS.classList.add('col-lg-10','col-md-10','col-sm-10','col-xs-10', 'row', 'rounded', 'border', 'border-dark', 'm-3');
+                var divComSMSTexto = document.createElement("div");
+                divComSMSTexto.classList.add('col-6','border');
+                var textSMS = document.createTextNode("SMS Enviados");
+                divComSMSTexto.appendChild(textSMS);
+                var divComSMSEnviados = document.createElement("div");
+                divComSMSEnviados.classList.add('col-6');
+                var textSMSEnviados = document.createTextNode(data.SMSEnviados);
+                divComSMSEnviados.appendChild(textSMSEnviados);
+
+                var divComDatosRadioTexto = document.createElement("div");
+                divComDatosRadioTexto.classList.add('col-6','border');
+                var textDatosRadio = document.createTextNode("Datos Radio");
+                divComDatosRadioTexto.appendChild(textDatosRadio);
+                var divComDatosRadio = document.createElement("div");
+                divComDatosRadio.classList.add('col-6');
+                var textDatosRadio = document.createTextNode(data.datosRadio);
+                divComDatosRadio.appendChild(textDatosRadio);
+
+                var divComErroresRadioTexto = document.createElement("div");
+                divComErroresRadioTexto.classList.add('col-6','border');
+                var textErroresRadio = document.createTextNode("Errores Radio");
+                divComErroresRadioTexto.appendChild(textErroresRadio);
+                var divComErroresRadio = document.createElement("div");
+                divComErroresRadio.classList.add('col-6');
+                var textErroresRadio = document.createTextNode(data.erroresRadio);
+                divComErroresRadio.appendChild(textErroresRadio);
+
+                var divComDatosIntranetTexto = document.createElement("div");
+                divComDatosIntranetTexto.classList.add('col-6','border');
+                var textDatosIntranet = document.createTextNode("Datos Intranet");
+                divComDatosIntranetTexto.appendChild(textDatosIntranet);
+                var divComDatosIntranet = document.createElement("div");
+                divComDatosIntranet.classList.add('col-6');
+                var textDatosIntranet = document.createTextNode(data.datosIntranet);
+                divComDatosIntranet.appendChild(textDatosIntranet);
+
+                divComSMS.appendChild(divComSMSTexto);
+                divComSMS.appendChild(divComSMSEnviados);
+                divComSMS.appendChild(divComDatosRadioTexto);
+                divComSMS.appendChild(divComDatosRadio);
+                divComSMS.appendChild(divComErroresRadioTexto);
+                divComSMS.appendChild(divComErroresRadio);
+                divComSMS.appendChild(divComDatosIntranetTexto);
+                divComSMS.appendChild(divComDatosIntranet);
+                divInforme.append(divComSMS);
+
+                var divComChecksum = document.createElement("div");
+                divComChecksum.classList.add('col-lg-10','col-md-10','col-sm-10','col-xs-10', 'row', 'rounded', 'border', 'border-dark', 'm-3');
+                if (data.checksum == 1){
+                    var textChecksum = document.createTextNode("IGNORAR. Anotar en informe de guardia que está pendiente de configurar la intranet de las conexiones. Comprobación de hash correcta. Cáceres(LOCAL): " + data.checksum1 + " Cáceres(LOCAL): " + data.checksum2);
+                    divComChecksum.id = "checksum";
+                    divComChecksum.appendChild(textChecksum);
+                }
+                else{
+                    var textChecksum = document.createTextNode("Comprobación de hash fallida. Estacion1: " + data.checksum1 + " Estacion2: " + data.checksum2);
+                    divComChecksum.id = "checksum";
+                    divComChecksum.appendChild(textChecksum);
+                }
+                divInforme.append(divComChecksum);
+
+                var divComTitleAlertas = document.createElement("div");
+                divComTitleAlertas.classList.add('col-lg-12','col-md-12','col-sm-12','col-xs-12','border-bottom','border-info','mb-2');
+                var textTitleAlertas = document.createTextNode("Alertas");
+                divComTitleAlertas.appendChild(textTitleAlertas);
+                divInforme.append(divComTitleAlertas);
+
+                var divComNiveles = document.createElement("div");
+                divComNiveles.classList.add('row');
+
+                var divComNivelesUno = document.createElement("div");
+                divComNivelesUno.classList.add('col-3','m-2');
+                var divComNivelesBordeUno = document.createElement("div");
+                divComNivelesBordeUno.classList.add('border','rounded','row','border-dark');
+                var divComNivelUnoTexto = document.createElement("div");
+                divComNivelUnoTexto.classList.add('col-6','border');
+                var textNivelUno = document.createTextNode("Niveles 1");
+                divComNivelUnoTexto.appendChild(textNivelUno);
+                var divComNivelUnoValor = document.createElement("div");
+                divComNivelUnoValor.classList.add('col-6','text-center');
+                var textNivelUnoValor = document.createTextNode(data.Niveles1);
+                divComNivelUnoValor.id = "niveles_1";
+                divComNivelUnoValor.appendChild(textNivelUnoValor);
+                divComNivelesBordeUno.appendChild(divComNivelUnoTexto);
+                divComNivelesBordeUno.appendChild(divComNivelUnoValor);
+                divComNivelesUno.appendChild(divComNivelesBordeUno);
+                divComNiveles.appendChild(divComNivelesUno);
+
+                var divComNivelesDos = document.createElement("div");
+                divComNivelesDos.classList.add('col-3','m-2');
+                var divComNivelesBordeDos = document.createElement("div");
+                divComNivelesBordeDos.classList.add('border','rounded','row','border-dark');
+                var divComNivelDosTexto = document.createElement("div");
+                divComNivelDosTexto.classList.add('col-6','border');
+                var textNivelDos = document.createTextNode("Niveles 2");
+                divComNivelDosTexto.appendChild(textNivelDos);
+                var divComNivelDosValor = document.createElement("div");
+                divComNivelDosValor.classList.add('col-6','text-center');
+                var textNivelDosValor = document.createTextNode(data.Niveles2);
+                divComNivelDosValor.id = "niveles_2";
+                divComNivelDosValor.appendChild(textNivelDosValor);
+                divComNivelesBordeDos.appendChild(divComNivelDosTexto);
+                divComNivelesBordeDos.appendChild(divComNivelDosValor);
+                divComNivelesDos.appendChild(divComNivelesBordeDos);
+                divComNiveles.appendChild(divComNivelesDos);
+
+                var divComNivelesTres = document.createElement("div");
+                divComNivelesTres.classList.add('col-3','m-2');
+                var divComNivelesBordeTres = document.createElement("div");
+                divComNivelesBordeTres.classList.add('border','rounded','row','border-dark');
+                var divComNivelTresTexto = document.createElement("div");
+                divComNivelTresTexto.classList.add('col-6','border');
+                var textNivelTres = document.createTextNode("Niveles 3");
+                divComNivelTresTexto.appendChild(textNivelTres);
+                var divComNivelTresValor = document.createElement("div");
+                divComNivelTresValor.classList.add('col-6','text-center');
+                var textNivelTresValor = document.createTextNode(data.Niveles3);
+                divComNivelTresValor.id = "niveles_3";
+                divComNivelTresValor.appendChild(textNivelTresValor);
+                divComNivelesBordeTres.appendChild(divComNivelTresTexto);
+                divComNivelesBordeTres.appendChild(divComNivelTresValor);
+                divComNivelesTres.appendChild(divComNivelesBordeTres);
+                divComNiveles.appendChild(divComNivelesTres);
+
+                divInforme.append(divComNiveles);
+
+                mostrarComentarios(parent);
+                parent.append(divInforme);
+
+                $("#carga").fadeOut(1000);
+                subirInforme();
+            },
+        })
+    }
+
+    function botonImprimir(parent){
+        var botonImprimir = document.createElement("button");
+        botonImprimir.classList.add('btn','btn-primary','mt-3','mb-3');
+        botonImprimir.type = 'button';
+        var textBotonImprimir = document.createTextNode("Imprimir");
+        botonImprimir.append(textBotonImprimir);
+        botonImprimir.onclick = function() {imprimirReport();};
+        $(parent).append(botonImprimir);
+    }
+
+
+    function imprimirReport(){
+        $("#sidebar-container").hide();
+        print();
+        $("#sidebar-container").show();
+    }
+
+    function subirInforme(){
+        var comentarios = "";
+        var comentarios = "";
+        var operatividad = "";
+        var niveles = "";
+        var integridad = "";
+        var grafica = "{{ red }}";
+        $( ".textComentarios" ).each(function( index ) {
+            comentarios = comentarios + "[" + $( this ).attr('name') + "] : " + $( this ).val() + "  ";
+        });
+        operatividad = $("#operatividad_total").text();
+        integridad = $("#checksum").text();
+        niveles = "[ Niveles 1 ] : " + $("#niveles_1").text() + "  [ Niveles 2 ] : " + $("#niveles_2").text() + "  [ Niveles 3 ] : " + $("#niveles_3").text();
+        formInforme(comentarios, operatividad, integridad, niveles);
+    }
+
+    function formInforme(coment, operat, integ, niv) {
+        $("#formComentarios").val(coment);
+        $("#formOperatividad").val(operat);
+        $("#formIntegridad").val(integ);
+        $("#formNiveles").val(niv);
+        $("#formRed").val("{{ red }}");
+        $("#formInforme").submit(function(e) {
+            e.preventDefault(); 
+            $.ajax({
+                url: "/private/rare/guardiaResumen/",
+                method : "POST",
+                data: $("#formInforme").serialize(),
+                dataType: "json",
+                success: function(data)
+                {
+                    crearAviso("guardia{{ red }}", data);
+                }
+            });
+        });
+        $("#formInforme").submit();
+    }
+
+
+    function agregarTexto(parent, titulo, comentario){
+        var divComentario = document.createElement("div");
+        divComentario.classList.add('col-lg-12','col-md-12','col-sm-12','col-xs-12','border','bg-white','p-2','m-3');
+
+        var divComTitle = document.createElement("div");
+        divComTitle.classList.add('col-lg-12','col-md-12','col-sm-12','col-xs-12','border-bottom','border-info','mb-2');
+        var textTitle = document.createTextNode(titulo);
+        divComTitle.appendChild(textTitle);
+
+        var divComValue = document.createElement("textarea");
+        divComValue.classList.add('col-lg-12','col-md-12','col-sm-12','col-xs-12');
+        divComValue.textContent = comentario;
+        //var textValue = document.createTextNode(comentario);
+        //divComValue.appendChild(textValue);
+
+        divComentario.appendChild(divComTitle);
+        divComentario.appendChild(divComValue);
+        $(parent).append(divComentario);
+    }
+
+    function redrawCharts(){
+        window.dispatchEvent(new Event('resize'));
+    }
+
+    function renovarChart(idChart){
+        $("#carga").show();
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url:"/private/rare/guardiaReload/"+idChart+"/",
+            success: function(data)
+            {
+                for (i = 0; i < charts.length; i++) {
+                    if (charts[i].el.id == data.id_chart){
+                        charts[i].updateOptions( {
+                            xaxis: {
+                                categories: data.fechas
+                            }
+                        });
+                        charts[i].updateSeries(data.series);
+                    }
+                }
+                $("#carga").fadeOut(1000);
+            },
+        })
+    }
+
+    function dibujarGraficaLineas(div, id, titulo, fechas, series, ejes) {
+        /**** grafica de valores de dosis ****/
+        /*** Stroke curve posibles 'smooth', 'straight', 'stepline' ***/
+        var options = {
+            series: series,
+            chart: {
+              animations: {
+                enabled: false,
+              },
+              defaultLocale: 'es',
+              locales: [{
+                name: 'es',
+                options: {
+                  months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                  shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                  days: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sabado'],
+                  shortDays: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+                  toolbar: {
+                    download: 'Descargar SVG',
+                    selection: 'Seleccion',
+                    selectionZoom: 'Seleccion Zoom',
+                    zoomIn: 'Acercar',
+                    zoomOut: 'Alejar',
+                    pan: 'Desplazar',
+                    reset: 'Resetear Zoom',
+                  }
+                }
+              }],
+              id: id,
+              height: 300,
+              height: 300,
+              background: '#FFF',
+              redrawOnParentResize: true,
+              type: 'line',
+              zoom: {
+                type: 'x',
+                enabled: true
+              },
+              toolbar: {
+                autoSelected: 'zoom',
+                export: {
+                    csv: {
+                        filename: undefined,
+                        columnDelimiter: ',',
+                        headerCategory: 'category',
+                        headerValue: 'value',
+                        dateFormatter(timestamp) {
+                            return timestamp.replace("T", " ").replace("Z", "")
+                        }
+                    },
+                    svg: {
+                        filename: undefined,
+                    },
+                    png: {
+                        filename: undefined,
+                    }
+                },
+              }
+            },
+            dataLabels: {
+              enabled: false
+            },
+            stroke: {
+              curve: 'straight',
+              lineCap: 'butt',
+              width: 2
+            },
+            title: {
+              text: titulo,
+              align: 'left',
+              style: {
+                fontSize: '9px',
+              }
+            },
+            xaxis: {
+                categories: fechas,
+                    title: {
+                        text: 'Fechas'
+                    },
+                type: 'datetime',
+                labels: {
+                    format: 'dd/MM HH:mm',
+                }
+            },
+            yaxis: ejes,
+            tooltip: {
+                x: {
+                    format: "dd MMM, yyyy HH:mm",
+                   }
+            }
+        };
+        chart = new ApexCharts(document.querySelector("#"+div), options);
+        chart.render();
+        charts.push(chart);
+    }
+
+    function dibujarGraficaLineasGrande(div, id, fechas, series, ejes) {
+        console.log(ejes);
+        /**** grafica de valores de dosis ****/
+        var options = {
+              defaultLocale: 'es',
+              locales: [{
+                name: 'es',
+                options: {
+                  months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                  shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                  days: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sabado'],
+                  shortDays: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+                  toolbar: {
+                    download: 'Descargar SVG',
+                    selection: 'Seleccion',
+                    selectionZoom: 'Seleccion Zoom',
+                    zoomIn: 'Acercar',
+                    zoomOut: 'Alejar',
+                    pan: 'Desplazar',
+                    reset: 'Resetear Zoom',
+                  }
+                }
+              }],
+            series: series,
+            colors:['#228b22', '#b03060', '#ff4500', '#ffff00', '#0000cd', '#00ff00', '#00ffff', '#2f4f4f', '#1e90ff', '#ffdab9'],
+            chart: {
+              animations: {
+                enabled: false,
+              },
+              id: id,
+              height: 600,
+              background: '#FFF',
+              width: '100%',
+              redrawOnParentResize: true,
+              type: 'line',
+              zoom: {
+                type: 'x',
+                enabled: true
+              },
+              toolbar: {
+                autoSelected: 'zoom'
+              }
+            },
+            dataLabels: {
+              enabled: false
+            },
+            stroke: {
+              curve: 'smooth',
+              lineCap: 'butt',
+              width: 2
+            },
+            title: {
+              text: "Medias diarias de Tasa H10",
+              align: 'left',
+              style: {
+                fontSize: '9px',
+              }
+            },
+            xaxis: {
+                categories: fechas,
+                    title: {
+                        text: 'Fechas'
+                    },
+                type: 'datetime'
+            },
+            yaxis: ejes,
+            tooltip: {
+                x: {
+                    format: "dd MMM, yyyy HH:mm",
+                   }
+            }
+        };
+        chart = new ApexCharts(document.querySelector("#"+div), options);
+        chart.render();
+        charts.push(chart);
+    }
+{% endblock %}

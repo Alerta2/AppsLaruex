@@ -1,0 +1,1226 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+
+  
+  /* ===============================
+  *  Estilo del los botones
+  =================================*/
+  
+  .agregarFormacion:hover {
+    color: #032031;
+  }
+  
+  .descargaPDF:hover {
+    color: #c36d0b;
+  }
+  .retirarStock:hover{
+    color: #492160;
+  }
+  .retirarStockUbicacion:hover{
+    color: #042e37;
+  }
+  .entrar:hover{
+    color: #195746;
+  }
+
+  
+
+  
+  .enviarNotificacion:hover {
+    color: #064061;
+  }
+  
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+
+  table {
+    width: auto;
+    height: auto;
+    font-size: auto;
+    padding: auto;
+    margin: auto;
+  }
+
+  #flechas {
+    width: auto;
+    height: auto;
+  }
+</style>
+
+<!-- breadcrumb  y botones -->
+<div class="card-body">
+  <nav>
+      <h5 class="card-title">Stock de material no inventariable</h5>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+        <li class="breadcrumb-item active" style="font-size: large;">Stock de material no inventariable</li>
+    </ol>
+  </nav>
+  <div class="d-flex justify-content-end">  
+    <a class="mx-1"  data-toggle="modal" data-toggle="tooltip "title="generar hoja de pedido seleccionando la categoría" data-target="#modalGenerarHojaPedidoCategoria" style="color: #005f73; align-items: md-center"><i class="fa-duotone fa-shop fa-2x enviarNotificacion"></i></a>
+
+    <a class="mx-1" title="generar hoja de pedido seleccionando el almacén" data-toggle="modal" data-toggle="tooltip"
+    data-target="#modalGenerarHojaPedido" style="color: #bb3e03; align-items: md-center"><i class="fa-duotone fa-cart-shopping fa-2x enviarNotificacion"></i></a>           
+
+  </div>
+</div>
+
+
+
+<!-- =================== Listado de Stock ==========================-->
+
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Listado de Stock por Categorias</h6>
+      <!-- Accordion without outline borders -->
+      <div class="accordion accordion-flush" id="accordionListadoStock">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headinListadoStock">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseListadoStock" aria-expanded="false"
+              aria-controls="flush-collapseListadoStock">Listado completo de stock por categorias
+            </button>
+          </h2>
+          <div id="flush-collapseListadoStock" class="accordion-collapse collapse"
+            aria-labelledby="flush-headingListadoStock" data-bs-parent="#accordionListadoStock">
+            <div class="accordion-body">
+              <div class="select col-4" >
+                <label for="idCategoria"><strong>Seleccione una categoría</strong></label>
+                <select class="form-control form-select" id="idCategoria" name="idCategoria" onchange="getCategoriaSeleciona()">
+                  {% for categoria in categorias %}
+                      <option value="{{categoria.id}}">{{categoria.categoria}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <table id="tabla_stock" data-toggle="table" data-show-export="true"
+                data-export-types="['excel', 'pdf']" data-page-list="[10, 25, 50, 100, All]" data-search="true"
+                data-show-columns="true" data-show-columns-toggle-all="true" data-buttons="buttons"
+                data-buttons-class="light" data-pagination="true"></table>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Accordion without outline borders -->
+    </div>
+  </div>
+</section>
+
+<!-- =================== Listado de Stock por Almacenes ==========================-->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Stock por Almacenes</h6>
+      <!-- Accordion without outline borders -->
+      <div class="accordion accordion-flush" id="accordionStockPorAlmacen">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingStockPorAlmacen">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseStockPorAlmacen" aria-expanded="false"
+              aria-controls="flush-collapseStockPorAlmacen">Listado de stock distribuido en las diferentes localizaciones establecidas como almacenes
+            </button>
+          </h2>
+          <div id="flush-collapseStockPorAlmacen" class="accordion-collapse collapse"
+            aria-labelledby="flush-headingStockPorAlmacen" data-bs-parent="#accordionStockPorAlmacen">
+            <div class="accordion-body">
+              <div class="select col-4" >
+                <label for="idAlmacen"><strong>Seleccione un almacén</strong></label>
+                <select class="form-control form-select" id="idAlmacen" name="idAlmacen" onchange="getSelecionados()">
+                  {% for ubicacion in ubicaciones %}
+                  {% if ubicacion.tipo_ubicacion == 4 %}
+                      <option value="{{ubicacion.id}}">{% if ubicacion.id__padre %} [{{ ubicacion.id__padre__nombre}}] {% endif %} {{ubicacion.id__nombre}} </option>
+                  {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+              <table id="tabla_stock_por_almacen" data-toggle="table" data-show-export="true"
+                data-export-types="['excel', 'pdf']" data-page-list="[10, 25, 50, 100, All]" data-search="true"
+                data-show-columns="true" data-show-columns-toggle-all="true" data-buttons="buttons"
+                data-buttons-class="light" data-pagination="true" ></table>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Accordion without outline borders -->
+    </div>
+  </div>
+</section>
+
+
+<!-- =================== Listado Stock mínimo ==========================-->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Listado de stock en punto de reorden (stock mínimo)</h6>
+      <!-- Accordion without outline borders -->
+      <div class="accordion accordion-flush" id="accordionStockEnMinimo">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingStockEnMinimo">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseStockEnMinimo" aria-expanded="false"
+              aria-controls="flush-collapseStockEnMinimo">Es necesario tomar medidas para reabastecer el inventario, ya que el artículo en cuestión está en riesgo de agotarse pronto.
+            </button>
+          </h2>
+          <div id="flush-collapseStockEnMinimo" class="accordion-collapse collapse"
+            aria-labelledby="flush-headingStockEnMinimo" data-bs-parent="#accordionStockEnMinimo">
+            <div class="accordion-body">
+              <table id="tabla_stock_minimo" data-toggle="table" data-search="true" data-show-export="true"
+                data-export-types="['excel', 'pdf']" data-page-list="[10, 25, 50, 100, All]" data-show-columns="true"
+                data-show-columns-toggle-all="true" data-buttons="buttons" data-buttons-class="light" data-pagination="true" ></table>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Accordion without outline borders -->
+    </div>
+  </div>
+</section>
+
+<!-- =================== Listado de inventario por debajo de stock mínimo ==========================-->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Listado de inventario por debajo de stock mínimo</h6>
+      <!-- Accordion without outline borders -->
+      <div class="accordion accordion-flush" id="accordionStockBajoMinimo">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingStockBajoMinimo">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseStockBajoMinimo" aria-expanded="false"
+              aria-controls="flush-collapseStockBajoMinimo">Artículos que han alcanzado un nivel crítico en el inventario y es necesario reabastecer el artículo para evitar quedarse sin existencias.
+            </button>
+          </h2>
+          <div id="flush-collapseStockBajoMinimo" class="accordion-collapse collapse"
+            aria-labelledby="flush-headingStockBajoMinimo" data-bs-parent="#accordionStockBajoMinimo">
+            <div class="accordion-body">
+              <table id="tabla_stock_fuera" data-toggle="table" data-show-export="true"
+                data-export-types="['excel', 'pdf']" data-page-list="[10, 25, 50, 100, All]" data-search="true"
+                data-show-columns="true" data-show-columns-toggle-all="true" data-buttons="buttons"
+                data-buttons-class="light" data-pagination="true" ></table>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Accordion without outline borders -->
+    </div>
+  </div>
+</section>
+
+<!-- ========== Modal para seleccionar el almacen del que se quiere obtener la hoja de pedido ========== -->
+<div id="modalGenerarHojaPedido" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+  aria-labelledby="modalGenerarHojaPedido" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">
+          <strong>
+            Seleccione el almacén del que desea obtener la hoja de pedido.
+          </strong>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+      </div>
+      <!-- END Cabecera del modalGenerarHojaPedido -->
+
+      <!-- Body del modalGenerarHojaPedido -->
+      <div class="modal-body">
+        <form id="formularioGenerarHojaPedido" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="row justify-content-center"><div class="select col-4" >
+            <label for="idAlmacenHojaPedido"><strong>Seleccione el almacén</strong></label>
+            <select class="form-control form-select" id="idAlmacenHojaPedido" name="idAlmacenHojaPedido">
+              {% for ubicacion in ubicaciones %}
+              {% if ubicacion.tipo_ubicacion == 4 %}
+                  <option value="{{ubicacion.id}}">{% if ubicacion.id__padre %} [{{ ubicacion.id__padre__nombre}}] {% endif %} {{ubicacion.id__nombre}}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+          </div>
+      </div>
+
+      <!-- Footer del ModalAsociarArchivo -->
+      <div class="modal-footer d-flex">
+
+        <button id="cerrarAsociar" type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cerrar
+        </button>
+        <button type="submit" value="submit" class="btn btn-primary">
+          Guardar
+        </button>
+      </div>
+      <!-- END Footer del ModalAsociarArchivo -->
+    </div>
+  </div>
+</div><!-- END Body del ModalGenerarHojaPedido -->
+</form>
+</div> <!-- END ModalGenerarHojaPedido -->
+
+
+<!-- ========== Modal para seleccionar la categoria del que se quiere obtener la hoja de pedido ========== -->
+<div id="modalGenerarHojaPedidoCategoria" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+  aria-labelledby="modalGenerarHojaPedidoCategoria" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalCategoria">
+          <strong>
+            Seleccione la categoria de la que desea obtener la hoja de pedido.
+          </strong>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+      </div>
+      <!-- END Cabecera del modalGenerarHojaPedido -->
+
+      <!-- Body del modalGenerarHojaPedido -->
+      <div class="modal-body">
+        <form id="formularioGenerarHojaPedidoCategoria" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="row justify-content-center"><div class="select col-4" >
+            <label for="idCategoriaHojaPedido"><strong>Seleccione la categoría</strong></label>
+            <select class="form-control form-select" id="idCategoriaHojaPedido" name="idCategoriaHojaPedido">
+              {% for categoria in categorias %}
+                  <option value="{{categoria.id}}">{{categoria.categoria}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          </div>
+      </div>
+
+      <!-- Footer del ModalAsociarArchivo -->
+      <div class="modal-footer d-flex">
+
+        <button id="cerrarHojaPedidoCategoria" type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cerrar
+        </button>
+        <button type="submit" value="submit" class="btn btn-primary">
+          Guardar
+        </button>
+      </div>
+      <!-- END Footer del ModalAsociarArchivo -->
+    </div>
+  </div>
+</div><!-- END Body del ModalGenerarHojaPedido -->
+</form>
+</div> <!-- END ModalGenerarHojaPedido -->
+
+<!-- ============= FORMULARIO Añadir Nuevo Item ============= -->
+<!-- formulario añadir Item  -->
+<div id="modalFormularioAddStock" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Stock</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioAddStock" action="/private/docLaruex/agregarStock" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="ubicacion">Ubicación</label>
+                <select class="form-select" data-rule="required" id="ubicacion" name="ubicacion">
+                  {% for ubicacion in ubicaciones %}
+                  <option value="{{ubicacion.id}}">
+                    {% if ubicacion.id__padre__nombre != None %}
+                    {% if ubicacion.id__padre %} [{{ ubicacion.id__padre__nombre}}] {% endif %} {{ubicacion.id__nombre}}
+                    {% else %}
+                    {{ubicacion.id__nombre}}
+                    {% endif %}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="estanteria">Estanteria</label>
+                <input required type="number" class="form-control" id="estanteria" placeholder="Ejemplo: 01" name="estanteria"
+                   pattern="[0-9]{1,3}"/>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="contenedor">Estante o Contenedor</label>
+                <input type="text" class="form-control" id="contenedor" name="contenedor" placeholder="Ejemplos: A, A01, A2"
+                   pattern="[A-Z]{1}[0-9]{0,2}"/>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="item">Nombre</label>
+                <input required type="text" class="form-control" id="item" placeholder="Bolígrafos azules"
+                  name="item" data-rule="required"/>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="cantidad">Cantidad</label>
+                <input type="number" step="0.25" class="form-control" id="cantidad" placeholder="4,25" name="cantidad"
+                  data-rule="required" />
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="unidad">Unidad</label>
+                <select class="form-select" data-rule="required" id="unidad" name="unidad">
+                  {% for unidad in unidades %}
+                  <option value="{{unidad.id}}">{{unidad.nombre}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="minCantidad">Cantidad Mínima</label>
+                <input type="number" step="0.25" class="form-control" id="minCantidad" placeholder="4,25" name="minCantidad"
+                  data-rule="required" />
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="categoria">Categoría</label>
+                <select class="form-select" data-rule="required" id="categoria" name="categoria">
+                  {% for categoria in categorias %}
+                  <option value="{{categoria.id}}">{{categoria.categoria}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="urgente">¿Es urgente?</label>
+                <select class="form-select" data-rule="required" id="urgente" name="urgente">
+                  <option value="0">No</option>
+                  <option value="1">Si</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="descripcionItem">Descripción</label>
+                <textarea type="text" class="form-control" id="descripcionItem" placeholder="Pilot punta fina"
+                  name="descripcionItem" data-rule="required"></textarea>
+              </div>
+            </div>
+          </div>
+            <div class="modal-footer">
+              <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+                Cerrar
+              </button>
+              <button id="reset" type="reset" class="btn btn-secondary" hidden>
+              </button>
+              <button type="submit" value="submit" class="btn btn-primary" >
+                Guardar
+              </button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div><!-- END formulario añadir Item  -->
+
+<!-- ============= FORMULARIO Agregar Stock de un item existente ============= -->
+<!-- formulario agregar stock  -->
+<div id="modalAgregarStock" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalAgregarStock"><strong>Agregar unidades</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalAgregarStock" action="/private/docLaruex/agregarUnidadesStock/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row d-flex justify-content-center">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="cantidadAgregada">Cantidad</label>
+                <input type="number" step="0.5" class="form-control" id="cantidadAgregada" name="cantidadAgregada"
+                  data-rule="required" placeholder="0" required/>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button id="cerrarAgregarStock"  data-dismiss="modal" hidden>Cerrar</button>
+
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancelAgregarStock" name="cancelAgregarStock" onclick="crearAviso('agregarUnidadesStockCancelar', 'No se ha podido agregar de unidades al stock', 'alert-warning', 3000)">Cancelar</button>
+
+            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('agregarUnidadesStockGuardar', 'Unidades agregadas con éxito', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- END formulario Agregar Stock  -->
+
+<!-- ============= FORMULARIO Retirar Stock ============= -->
+<!-- formulario retirar stock  -->
+<div id="modalRetirarStock" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalRetirarStock"><strong>Retirar Stock </strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalRetirarStock" action="/private/docLaruex/retirarStock/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+            <div class="row d-flex justify-content-center align-items-center">
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="fechaRetirada">Fecha de Retirada</label>
+                  <input type="date" id="fechaRetirada" name="fechaRetirada" class="form-control" required/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="cantidadRetirada">Cantidad</label>
+                  <input type="number" step="0.5" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
+                    data-rule="required" placeholder="0" required/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="empleadoQueRetira">Empleado</label>
+                  <select class="form-select"  id="empleadoQueRetira" name="empleadoQueRetira">
+                    {% for empleado in empleados %}
+                    <option data-tokens="{{empleado.first_name}}" value="{{empleado.id}}">
+                      {{empleado.first_name}} {{empleado.last_name}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col d-flex justify-content-center align-items-center">              
+                <div class="form-check my-auto align-items-center">
+                  <input class="form-check-input" type="checkbox" id="error" name="error">
+                  <label class="form-check-label" for="error" style="font-size: 1.2rem;">
+                    <i class="fa-duotone fa-triangle-exclamation" style="color: #ae2012"></i>
+                    Marcar si es retirarda por error
+                  </label>
+                </div>
+              </div>
+            </div>
+
+          <div class="modal-footer">
+            
+            <button id="cerrarRetirarStock"  data-dismiss="modal" hidden>Cerrar</button>
+
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancelRetirarStock" name="cancelRetirarStock" onclick="crearAviso('retirarUnidadesStockCancelar', 'No se ha podido agregar de unidades al stock', 'alert-warning', 3000)">Cancelar</button>
+
+            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('retirarUnidadesStockGuardar', 'Unidades agregadas con éxito', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- END formulario retirar Stock  -->
+
+<!-- ============= FORMULARIO Retirar Stock ============= -->
+<!-- formulario retirar stock  -->
+<div id="modalRetirarStockUbicacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalRetirarStockUbicacion"><strong>Retirar Stock a otra Ubicacion</strong></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalRetirarStockUbicacion" action="/private/docLaruex/retirarStockUbicacion/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+            <div class="row">
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="fechaRetirada">Fecha de Retirada</label>
+                  <input type="date" id="fechaRetirada" name="fechaRetirada" class="form-control" required/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="cantidadRetirada">Cantidad</label>
+                  <input type="number" step="0.5" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
+                    data-rule="required" placeholder="0" required/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="empleadoQueRetira">Empleado</label>
+                  <select class="form-select"  id="empleadoQueRetira" name="empleadoQueRetira">
+                    {% for empleado in empleados %}
+                    <option data-tokens="{{empleado.first_name}}" value="{{empleado.id}}">
+                      {{empleado.first_name}} {{empleado.last_name}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="nuevaUbicacion">Ubicacion</label>
+                  <select class="form-select"  id="nuevaUbicacion" name="nuevaUbicacion">
+                    {% for ubicacion in ubicaciones %}
+                    <option data-tokens="{{ubicacion.id}}" value="{{ubicacion.id}}">{% if ubicacion.id__padre %} [{{ ubicacion.id__padre__nombre}}] {% endif %} {{ubicacion.id__nombre}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          <div class="modal-footer">
+            <button id="cerrarRetirarStockUbicacion"  data-dismiss="modal" hidden>Cerrar</button>
+
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancelRetirarStockUbicacion" name="cancelRetirarStockUbicacion" onclick="crearAviso('retirarUnidadesStockUbicacionCancelar', 'No se ha podido retirar de unidades al stock', 'alert-warning', 3000)">Cancelar</button>
+
+            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('retirarUnidadesStockUbicacionGuardar', 'Unidades agregadas con éxito', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- END formulario retirar Stock  -->
+
+
+
+
+<!-- ============= FORMULARIO Agregar Stock de nuevo proveedor de un item existente ============= -->
+<!-- formulario agregar stock proveedor-->
+<div id="modalAgregarStockProveedor" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalAgregarStockProveedor"><strong>Agregar unidades de nuevo Proveedor</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalAgregarStockProveedor" action="/private/docLaruex/agregarUnidadesStockProveedor/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}            <div class="row d-flex justify-content-center">
+            <div class="col-4">
+              <div class="form-group">
+                <label for="fechaAgregarStockProveedor">Fecha de Compra</label>
+                <input type="date" class="form-control" id="fechaAgregarStockProveedor" name="fechaAgregarStockProveedor" data-rule="required" required/>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="proveedorAgregarStock">Proveedor</label>
+                <select class="form-select" data-rule="required" id="proveedorAgregarStock" name="proveedorAgregarStock">
+                  {% for proveedor in proveedores %}
+                  <option value="{{proveedor.id}}">
+                    {{proveedor.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center">
+            <div class="col-5">
+              <div class="form-group">
+                <label for="cantidadAgregadaProveedor">Cantidad</label>
+                <input type="number" step="0.01" class="form-control" id="cantidadAgregadaProveedor" name="cantidadAgregadaProveedor" data-rule="required" placeholder="0,01" required/>
+              </div>
+            </div>
+            <div class="col-5">
+              <div class="form-group">
+                <label for="costeAgregarStockProveedor">Precio</label>
+                <input type="number" step="0.01" class="form-control" id="costeAgregarStockProveedor" name="costeAgregarStockProveedor" data-rule="required" placeholder="0,01" required/>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button id="cerrarAgregarStockProveedor"  data-dismiss="modal" hidden>Cerrar</button>
+
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancelAgregarStockProveedor" name="cancelAgregarStockProveedor" onclick="crearAviso('agregarStockProveedorCancelar', 'No se ha podido agregar de stock de nuevo proveedor', 'alert-warning', 3000)">Cancelar</button>
+
+            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('agregarStockProveedorGuardar', 'Stock agregado con éxito', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- END formulario Agregar Stock Proveedor-->
+
+<!-- ============= FORMULARIO Retirar Stock ============= -->
+<!-- formulario retirar stock  -->
+<div id="modalRetirarStock" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalRetirarStock"><strong>Retirar Stock </strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalRetirarStock" action="/private/docLaruex/retirarStock/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+            <div class="row">
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="fechaRetirada">Fecha de Retirada</label>
+                  <input type="date" id="fechaRetirada" name="fechaRetirada" class="form-control" required/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="cantidadRetirada">Cantidad</label>
+                  <input type="number" step="0.5" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
+                    data-rule="required" placeholder="0" required/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="empleadoQueRetira">Empleado</label>
+                  <select class="form-select"  id="empleadoQueRetira" name="empleadoQueRetira">
+                    {% for empleado in empleados %}
+                    <option data-tokens="{{empleado.first_name}}" value="{{empleado.id}}">
+                      {{empleado.first_name}} {{empleado.last_name}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+  
+              </div>
+            </div>
+
+          <div class="modal-footer">
+            <button id="cerrarRetirarStock" type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancel" name="cancel" onclick="crearAviso('cambiarUbicacionEquipoCerrar', 'No se ha podido cambiar de ubicación el equipo {{ equipo.id.nombre }}', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('cambiarUbicacionEquipoGuardar', 'Equipo {{ equipo.id.nombre }} cambiado de ubicación', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- END formulario retirar Stock  -->
+
+<!-- ============= FORMULARIO Retirar Stock de Ubicación ============= -->
+<!-- formulario retirar stock Ubicación  -->
+<div id="modalRetirarStockUbicacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalRetirarStockUbicacion"><strong>Retirar Stock a otra Ubicacion</strong></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalRetirarStockUbicacion" action="/private/docLaruex/retirarStockUbicacion/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+            <div class="row">
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="fechaRetirada">Fecha de Retirada</label>
+                  <input type="date" id="fechaRetirada" name="fechaRetirada" class="form-control" required/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="cantidadRetirada">Cantidad</label>
+                  <input type="number" step="0.5" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
+                    data-rule="required" placeholder="0" required/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="empleadoQueRetira">Empleado</label>
+                  <select class="form-select"  id="empleadoQueRetira" name="empleadoQueRetira">
+                    {% for empleado in empleados %}
+                    <option data-tokens="{{empleado.first_name}}" value="{{empleado.id}}">
+                      {{empleado.first_name}} {{empleado.last_name}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="nuevaUbicacion">Ubicacion</label>
+                  <select class="form-select"  id="nuevaUbicacion" name="nuevaUbicacion">
+                    {% for ubicacion in ubicaciones %}
+                    <option data-tokens="{{ubicacion.id}}" value="{{ubicacion.id}}">{% if ubicacion.id__padre %} [{{ ubicacion.id__padre__nombre}}] {% endif %} {{ubicacion.id__nombre}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          <div class="modal-footer">
+            <button id="cerrarRetirarStockUbicacion" type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancel" name="cancel" onclick="crearAviso('cambiarUbicacionEquipoCerrar', 'No se ha podido cambiar de ubicación el equipo {{ equipo.id.nombre }}', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('cambiarUbicacionEquipoGuardar', 'Equipo {{ equipo.id.nombre }} cambiado de ubicación', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- END formulario retirar Stock Ubicación  -->
+
+
+<script type="text/javascript">
+
+  // =================== Tablas con lista de stock ========================
+  
+  $('#tabla_stock').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/listadoStockDatos",
+        cache: false,
+        columns: [{
+            title: 'Artículo',
+            field: 'item',
+            align: "center",
+        }, {
+            title: 'Cantidad',
+            field: 'cantidad',
+            align: "center",
+            sortable: "true",
+        }, {
+            title: 'Unidad',
+            field: 'unidad__nombre',
+            align: "center",
+            sortable: "true",
+        },{
+            title: 'Localizacion',
+            field: 'id_ubicacion__id__nombre',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              var localizacion = "Estante/Cajón " + row.num_contenedor + " del "+ row.id_ubicacion__id__nombre;
+              return (localizacion);
+            }
+        },{
+            title: 'Tipo de Inventario',
+            field: 'categoria__categoria',
+            align: "center",
+            sortable: "true",
+        },{
+            title: '',
+            field: 'min_cantidad',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              if (row.cantidad > row.min_cantidad) {
+                return (
+                  '<span class="badge badge-pill badge-success">Stock Suficiente</span>'
+                  
+                );
+                }if(row.cantidad= row.min_cantidad){
+                  return (
+                  '<span class="badge badge-pill badge-warning">Stock Minimo</span>'
+                  );
+                }else{
+                  return (
+                  '<span class="badge badge-pill badge-danger">Realizar pedido</span>'
+                  );
+                };
+              }
+        },{
+            title: "Acciones",
+            field: "action",
+            align: "center",
+            formatter: function (value, row) {
+              var admin = '{{administrador}}';
+
+              var editarItem = '<a href="/private/docLaruex/editarStock/' + row.id + '/" class="mx-1" title="Editar Item" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen fa-lg retirarStockUbicacion" ></i></a>';
+
+              var verStock = '<a href="/private/docLaruex/verItemStock/' + row.id + '/" class="mx-1" title="Ver stock del item"style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>'; 
+
+              var agregarStock = '<a href="" title="Agregar Stock" data-toggle="modal" data-target="#modalAgregarStock" onclick="$('+"'#formularioModalAgregarStock').attr('action', '/private/docLaruex/agregarUnidadesStock/"+ row.id +"/');"+'" class="mx-1" style="color: #eba43d"><i class="fa-duotone fa-grid-2-plus fa-lg descargaPDF"></i></a>';
+
+              var agregarStockProveedor = '<a href="" title="Agregar Stock nuevo Proveedor" data-toggle="modal" data-target="#modalAgregarStockProveedor" onclick="$('+"'#formularioModalAgregarStockProveedor').attr('action', '/private/docLaruex/agregarUnidadesStockProveedor/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-lg agregarFormacion"></i></a>';
+
+              var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/');"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
+
+              var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
+
+              if (admin == 'True'){
+                return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion +editarItem);
+              } else{
+                return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion);
+              }        
+            },
+        },
+    ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'id',
+        sortOrder: 'desc',
+
+    });
+
+  $('#tabla_stock_minimo').bootstrapTable({
+      method: 'get',
+      url: "/private/docLaruex/listadoStockMinimoDatos",
+      cache: false,
+      columns: [{
+          title: 'Artículo',
+          field: 'item',
+          align: "center",
+      },{
+          title: 'Unidad',
+          field: 'unidad__nombre',
+          align: "center",
+          sortable: "true",
+      }, {
+          title: 'Tipo de Inventario',
+          field: 'categoria__categoria',
+          align: "center",
+          sortable: "true",
+      },{
+          title: '',
+          field: 'min_cantidad',
+          align: "center",
+          sortable: "true",
+          formatter: function (value, row) {
+            if (row.cantidad > row.min_cantidad) {
+              return (
+                '<span class="badge badge-pill badge-success">Stock Suficiente</span>'
+                
+              );
+              }else{
+                return (
+                '<span class="badge badge-pill badge-warning">Stock Minimo</span>'
+                );
+              };
+            }
+      },{
+          title: "Acciones",
+          field: "action",
+          align: "center",
+          formatter: function (value, row) {
+            var admin = '{{administrador}}';
+
+            var editarItem = '<a href="/private/docLaruex/editarStock/' + row.id + '/" class="mx-1" title="Editar Item" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen fa-lg retirarStockUbicacion" ></i></a>';
+
+            var verStock = '<a href="/private/docLaruex/verItemStock/' + row.id + '/" class="mx-1" title="Ver stock del item"style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>'; 
+
+            var agregarStock = '<a href="" title="Agregar Stock" data-toggle="modal" data-target="#modalAgregarStock" onclick="$('+"'#formularioModalAgregarStock').attr('action', '/private/docLaruex/agregarUnidadesStock/"+ row.id +"/');"+'" class="mx-1" style="color: #eba43d"><i class="fa-duotone fa-grid-2-plus fa-lg descargaPDF"></i></a>';
+
+            var agregarStockProveedor = '<a href="" title="Agregar Stock nuevo Proveedor" data-toggle="modal" data-target="#modalAgregarStockProveedor" onclick="$('+"'#formularioModalAgregarStockProveedor').attr('action', '/private/docLaruex/agregarUnidadesStockProveedor/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-lg agregarFormacion"></i></a>';
+
+            var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/');"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
+
+            var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
+
+            if (admin == 'True'){
+              return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion +editarItem);
+            } else{
+              return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion);
+            }       
+          },
+      },
+  ],
+      locale: "es-ES",
+      search: true,
+      sortName: 'id',
+      sortOrder: 'desc',
+
+  });
+
+  $('#tabla_stock_fuera').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/listadoStockFueraDatos",
+        cache: false,
+        columns: [  {
+            title: 'Artículo',
+            field: 'item',
+            align: "center",
+        },{
+            title: 'Tipo de Inventario',
+            field: 'categoria__categoria',
+            align: "center",
+            sortable: "true",
+        },{
+            title: 'Urgente',
+            field: 'urgente',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              if (row.urgente != 0 ) {
+                  return (
+                  '<span class="badge badge-pill badge-danger">Realizar pedido</span>'
+                  );
+                }
+              else {
+                return (
+                '<span class="badge badge-pill badge-warning">No es urgente</span>'
+                );
+              };
+              }
+        },{
+            title: "Acciones",
+            field: "action",
+            align: "center",
+            formatter: function (value, row) {
+              var admin = '{{administrador}}';
+
+              var editarItem = '<a href="/private/docLaruex/editarStock/' + row.id + '/" class="mx-1" title="Editar Item" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen fa-lg retirarStockUbicacion" ></i></a>';
+
+              var verStock = '<a href="/private/docLaruex/verItemStock/' + row.id + '/" class="mx-1" title="Ver stock del item"style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>'; 
+
+              var agregarStock = '<a href="" title="Agregar Stock" data-toggle="modal" data-target="#modalAgregarStock" onclick="$('+"'#formularioModalAgregarStock').attr('action', '/private/docLaruex/agregarUnidadesStock/"+ row.id +"/');"+'" class="mx-1" style="color: #eba43d"><i class="fa-duotone fa-grid-2-plus fa-lg descargaPDF"></i></a>';
+
+              var agregarStockProveedor = '<a href="" title="Agregar Stock nuevo Proveedor" data-toggle="modal" data-target="#modalAgregarStockProveedor" onclick="$('+"'#formularioModalAgregarStockProveedor').attr('action', '/private/docLaruex/agregarUnidadesStockProveedor/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-lg agregarFormacion"></i></a>';
+
+              var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/');"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
+
+              var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
+
+              if (admin == 'True'){
+                return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion +editarItem);
+              } else{
+                return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion);
+              }       
+            },
+        },
+    ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'id',
+        sortOrder: 'desc',
+
+    });
+  
+  $('#tabla_stock_por_almacen').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/listadoStockDatos",
+    cache: false,
+    columns: [{
+        title: 'Cantidad',
+        field: 'cantidad',
+        align: "center",
+        sortable: "true",
+    }, {
+        title: 'Unidad',
+        field: 'unidad__nombre',
+        align: "center",
+        sortable: "true",
+    }, {
+        title: 'Artículo',
+        field: 'item',
+        align: "center",
+    },{
+        title: 'Tipo de Inventario',
+        field: 'categoria__categoria',
+        align: "center",
+        sortable: "true",
+    },{
+        title: '',
+        field: 'min_cantidad',
+        align: "center",
+        sortable: "true",
+        formatter: function (value, row) {
+          if (row.cantidad > row.min_cantidad) {
+            return (
+              '<span class="badge badge-pill badge-success">Stock Suficiente</span>'
+              
+            );
+            }if(row.cantidad= row.min_cantidad){
+              return (
+              '<span class="badge badge-pill badge-warning">Stock Minimo</span>'
+              );
+            }else{
+              return (
+              '<span class="badge badge-pill badge-danger">Realizar pedido</span>'
+              );
+            };
+          }
+    },{
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          var admin = '{{administrador}}';
+
+          var editarItem = '<a href="/private/docLaruex/editarStock/' + row.id + '/" class="mx-1" title="Editar Item" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen fa-lg retirarStockUbicacion" ></i></a>';
+
+
+          var verStock = '<a href="/private/docLaruex/verItemStock/' + row.id + '/" class="mx-1" title="Ver stock del item"style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>'; 
+
+          var agregarStock = '<a href="" title="Agregar Stock" data-toggle="modal" data-target="#modalAgregarStock" onclick="$('+"'#formularioModalAgregarStock').attr('action', '/private/docLaruex/agregarUnidadesStock/"+ row.id +"/');"+'" class="mx-1" style="color: #eba43d"><i class="fa-duotone fa-grid-2-plus fa-lg descargaPDF"></i></a>';
+
+          var agregarStockProveedor = '<a href="" title="Agregar Stock nuevo Proveedor" data-toggle="modal" data-target="#modalAgregarStockProveedor" onclick="$('+"'#formularioModalAgregarStockProveedor').attr('action', '/private/docLaruex/agregarUnidadesStockProveedor/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-lg agregarFormacion"></i></a>';
+
+          var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/');"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
+
+          var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
+
+          if (admin == 'True'){
+            return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion +editarItem);
+          } else{
+            return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion);
+          }        
+        },
+    },
+  ],
+      locale: "es-ES",
+      search: true,
+      sortName: 'id',
+      sortOrder: 'desc',
+
+  });
+
+  function getSelecionados (){
+    // get value of selected  element in select box
+    var idAlmacen = document.getElementById("idAlmacen").value;
+
+    // actualizar la tabla con los seleccionados
+    $("#tabla_stock_por_almacen").bootstrapTable('refresh', {url: "/private/docLaruex/stockDatosAlmacen/" + idAlmacen + "/"});
+  }
+
+  function getCategoriaSeleciona (){
+    // get value of selected  element in select box
+    var idCategoria = document.getElementById("idCategoria").value;
+
+    // actualizar la tabla con los seleccionados
+    $("#tabla_stock").bootstrapTable('refresh', {url: "/private/docLaruex/stockDatosCategoria/" + idCategoria + "/"});
+  }
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  $("#formularioGenerarHojaPedido").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    id_almacen = document.getElementById("idAlmacenHojaPedido").value;
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Hoja de pedido creada con éxito', 'alert-success', 2000)
+        window.location.href = "/private/docLaruex/hojaPedidoStockAlmacen/"+ id_almacen +"/";
+        
+      }
+    });
+  });
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  $("#formularioGenerarHojaPedidoCategoria").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    id_categoria = document.getElementById("idCategoriaHojaPedido").value;
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Hoja de pedido creada con éxito', 'alert-success', 2000)
+        window.location.href = "/private/docLaruex/hojaPedidoStockCategoria/"+ id_categoria +"/";
+        
+      }
+    });
+  });
+
+
+
+
+  </script><!--collapse con listado de equipos asociados a la estación -->
+{% endblock %}

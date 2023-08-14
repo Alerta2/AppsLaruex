@@ -1,0 +1,61 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Editar Notificación {{notificacion.titulo}}</h5>
+    
+    <form class="row g-3" id="formularioEditarNotificacion"method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Multi Columns Form -->
+      <div class="col-md-12">
+        <label for="nuevoTitulo" class="form-label">Título</label>
+        <input type="text" class="form-control" name="nuevoTitulo" id="nuevoTitulo" value="{{notificacion.titulo}}" pattern="[a-zA-Z\w\s]{1,255}">
+      </div>
+
+      <div class="col-12">
+        <label for="nuevoResumen" class="form-label">Resumen</label>
+        
+        <textarea class="form-control" name="nuevoResumen" id="nuevoResumen" rows="5" 
+        placeholder="Añade aquí los comentarios" >{{notificacion.resumen}}</textarea>
+      </div>
+      <div class="text-center">
+        <button type="reset" class="btn btn-secondary" onclick="location.href='/private/docLaruex/notificaciones'">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form><!-- End Multi Columns Form -->
+
+  </div>
+</div>
+
+<script>
+// cambiamos la funcionalidad del boton submit del formulario
+$("#formularioEditarNotificacion").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarNotificacion/{{notificacion.id}}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Notificación modificada con éxito', 'alert-success', 2000);
+        setTimeout(function () {
+          window.location.href = "/private/docLaruex/verNotificacion/{{notificacion.id}}/";
+        }, 1000);
+      }
+    });
+  });
+
+</script>
+
+{% endblock %}

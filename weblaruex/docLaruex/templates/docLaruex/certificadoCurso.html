@@ -1,0 +1,156 @@
+{% extends "base/base_docLaruex.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<html>
+  <head>
+    <style>
+  
+      /*--------------------------------------------------------------
+      # Diseño del papel
+      --------------------------------------------------------------*/
+      @page { 
+            size: A4 landscape;
+        } 
+      @media print {
+        html, body {
+          width: 210mm;
+          height: 297mm;
+        }
+        
+        p.saltoPagina {
+          page-break-after: always;
+          color: None;
+        }
+        #wrapper {
+        position: absolute;
+        overflow: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        border: 10px solid #027F84;       
+
+        
+      }
+
+      #wrapper2{
+        height: auto;
+        position: absolute;
+        overflow: auto;
+        left: auto;
+        right: auto;
+        top: auto;
+        bottom: auto;
+        margin: auto;
+        padding: auto;
+        border: 10px solid #027F84;
+      }
+      
+      
+  }
+  
+
+    </style>
+  </head>
+  
+  <body>
+    <div class="my-auto" id="wrapper" >
+      <div class="d-flex justify-content-end p-4" >
+        <img src="{% static 'niceAdminAssets' %}/img/laruex.png" class="img-fluid d-flex justify-content-end" alt="Responsive image" style=" max-width: 100px;"/>
+      </div>
+      <div>
+        <h4 class="font-weight-bold text-secondary text-center " >EL LABORATORIO DE RADIACTIVIDAD AMBIENTAL DE LA UNIVERSIDAD DE EXTREMADURA CERTIFICA QUE </h4>
+      </div>
+      <div>
+        <h3 class="font-weight-bold text-info text-center" style="font-size: clamp(1.5rem, 13.3vw - 4.3rem, 3rem);">D./Dña. Sandra Balás Sánchez</h3>
+      </div>
+      <div class="p-4">
+        <h5 class="text-secondary text-center"> Ha participado en calidad de alumno/a y ha completado el curso</h5>
+        <h4 class="font-weight-bold text-secondary text-center text-uppercase" >{{ curso.id.nombre }}</h4>
+
+      </div>
+      <div class="d-flex justify-content-center">
+        <table>
+          <tr scope="row">
+            <th scope="col">
+              <i class="fa-solid fa-clock p-2" style="color: #02383a;" > </i>
+            </th>
+            <td>
+              {{ curso.horas|floatformat:0 }} Horas
+            </td>
+          </tr>
+          <tr  scope="row">
+            <th scope="col">
+              <i class="fa-solid fa-calendar-days p-2" style="color: #02383a;"></i>
+            </th>
+            <td>
+              Del {{curso.fecha_inicio|date:'j'}} al {{curso.fecha_fin}}
+            </td>
+          </tr>
+          <tr  scope="row">
+            <th scope="col">
+              <i class="fa-solid fa-location-dot p-2" style="color: #02383a;"></i>
+            </th>
+            <td>
+              Centro Hispano Luso de Alertas Tempranas (ALERTA2)
+            </td>
+          </tr>
+        </table>
+          <table class="d-flex justify-content-end px-5">
+            <tr>
+              <th class="p-3">
+                <img src="{% static 'niceAdminAssets' %}/img/firma.png" class="img-fluid" alt="Responsive image" style=" max-width: 80px;">
+                <p class="text-center"> Yolanda Miralles</p>
+              </th>
+              <th class="p-3">
+                <img src="{% static 'niceAdminAssets' %}/img/firma.png" class="img-fluid d-flex justify-content-center " alt="Responsive image" style=" max-width: 80px;">
+                <p class="text-center"> Juan Baeza</p>
+              </img>
+              </th>
+            </tr>
+          </table>
+      </div>
+      <div class="d-flex justify-content-center p-4">
+
+        <h5 class="text-secondary text-center" >{{ curso.patrocinadores.nombre }} -- Financiado por el Proyecto del programa INTERREG-POCTEP 0017 RAT VA PC 4 E y organizado por los Beneficiarios de la Universidad de Extremadura. </h5>
+
+      </div>
+    </div>
+      <p class="saltoPagina"></p>
+    <div id="wrapper2" style="top: auto; bottom: auto;  right: auto;  left: auto;">
+      <div class="d-flex justify-content-end p-4 " >
+        <img src="{% static 'niceAdminAssets' %}/img/laruex.png" class="img-fluid d-flex justify-content-end" alt="Responsive image" style=" max-width: 100px;"/>
+      </div>
+      <div>
+        <p class="text-center p-2" >
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eros elit, interdum non lectus sit amet, hendrerit elementum sapien. Vivamus ullamcorper augue nulla, sed efficitur odio scelerisque at. Ut nec porttitor dui, eu ullamcorper enim. Vivamus dolor ante, ultrices ut facilisis eget, fermentum nec diam. In a nulla quam. Phasellus ac neque risus. Nunc lacinia dictum rutrum. Morbi vulputate, purus vel egestas facilisis, massa quam venenatis erat, sit amet faucibus tellus mi eu augue. Suspendisse ullamcorper metus sed interdum aliquam. Integer placerat molestie lorem, at porttitor est auctor non. Donec eu enim ut magna hendrerit aliquam vel in tellus. Nam vitae augue molestie, consequat enim nec, lacinia ipsum. Fusce id faucibus dolor, id congue diam. Fusce aliquet neque at dui tincidunt, in condimentum eros placerat.
+
+          Proin tincidunt facilisis interdum. Donec maximus, ex non ultrices elementum, turpis metus facilisis augue, in iaculis purus arcu vel ante. Aenean et pulvinar urna, sed aliquam nisi. Cras tortor quam, convallis in imperdiet in, euismod faucibus nibh. Nunc euismod, ligula elementum feugiat consectetur, nisi metus mollis nibh, sed cursus odio mauris id nisl. Vivamus mauris felis, pretium in tristique eu, ultrices eget turpis. Ut non elementum arcu, non consequat augue. Etiam lacinia non felis quis dignissim. Sed ipsum sem, elementum quis aliquet in, pharetra sit amet enim. Curabitur non mauris sit amet eros efficitur iaculis. 
+        </p>
+        <p class="text-center p-2" >
+          {{curso.resumen}}
+        </p>
+
+      </div>
+
+    </div>
+    
+  </body>
+
+</html>
+
+
+{% endblock %}
+
+<script>
+  function editar(){
+    document.getElementById('wrapper2').contentEditable = 'true';
+    document.getElementById('wrapper2').designMode='on';
+  }
+    window.onload=function(){
+      editar();
+  }
+</script>

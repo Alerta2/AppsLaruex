@@ -1,0 +1,67 @@
+{% load static %}
+<!-- ======= news Section ======= -->
+<div id="blog" class="blog-area">
+  <div class="blog-inner area-padding">
+    <div class="blog-overly"></div>
+    <div class="container" data-aos="fade-up">
+      <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="section-title">
+            <h2>Novedades</h2>
+            <p>Últimas Noticias</p>
+          </div>
+        </div>
+      </div>
+      <div class="row" data-aos="zoom-in" data-aos-delay="100">
+        {% for noticia in noticias %}
+        <!-- Start Left news -->
+        <div class="col-md-4 col-sm-12 col-xs-12 my-2">
+          <div class="single-blog ">
+            <div class="single-blog-img">
+              <div style="width:100%; height:200px; background: url('{% static "img/news/" %}{{ noticia.img_portada }}') no-repeat; background-size: contain; background-position: center;"></div>
+
+            </div>
+            <div class="blog-meta">
+              <span class="comments-type">
+                <i class="icofont-speech-comments"></i>
+               <!-- <a href="#noticia{{ noticia.id }}">{{ noticia.n_comentarios }} comentarios</a> -->
+              </span>
+              <span class="date-type">
+                <i class="icofont-ui-calendar"></i>{{ noticia.fecha }}
+              </span>
+            </div>
+            <div class="blog-text">
+              <h4 class="text-center">
+                <a href="{% url 'public:publicNoticia' id=noticia.id%}">{{ noticia.titulo }}</a>
+              </h4>
+              <p class="text-center" >
+                {{ noticia.resumen|safe|slice:"0:200" }}
+                {% if noticia.resumen|safe|length > 200 %}
+                    ...
+                {% endif %}
+              </p>
+            </div>
+            <span class="d-flex justify-content-center">
+              {% if noticia.resumen|length > 200 or noticia.noticia%}
+                    <a href="{% url 'public:publicNoticia' id=noticia.id%}" class="ready-btn">Leer más</a>
+              {% endif %}
+            </span>
+          </div>
+          <!-- Start single blog -->
+        </div>
+        <!-- End Left Blog-->
+      {% endfor %}
+
+
+
+    </div>
+    <div class="d-flex justify-content-center my-4">
+      <button class="btnVerTodo"><a href="{% url 'public:publicNoticias' %}"> Ver Todas las noticias</a></button>
+    </div>
+
+  </div>
+
+
+  </div>
+</div><!-- End news Section -->
+
