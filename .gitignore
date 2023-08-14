@@ -6,7 +6,7 @@
 
 
 # Ignorar archivos específicos
-weblaruex/weblaruex/setting.py
+weblaruex/weblaruex/settings.py
 weblaruex/weblaruex/*.save*
 weblaruex/config.ini
 
