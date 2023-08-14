@@ -78,6 +78,7 @@
         {% if paginas.has_other_pages %}
         <nav aria-label="Page navigation">
             <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="?page=1">Primera</a></li>
                 {% if paginas.has_previous %}
                   <li class="page-item"><a class="page-link" href="?page={{ paginas.previous_page_number }}">&laquo;</a></li>
                 {% else %}
@@ -97,6 +98,7 @@
                 {% else %}
                   <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
                 {% endif %}
+                <li class="page-item"><a class="page-link" href="?page=0">Última</a></li>
             </ul>
         </nav>
 {% endif %}

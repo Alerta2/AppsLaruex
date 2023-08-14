@@ -184,124 +184,6 @@ class DatosCorregidosGraficas(models.Model):
         managed = False
         db_table = 'datos_corregidos_graficas'
 
-
-
-class DatosMonitorizables(models.Model):
-    estacion_id = models.IntegerField(db_column='ESTACION_ID', primary_key=True)  # Field name made lowercase.
-    can_det_est = models.IntegerField(db_column='CAN_DET_EST')  # Field name made lowercase.
-    isotopo_id = models.ForeignKey('Isotopos', models.DO_NOTHING, db_column='ISOTOPO_ID')  # Field name made lowercase.
-    portugal = models.IntegerField(db_column='PORTUGAL', blank=True, null=True)  # Field name made lowercase.
-    csn = models.IntegerField(db_column='CSN', blank=True, null=True)  # Field name made lowercase.
-    min_sd_csn = models.IntegerField(db_column='MIN_SD_CSN', blank=True, null=True)  # Field name made lowercase.
-    csn_f_ult_valor = models.DateTimeField(db_column='CSN_F_ULT_VALOR', blank=True, null=True)  # Field name made lowercase.
-    sd_activo = models.IntegerField(db_column='SD_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    minutos_sd = models.IntegerField(db_column='MINUTOS_SD', blank=True, null=True)  # Field name made lowercase.
-    f_ini_sin_datos = models.DateTimeField(db_column='F_INI_SIN_DATOS', blank=True, null=True)  # Field name made lowercase.
-    sd_sms_env = models.IntegerField(db_column='SD_SMS_ENV', blank=True, null=True)  # Field name made lowercase.
-    med_anio_ant = models.FloatField(db_column='MED_ANIO_ANT', blank=True, null=True)  # Field name made lowercase.
-    med_amd_anio_ant = models.FloatField(db_column='MED_AMD_ANIO_ANT', blank=True, null=True)  # Field name made lowercase.
-    n1_activo = models.IntegerField(db_column='N1_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    factor_n1 = models.FloatField(db_column='FACTOR_N1', blank=True, null=True)  # Field name made lowercase.
-    f_i_niv_1 = models.DateTimeField(db_column='F_I_NIV_1', blank=True, null=True)  # Field name made lowercase.
-    n1_sms_env = models.IntegerField(db_column='N1_SMS_ENV', blank=True, null=True)  # Field name made lowercase.
-    n2_activo = models.IntegerField(db_column='N2_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    factor_n2 = models.FloatField(db_column='FACTOR_N2', blank=True, null=True)  # Field name made lowercase.
-    f_i_niv_2 = models.DateTimeField(db_column='F_I_NIV_2', blank=True, null=True)  # Field name made lowercase.
-    n2_sms_env = models.IntegerField(db_column='N2_SMS_ENV', blank=True, null=True)  # Field name made lowercase.
-    n3_activo = models.IntegerField(db_column='N3_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    factor_n3 = models.FloatField(db_column='FACTOR_N3', blank=True, null=True)  # Field name made lowercase.
-    f_i_niv_3 = models.DateTimeField(db_column='F_I_NIV_3', blank=True, null=True)  # Field name made lowercase.
-    n3_sms_env = models.IntegerField(db_column='N3_SMS_ENV', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'datos_monitorizables'
-        unique_together = (('estacion_id', 'can_det_est', 'isotopo_id'),)
-
-
-class DatosMonitorizablesCanales(models.Model):
-    estacion_id = models.ForeignKey('Estaciones', models.DO_NOTHING, db_column='ESTACION_ID')  # Field name made lowercase.
-    can_det_est = models.ForeignKey('Canales', models.DO_NOTHING, db_column='CAN_DET_EST')  # Field name made lowercase.
-    isotopo_id = models.ForeignKey('Isotopos', models.DO_NOTHING, db_column='ISOTOPO_ID')  # Field name made lowercase.
-    csn = models.IntegerField(db_column='CSN', blank=True, null=True)  # Field name made lowercase.
-    min_sd_csn = models.IntegerField(db_column='MIN_SD_CSN', blank=True, null=True)  # Field name made lowercase.
-    csn_f_ult_valor = models.DateTimeField(db_column='CSN_F_ULT_VALOR', blank=True, null=True)  # Field name made lowercase.
-    sd_activo = models.IntegerField(db_column='SD_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    minutos_sd = models.IntegerField(db_column='MINUTOS_SD', blank=True, null=True)  # Field name made lowercase.
-    f_ini_sin_datos = models.DateTimeField(db_column='F_INI_SIN_DATOS', blank=True, null=True)  # Field name made lowercase.
-    sd_sms_env = models.IntegerField(db_column='SD_SMS_ENV', blank=True, null=True)  # Field name made lowercase.
-    med_anio_ant = models.FloatField(db_column='MED_ANIO_ANT', blank=True, null=True)  # Field name made lowercase.
-    med_amd_anio_ant = models.FloatField(db_column='MED_AMD_ANIO_ANT', blank=True, null=True)  # Field name made lowercase.
-    niveles_activo = models.IntegerField(db_column='NIVELES_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    sms_enviado = models.IntegerField(db_column='SMS_ENVIADO', blank=True, null=True)  # Field name made lowercase.
-    f_ini_nivel = models.DateTimeField(db_column='F_INI_NIVEL', blank=True, null=True)  # Field name made lowercase.
-    factor_n1 = models.FloatField(db_column='FACTOR_N1', blank=True, null=True)  # Field name made lowercase.
-    factor_n2 = models.FloatField(db_column='FACTOR_N2', blank=True, null=True)  # Field name made lowercase.
-    factor_n3 = models.FloatField(db_column='FACTOR_N3', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'config_monitoriza'
-        unique_together = (('estacion_id', 'can_det_est', 'isotopo_id'),)
-        
-
-class DatosMonitorizablesDetectores(models.Model):
-    estacion_id = models.ForeignKey('Estaciones', models.DO_NOTHING, db_column='ESTACION_ID', primary_key=True)  # Field name made lowercase.
-    can_det_est = models.ForeignKey('RelacionDetectoresEstacion', models.DO_NOTHING,db_column='CAN_DET_EST')  # Field name made lowercase.
-    isotopo_id = models.ForeignKey('Isotopos', models.DO_NOTHING, db_column='ISOTOPO_ID')  # Field name made lowercase.
-    csn = models.IntegerField(db_column='CSN', blank=True, null=True)  # Field name made lowercase.
-    min_sd_csn = models.IntegerField(db_column='MIN_SD_CSN', blank=True, null=True)  # Field name made lowercase.
-    csn_f_ult_valor = models.DateTimeField(db_column='CSN_F_ULT_VALOR', blank=True, null=True)  # Field name made lowercase.
-    sd_activo = models.IntegerField(db_column='SD_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    minutos_sd = models.IntegerField(db_column='MINUTOS_SD', blank=True, null=True)  # Field name made lowercase.
-    f_ini_sin_datos = models.DateTimeField(db_column='F_INI_SIN_DATOS', blank=True, null=True)  # Field name made lowercase.
-    sd_sms_env = models.IntegerField(db_column='SD_SMS_ENV', blank=True, null=True)  # Field name made lowercase.
-    med_anio_ant = models.FloatField(db_column='MED_ANIO_ANT', blank=True, null=True)  # Field name made lowercase.
-    med_amd_anio_ant = models.FloatField(db_column='MED_AMD_ANIO_ANT', blank=True, null=True)  # Field name made lowercase.
-    niveles_activo = models.IntegerField(db_column='NIVELES_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    sms_enviado = models.IntegerField(db_column='SMS_ENVIADO', blank=True, null=True)  # Field name made lowercase.
-    f_ini_nivel = models.DateTimeField(db_column='F_INI_NIVEL', blank=True, null=True)  # Field name made lowercase.
-    factor_n1 = models.FloatField(db_column='FACTOR_N1', blank=True, null=True)  # Field name made lowercase.
-    factor_n2 = models.FloatField(db_column='FACTOR_N2', blank=True, null=True)  # Field name made lowercase.
-    factor_n3 = models.FloatField(db_column='FACTOR_N3', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'config_monitoriza'
-        unique_together = (('estacion_id', 'can_det_est', 'isotopo_id'),)
-
-class DatosMonitoriza(models.Model):
-    estacion = models.OneToOneField('Estaciones', models.DO_NOTHING, db_column='ESTACION_ID', primary_key=True)  # Field name made lowercase.
-    can_det_est = models.IntegerField(db_column='CAN_DET_EST')  # Field name made lowercase.
-    isotopo = models.ForeignKey('Isotopos', models.DO_NOTHING, db_column='ISOTOPO_ID')  # Field name made lowercase.
-    portugal = models.IntegerField(db_column='PORTUGAL', blank=True, null=True)  # Field name made lowercase.
-    csn = models.IntegerField(db_column='CSN', blank=True, null=True)  # Field name made lowercase.
-    min_sd_csn = models.IntegerField(db_column='MIN_SD_CSN', blank=True, null=True)  # Field name made lowercase.
-    csn_f_ult_valor = models.DateTimeField(db_column='CSN_F_ULT_VALOR', blank=True, null=True)  # Field name made lowercase.
-    sd_activo = models.IntegerField(db_column='SD_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    minutos_sd = models.IntegerField(db_column='MINUTOS_SD', blank=True, null=True)  # Field name made lowercase.
-    f_ini_sin_datos = models.DateTimeField(db_column='F_INI_SIN_DATOS', blank=True, null=True)  # Field name made lowercase.
-    sd_sms_env = models.IntegerField(db_column='SD_SMS_ENV', blank=True, null=True)  # Field name made lowercase.
-    med_anio_ant = models.FloatField(db_column='MED_ANIO_ANT', blank=True, null=True)  # Field name made lowercase.
-    med_amd_anio_ant = models.FloatField(db_column='MED_AMD_ANIO_ANT', blank=True, null=True)  # Field name made lowercase.
-    n1_activo = models.IntegerField(db_column='N1_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    factor_n1 = models.FloatField(db_column='FACTOR_N1', blank=True, null=True)  # Field name made lowercase.
-    f_i_niv_1 = models.DateTimeField(db_column='F_I_NIV_1', blank=True, null=True)  # Field name made lowercase.
-    n1_sms_env = models.IntegerField(db_column='N1_SMS_ENV', blank=True, null=True)  # Field name made lowercase.
-    n2_activo = models.IntegerField(db_column='N2_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    factor_n2 = models.FloatField(db_column='FACTOR_N2', blank=True, null=True)  # Field name made lowercase.
-    f_i_niv_2 = models.DateTimeField(db_column='F_I_NIV_2', blank=True, null=True)  # Field name made lowercase.
-    n2_sms_env = models.IntegerField(db_column='N2_SMS_ENV', blank=True, null=True)  # Field name made lowercase.
-    n3_activo = models.IntegerField(db_column='N3_ACTIVO', blank=True, null=True)  # Field name made lowercase.
-    factor_n3 = models.FloatField(db_column='FACTOR_N3', blank=True, null=True)  # Field name made lowercase.
-    f_i_niv_3 = models.DateTimeField(db_column='F_I_NIV_3', blank=True, null=True)  # Field name made lowercase.
-    n3_sms_env = models.IntegerField(db_column='N3_SMS_ENV', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'datos_monitoriza'
-        unique_together = (('estacion', 'can_det_est', 'isotopo'),)
-
 class ConfigMonitoriza(models.Model):
     estacion = models.OneToOneField('Estaciones', models.DO_NOTHING, db_column='ESTACION_ID', primary_key=True)  # Field name made lowercase.
     can_det_est = models.IntegerField(db_column='CAN_DET_EST')  # Field name made lowercase.
@@ -329,7 +211,7 @@ class ConfigMonitoriza(models.Model):
 
 class ConfigMonitorizaCanales(models.Model):
     estacion = models.OneToOneField('Estaciones', models.DO_NOTHING, db_column='ESTACION_ID', primary_key=True)  # Field name made lowercase.
-    can_det_est = models.ForeignKey('RelacionDetectoresEstacion', models.DO_NOTHING,db_column='CAN_DET_EST')  # Field name made lowercase.
+    can_det_est = models.ForeignKey('Canales', models.DO_NOTHING, db_column='CAN_DET_EST')  # Field name made lowercase.
     isotopo = models.ForeignKey('Isotopos', models.DO_NOTHING, db_column='ISOTOPO_ID')  # Field name made lowercase.
     csn = models.IntegerField(db_column='CSN', blank=True, null=True)  # Field name made lowercase.
     min_sd_csn = models.IntegerField(db_column='MIN_SD_CSN', blank=True, null=True)  # Field name made lowercase.
@@ -354,7 +236,7 @@ class ConfigMonitorizaCanales(models.Model):
 
 class ConfigMonitorizaDetectores(models.Model):
     estacion = models.OneToOneField('Estaciones', models.DO_NOTHING, db_column='ESTACION_ID', primary_key=True)  # Field name made lowercase.
-    can_det_est = models.IntegerField(db_column='CAN_DET_EST')  # Field name made lowercase.
+    can_det_est = models.ForeignKey('RelacionDetectoresEstacion', models.DO_NOTHING,db_column='CAN_DET_EST')  # Field name made lowercase.
     isotopo = models.ForeignKey('Isotopos', models.DO_NOTHING, db_column='ISOTOPO_ID')  # Field name made lowercase.
     csn = models.IntegerField(db_column='CSN', blank=True, null=True)  # Field name made lowercase.
     min_sd_csn = models.IntegerField(db_column='MIN_SD_CSN', blank=True, null=True)  # Field name made lowercase.

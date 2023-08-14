@@ -1459,14 +1459,14 @@ def consultarGraficas(id_grupo, id_subgrupo):
 
                     if datosMonitorizados is None:
                         if serieConf.tabla == 'Espec':
-                            datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id,
-                                                                                                  can_det_est=configGrafica.detector,
-                                                                                                  isotopo_id=serieConf.canal, n1_activo=1)
+                            # datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id, can_det_est=configGrafica.detector, isotopo_id=serieConf.canal, n1_activo=1)
+                            datosMonitorizados = ConfigMonitoriza.objects.using('rvra').filter(estacion__id=est.id, can_det_est=configGrafica.detector, isotopo__id=serieConf.canal)
+                            
                         elif serieConf.tabla == 'EspecAcum':
                             datosMonitorizados = []
                         else:
-                            datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id,
-                                                                                                  can_det_est=serieConf.canal, n1_activo=1)
+                            # datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id, can_det_est=serieConf.canal, n1_activo=1)
+                            datosMonitorizados = ConfigMonitoriza.objects.using('rvra').filter(estacion__id=est.id, can_det_est=serieConf.canal)
                         if len(datosMonitorizados) > 0:
                             seriesMonitorizadas = seriesMonitoriza(datosMonitorizados[0], fechas)
 
@@ -1505,14 +1505,13 @@ def consultarGraficas(id_grupo, id_subgrupo):
 
                 if datosMonitorizados is None:
                     if serieConf.tabla == 'Espec':
-                        datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id,
-                                                                                              can_det_est=configGrafica.detector,
-                                                                                              isotopo_id__id=serieConf.canal, n1_activo=1)
+                        # datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id, can_det_est=configGrafica.detector, isotopo_id__id=serieConf.canal, n1_activo=1)
+                        datosMonitorizados = ConfigMonitoriza.objects.using('rvra').filter(estacion__id=est.id, can_det_est=configGrafica.detector, isotopo__id=serieConf.canal)
                     elif serieConf.tabla == 'EspecAcum':
                         datosMonitorizados = []
                     else:
-                        datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id,
-                                                                                              can_det_est=serieConf.canal, n1_activo=1)
+                        # datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id, can_det_est=serieConf.canal, n1_activo=1)
+                        datosMonitorizados = ConfigMonitoriza.objects.using('rvra').filter(estacion__id=est.id, can_det_est=serieConf.canal)
 
                     if len(datosMonitorizados) > 0:
                         seriesMonitorizadas = seriesMonitoriza(datosMonitorizados[0], fechas)
@@ -1567,16 +1566,13 @@ def getChartReload(request, id_chart):
 
             if datosMonitorizados is None:
                 if serieConf.tabla == 'Espec':
-                    datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id,
-                                                                                          can_det_est=config.detector,
-                                                                                          isotopo_id=serieConf.canal,
-                                                                                          n1_activo=1)
+                    # datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id, can_det_est=config.detector, isotopo_id=serieConf.canal,  n1_activo=1)
+                    datosMonitorizados = ConfigMonitoriza.objects.using('rvra').filter(estacion__id=est.id, can_det_est=config.detector, isotopo__id=serieConf.canal)
                 elif serieConf.tabla == 'EspecAcum':
                     datosMonitorizados = []
                 else:
-                    datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id,
-                                                                                          can_det_est=serieConf.canal,
-                                                                                          n1_activo=1)
+                    # datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id, can_det_est=serieConf.canal, n1_activo=1)
+                    datosMonitorizados = ConfigMonitoriza.objects.using('rvra').filter(estacion__id=est.id, can_det_est=serieConf.canal)
                 if len(datosMonitorizados) > 0:
                     seriesMonitorizadas = seriesMonitoriza(datosMonitorizados[0], fechas)
 
@@ -1615,16 +1611,13 @@ def getChartReload(request, id_chart):
 
         if datosMonitorizados is None:
             if serieConf.tabla == 'Espec':
-                datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id,
-                                                                                      can_det_est=config.detector,
-                                                                                      isotopo_id=serieConf.canal,
-                                                                                      n1_activo=1)
+                #datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id, can_det_est=config.detector,  isotopo_id=serieConf.canal, n1_activo=1)
+                datosMonitorizados = ConfigMonitoriza.objects.using('rvra').filter(estacion__id=est.id, can_det_est=config.detector, isotopo__id=serieConf.canal)
             elif serieConf.tabla == 'EspecAcum':
                 datosMonitorizados = []
             else:
-                datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id,
-                                                                                      can_det_est=serieConf.canal,
-                                                                                      n1_activo=1)
+                #datosMonitorizados = DatosMonitorizables.objects.using('rvra').filter(estacion_id=est.id, can_det_est=serieConf.canal, n1_activo=1)
+                datosMonitorizados = ConfigMonitoriza.objects.using('rvra').filter(estacion__id=est.id, can_det_est=serieConf.canal)
             if len(datosMonitorizados) > 0:
                 seriesMonitorizadas = seriesMonitoriza(datosMonitorizados[0], fechas)
 
@@ -1742,9 +1735,9 @@ def comprobacionesAvisos(serieConf, fechas, diferenciaDatos):
 # METODO QUE OBTIENE LAS SERIES DE MONITORIZACION
 def seriesMonitoriza(datosMonitorizados, fechas):
     series = []
-    if datosMonitorizados.can_det_est == 1 and datosMonitorizados.isotopo_id.id == 0:
+    if datosMonitorizados.can_det_est == 1 and datosMonitorizados.isotopo.id == 0:
         series = calcularNivelesDosis(datosMonitorizados.med_anio_ant, datosMonitorizados.factor_n1, datosMonitorizados.factor_n2, datosMonitorizados.factor_n3, fechas)
-    elif datosMonitorizados.isotopo_id.id == 0:
+    elif datosMonitorizados.isotopo.id == 0:
         series = calcularNivelesParametro(datosMonitorizados.factor_n1, datosMonitorizados.factor_n2, datosMonitorizados.factor_n3, fechas)
     else:
         series = calcularNivelesEspectrometria(datosMonitorizados.med_amd_anio_ant, datosMonitorizados.factor_n1, datosMonitorizados.factor_n2, datosMonitorizados.factor_n3, fechas)
@@ -2209,6 +2202,7 @@ def invalidarDatos(request, id_chart, anio):
     dias = datetime.now(timezone.utc) - timedelta(days=config.dias)
     est = Estaciones.objects.using(bd).filter(id=config.id_estacion)[0]
     texto = est.nombre
+    media = None
 
     if config.series.find(",") >= 0:
         idSerieConf = config.series.split(",")[0]
@@ -2272,7 +2266,7 @@ def invalidarDatos(request, id_chart, anio):
         texto = texto + " - " + isotopo.n_iso
 
     valoresJSON = simplejson.dumps(valores, default=myconverter)
-    
+ 
     if anio == "0":
         return render(request, 'correccionDatos.html', { "estacion":texto, "tabla": serieConf.tabla, "valores": valoresJSON, "media": media  })
     else:
@@ -2765,9 +2759,10 @@ def getMonitoriza(request):
 
 @permission_required('auth.consulta_rarex')
 def getMonitorizaDatos(request):
-    monitorizaCanales = list(DatosMonitorizablesCanales.objects.using('rvra').filter(isotopo_id=0).values('estacion_id','can_det_est','isotopo_id','estacion_id__nombre', 'can_det_est__nombre','isotopo_id__n_iso','med_anio_ant','med_amd_anio_ant','sd_activo','minutos_sd','sd_sms_env','niveles_activo','sms_enviado','factor_n1','factor_n2','factor_n3'))
-    monitorizaDetectores = list(DatosMonitorizablesDetectores.objects.using('rvra').exclude(isotopo_id=0).values('estacion_id','can_det_est','isotopo_id','estacion_id__nombre', 'can_det_est__dir_datos','isotopo_id__n_iso','med_anio_ant','med_amd_anio_ant','sd_activo','minutos_sd','sd_sms_env','niveles_activo','sms_enviado','factor_n1','factor_n2','factor_n3'))
+    monitorizaCanales = list(ConfigMonitorizaCanales.objects.using('rvra').filter(isotopo_id=0).values('estacion_id','can_det_est','isotopo_id','estacion_id__nombre', 'can_det_est__nombre','isotopo__n_iso','med_anio_ant','med_amd_anio_ant','sd_activo','minutos_sd','sd_sms_env','niveles_activo','sms_enviado','factor_n1','factor_n2','factor_n3'))
+    monitorizaDetectores = list(ConfigMonitorizaDetectores.objects.using('rvra').exclude(isotopo_id=0).values('estacion_id','can_det_est','isotopo_id','estacion_id__nombre', 'can_det_est__dir_datos','isotopo__n_iso','med_anio_ant','med_amd_anio_ant','sd_activo','minutos_sd','sd_sms_env','niveles_activo','sms_enviado','factor_n1','factor_n2','factor_n3'))
     monitoriza = monitorizaCanales+monitorizaDetectores
+
     return JsonResponse(monitoriza, safe=False)
 
 # GENERACION DE INFORMES PARA CSN
@@ -3527,23 +3522,6 @@ def nuevaRelacionEquiposRemotosParaUser(request):
     return JsonResponse({"valor":"a"}, safe=False)
 
 
-'''
-class SimulacrosRarex(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    fecha = models.CharField(db_column='FECHA', max_length=50)  # Field name made lowercase.
-    estacion = models.ForeignKey('Estaciones', models.DO_NOTHING, db_column='ESTACION')  # Field name made lowercase.
-    estado = models.IntegerField(db_column='ESTADO', blank=True, null=True)  # Field name made lowercase.
-    inicio_nivel1 = models.DateTimeField(db_column='INICIO_NIVEL1', blank=True, null=True)  # Field name made lowercase.
-    minutos_nivel1 = models.IntegerField(db_column='MINUTOS_NIVEL1', blank=True, null=True)  # Field name made lowercase.
-    inicio_nivel2 = models.DateTimeField(db_column='INICIO_NIVEL2', blank=True, null=True)  # Field name made lowercase.
-    minutos_nivel2 = models.IntegerField(db_column='MINUTOS_NIVEL2', blank=True, null=True)  # Field name made lowercase.
-    inicio_nivel3 = models.DateTimeField(db_column='INICIO_NIVEL3', blank=True, null=True)  # Field name made lowercase.
-    minutos_nivel3 = models.IntegerField(db_column='MINUTOS_NIVEL3', blank=True, null=True)  # Field name made lowercase.
-    exitoso = models.IntegerField(db_column='EXITOSO', blank=True, null=True)  # Field name made lowercase.
-    analista_guardia = models.IntegerField(db_column='ANALISTA_GUARDIA', blank=True, null=True)  # Field name made lowercase.
-    analista_confirmacion = models.IntegerField(db_column='ANALISTA_CONFIRMACION', blank=True, null=True)  # Field name made lowercase.
-
-'''
 @permission_required('auth.guardia_rarex')
 def simulacrosRealizados(request):
     simulacros = SimulacrosRarex.objects.using('rvra').exclude(estado=0).order_by('-id')
@@ -3585,3 +3563,12 @@ def informeSimulacro(request, id):
         "informeSimulacro.html",
         {"simulacro":simulacro, "analista_guardia": nombreAnalistaGuardia, "analista_confirmacion": nombreAnalistaConfirmacion}
     )
+
+
+def getPruebaGrafica(request):
+    return render(
+        request,
+        "grafica.html",
+        {}
+    )
+

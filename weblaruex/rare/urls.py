@@ -74,6 +74,8 @@ urlpatterns = [
     path('private/laruex/conexionesPorEquipo/', conexionesPorEquipo, name='conexionesPorEquipo'),
     path('private/laruex/nuevaRelacionEquiposRemotosParaEquipo/', nuevaRelacionEquiposRemotosParaEquipo, name='nuevaRelacionEquiposRemotosParaEquipo'),
     path('private/laruex/nuevaRelacionEquiposRemotosParaUser/', nuevaRelacionEquiposRemotosParaUser, name='nuevaRelacionEquiposRemotosParaUser'),
-    
+
+    path('private/rare/pruebaGrafica/', getPruebaGrafica, name='getPruebaGrafica'),
+   
 ]
 

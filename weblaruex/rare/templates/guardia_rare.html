@@ -1129,12 +1129,7 @@
                     format: 'dd/MM HH:mm',
                 }
             },
-            yaxis: ejes,
-            tooltip: {
-                x: {
-                    format: "dd MMM, yyyy HH:mm",
-                   }
-            }
+            yaxis: ejes
         };
         chart = new ApexCharts(document.querySelector("#"+div), options);
         chart.render();
@@ -1206,12 +1201,7 @@
                     },
                 type: 'datetime'
             },
-            yaxis: ejes,
-            tooltip: {
-                x: {
-                    format: "dd MMM, yyyy HH:mm",
-                   }
-            }
+            yaxis: ejes
         };
         chart = new ApexCharts(document.querySelector("#"+div), options);
         chart.render();

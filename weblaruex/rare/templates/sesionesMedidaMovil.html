@@ -189,7 +189,10 @@
                     sesionesJSON[idSesion]["layer"] = L.layerGroup();
 
                     var iconFijo = crearIconMedida(sesionesJSON[idSesion]["tipo"]);
-                    iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, medida.cuentas_totales);    
+                    var valor = medida.cuentas_totales;
+                    if (valor == null)
+                        valor = medida.dosis + " μSv/h";
+                    iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, valor);    
                     
                     var auxMarker = new L.marker([medida.lat,medida.lon], {
                         icon:	iconFijo
@@ -214,7 +217,10 @@
                         var medida = sesionesJSON[data.sesion]["medidasPorPintar"].shift();
                         
                         var iconFijo = crearIconMedida(data.tipo);
-                        iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, medida.cuentas_totales);    
+                        var valor = medida.cuentas_totales;
+                        if (valor == null)
+                            valor = medida.dosis + " μSv/h";
+                        iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, valor);    
 
                         var auxMarker = new L.marker([medida.lat,medida.lon], {
                             icon:	iconFijo
@@ -239,7 +245,10 @@
                     sesionesJSON[idSesion]["markerMovible"].setIcon(icon);  
                     sesionesJSON[idSesion]["markerMovible"].moveTo([medida.lat, medida.lon], 1000, {autostart: true}); 
                     var iconFijo = crearIconMedida(sesionesJSON[idSesion]["tipo"]);
-                    iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, medida.cuentas_totales);    
+                    var valor = medida.cuentas_totales;
+                    if (valor == null)
+                        valor = medida.dosis + " μSv/h";
+                    iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, valor);    
                     var auxMarker = new L.marker([medida.lat,medida.lon], {
                         icon:	iconFijo
                     });
@@ -269,7 +278,10 @@
                     sesionesJSON[data.sesion]["layer"] = L.layerGroup();
 
                     var iconFijo = crearIconMedida(data.tipo);
-                    iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, primeraMedida.cuentas_totales);    
+                    var valor = primeraMedida.cuentas_totales;
+                    if (valor == null)
+                        valor = primeraMedida.dosis + " μSv/h";
+                    iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, valor);    
                     
                     var auxMarker = new L.marker([primeraMedida.lat,primeraMedida.lon], {
                         icon:	iconFijo
@@ -286,7 +298,10 @@
                             sesionesJSON[data.sesion]["markerMovible"].setIcon(icon);  
                             sesionesJSON[data.sesion]["markerMovible"].moveTo([medida.lat, medida.lon], 1000, {autostart: true}); 
                             var iconFijo = crearIconMedida(data.tipo);
-                            iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, medida.cuentas_totales);    
+                            var valor = medida.cuentas_totales;
+                            if (valor == null)
+                                valor = medida.dosis + " μSv/h";
+                            iconFijo.options.html = cambiarTextoMarkerMovil(iconFijo.options.html, valor);    
                             var auxMarker = new L.marker([medida.lat,medida.lon], {
                                 icon:	iconFijo
                             });
