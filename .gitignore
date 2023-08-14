@@ -18,3 +18,4 @@ weblaruex/static/
 # Ignorar una extensión específica en todas las carpetas
 *.tmp
 *.MP4
+*.pyc
