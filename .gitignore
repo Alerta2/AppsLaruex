@@ -1,0 +1,20 @@
+# Ignorar todos los archivos con la extensión .log
+*.log
+
+# Ignorar todos los archivos de respaldo
+*~
+
+
+# Ignorar archivos específicos
+weblaruex/weblaruex/setting.py
+weblaruex/weblaruex/*.save*
+weblaruex/config.ini
+
+# Ignorar todo el contenido de una carpeta
+weblaruex/media/
+weblaruex/static/
+*/__pycache__/
+
+# Ignorar una extensión específica en todas las carpetas
+*.tmp
+*.MP4
