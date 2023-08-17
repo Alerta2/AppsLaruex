@@ -48,6 +48,8 @@ from Crypto.Hash import MD5 # pip install pycryptodome
 from clasesPropias.generarFechas import *
 from clasesPropias.consultasGuardias import *
 
+# import FTP
+from ftplib import FTP
 
 def myconverter(o):
     if isinstance(o, datetime):
@@ -2651,19 +2653,65 @@ def informeGuardiaRare(request):
 
     return JsonResponse(valores, safe=False)
 
+
+def connect_to_ftp(host, port, username, password):
+    ftp = FTP()
+    ftp.connect(host, port)
+    ftp.login(username, password)
+    return ftp
+
+def get_files_sorted_by_date(ftp):
+    file_list = ftp.nlst()
+    file_list_with_dates = []
+
+    for filename in file_list:
+        modified_time = ftp.sendcmd(f"MDTM {filename}")
+        file_list_with_dates.append((filename, modified_time))
+
+    return sorted(file_list_with_dates, key=lambda x: x[1], reverse=True)
+
+def delete_files_except_latest(ftp, files_to_keep):
+    file_list = ftp.nlst()
+    for filename in file_list:
+        if filename not in files_to_keep:
+            ftp.delete(filename)
+
+def download_file(ftp, filename, ruta):
+    with open(ruta, "wb") as f:
+        ftp.retrbinary(f"RETR {filename}", f.write)
+    print("File downloaded as estacion_papel.jpg")
+
 @permission_required('auth.guardia_rarex')
 def consultarImagenPapel(request):
     fechaHora = datetime.now().astimezone(pytz.timezone("Europe/Madrid"))
-    estacionesPapel = [{"nombre":"azuaga", "ip":'http://172.20.36.19/videostream.cgi?user=rvra&pwd=rvra&resolution=32&rate=0'},{"nombre":"saucedilla", "ip":'http://172.20.36.30/videostream.cgi?user=rvra&pwd=rvra&resolution=32&rate=0'},{"nombre":"serrejon", "ip":'rtsp://rvra:rvra@172.20.36.68:554/live/ch0'},{"nombre":"fregenal", "ip":'http://172.20.36.11/videostream.cgi?user=rvra&pwd=rvra&resolution=32&rate=0'}]
+    estacionesPapel = [{"conexion":"ip", "nombre":"azuaga", "ip":'http://172.20.36.19/videostream.cgi?user=rvra&pwd=rvra&resolution=32&rate=0'},{"conexion":"ip", "nombre":"saucedilla", "ip":'http://172.20.36.30/videostream.cgi?user=rvra&pwd=rvra&resolution=32&rate=0'},{"conexion":"ip", "nombre":"serrejon", "ip":'rtsp://rvra:rvra@172.20.36.68:554/live/ch0'},{"conexion":"ip", "nombre":"fregenal", "ip":'http://172.20.36.11/videostream.cgi?user=rvra&pwd=rvra&resolution=32&rate=0'},{"conexion":"ftp", "nombre":"atalaya", "ip":"158.49.111.20", "port":8212, "usuario":"ATALAYA", "password":"Atalaya", "ruta":"CAMARA"}]
     for estacion in estacionesPapel:
-        try:
-            vid = cv2.VideoCapture(estacion["ip"])
-            ret, frame = vid.read()
-            cv2.putText(frame,estacion["nombre"]+" "+fechaHora.strftime("%m/%d/%Y, %H:%M:%S"), (10,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, 3)	
-            print("CARGANDO CAMARA", estacion["nombre"], settings.STATIC_ROOT)
-            cv2.imwrite(settings.STATIC_ROOT +"papel/"+estacion["nombre"]+'_papel.jpg', frame)
-        except Exception as e:
-            print("ERROR CARGANDO CAMARA", estacion["nombre"], e)
+        if estacion["conexion"] == "ip":
+            try:
+                vid = cv2.VideoCapture(estacion["ip"])
+                ret, frame = vid.read()
+                cv2.putText(frame,estacion["nombre"]+" "+fechaHora.strftime("%m/%d/%Y, %H:%M:%S"), (10,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, 3)	
+                cv2.imwrite(settings.STATIC_ROOT +"papel/"+estacion["nombre"]+'_papel.jpg', frame)
+            except Exception as e:
+                print("ERROR CARGANDO CAMARA", estacion["nombre"], e)
+        elif estacion["conexion"] == "ftp":
+            print("Conectando ftp para la estacion ")
+            # listo los ficheros del ftp            
+            try:
+                ftp = connect_to_ftp(estacion["ip"], estacion["port"], estacion["usuario"], estacion["password"])
+                print("conectado al ftp")
+                ftp.cwd(estacion["ruta"])
+                print("actualizo la ruta")
+                sorted_files = get_files_sorted_by_date(ftp)
+
+                if len(sorted_files) > 0:
+                    files_to_keep = [sorted_files[0][0]]
+                    download_file(ftp, files_to_keep[0], settings.STATIC_ROOT +"papel/"+estacion["nombre"]+'_papel.jpg')
+                    delete_files_except_latest(ftp, files_to_keep)
+                else:
+                    print("No files to delete.")
+            except Exception as e:
+                print(e)
             
     return render(
         request,
