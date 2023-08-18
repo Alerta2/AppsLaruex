@@ -14,6 +14,7 @@ weblaruex/config.ini
 weblaruex/media/
 weblaruex/static/
 */__pycache__/
+*__pycache__*
 
 # Ignorar una extensión específica en todas las carpetas
 *.tmp
