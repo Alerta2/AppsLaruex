@@ -194,8 +194,14 @@
                     {% endif %}
             </section>
             <section id="inicio" class="text-center">
-                <h1><a class="badge badge-pill badge-primary" href="{% static 'docs/guiaBuenasPracticas.pdf' %}" download>Buenas prácticas RAREx</a></h1>
-                <h1><a class="badge badge-pill badge-primary" href="{% static 'docs/PR-01 F01.pdf' %}" download>Descargar formato PR-01 F01</a></h1>
+                <div class="text-center" >
+                    <a class="pdf-mobile get-started-btn mb-3" href="{% static 'docs/BuenasPracticasIV.pdf' %}">Si no ve el documento descarguelo aquí. (Buenas prácticas IV)</a>
+                    <embed src="{% static 'docs/BuenasPracticasIV.pdf' %}" type="application/pdf" width="100%" height="700px"/>
+                </div> <!-- End rare Item-->
+                <h4><a class="badge badge-pill badge-primary" href="{% static 'docs/BuenasPracticasIII.pdf' %}" download>Buenas prácticas RAREx III</a></h4>
+                <h4><a class="badge badge-pill badge-primary" href="{% static 'docs/BuenasPracticasII.pdf' %}" download>Buenas prácticas RAREx II</a></h4>
+                <h4><a class="badge badge-pill badge-primary" href="{% static 'docs/BuenasPracticasI.pdf' %}" download>Buenas prácticas RAREx I</a></h4>
+                <h2><a class="badge badge-pill badge-primary" href="{% static 'docs/PR-01 F01.pdf' %}" download>Descargar formato PR-01 F01</a></h2>
                 <h3>¡IMPORTANTE!: Tras finalizar las gráficas, tanto RAREx como CSN, al imprimir el resumen se debe abrir automáticamente una nueva ventana con un mensaje que informa que se ha realizado correctamente. Si esta ventana no se abre hay que aceptar los elementos emergentes en la barra de navegación del navegador y volver a pulsar en imprimir (aunque no se imprima de nuevo). Los informes se deben guardar en su sitio en el ordenador de Gráficas.</h3>
                 <button class="btn btn-primary btn-sm active" onclick="activarBloque();">{% translate "Comenzar revisión" %}</button>
                 {% if request.user.is_superuser %}
