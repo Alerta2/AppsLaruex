@@ -153,7 +153,6 @@ def ConfirmacionTelegram(request):
             id_mensaje = json_info.get('m', None)
             id_chat = json_info.get('c', None) 
 
-        print("AREA", id_area, "MENSAJE", id_mensaje, "CHAT", id_chat)
         df_analista = pd.DataFrame()
         autorizado = False
         if id_mensaje!=None and id_chat!=None and id_area!=None:
@@ -184,6 +183,9 @@ def ConfirmacionTelegram(request):
                 df_analista = df_analista.drop_duplicates(subset = ["area"]) # Me quedo unicamente con el primer analista que debe encontrarse de guaardia
                 df_analista["nombre"] = df_analista.apply(lambda row : User.objects.get(id=row['id_user']).first_name, axis = 1)
 
+
+                ''' Ignoramos comprobación de analista de guarda y autorizamos la confirmación del mensaje '''
+                '''
                 if request.user.id == df_analista.iloc[0]['id_user']:
                     print("AUTORIZADO")
                     autorizado = True
@@ -191,6 +193,8 @@ def ConfirmacionTelegram(request):
                     print("NO AUTORIZADO")
                     #Compruebo si el analista que quiere confirmar ha recibido mensajes en la ultima hora de este area
                     autorizado = False
+                '''
+                autorizado = True
                 
                 bot = Bot(token=settings.TOKEN_TELEGRAM)
 
