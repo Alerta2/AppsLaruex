@@ -142,6 +142,7 @@
 {% endblock %}
 
 {% block content %}
+
     <div id="carga">
         <div class="row rounded bg-info p-1 progress-bar progress-bar-striped progress-bar-animated text-center">
             <h3><strong>Cargando gráficas...</strong></h3>
@@ -176,6 +177,7 @@
         </div>
         <div id="ventana_principal" class="col">
             <section id="title" class="justify-content-center row mt-5 mb-5">
+                
                 <div><h3>{% translate "Revisión diaria" %}
                     {% if red == "rvra" %}
                         <img src="{% static 'img/rare/logo_rarex.png' %}" alt="Logo" title="Centro Hispano-luso de Alerta Temprana" height="24px"/>
@@ -194,10 +196,8 @@
                     {% endif %}
             </section>
             <section id="inicio" class="text-center">
-                <div class="text-center" >
-                    <a class="pdf-mobile get-started-btn mb-3" href="{% static 'docs/BuenasPracticasIV.pdf' %}">Si no ve el documento descarguelo aquí. (Buenas prácticas IV)</a>
-                    <embed src="{% static 'docs/BuenasPracticasIV.pdf' %}" type="application/pdf" width="100%" height="700px"/>
-                </div> <!-- End rare Item-->
+
+                <h3><a class="badge badge-pill badge-warning" href="{% static 'docs/BuenasPracticasIV.pdf' %}" download>Consultar si no lo has leído: Buenas prácticas RAREx IV</a></h3>
                 <h4><a class="badge badge-pill badge-primary" href="{% static 'docs/BuenasPracticasIII.pdf' %}" download>Buenas prácticas RAREx III</a></h4>
                 <h4><a class="badge badge-pill badge-primary" href="{% static 'docs/BuenasPracticasII.pdf' %}" download>Buenas prácticas RAREx II</a></h4>
                 <h4><a class="badge badge-pill badge-primary" href="{% static 'docs/BuenasPracticasI.pdf' %}" download>Buenas prácticas RAREx I</a></h4>
@@ -222,9 +222,10 @@
         <input type="hidden" id="formNiveles" name="niveles"/>
         <input type="hidden" id="formRed" name="red"/>
     </form>
-{% endblock %}
 
-{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script type="text/javascript">
+
     $('.btnright').hide();
     $('.btnleft').hide();
     $('#carga').hide();
@@ -952,16 +953,20 @@
         var botonImprimir = document.createElement("button");
         botonImprimir.classList.add('btn','btn-primary','mt-3','mb-3');
         botonImprimir.type = 'button';
+        botonImprimir.setAttribute("id", "botonImprimirReport");
         var textBotonImprimir = document.createTextNode("Imprimir");
         botonImprimir.append(textBotonImprimir);
-        botonImprimir.onclick = function() {imprimirReport();};
+
+        botonImprimir.setAttribute("onclick","imprimirReport();");
         $(parent).append(botonImprimir);
     }
-
-
+    
     function imprimirReport(){
+        
         $("#sidebar-container").hide();
-        print();
+        $("#botonImprimirReport").hide();
+        window.print();
+        $("#botonImprimirReport").show();
         $("#sidebar-container").show();
     }
 
@@ -1213,4 +1218,6 @@
         chart.render();
         charts.push(chart);
     }
+</script>
+
 {% endblock %}
