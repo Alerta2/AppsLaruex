@@ -1,0 +1,65 @@
+{% load static %}
+
+<!-- ======= Internal service section ======= -->
+<section id="popular-courses" class="courses">
+
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+      <h2>Listado de Acreditaciones</h2> 
+      <p>Nuestras acreditaciones de calidad</p>
+    </div>
+    {% if user.is_superuser %}
+    <div class="row mb-5">
+
+      <div class="col d-flex justify-content-center">
+        <button class="btn btn-outline-info my-2 my-sm-0" title="Agregar nuevo slider" data-toggle="modal" data-target="#modalAgregarAcreditacion">Agregar nueva acreditacion</button>
+
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+<div class="row">
+  <div class="col">
+
+    
+    {% regroup acreditaciones by seccion as seccion_list %}
+
+    {% for seccion in seccion_list %}
+    
+    <div class="section-title text-center">
+      <h2>Acreditaciones</h2>
+      <p>{{ seccion.grouper }}</p>
+    </div>
+
+    <div class="row d-flex justify-content-center" data-aos="zoom-in" data-aos-delay="100">
+      {% for acreditacion in seccion.list %}
+      
+        <div class="col-lg-4 col-md-6 mb-5">
+          <div class="row mx-5">
+
+            <div class="col">
+              <div class="course-item">
+                <a class="pdf-mobile get-started-btn mb-3" href="{% static 'files/' %}{{ acreditacion.archivo }}">Si no ve el documento descarguelo aquí</a>
+                <embed src="{% static 'files/' %}{{ acreditacion.archivo }}" type="application/pdf" width="100%" height="450px"/>
+      
+                <div class="course-content">
+                  <h3 class="text-center"><a href="/acreditacionInfo/{{ acreditacion.id }}/" target="_blank">{{ acreditacion.nombre }}</a></h3>
+                </div>
+                {% if user.is_superuser %}
+                <div class="col d-flex justify-content-center">
+                  <button class="btn btn-outline-danger my-2 my-sm-0" title="Eliminar acreditacion" onclick="agregarInfoAcreditacion('{{acreditacion.id}}', '{{acreditacion.nombre}}')">Eliminar Acreditación</button>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div> <!-- End rare Item-->
+      {% endfor %}
+      </div>
+
+    {% endfor %}
+  </div>
+</div>
+    
+</section><!-- End Internal Service Section -->

@@ -1,0 +1,102 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+{% block content %}
+
+
+
+<style>
+      /*--------------------------------------------------------------
+    # Ir a Archivos
+    --------------------------------------------------------------*/
+    .cta {
+    position: relative;
+    margin: auto;
+    padding: 12px 18px;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    }
+
+    .cta:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    border-radius: 50px;
+    background: #d4e4e2;
+    width: 45px;
+    height: 45px;
+    transition: all 0.3s ease;
+    }
+
+    .cta span {
+    position: relative;
+    font-family: "Ubuntu", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #087B6C;
+    }
+
+
+
+    .cta:hover:before {
+    width: 100%;
+    background: #d4e4e2;
+    }
+
+    .cta:active {
+    transform: scale(0.95);
+    }
+
+</style>
+
+<div class="row">
+
+  <div class="col">
+    <div class="align-middle">
+      <img class="mx-auto d-block" src="{% static 'niceAdminAssets' %}/img/not-found.svg" alt="No encontrado"
+      style="max-width: 30em; max-height: 30em;  margin: 0 auto;" >
+    </div>
+  </div>
+
+
+</div>
+<div class="row mx-auto my-2">  
+  <div class="col">
+      <h3 class="display-3 font-weight-bold text-center " style="color: #087B6C;">No existe ninguna tarea con esas caracteristicas</h3>
+  </div>
+</div>
+
+{% if registrosTarea %}
+<div class="row">
+  <button class="col-2 cta" title="Ir a Tareas" id="botonIrTarea" onclick="irTarea()">
+    <span>Volver a la tarea</span>
+  </button>    
+</div>
+{% else %}
+<div class="row">
+  <button class="col-2 cta" title="Ir a Tareas" onclick="irTareas()">
+    <span>Ir a Tareas</span>
+  </button>    
+</div>
+{% endif %}
+
+<script>
+  function irTareas(){
+      $('#botonIrArchivo').attr("title", "Ir a Tareas");
+      location.href="{% url 'docLaruex:docLaruexTareas' %}";
+    }
+    
+    function irTarea(){
+      $('#botonIrTarea').attr("title", "Volver a la tarea");
+      var url = "{% url 'docLaruex:docLaruexVerTarea' id=registrosTarea.id_tarea_programada.id %}";
+      location.href = url;
+    }
+
+  
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% load static %}
+
+<!-- ======= Internal service section ======= -->
+<section id="popular-courses" class="courses">
+
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+      <h2>Listado de Sliders</h2> 
+    </div>
+    {% if user.is_superuser %}
+    <div class="row mb-5">
+
+      <div class="col d-flex justify-content-center">
+        <button class="btn btn-outline-info my-2 my-sm-0" title="Agregar nuevo slider" data-toggle="modal" data-target="#modalAgregarSlider">Agregar nuevo slider</button>
+
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Home -->
+    <div class="row text-center" data-aos="zoom-in" data-aos-delay="100">
+      <div class="container" data-aos="fade-up">
+        <div class="section-title">
+          <h2>Sliders</h2>
+          <p>Home</p>
+        </div>
+      </div>
+      {% for sHome in slidersHome %}
+        <div class="col-lg-4 col-md-6 d-flex align-items-stretch mb-5  d-flex justify-content-center">
+          <div class="course-item">
+            <img style="width: 200px; height: 184px;" src="{% static 'img/slider/' %}{{ sHome.imagen_slider }}" class="img-fluid img-thumbnail rounded" alt="..." >
+            <div class="course-content">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="date-type">{{ sHome.descripcion }}</span>
+              </div>
+              <h3><a href="/sliderInfo/{{ sHome.id }}/" target="_blank">{{ sHome.titulo|upper }}</a></h3>
+            </div>
+            {% if user.is_superuser %}
+            <div class="col d-flex justify-content-center">
+              <button class="btn btn-outline-danger my-2 my-sm-0" title="Eliminar slider" onclick="agregarInfoSlider('{{sHome.id}}', '{{sHome.titulo}}')">Eliminar slider</button>
+            </div>
+          {% endif %}
+          </div>
+        </div> <!-- End rare Item-->
+      {% endfor %}
+    </div>
+    
+    <!-- Laboratorios -->
+
+    <div class="row text-center" data-aos="zoom-in" data-aos-delay="100">
+      <div class="container" data-aos="fade-up">
+        <div class="section-title">
+          <h2>Sliders</h2>
+          <p>Laboratorios</p>
+        </div>
+      </div>
+      {% for sLab in slidersLaboratorios %}
+      
+        <div class="col-lg-4 col-md-6 d-flex align-items-stretch mb-5  d-flex justify-content-center">
+          <div class="course-item">
+            <img style="width: 200px; height: 184px;" src="{% static 'img/slider/' %}{{ sLab.imagen_slider }}" class="img-fluid img-thumbnail rounded" alt="..." >
+            <div class="course-content">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="date-type">{{ sLab.descripcion }}</span>
+              </div>
+              <h3><a href="/sliderInfo/{{ sLab.id }}/" target="_blank">{{ sLab.titulo|upper }}</a></h3>
+            </div>
+            {% if user.is_superuser %}
+            <div class="col d-flex justify-content-center">
+              <button class="btn btn-outline-danger my-2 my-sm-0" title="Eliminar slider" onclick="agregarInfoSlider('{{sLab.id}}', '{{sLab.titulo}}')">Eliminar slider</button>
+            </div>
+          {% endif %}
+          </div>
+        </div> <!-- End rare Item-->
+      {% endfor %}
+    </div>
+
+    <!-- Redes -->
+    <div class="row text-center" data-aos="zoom-in" data-aos-delay="100">
+      <div class="container" data-aos="fade-up">
+        <div class="section-title">
+          <h2>Sliders</h2>
+          <p>Redes</p>
+        </div>
+      </div>
+      {% for sRed in slidersRedes %}
+        <div class="col-lg-4 col-md-6 d-flex align-items-stretch mb-5  d-flex justify-content-center">
+          <div class="course-item">
+            <img style="width: 200px; height: 184px;" src="{% static 'img/slider/' %}{{ sRed.imagen_slider }}" class="img-fluid img-thumbnail rounded" alt="..." >
+            <div class="course-content">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="date-type">{{ sRed.descripcion }}</span>
+              </div>
+              <h3><a href="/sliderInfo/{{ sRed.id }}/" target="_blank">{{ sRed.titulo|upper }}</a></h3>
+            </div>
+            {% if user.is_superuser %}
+            <div class="col d-flex justify-content-center">
+              <button class="btn btn-outline-danger my-2 my-sm-0" title="Eliminar slider" onclick="agregarInfoSlider('{{sRed.id}}', '{{sRed.titulo}}')">Eliminar slider</button>
+            </div>
+          {% endif %}
+          </div>
+        </div> <!-- End rare Item-->
+      {% endfor %}
+    </div>
+  </div>
+    
+</section><!-- End Internal Service Section -->

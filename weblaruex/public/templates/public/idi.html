@@ -1,0 +1,205 @@
+{% extends "public/template.html" %}
+{% load static %}
+
+{% block meta %}
+  <title>Investigaciones - LARUEX</title>
+  <meta content="investigaciones realizadas por Laruex" name="description">
+  <meta content="investigación, radiactividad, radioactividad, " name="keywords">
+
+  <style>
+    .close:focus {
+      outline: none;
+    }
+
+    .imagenInvestigacion{
+      height: 180px !important;
+      width:  180px !important;
+      border-radius: 10%;
+      
+      box-shadow: 0 3px 6px rgba(10, 20, 21, 0.5);
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+
+  <main id="main">
+  <div class="breadcrumbs"></div>
+
+    <!-- ======= listado investigaciones y publicaciones ======= -->
+    <div class="blog-page area-padding">
+      <div class="container">
+        <div class="section-title">
+          <h2>Investigaciones</h2>
+          <p>I+D+I</p>
+        </div>
+        <div class="row">
+          <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+            
+            <form class="form-inline my-2 my-lg-0 mx-auto" action="{% url 'public:publicBuscarPublicacion' %}" method="post">
+                {% csrf_token %}
+              <input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search" name="busqueda">
+              <button class="btn btn-outline-info my-2 my-sm-2 " type="submit">Buscar</button>
+            </form>
+            <br>
+            <div class="left-tags blog-tags">
+               <div class="popular-tag left-side-tags left-blog">
+                    <h4>Secciones</h4>
+                    <ul>
+                      <li>
+                        <a href="/idi/">{% if request.path == '/idi/' %}<strong>{% endif %}Todos{% if request.path == '/idi/' %}</strong>{% endif %}</a>
+                      </li>
+                      <li>
+                        <a href="{% url 'public:publicPublicacionesLaboratorios' %}">{% if 'laboratorios' in request.path %}<strong>{% endif %}Laboratorios{% if 'laboratorios' in request.path %}</strong>{% endif %}</a>
+                      </li>
+                      <li>
+                        <a href="{% url 'public:publicPublicacionesRedes' %}">{% if 'redes' in request.path %}<strong>{% endif %}Redes{% if 'redes' in request.path %}</strong>{% endif %}</a>
+                      </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="left-tags blog-tags">
+               <div class="popular-tag left-side-tags left-blog">
+                    <h4>Categorias</h4>
+                    <ul>
+                      <li>
+                        <a href="/idi/">{% if request.path == '/idi/' %}<strong>{% endif %}Todos{% if request.path == '/idi/' %}</strong>{% endif %}</a>
+                      </li>
+                      <li>
+                        <a href="/idi/Publicacion/">{% if 'Publicacion' in request.path %}<strong>{% endif %}Publicaciones{% if 'Publicacion' in request.path %}</strong>{% endif %}</a>
+                      </li>
+                      <li>
+                        <a href="/idi/Proyecto/">{% if 'Proyecto' in request.path %}<strong>{% endif %}Proyectos{% if 'Proyecto' in request.path %}</strong>{% endif %}</a>
+                      </li>
+                      <li>
+                        <a href="/idi/Tesis/">{% if 'Tesis' in request.path %}<strong>{% endif %}Tesis{% if 'Tesis' in request.path %}</strong>{% endif %}</a>
+                      </li>
+                      <li>
+                        <a href="/idi/Intercomparacion/">{% if 'Intercomparacion' in request.path %}<strong>{% endif %}Intercomparaciones{% if 'Intercomparacion' in request.path %}</strong>{% endif %}</a>
+                      </li>
+                    </ul>
+                </div>
+            </div>
+          </div>
+          <!-- End left sidebar -->
+          <!-- Start single blog -->
+          <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+
+            {% for publicacion in page_obj %}
+            <!-- Single new -->
+              <div class="row todos {{ publicacion.tipo }} mx-auto">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <div class="single-blog">
+                    <div class="row">
+                      <div class="col-lg-3 col-md-3 col-sm-11 col-xs-11 mx-auto my-auto">
+                          <img class="imagenInvestigacion" src="{% static 'img/investigaciones/' %}{{ publicacion.imagen }}" alt="">
+                      </div>
+                      <div class="col-lg-8 col-md-8 col-sm-11 col-xs-111 mx-lg-1 mx-md-1 mx-sm-0">
+                        <div class="row">
+                          <div class="col">
+                            <div class="blog-meta">
+                              <span class="comments-type">
+                                <i class="fas fa-file"></i> {{ publicacion.tipo }}
+                              </span>
+                              <span class="date-type">
+                                <i class="fa fa-calendar"></i> {{ publicacion.fecha }}
+                              </span>
+                              
+                              {% if user.is_superuser %}
+                                <button class="btn btn-outline-danger my-2 my-sm-0" title="Eliminar publicación" onclick="agregarInfoPublicacion('{{publicacion.id}}', '{{publicacion.titulo}}')">Eliminar publicación</button>
+                              {% endif %}
+                            </div>
+                            <div class="blog-text">
+                              <h4>
+                                <a href="{% url 'public:publicPublicacion' id=publicacion.id %}">{{ publicacion.titulo }}</a>
+                              </h4>
+                                <p>
+                                  {% if publicacion.tipo == "Tesis" %}
+                                    <strong class="text-secondary">Autor: </strong> {{ publicacion.autor }}
+                                  {% elif publicacion.tipo == "Proyecto" %}
+                                    <strong class="text-secondary">Entidad: </strong> {{ publicacion.entidad_financiadora }}
+                                    {% if publicacion.informacion %}
+                                      {{ publicacion.informacion }}
+                                    {%endif %}
+                                  {% else %}
+                                  <strong class="text-secondary">Revista: </strong> {{ publicacion.revista }}
+                                  {% endif %}
+                                </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          <!-- end single new -->
+          {% endfor %}
+          <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; Primero</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                {% endif %}
+        
+                <span class="current">
+                    Page {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                </span>
+        
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+
+          </div>
+          <!-- end single blog-->
+        </div>
+      </div>
+    </div><!-- End listado investigaciones y publicaciones-->
+  </main><!-- End #main -->
+
+
+  <div id="modalEliminarInvestigacion" class="modal fade my-5" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="TituloModalEliminarInvestigacion">Eliminar investigación</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formularioEliminarInvestigacion" action="\eliminarInvestigacion/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" class="form-control" id="idInvestigacionEliminar" name="idInvestigacionEliminar" data-rule="required" hidden/>
+            <input type="text" class="form-control" id="inputNombreInvestigacionEliminar" name="inputNombreInvestigacionEliminar" data-rule="required" hidden/>
+            <label for="seguroEliminarInvestigacion"><strong>¿Está seguro que desea eliminar la información del Slider <span class="text-danger" id="tituloInvestigacionEliminar"></span> ?</strong></label>
+            <div class="modal-footer d-flex justify-content-center">
+              <div>
+                <button id="cerrarModalEliminarInvestigacion" type="button" class="btn btn-secondary mx-1" data-dismiss="modal">
+                  Cerrar
+                </button>
+                <button type="submit" value="submit" class="btn btn-danger">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    function agregarInfoPublicacion(id, nombre) {
+    document.getElementById('idInvestigacionEliminar').value = id;
+    document.getElementById('tituloInvestigacionEliminar').innerHTML = nombre;
+    document.getElementById('inputNombreInvestigacionEliminar').value = nombre;
+    // mostrar modal modalEliminarServicio
+    $('#modalEliminarInvestigacion').modal('show');
+  }
+  </script>
+{% endblock %}

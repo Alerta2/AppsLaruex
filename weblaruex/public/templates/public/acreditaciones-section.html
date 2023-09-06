@@ -1,0 +1,209 @@
+
+{% extends "public/template.html" %}
+
+{% load static %}
+
+{% block meta %}
+  <title>Acreditaciones - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+<style>  
+.addArchivo {
+  color: #961d1d;
+}
+
+.addArchivo:hover {
+  color: rgba(150, 29, 29, 20);
+  filter: brightness(80%);
+}
+
+.imagenCargada{
+  color: #1d9678;
+}
+
+.close:focus {
+  outline: none;
+}
+
+.checkboxDiv input[type="checkbox"]:checked{
+  
+  background-color: #1d8896 !important;
+  border: 2px solid #1d8896 !important;
+  color: #fff;
+  accent-color: #1d8896;
+}
+</style>
+  <main id="main" data-aos="fade-in">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+    </div>
+
+    {% if alerta %}
+    {% if alerta.tipo == "success" %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fa-solid fa-circle-check"></i> {{ alerta.mensaje }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% else %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="fa-sharp fa-solid fa-circle-exclamation"></i> {{ alerta.mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endif %}
+  {% endif %}
+
+    {% include "public/parts/acreditaciones-list.html" %}
+
+  </main><!-- End #main -->
+
+  <div id="modalEliminarAcreditacion" class="modal fade my-5" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="TituloModalEliminarAcreditacion">Eliminar acreditación</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formularioEliminarAcreditacion" action="\eliminarAcreditacion/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" class="form-control" id="idAcreditacionEliminar" name="idAcreditacionEliminar" data-rule="required" hidden/>
+            <input type="text" class="form-control" id="inputNombreAcreditacionEliminar" name="inputNombreAcreditacionEliminar" data-rule="required" hidden/>
+            <label for="seguroEliminarAcreditacion"><strong>¿Está seguro que desea eliminar la acreditacion <span class="text-danger" id="nombreAcreditacionEliminar"></span> ?</strong></label>
+            <div class="modal-footer d-flex justify-content-center">
+              <div>
+                <button id="cerrarModalEliminarAcreditacion" type="button" class="btn btn-secondary mx-1" data-dismiss="modal">
+                  Cerrar
+                </button>
+                <button type="submit" value="submit" class="btn btn-danger">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+<div id="modalAgregarAcreditacion" class="modal fade pt-5" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalAgregarAcreditacion">Agregar Acreditación</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioAgregarAcreditacion" action="\agregarAcreditacion/" method="POST" enctype="multipart/form-data" class="php-email-form"  role="form">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col form-group">
+              <label for="nombreAcreditacion" class="text-secondary"><strong>Nombre de la acreditación</strong></label>
+              <input type="text" class="form-control" id="nombreAcreditacion" name="nombreAcreditacion" data-rule="required" required/>
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col form-group">
+              <div>
+                <label for="seccionAcreditacionEditar" class="text-secondary"><strong>Secciones</strong></label>
+              </div>
+              <div class="checkboxDiv form-check-inline">
+                <div class="mx-2 ">
+                  <input class="form-check-input" type="checkbox" id="seccionSeleccionadaAcreditacionLaboratorio" name="checkboxAgregarAcreditacion"  value="laboratorios" onchange="comprobarSeleccionado(this)">
+                  <label class="form-check-label" for="seccionSeleccionadaAcreditacionLaboratorio">Laboratorios</label>
+                </div>
+                <div class="mx-2">
+                  <input class="form-check-input" type="checkbox" id="seccionSeleccionadaAcreditacionRedes" name="checkboxAgregarAcreditacion"  value="redes" onchange="comprobarSeleccionado(this)">
+                  <label class="form-check-label" for="seccionSeleccionadaAcreditacionRedes">Redes</label>
+                </div>
+                <div class="mx-2">
+                  <input class="form-check-input" type="checkbox" id="seccionSeleccionadaAcreditacionHome" name="checkboxAgregarAcreditacion" value="home" onchange="comprobarSeleccionado(this)">
+                  <label class="form-check-label" for="seccionSeleccionadaAcreditacionHome">Home</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        <div class="row my-2">
+          <div class="col-sm-12 d-flex justify-content-center">
+            <div class="form-group">
+              <label for="archivoAcreditacionAgregar">
+                <i class="fa-duotone fa-file-pdf fa-6x addArchivo" id="iconoArchivo"></i>
+              </label>
+              <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                id="archivoAcreditacionAgregar" name="archivoAcreditacionAgregar"
+                onchange="mostrarNombreArchivoAcreditacion(this.value)"/>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="text-center"><strong id="mostrarNombreArchivoAcreditacion"><br></strong>
+              <spam id="file-name-acreditacion"></spam>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-center">
+          <button type="submit" value="submit" class="btn btn-info">
+            Guardar
+          </button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+<script>
+
+function agregarInfoAcreditacion(id, nombre) {
+    document.getElementById('idAcreditacionEliminar').value = id;
+    document.getElementById('nombreAcreditacionEliminar').innerHTML = nombre;
+    document.getElementById('inputNombreAcreditacionEliminar').value = nombre;
+    // mostrar modal modalEliminarServicio
+    $('#modalEliminarAcreditacion').modal('show');
+  }
+
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreArchivoAcreditacion(value) {
+    var iconoImagen = document.getElementById('iconoArchivo');
+    var imagenName = document.getElementById('file-name-acreditacion');
+    var mostrarNombreImagen = document.getElementById('mostrarNombreArchivoAcreditacion');
+
+
+    imagenName.innerHTML = value;
+    mostrarNombreImagen.style.display = 'none';
+    iconoImagen.classList.remove("fa-file-pdf", "fa-6x", "addArchivo");
+    iconoImagen.classList.add("fa-file-check", "fa-6x", "imagenCargada");
+  }
+
+
+  function comprobarSeleccionado(checkbox) {
+  var checkboxes = document.getElementsByName("checkboxAgregarAcreditacion");
+  checkboxes.forEach(function(cb) {
+    if (cb !== checkbox) {
+      cb.checked = false;
+    }
+  });
+  }
+
+
+
+</script>
+  
+{% endblock %}
+

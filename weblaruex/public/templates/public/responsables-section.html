@@ -1,0 +1,222 @@
+
+{% extends "public/template.html" %}
+
+{% load static %}
+
+{% block meta %}
+  <title>Responsables - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+<style>  
+.addImagen {
+  color: #1d8896;
+}
+
+.addImagen:hover {
+  color: rgba(29, 136, 150, 10);
+  filter: brightness(80%);
+}
+
+.imagenCargada{
+  color: #1d9678;
+}
+
+.close:focus {
+  outline: none;
+}
+
+.checkboxDiv input[type="checkbox"]:checked{
+  
+  background-color: #1d8896 !important;
+  border: 2px solid #1d8896 !important;
+  color: #fff;
+  accent-color: #1d8896;
+}
+</style>
+  <main id="main" data-aos="fade-in">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+    </div>
+
+    {% if alerta %}
+    {% if alerta.tipo == "success" %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fa-solid fa-circle-check"></i> {{ alerta.mensaje }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% else %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="fa-sharp fa-solid fa-circle-exclamation"></i> {{ alerta.mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endif %}
+  {% endif %}
+
+    {% include "public/parts/responsables-list.html" %}
+
+  </main><!-- End #main -->
+
+  <div id="modalEliminarResponsable" class="modal fade my-5" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="TituloModalEliminarResponsable">Eliminar Responsable</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formularioEliminarResponsable" action="\eliminarResponsable/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" class="form-control" id="idResponsable" name="idResponsable" data-rule="required" hidden/>
+            <input type="text" class="form-control" id="inputNombreResponsableEliminar" name="inputNombreResponsableEliminar" data-rule="required" hidden />
+            <label for="seguroEliminarResponsable"><strong>¿Está seguro que desea eliminar la información del Responsable <span class="text-danger" id="nombreResponsableEliminar"></span> ?</strong></label>
+            <div class="modal-footer d-flex justify-content-center">
+              <div>
+                <button id="cerrarModalEliminarResponsable" type="button" class="btn btn-secondary mx-1" data-dismiss="modal">
+                  Cerrar
+                </button>
+                <button type="submit" value="submit" class="btn btn-danger">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+<div id="modalAgregarResponsable" class="modal fade pt-5" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalAgregarResponsable">Agregar Responsable</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioAgregarResponsable" action="\agregarResponsable/" method="POST" enctype="multipart/form-data" class="php-email-form"  role="form">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col form-group">
+              <label for="nombreResponsable" class="text-secondary"><strong>Nombre del responsable</strong></label>
+              <input type="text" class="form-control" id="nombreResponsable" name="nombreResponsable" data-rule="required" required/>
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col form-group">
+              <label for="puestoResponsable" class="text-secondary"><strong>Puesto del responsable</strong></label>
+              <input type="text" class="form-control" id="puestoResponsable" name="puestoResponsable" data-rule="required"  required/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col form-group">
+              <label for="correoResponsable" class="text-secondary"><strong>Correo del responsable</strong></label>
+              <input type="email" class="form-control" id="correoResponsable" name="correoResponsable" data-rule="required" required/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col form-group">
+              <label for="telefonoResponsable" class="text-secondary"><strong>Teléfono del responsable</strong></label>
+              <input type="text" class="form-control" id="telefonoResponsable" name="telefonoResponsable" data-rule="required" required/>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col form-group">
+              <label for="fraseResponsable" class="text-secondary"><strong>Frase del responsable</strong></label>
+              <textarea name="fraseResponsable" class="form-control" id="fraseResponsable" rows="3" style="white-space: pre-line; border-color: #1d8896;" maxlength="150" ></textarea>
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col form-group">
+              <div>
+                <label for="seccionesResponsableEditar" class="text-secondary"><strong>Secciones</strong></label>
+              </div>
+              <div class="checkboxDiv form-check-inline">
+                <div class="mx-2 ">
+                  <input class="form-check-input" type="checkbox" id="seccionSeleccionadaLaboratorio" name="checkbox"  value="laboratorios">
+                  <label class="form-check-label" for="seccionSeleccionadaLaboratorio">Laboratorios</label>
+                </div>
+                <div class="mx-2">
+                  <input class="form-check-input" type="checkbox" id="seccionSeleccionadaRedes" name="checkbox"  value="redes">
+                  <label class="form-check-label" for="seccionSeleccionadaRedes">Redes</label>
+                </div>
+                <div class="mx-2">
+                  <input class="form-check-input" type="checkbox" id="seccionSeleccionadaHome" name="checkbox" value="home">
+                  <label class="form-check-label" for="seccionSeleccionadaHome">Home</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        <div class="row my-2">
+          <div class="col-sm-12 d-flex justify-content-center">
+            <div class="form-group">
+              <label for="imagenResponsableAgregar">
+                <i class="fa-duotone fa-image fa-6x addImagen" id="iconoImagen"></i>
+              </label>
+              <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                id="imagenResponsableAgregar" name="imagenResponsableAgregar"
+                onchange="mostrarNombreImagen(this.value)"/>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+              <spam id="imagen-name"></spam>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer d-flex justify-content-center">
+          <button type="submit" value="submit" class="btn btn-info">
+            Guardar
+          </button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+<script>
+
+function agregarInfoResponsable (id, nombre) {
+    document.getElementById('idResponsable').value = id;
+    document.getElementById('nombreResponsableEliminar').innerHTML = nombre;
+    document.getElementById('inputNombreResponsableEliminar').value = nombre;
+    // mostrar modal modalEliminarServicio
+    $('#modalEliminarResponsable').modal('show');
+  }
+
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+    document.getElementById('imagen-name').innerHTML = value;
+    document.getElementById('mostrarNombreImagen').style.display = 'none';
+    
+    var iconoImagen = document.getElementById('iconoImagen');
+    iconoImagen.classList.remove("fa-image", "fa-6x", "addImagen");
+    iconoImagen.classList.add("fa-circle-check", "fa-6x", "imagenCargada");
+  }
+
+
+
+</script>
+  
+{% endblock %}
+

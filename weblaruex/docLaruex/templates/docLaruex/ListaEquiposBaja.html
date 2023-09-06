@@ -1,0 +1,241 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+
+/*  3 estilo del campo añadir archivo*/
+.addFichero{
+  color: rgb(9, 58, 65);
+}
+.addFichero:hover{
+  color: rgb(133, 198, 228);
+}
+
+
+    /* ===============================
+  *  Estilo del los botones
+  =================================*/
+  
+  .agregarFormacion:hover {
+    color: #032031;
+  }
+  
+  .descargaPDF:hover {
+    color: #c36d0b;
+  }
+  .retirarStock:hover{
+    color: #492160;
+  }
+  .retirarStockUbicacion:hover{
+    color: #042e37;
+  }
+  .entrar:hover{
+    color: #195746;
+  }
+</style>
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Listado de Equipos de Baja</h5>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Listado de Equipos de Baja</li>
+    </ol>
+  </nav>
+</div>
+
+<table id="tabla_equipos" data-toggle="table" data-search="true" data-show-columns="true"
+  data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+  data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+  data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-row-style="rowStyle"></table>
+
+
+<!-- ============= Modal Eliminar Equipo ====================-->
+<div id="modalEliminarObjeto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarObjeto"><strong>¿Estas seguro que deseas eliminar el objeto?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarObjeto" action="/private/docLaruex/eliminarObjeto/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarObjeto" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarObjeto" name="cancel" onclick="crearAviso('eliminarObjetoCancelar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarObjetoGuardar', 'Objeto  eliminado', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $("#tabla_equipos").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/docLaruex/equiposDatosBaja",
+    cache: false,
+    columns: [
+      {
+        title: "",
+        field: "id__icono",
+        align: "center",
+      },
+      {
+        title: "Código Laruex",
+        field: "cod_laruex",
+        align: "center",
+        sortable: "true",
+        formatter: function (value, row) {
+          var codigo = row.cod_laruex;
+          var fecha = new Date(row.fecha_alta);
+          return (
+            codigo + '/' + fecha.getFullYear()
+          );
+        },
+      },
+      {
+        title: "Código Uex",
+        field: "cod_uex",
+        align: "center",
+      },
+      {
+        title: "Nombre",
+        field: "id__nombre",
+        align: "center",
+      },
+      {
+        title: "Tipo",
+        field: "tipo_equipo__nombre",
+        align: "center",
+      },
+      {
+        title: "Ubicación actual",
+        field: "ubicacion",
+        align: "center",
+      },
+      {
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          var botonEditar = '<a href="/private/docLaruex/editarObjeto/' + row.id + '/' + '" class="mx-1" title="Editar" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen agregarFormacion" ></i></a>';
+
+          var botonCambiarUbicacion = '<a href="" title="Cambiar Ubicacion" data-toggle="modal" data-target="#modalCambiarUbicacion" onclick="$('+"'#formularioModalCambiarUbicacion').attr('action', '/private/docLaruex/cambiarUbicacionEquipo/"+ row.id +"/');"+'" class="mx-1" style="color: #eba43d"><i class="fa-duotone fa-cart-flatbed-boxes descargaPDF"></i></a>';
+
+          var botonReportEquipo = '<a href="/private/docLaruex/reportEquipo/' + row.id + '/" class="mx-1" title="report Equipo"  style="color: #405BDE;" ><i class="fa-duotone fa-file-chart-column fa-lg agregarFormacion"></i></a>';
+
+          var botonEliminar = '<a href="/private/docLaruex/eliminarObjeto/' + row.id + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarObjeto" onclick="$('+"'#formularioModalEliminarObjeto').attr('action', '/private/docLaruex/eliminarObjeto/"+ row.id +"/');"+'"style="color:#AE2012" ><i class="fa-solid fa-x" ></i></a>';
+          var admin = '{{administrador}}';
+          var secretaria = '{{secretaria}}';
+          var direccion = '{{direccion}}';
+        
+          if (admin == 'True') {
+            return(botonVer + botonCambiarUbicacion + botonReportEquipo + botonEliminar)
+          }else if (direccion == 'True' || secretaria == 'True'){
+            return(botonVer + botonReportEquipo)
+          }else{
+            return(botonVer)
+          }
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+  function rowStyle(row, index) {
+        if (row.fecha_baja == null ) {
+            return {
+                css: {
+                    'color': 'black'
+                }
+            }
+        } else {
+            return {
+                css: {
+                    'color': 'black',
+                     //'background-color': 'light-red',
+                    'background-color': '#f5c6cb'
+                }
+            }
+        }
+    }
+
+  
+  function getFile(ficheroAdjuntoEquipo){
+    var newFile = ficheroAdjuntoEquipo.replace(/^.*\\/,"");
+  }
+  let inputFile=document.getElementById('ficheroAdjuntoEquipo');
+  let fileNameField = document.getElementById('file-name');
+  inputFile.addEventListener('change', function(event){
+    let uploadedFileName = event.target.files[0].name;
+    fileNameField.textContent=uploadedFileName;
+  })
+
+  
+
+$(function(){
+    var $table = $('#tabla_equipos');
+
+    $table.bootstrapTable('hideRow', 'fecha_baja');
+    $table.bootstrapTable('hideRow', 'cutter');
+    $table.bootstrapTable('hideRow', 'valid_s');
+});
+
+$(function(){
+    var $table = $('#tabla_equipos');
+
+    $table.bootstrapTable('showRow', 'fecha_baja');
+    $table.bootstrapTable('showRow', 'cutter');
+    $table.bootstrapTable('showRow', 'valid_s');
+});
+
+
+
+
+
+</script>
+{% endblock %}

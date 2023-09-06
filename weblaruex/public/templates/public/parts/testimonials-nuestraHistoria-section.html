@@ -1,0 +1,406 @@
+{% load static %}
+<style>
+  h1 {
+
+    color: #333;
+    font-weight: 700;
+    margin-top: 125px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    line-height: 23px;
+  }
+
+  /* --- Start progress bar --- */
+
+  .process-wrapper {
+    margin: auto;
+    max-width: 1080px;
+  }
+
+  #progress-bar-container {
+    position: relative;
+    width: 90%;
+    margin: auto;
+    height: 100px;
+    margin-top: 65px;
+    margin-left: 10%;
+  }
+
+  #progress-bar-container ul {
+    padding: 0;
+    margin: 0;
+    padding-top: 15px;
+    z-index: 9999;
+    position: absolute;
+    width: 100%;
+    margin-top: -40px
+  }
+
+  #progress-bar-container li:before {
+    display: block;
+    margin: auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: solid 2px #aaa;
+    transition: all ease 0.3s;
+
+  }
+
+  #progress-bar-container li.active:before,
+  #progress-bar-container li:hover:before {
+    border: solid px #fff;
+    /* background: linear-gradient(to right, #1f5667 0%,#fff 100%);  */
+  }
+
+  #progress-bar-container li {
+    list-style: none;
+    float: left;
+    width: 13%;
+    text-align: center;
+    color: #aaa;
+    text-transform: uppercase;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all ease 0.2s;
+    vertical-align: bottom;
+    height: 60px;
+    position: relative;
+  }
+
+  #progress-bar-container li .step-inner {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    font-size: 14px;
+  }
+
+  #progress-bar-container li.active,
+  #progress-bar-container li:hover {
+    color: #a2a8a9;
+  }
+
+  #progress-bar-container li:after {
+    content: " ";
+    display: block;
+    width: 6px;
+    height: 6px;
+    background: #777;
+    margin: auto;
+    border: solid 7px #ffffff;
+    border-radius: 50%;
+    margin-top: 45px;
+    box-shadow: 0 2px 13px -1px rgba(0, 0, 0, 0.9);
+    transition: all ease 0.2s;
+
+  }
+
+  #progress-bar-container li:hover:after {
+    background: #555;
+    box-shadow: 0 2px 13px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  #progress-bar-container li.active .step-inner {
+    color: #207893;
+  }
+
+  #progress-bar-container li.active:after {
+    background: #207893;
+    outline: solid 2px #1e6175;
+  }
+
+  #progress-bar-container #line {
+    width: 80%;
+    margin: auto;
+    background: #eee;
+    height: 6px;
+    position: absolute;
+    left: 5%;
+    top: 57px;
+    z-index: 1;
+    border-radius: 50px;
+    transition: all ease 0.9s;
+  }
+
+  #progress-bar-container #line-progress {
+    content: " ";
+    width: 3%;
+    height: 100%;
+    background: #207893;
+    background: linear-gradient(to right, #63d6e1 0%, #1a7e8b 100%);
+    position: absolute;
+    z-index: 2;
+    border-radius: 50px;
+    transition: all ease 0.9s;
+  }
+
+  #progress-content-section {
+    width: 90%;
+    margin: auto;
+    background-image: linear-gradient(to right bottom, #fdfcfb 0%, #c3dfe2 100%);
+    box-shadow: 0 0 10px rgba(6, 32, 30, 0.7);
+    border-radius: 20px;
+  }
+
+  #progress-content-section .section-content {
+    padding: 30px 40px;
+    text-align: center;
+  }
+
+  #progress-content-section .section-content h2 {
+    font-size: 17px;
+    text-transform: uppercase;
+    color: #333;
+    letter-spacing: 1px;
+  }
+
+  #progress-content-section .section-content p {
+    font-size: 16px;
+    line-height: 1.8em;
+    color: #777;
+  }
+
+  #progress-content-section .section-content {
+    display: none;
+    animation: FadeInUp 700ms ease 1;
+    animation-fill-mode: forwards;
+    transform: translateY(15px);
+    opacity: 0;
+  }
+
+  #progress-content-section .section-content.active {
+    display: block;
+  }
+
+  @keyframes FadeInUp {
+    0% {
+      transform: translateY(15px);
+      opacity: 0;
+    }
+
+    100% {
+      transform: translateY(0px);
+      opacity: 1;
+    }
+  }
+
+  .imagen-timeline {
+    max-width: 200px;
+    max-height: 200px;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    border: 2px solid #ccc;
+    overflow: hidden;
+  }
+
+  .imagen-timeline img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  #progress-bar-container li:hover:after,
+  .iconoActivo {
+    color: #1e6175;
+
+  }
+</style>
+<!-- <img src="{% static 'img/personal/trabajadores/' %}antonio_baeza.webp" alt="Imagen evento 1"> -->
+
+<!-- ======= Testimonials Section ======= -->
+<section id="testimonials">
+  <div class="container " data-aos="fade-up">
+
+    <div class="section-title">
+      <h2>Nuestra historia</h2>
+      <p>¿Cómo se creó el Laruex?</p>
+    </div>
+
+    <div class="process-wrapper">
+      <div id="progress-bar-container">
+        <ul>
+          <li class="step step01 active"><i class="fa-duotone fa-door-open fa-3x iconoActivo" id="door-icon"></i>
+            <div class="step-inner">1985</div>
+          </li>
+          <li class="step step02"><i class="fa-duotone fa-tower-broadcast fa-3x" id="tower-icon"></i>
+            <div class="step-inner">1989</div>
+          </li>
+          <li class="step step03"><i class="fa-duotone fa-file-certificate fa-3x" id="certificate-icon"></i>
+            <div class="step-inner">2008</div>
+          </li>
+          <li class="step step04"><i class="fa-duotone fa-building fa-3x" id="building-icon"></i>
+            <div class="step-inner">2014</div>
+          </li>
+          <li class="step step05"><i class="fa-duotone fa-siren-on fa-3x" id="siren-icon"></i>
+            <div class="step-inner">2015</div>
+          </li>
+          <li class="step step06"><i class="fa-duotone fa-radiation fa-3x" id="radiation-icon"></i>
+            <div class="step-inner">2017</div>
+          </li>
+          <li class="step step07"><i class="fa-duotone fa-house-chimney-user fa-3x" id="radiation-cirle-icon"></i>
+            <div class="step-inner">2022</div>
+          </li>
+        </ul>
+
+        <div id="line">
+          <div id="line-progress"></div>
+        </div>
+      </div>
+
+
+      <div id="progress-content-section">
+        <div class="section-content 1985 active">
+          <div class="imagen-timeline mx-auto mb-4">
+            <img src="{% static 'img/historia/antonio_baeza.webp' %}" alt="Antonio Baeza">
+          </div>
+          <h4 style="color: #1e6175;"><strong>Fundación de LARUEX</strong></h4>
+          <p> Bajo la dirección de <strong>Antonio Salvador Baeza Espasa, se crea el Laboratorio de Radiactividad
+              Ambiental de la Universidad de Extremadura (LARUEX) </strong> con el objetivo de realizar controles
+            exhaustivos sobre radiactividad ambiental debido a las preocupaciones relacionadas con con la central
+            nuclear de Almaraz, la central en construcción de Valdecaballeros y las minas de Uranio.</p>
+        </div>
+
+        <div class="section-content 1989">
+          <div class="imagen-timeline mx-auto mb-4">
+            <img src="{% static 'img/historia/1989.webp' %}" alt="Antonio Baeza">
+          </div>
+          <h4 style="color: #1e6175;"><strong>Primeras Estaciones</strong></h4>
+          <p>Se instalan las primeras estaciones de medida automática de radiactividad en el entorno de Almaraz.
+            Formandose así los inicios de la <strong>red RAREx</strong>.</p>
+        </div>
+
+        <div class="section-content 2008">
+          <div class="imagen-timeline mx-auto mb-4">
+            <img src="{% static 'img/historia/2008.webp' %}" alt="Antonio Baeza">
+          </div>
+          <h4 style="color: #1e6175;"><strong>Primera Acreditación en Norma ISO 17025</strong></h4>
+          <p>El laboratorio obtiene la <strong>acreditación ISO 17025 de ENAC</strong> para ampliar sus servicios de
+            medida a clientes.</p>
+        </div>
+
+        <div class="section-content 2014">
+          <div class="imagen-timeline mx-auto mb-4">
+            <img src="{% static 'img/historia/2014.webp' %}" alt="Antonio Baeza">
+          </div>
+          <h4 style="color: #1e6175;"><strong>Creación de Alerta2</strong></h4>
+          <p>Se inaugura el <strong>edificio ALERTA2, el Centro Hispano-Luso de Redes de Alerta Temprana</strong>, con
+            el fin de expandir las capacidades en materia de protección civil.</p>
+        </div>
+
+        <div class="section-content 2015">
+          <div class="imagen-timeline mx-auto mb-4">
+            <img src="{% static 'img/historia/2015.webp' %}" alt="Antonio Baeza">
+          </div>
+          <h4 style="color: #1e6175;"><strong>Desarrollo Red SPIDA</strong></h4>
+          <p>Comienza el desarrollo de la <strong>red de inundaciones de Extremadura</strong> que ha culminado en la
+            <strong>Red SPIDA con 21 estaciones</strong> de monitorización en tiempo real.</p>
+        </div>
+
+        <div class="section-content 2017">
+          <div class="imagen-timeline mx-auto mb-4">
+            <img src="{% static 'img/historia/2017.webp' %}" alt="Antonio Baeza">
+          </div>
+          <h4 style="color: #1e6175;"><strong>LARUEX - Pionero en la medida de tasa de dosis en aire</strong></h4>
+          <p>LARUEX se convierte en la <strong>primera entidad que acredita la medida de tasa de dosis en aire en la red
+              RAREx por ENAC</strong>.</p>
+        </div>
+
+        <div class="section-content 2022">
+          <h4 style="color: #1e6175;"><strong>Ampliación de acreditación para el monitoreo de radón en suelos y aire
+              interior</strong></h4>
+          <p>LARUEX <strong>ha ampliado su acreditación para medir la concentración de radón en suelos y la instalación
+              de detectores pasivos y activos de radón en viviendas habitadas y de nueva construcción. Esta expansión
+              permite evaluar, monitorear y emitir certificados de la concentración de radón, contribuyendo a la seguridad
+              en interiores</strong>.</p>
+        </div>
+      </div>
+      <div class="my-3 d-flex justify-content-center">
+        {% if request.get_full_path == "/" %}
+        <div class="d-flex justify-content-center my-4">
+          <button class="btnVerTodo"><a href="{% url 'public:publicNosotros' %}"> Saber más</a></button>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+</section><!-- End Testimonials Section -->
+
+<script>
+
+  $(".step").click(function () {
+    $(this).addClass("active").prevAll().addClass("active");
+    $(this).nextAll().removeClass("active");
+  });
+
+  $(".step01").click(function () {
+    $("#line-progress").css("width", "2%");
+    $(".1985").addClass("active").siblings().removeClass("active");
+    $('.iconoActivo').removeAttr("--fa-animation-duration");
+    $('.iconoActivo').removeClass("fa-duotone fa-beat iconoActivo");
+    $("#door-icon").toggleClass("fa-duotone fa-beat iconoActivo");
+    $("#door-icon").css("--fa-animation-duration", "3s");
+  });
+
+  $(".step02").click(function () {
+    $("#line-progress").css("width", "19%");
+    $(".1989").addClass("active").siblings().removeClass("active");
+    $('.iconoActivo').removeAttr("--fa-animation-duration");
+    $('.iconoActivo').removeClass("fa-duotone fa-beat iconoActivo");
+    $("#tower-icon").toggleClass("fa-duotone fa-beat iconoActivo");
+    $("#tower-icon").css("--fa-animation-duration", "3s");
+  });
+
+  $(".step03").click(function () {
+    $("#line-progress").css("width", "35%");
+    $(".2008").addClass("active").siblings().removeClass("active");
+    $('.iconoActivo').removeAttr("--fa-animation-duration");
+    $('.iconoActivo').removeClass("fa-duotone fa-beat iconoActivo");
+    $("#certificate-icon").toggleClass("fa-duotone fa-beat iconoActivo");
+    $("#certificate-icon").css("--fa-animation-duration", "3s");
+  });
+
+  $(".step04").click(function () {
+    $("#line-progress").css("width", "51%");
+    $(".2014").addClass("active").siblings().removeClass("active");
+    $('.iconoActivo').removeAttr("--fa-animation-duration");
+    $('.iconoActivo').removeClass("fa-duotone fa-beat iconoActivo");
+    $("#building-icon").toggleClass("fa-duotone fa-beat iconoActivo");
+    $("#building-icon").css("--fa-animation-duration", "3s");
+
+  });
+
+  $(".step05").click(function () {
+    $("#line-progress").css("width", "67%");
+    $(".2015").addClass("active").siblings().removeClass("active");
+    $('.iconoActivo').removeAttr("--fa-animation-duration");
+    $('.iconoActivo').removeClass("fa-duotone fa-beat iconoActivo");
+    $("#siren-icon").toggleClass("fa-duotone fa-beat iconoActivo");
+    $("#siren-icon").css("--fa-animation-duration", "3s");
+
+  });
+
+
+  $(".step06").click(function () {
+    $("#line-progress").css("width", "83%");
+    $(".2017").addClass("active").siblings().removeClass("active");
+    $('.iconoActivo').removeAttr("--fa-animation-duration");
+    $('.iconoActivo').removeClass("fa-duotone fa-beat iconoActivo");
+    $("#radiation-icon").toggleClass("fa-duotone fa-beat iconoActivo");
+    $("#radiation-icon").css("--fa-animation-duration", "3s");
+  });
+
+  $(".step07").click(function () {
+    $("#line-progress").css("width", "100%");
+    $(".2022").addClass("active").siblings().removeClass("active");
+    $('.iconoActivo').removeAttr("--fa-animation-duration");
+    $('.iconoActivo').removeClass("fa-duotone fa-beat iconoActivo");
+    $("#radiation-cirle-icon").toggleClass("fa-duotone fa-beat iconoActivo");
+    $("#radiation-cirle-icon").css("--fa-animation-duration", "3s");
+  });
+
+</script>

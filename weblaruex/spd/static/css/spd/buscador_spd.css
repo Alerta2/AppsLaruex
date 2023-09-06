@@ -1,0 +1,41 @@
+/*--------------------------------------------------------
+# Buscador Search
+--------------------------------------------------------*/
+.search-box{
+    border: 1px solid #c4c4c4;
+    width: 500px;
+    overflow-x: hidden;
+    display: flex;
+    border-radius: 50px;
+    font-size: 18px;
+    position: relative;
+    margin-bottom: 25px;
+}
+.search-box input{
+    width: 500px;
+    height:50px;
+    border: none;
+    outline: none;
+    font-size: 18px;  
+    background-color: transparent;
+}
+
+
+/*-------------------------------------------------
+# Boton info search (Borrar contorno azul al hacer click)
+--------------------------------------------------*/
+.btn:focus,.btn:active {
+   outline: none !important;
+   box-shadow: none;
+}
+
+.swal2-title{
+    /*font-family: 'Brush Script MT', cursive;*/
+    font-family: 'Bradley Hand ITC';
+    font-weight: bold;
+    color: #49A1A4;
+}
+
+.swal2-html-container{
+    font-size: 14px;
+}

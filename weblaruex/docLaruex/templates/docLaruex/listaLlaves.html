@@ -1,0 +1,373 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+    .add:hover {
+    color: #ce8312;
+  }
+
+       /*--------------------------------------------------------------
+    # Añadir Imagen
+    --------------------------------------------------------------*/
+    .addImagen {
+      color: rgb(16, 108, 161);
+    }
+
+    .addImagen:hover {
+      color: rgb(10, 59, 99);
+    }
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h3 class="card-title"><i class="fa-duotone fa-key"></i> Llaves</h3>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Llaves</li>
+    </ol>
+  </nav>
+</div>
+
+{% if administrador %}
+<div id="toolbar">
+  <!-- boton que permite añadir un nuevo Proveedor -->
+  <a href="" class="mx-1" title="Agregar un nuevo proveedor" data-toggle="modal" data-target="#modalFormularioAgregarLlave" style="color: #eba43d"><i
+      class="fa-solid fa-square-plus fa-2x add"></i></a>
+</div>
+{% endif %}
+
+
+<!--- modalFormularioAgregarLlave que los proveedores-->
+<div id="modalFormularioAgregarLlave" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Llave</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioAgregarLlave" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+
+
+          
+          <div class="row" >
+            <div class="col-3">
+              <label for="nombre">Color</label>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                  <input type="color" class="form-control form-control-color" id="color" name="color" value="#4154f1" title="Choose your color">
+              </div>
+            </div>
+            <div class="col-7">
+              <div class="form-group">
+                <select class="form-select" data-rule="required" id="esOriginal" name="esOriginal" onchange="mostrarTitulo(this.value)">  
+                  <option value="0">Copia</option>
+                  <option value="1" selected>Original</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-3">
+              <div class="form-group" >
+                <label for="ubicacion">¿Qué abre?</label>
+              </div>
+            </div>
+            <div class="col-9">
+              <div class="form-group">
+                <select class="form-select" data-rule="required" id="ubicacion" name="ubicacion" onchange="actualizarMostrar(this.value)">
+                  {% for ubicacion in ubicaciones %}
+                  <option value="{{ubicacion.id}}">
+                    {% if ubicacion.id__padre %}
+                      [{{ubicacion.id__padre__nombre}}] {{ubicacion.id__nombre}}
+                    {% else %}
+                      {{ubicacion.id__nombre}}
+                    {% endif %}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-3">
+              <label for="nombre">Nombre</label>
+            </div>
+            
+            <div class="col-9">
+              <div class="form-group" >
+                <input type="text" class="form-control" id="nombre" name="nombre" data-rule="required" readonly required/></div>
+            </div>
+          </div>
+
+          <div class="row" >
+            <div class="col-3">
+              <div class="form-group" >
+                <label for="responsable">Responsable</label>
+              </div>
+            </div>
+            <div class="col-9">
+              <div class="form-group">
+                <div class="row">
+                    <div class="col">
+                      <select class="form-select" data-rule="required" id="responsable" name="responsable">
+                        {% for responsable in responsables %}
+                        <option value="{{responsable.id}}">
+                            {{responsable.first_name}} {{responsable.last_name}}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                </div>
+              </div>
+            </div>     
+          </div>
+          <div class="row">      
+            <div class="col-3">
+              <div class="form-group" >
+                <label for="localizacion">¿Donde está?</label>
+              </div>
+            </div>
+            <div class="col-9">
+              <div class="form-group">
+                <div class="row">
+                    <div class="col">
+                      <select class="form-select" data-rule="required" id="localizacion" name="localizacion">
+                        {% for ubicacion in ubicaciones %}
+                        <option value="{{ubicacion.id}}">
+                          {% if ubicacion.id__padre %}
+                            [{{ubicacion.id__padre__nombre}}] {{ubicacion.id__nombre}}
+                          {% else %}
+                            {{ubicacion.id__nombre}}
+                          {% endif %}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                </div>
+              </div>
+            </div>  
+
+           </div>               
+          
+
+          <div class="row d-flex justify-content-center" >
+            <div class="col-md-auto ">
+              <div class="form-group">
+                <label for="imagenLlave">
+                  <i class="fa-duotone fa-image fa-4x addImagen"></i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="imagenLlave" name="imagenLlave"
+                  onchange="mostrarNombreImagen(this.value)" />
+                <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+                  <spam id="imagen-name"></spam>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+        
+        </div>
+
+          <div class="modal-footer">
+            <button id="cerrarAgregarLlave" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+</form>
+</div> <!-- END ModalAsociarHabilitacion -->
+
+<!-- ============= Tablas ============= -->
+
+<!-- Tabla con lista de proveedores -->
+
+    <table id="tabla_llaves" data-toggle="table" data-search="true" data-show-columns="true"
+      data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+      data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+      data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+    </table>
+
+
+<script type="text/javascript">
+
+
+  $('#tabla_llaves').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/llavesDatos",
+    cache: false,
+    columns: [{
+      title: 'Color',
+      field: 'color',
+      align: "center",
+      formatter: function (value, row) {
+        var color = row.color;
+          return('<i class="fa-solid fa-key fa-2x" style="color: ' + color + '"></i>');
+      },
+    },{
+      title: 'Código',
+      field: 'id',
+      align: "center"
+    },{
+      title: 'Nombre',
+      field: 'nombre',
+      align: "center"
+    },{
+      title: '¿Qué abre?',
+      field: 'ubicacion__id__nombre',
+      align: "center",
+      formatter: function (value, row) {
+        if(row.ubicacion__id__padre){
+          return("[" + row.ubicacion__id__padre__nombre + "] "+ row.ubicacion__id__nombre);
+        }else{
+          return(row.ubicacion__id__nombre);
+
+        }
+      },
+    },{
+      title: "Acciones",
+      field: "action",
+      align: "center",
+      formatter: function (value, row) {
+        var admin = '{{administrador}}';
+        var botonVerLlave = '<a href="/private/docLaruex/verLlave/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+        if (admin == 'True') { 
+          var botonEditarLlave = '<a href="/private/docLaruex/editarLlave/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-duotone fa-money-check-pen" style="color:#4F5775"></i></a>';
+          return (botonVerLlave + botonEditarLlave);
+        } else {
+          return (botonVerLlave);
+        }
+      },
+  },
+    ],
+    locale: "es-ES",
+    search: true,
+    sortName: 'id',
+    sortOrder: 'desc',
+
+  });
+
+/*$("#tabla_llaves").on("click-row.bs.table", function (e, row, $element) {
+    window.location.href = "/private/docLaruex/verProveedor/" + row.id + "/";
+  });*/
+  
+
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
+  function addZero(i) {
+    if (i < 10) { i = "0" + i }
+    return i;
+  }
+
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+
+    document.getElementById('imagen-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreImagen').style.display = 'none';
+  }
+
+  
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioAgregarLlave").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarLlave/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Llave guardado con éxito', 'alert-success', 2000);
+        document.getElementById('formularioAgregarLlave').reset();
+        $('#tabla_llaves').bootstrapTable('refresh');
+        $('#cerrarAgregarLlave').trigger('click');
+
+      }
+    });
+  });
+
+
+
+    // permite modificar el nombre del formulario en funcion del tipo del documento seleccionado
+    function mostrarTitulo(value) {
+      if (value == "0") {
+        $("#nombre").val($("#ubicacion option:selected").text().trim() + " - " + $("#esOriginal option:selected").text());
+        $("#nombre").prop('readonly', true);
+      } else if (value == "1") {
+
+        $("#nombre").val($("#ubicacion option:selected").text().trim() + " - " + $("#esOriginal option:selected").text());
+        $("#nombre").prop('readonly', true);
+      }else {
+        $("#nombre").val($("#ubicacion option:selected").text().trim() + " - " + $("#esOriginal option:selected").text());
+        $("#nombre").prop('readonly', true);
+      }
+  }
+  function actualizarMostrar(value){
+    mostrarTitulo(value);
+  }
+
+
+
+</script>
+{% endblock %}

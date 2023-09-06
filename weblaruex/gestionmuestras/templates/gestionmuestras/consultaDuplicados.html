@@ -1,0 +1,277 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="https://code.highcharts.com/themes/high-contrast-light.js"></script>
+{% endblock %}
+
+{% block css %}
+    button, input[type="submit"], input[type="reset"] {
+        background: none;
+        color: inherit;
+        border: none;
+        padding: 0;
+        font: inherit;
+        cursor: pointer;
+        outline: inherit;
+    }
+    .param-adicional div:hover{
+        background-color: #D7E9FC;
+    }
+    .clickable {
+        display: block;
+        height: 100%;
+        width: 100%;
+        text-decoration: none;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Consultor de duplicados</h5>
+            <!-- Multi Columns Form -->
+            <form class="g-3 mx-5" action="{% url 'gestionmuestras:gestmuesConsultaDuplicados' %}" method="POST"> 
+                {% csrf_token %}
+                <!-- captura de fichero -->
+                <label for="inputFile" class="form-label">Selecciona filtrado:</label>
+                <!-- selector de fecha de inicio y fecha fin -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="inputFile" class="form-label">Fecha inicio:</label>
+                        <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="inputFile" class="form-label">Fecha fin:</label>
+                        <input type="date" class="form-control" id="fechaFin" name="fechaFin" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label>
+                            Seleccione el procedimiento a consultar:
+                        </label>
+                        <div class="row">
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 border border-light">
+                                <label for="procedimiento">Procedimiento:</label>
+                                <select name="procedimiento" id="cars">
+                                    <option value="AB">Desecación (AB)</option>
+                                    <option value="CP">Coprecipitación (CP)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <label>
+                            Selecciona la medida a consultar:
+                        </label>
+                        <div class="row">
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 border border-light">
+                                <label for="medida">Medida:</label>
+                                <select name="medida" id="cars">
+                                    <option value="ALFA">ALFA</option>
+                                    <option value="BETA">BETA</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    
+                
+                <div class="text-center">
+                    <div class="card-header my-4"></div>
+                    <button type="submit" class="btn btn-primary">Consultar</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </div>
+            </form><!-- End Multi Columns Form -->
+        </div>
+        {% if resultados %}
+
+            <div class="card-body">
+                <figure class="highcharts-figure">
+                    <div id="container"></div>
+                </figure>
+            </div>
+            <div class="card-body">
+                    <table 
+                    data-toggle="table"
+                    data-search="true"
+                    data-show-fullscreen="true"
+                    data-show-columns="true"
+                    data-show-columns-toggle-all="true"
+                    data-pagination="true"
+                    data-show-export="true"
+                    >
+                    <thead>
+                        <tr>
+                            <th>Muestra</th>
+                            <th>Control</th>
+                            <th>Descripción</th>
+                            <th>Factor 1</th>
+                            <th>Intersecta</th>
+                            <th>Original</th>
+                            <th>Actividad</th>
+                            <th>Incertidumbre</th>
+                            <th>AMD</th>
+                            <th>Duplicada</th>
+                            <th>Actividad</th>
+                            <th>Incertidumbre</th>
+                            <th>AMD</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for resultado in resultados %}
+                            <tr>
+                                <td>{{ resultado.muestra }}</td>
+                                <td>{{ resultado.control }}</td>
+                                <td>{{ resultado.descripcion }}</td>
+                                <td>{{ resultado.factor }}</td>
+                                <td>{{ resultado.factor2 }}</td>
+                                <td>{{ resultado.original }}</td>
+                                <td>{{ resultado.actividad_original }}</td>
+                                <td>{{ resultado.error_original }}</td>
+                                <td>{{ resultado.amd_original }}</td>
+                                <td>{{ resultado.duplicada }}</td>
+                                <td>{{ resultado.actividad_duplicada }}</td>
+                                <td>{{ resultado.error_duplicada }}</td>
+                                <td>{{ resultado.amd_duplicada }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</section>
+<!-- End Info programa -->
+
+<script>
+    // Define custom series type for displaying low/med/high values using boxplot as a base
+    Highcharts.seriesType('lowmedhigh', 'boxplot', {
+        keys: ['low', 'median', 'high'],
+        tooltip: {
+            pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.name}: ' +
+                '<b>{point.low}</b> - <b>{point.median}</b> - <b>{point.high}</b><br/>'
+        }
+    }, {
+        // Change point shape to a line with three crossing lines for low/median/high
+        // Stroke width is hardcoded to 1 for simplicity
+        drawPoints: function () {
+            var series = this;
+            this.points.forEach(function (point) {
+                var graphic = point.graphic,
+                    verb = graphic ? 'animate' : 'attr',
+                    shapeArgs = point.shapeArgs,
+                    width = shapeArgs.width,
+                    left = Math.floor(shapeArgs.x) + 0.5,
+                    right = left + width,
+                    crispX = left + Math.round(width / 2) + 0.5,
+                    highPlot = Math.floor(point.highPlot) + 0.5,
+                    medianPlot = Math.floor(point.medianPlot) + 0.5,
+                    // Sneakily draw low marker even if 0
+                    lowPlot = Math.floor(point.lowPlot) +
+                        0.5 - (point.low === 0 ? 1 : 0);
+
+                if (point.isNull) {
+                    return;
+                }
+
+                if (!graphic) {
+                    point.graphic = graphic = series.chart.renderer
+                        .path('point')
+                        .add(series.group);
+                }
+
+                graphic.attr({
+                    stroke: point.color || series.color,
+                    'stroke-width': 1
+                });
+
+                graphic[verb]({
+                    d: [
+                        'M', left, highPlot,
+                        'H', right,
+                        'M', left, medianPlot,
+                        'H', right,
+                        'M', left, lowPlot,
+                        'H', right,
+                        'M', crispX, highPlot,
+                        'V', lowPlot
+                    ]
+                });
+            });
+        }
+    });
+
+    // Create chart
+    var chart = Highcharts.chart('container', {
+        chart: {
+            type: 'lowmedhigh'
+        },
+        title: {
+            text: 'Comparación de duplicados',
+            align: 'left'
+        },
+        accessibility: {
+            point: {
+                descriptionFormat: '{#unless isNull}{category}, low {low}, median {median}, high {high}{/unless}'
+            },
+            series: {
+                descriptionFormat: '{series.name}, series {seriesNumber} de {chart.series.length} con {series.points.length} puntos.'
+            },
+            typeDescription: 'Se muestra la medida de la actividad con la variación posible por el error.' // Describe the chart type to screen reader users, since this is not a traditional boxplot chart
+        },
+        xAxis: [{
+            accessibility: {
+                description: 'Muestra'
+            },
+            crosshair: true,
+            categories: {{ labels|safe }}
+        }],
+        yAxis: {
+            title: {
+                text: 'Control de duplicados'
+            },
+            min: -0.01
+        },
+        tooltip: {
+            shared: true,
+            stickOnContact: true
+        },
+        plotOptions: {
+            series: {
+                stickyTracking: true,
+                whiskerWidth: 5
+            }
+        },
+        series: [{
+            name: 'Muestras originales',
+            data: {{ data1|safe }}
+        }, {
+            name: 'Muestras duplicadas',
+            data: {{ data2|safe }}
+        }]
+    });
+
+    // Remove click events on container to avoid having "clickable" announced by AT
+    // These events are needed for custom click events, drag to zoom, and navigator
+    // support.
+    chart.container.onmousedown = null;
+    chart.container.onclick = null;
+
+</script>
+{% endblock %}

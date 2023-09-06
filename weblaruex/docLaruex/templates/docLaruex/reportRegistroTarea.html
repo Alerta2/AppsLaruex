@@ -1,0 +1,400 @@
+{% extends "base/base_docLaruex.html" %} {% load static %} {% block content %}
+
+
+<style>
+
+
+
+  /**------------------ CSS Botón Imprimir ----------------------*/
+  .cta {
+  position: relative;
+  margin: auto;
+  padding: 12px 18px;
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  }
+
+  .cta:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border-radius: 50px;
+  background: #b1dae7;
+  width: 45px;
+  height: 45px;
+  transition: all 0.3s ease;
+  }
+
+  .cta span {
+  position: relative;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #234567;
+  }
+
+  .cta svg {
+  position: relative;
+  top: 0;
+  margin-left: 10px;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke: #234567;
+  stroke-width: 2;
+  transform: translateX(-5px);
+  transition: all 0.3s ease;
+  }
+
+  .cta:hover:before {
+  width: 100%;
+  background: #b1dae7;
+  }
+
+  .cta:hover svg {
+  transform: translateX(0);
+  }
+
+  .cta:active {
+  transform: scale(0.95);
+  }
+
+/*---------------------- FIN -------------------------------*/
+  .borderless tr,
+  .borderless td,
+  .borderless th {
+    border: none !important;
+  }
+
+
+  @page {
+    size: A4;
+  }
+  @media print {
+    html, body {
+      width: 210mm;
+      height: 297mm;    
+    }  
+
+  #imprimir  {
+      visibility: hidden;
+      display: none;
+    }
+  }
+  th{
+    font-size:1.3rem;
+  }
+
+  td {
+    font-size: 1.1rem; /* equivalente a 14px */
+  }
+
+
+    /*===========================
+    Section Title One CSS
+  ===========================*/
+  .section-title-one {
+    text-align: center;
+    max-width: 750px;
+    margin: auto;
+    margin-bottom: 50px;
+    position: relative;
+    z-index: 5;
+    color: rgb(16, 110, 134);
+  }
+  @media only screen and (min-width: 768px) and (max-width: 991px) {
+    .section-title-one {
+      margin-bottom: 45px;
+    }
+  }
+  @media (max-width: 767px) {
+    .section-title-one {
+      margin-bottom: 35px;
+    }
+  }
+  .section-title-one h2 {
+    margin-bottom: 15px;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 991px) {
+    .section-title-one h2 {
+      font-size: 2rem;
+      line-height: 2.8rem;
+    }
+  }
+  @media (max-width: 767px) {
+    .section-title-one h2 {
+      font-size: 1.5rem;
+      line-height: 1.9rem;
+    }
+  }
+  
+  hr {
+    height: 10px;
+    width: 20%;
+    margin: auto;
+    background-color: rgb(5, 215, 243);
+    color: rgb(5, 215, 243);
+  }
+
+  h6 {
+    font-family: 'Poppins', sans-serif;
+    color: #394747;
+    font-size: 36px;
+  }
+
+
+  /*------------------------------------
+  SELLO CONFORME
+  ------------------------------------*/
+
+  .conforme {
+  box-shadow: 0 0 0 3px green, 0 0 0 2px green inset !important;  
+  border: 3px solid transparent !important;
+  border-radius: 10px !important;
+  display: inline-block !important;
+  padding: 5px 2px !important;
+  line-height: 44px !important;
+  color: green !important;
+  font-size: 48px !important;
+  font-family: 'Black Ops One', cursive !important;
+  font-weight: bolder !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+  opacity: 0.7 !important;
+  width: 310px !important;
+  transform: rotate(-5deg) !important;
+}
+
+
+.noConforme {
+  box-shadow: 0 0 0 3px red, 0 0 0 2px red inset !important;  
+  border: 3px solid transparent !important;
+  border-radius: 10px !important;
+  display: inline-block !important;
+  padding: 5px 2px !important;
+  line-height: 44px !important;
+  color: red !important;
+  font-size: 48px !important;
+  font-family: 'Black Ops One', cursive !important;
+  font-weight: bolder !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+  opacity: 0.7 !important;
+  width: 310px !important;
+  transform: rotate(-5deg) !important;
+  
+
+}
+
+@media print{
+  #informe-generado {
+    position: fixed;
+    bottom: 0;
+  }
+}
+
+.badge-programado{
+  background-color: #0A9396 !important;
+}
+.badge-avisado{
+  background-color: #EB8E34 !important;
+}
+.badge-realizado{
+  background-color: #21b563 !important;
+}
+.badge-caducado{
+  background-color: #b52121 !important;
+}
+.badge-cancelado{
+  background-color: #524e4e !important;
+}
+.badge-corregido{
+  border:2px solid #0A9396  !important;
+  background-color: transparent !important;
+  color:#0A9396  !important;
+}
+.badge-erroneo{
+  border:2px solid #b52121  !important;
+  background-color: transparent !important;
+  color:#b52121  !important;
+}
+
+</style>
+
+<section class="section dashboard ">
+  <div class="card-body">
+    <div class="row">
+      <div class="col">        
+        <button id="imprimir" class="cta" onclick="window.print()">
+          <span>Imprimir</span>
+          <svg viewBox="0 0 13 10" height="10px" width="15px">
+            <path d="M1,5 L11,5"></path>
+            <polyline points="8 1 12 5 8 9"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+
+    <div class="section-title-one">
+      <h1 class="fw-bold">Registro de la tarea </h1>
+      <hr>
+    </div>
+
+    <div class="row d-flex justify-content-end">
+
+      <div class="col-8">
+        <div class="card">
+          <div class="card-body">
+            <table class="table table-responsive borderless ">
+              <tr>
+                <th style="color: rgba(1, 41, 112, 0.6);
+                ">Fecha:</th>
+                <td>{{ registrosTarea.fecha }}</td>
+              </tr>
+              <tr>
+                <th style="color: rgba(1, 41, 112, 0.6);
+                ">Empleado:</th>
+                <td>{{ registrosTarea.empleado.first_name }} {{ registrosTarea.empleado.last_name }}</td>
+              </tr>
+              <tr>
+                {% if tarea.id_objeto.tipo == "Equipo" %}
+                <th style="color: rgba(1, 41, 112, 0.6);
+                ">Equipo:</th>
+                {% else %}
+                <th style="color: rgba(1, 41, 112, 0.6);
+                ">Ubicación:</th>
+                {% endif %}
+                <td>{{ tarea.id_objeto.nombre }}</td>
+              </tr>
+              
+              {% if equipo %}
+                <tr>
+                  <th style="color: rgba(1, 41, 112, 0.6);
+                  ">Localización del Equipo:</th>
+                  {% if equipo.ubicacion_actual.id.padre %}
+                  <td>[{{ equipo.ubicacion_actual.id.padre.nombre }}] {{ equipo.ubicacion_actual.id.nombre }}</td>
+                  {% else %}
+                  <td>{{ equipo.ubicacion_actual.id.nombre }}</td>
+                  {% endif %}
+                </tr>
+              {% endif %}
+              <tr>
+                <th style="color: rgba(1, 41, 112, 0.6);
+                ">Estado:</th>
+                {% if registrosTarea.estado.id == 1 %}
+                <td><span class="badge badge-programado">{{registrosTarea.estado.nombre}}</span></td>
+                {% elif registrosTarea.estado.id == 2 %}
+                <td><span class="badge badge-avisado" >{{registrosTarea.estado.nombre}}</span></td>
+                {% elif registrosTarea.estado.id == 3 %}
+                <td><span class="badge badge-realizado">{{registrosTarea.estado.nombre}}</span></td>
+                {% elif registrosTarea.estado.id == 4 %}
+                <td><span class="badge badge-caducado">{{registrosTarea.estado.nombre}}</span></td>
+                {% elif registrosTarea.estado.id == 5 %}
+                <td><span class="badge badge-cancelado">{{registrosTarea.estado.nombre}}</span></td>
+                {% elif registrosTarea.estado.id == 6 %}
+                <td><span class="badge badge-corregido">{{registrosTarea.estado.nombre}}</span></td>
+                {% elif registrosTarea.estado.id == 7 %}
+                <td><span class="badge badge-erroneo">{{registrosTarea.estado.nombre}}</span></td>
+                
+                {% else %}
+                <td><span class="badge" style="border:2px solid #b52121; background-color: transparent; color:#b52121;">--</span></td>
+                {% endif %}
+
+              </tr>
+            </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    {% if datos %}
+    <div class="row my-auto ">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Datos de la tarea</h5>
+          <table class="table table-responsive borderless">
+            <tbody>
+              {% for key, value in datos.items %}
+              <tr>
+                <th style="color: rgba(1, 41, 112, 0.6);
+              ">{{ key }}</th>
+                <td>{{ value }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    
+    <div class="row my-auto ">
+      <div class="col">
+        
+        <h5 class="card-title">Datos de la tarea</h5>
+        <span style=" font-size: 1.2rem;">Sin datos <br></span>
+        {% if registrosTarea.estado.id == 5 %}
+        <span style=" font-size: 1.2rem;">Motivo: El {{evento.tipo_evento.nombre}} fue cancelado/a </span> 
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="row my-2" >
+      <div class="col">
+        
+        <h5 class="card-title">Observaciones</h5>
+        <span class="font-italic" style=" font-size: 1.2rem;">{{ registrosTarea.observaciones}}</span>
+      </div>
+    </div>
+    {% if datos %}
+    <div class="row my-4">
+      <div class="col d-flex justify-content-center">
+        {% if registrosTarea.conforme == 1 %}
+        <div class="conforme my-2">
+          
+          Conforme
+        </div>
+        
+        {% else %}
+        <div class="noConforme my-2">
+          
+          No conforme
+        </div>
+        
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+
+  
+
+    <div class="row"  id="informe-generado">
+      <div class="col-9 d-flex align-items-end justify-content-start">
+        <h5>Informe generado con fecha <strong>{% now "d" %} de {% now "F" %} de {% now "Y" %} </strong>obtenido por<strong>{{user.first_name}} {{user.last_name}}</strong></h5>
+      </div>
+      <div class="col-3 d-flex justify-content-end justify-content-end">
+        <img src="{% static 'niceAdminAssets' %}/img/laruex.png" class="img-fluid" alt="Responsive image"
+          style=" max-width: 70%;">
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+
+
+
+<!--collapse con listado de equipos asociados a la estación -->
+{% endblock %}

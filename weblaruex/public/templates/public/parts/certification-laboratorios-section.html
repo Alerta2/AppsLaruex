@@ -1,0 +1,16 @@
+{% load static %}
+<section id="certification" class="certification">
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+        <h2>Acreditaciones</h2>
+        <p>Nuestras acreditaciones de calidad</p>
+    </div>
+    {% for acreditacion in acreditaciones %}
+    <div class="text-center" >
+          <a class="pdf-mobile get-started-btn mb-3" href="{% static 'files/' %}{{ acreditacion.archivo }}">Si no ve el documento descarguelo aquí</a>
+          <embed src="{% static 'files/' %}{{ acreditacion.archivo }}" type="application/pdf" width="100%" height="700px"/>
+    </div> <!-- End rare Item-->
+    {% endfor %}
+  </div>
+</section><!-- End certification Section -->
+,

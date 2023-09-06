@@ -1,0 +1,19 @@
+<h1>Reporte de limpieza de datos históricos</h1>
+
+{% for e in Estaciones %}
+    <h3>Estacion: {{ e.Estacion|safe }}</h3>
+    <h3>Detector: {{ e.Detector|safe }}</h3>
+    <h3>Meses: {{ e.Meses|safe }}</h3>
+    
+    {% for a in e.Revisables %}
+        <h3>Revisable isotopo {{ a.Isotopo|safe }}:</h3>
+    {% endfor %}
+    {% for a in e.Anulados %}
+        <h3>Anulados para isotopo {{ a.Isotopo|safe }}:</h3>
+        Fecha - Actividad - Amd ; 
+        {% for v in a.Valores %}
+            {{ v.fh|safe }} - {{ v.act|safe }} - {{ v.amd|safe }} ; 
+        {% endfor %}
+    {% endfor %}
+    
+{% endfor %}

@@ -1,0 +1,159 @@
+{% load static %}{% load widget_tweaks %}
+
+<style>
+
+.card {
+ width: 70rem;
+ height: auto;
+ background: white;
+ border-radius: 10px;
+ transition: border-radius 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.shadow {
+ box-shadow: inset 0 -3em 3em rgba(0,0,0,0.1),
+             0 0  0 2px rgb(190, 190, 190),
+             0.3em 0.3em 1em rgba(0,0,0,0.3);
+}
+
+
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: #1d8896;
+  }
+  
+  .addImagen:hover {
+    color: rgba(29, 136, 150, 10);
+    filter: brightness(80%);
+  }
+
+  .imagenCargada{
+    color: #1d9649;
+  }
+
+  .sinBorde:focus {
+    outline: none;
+  }
+</style>
+
+<!-- ======= Contact Section ======= -->
+<section id="contact" class="contact"  >
+  <div class="container d-flex justify-content-center" data-aos="fade-up" >
+    <div class="card shadow">
+      <div class="card-body">
+        <div class="row d-flex justify-content-center">
+          <div class="col-10">
+
+            <form id="formularioEditarMedida" action="{% url 'public:publicEditarMedida' id=medida.id %}" method="POST" enctype="multipart/form-data" class="php-email-form"  role="form">
+              {% csrf_token %}
+              <div class="row">
+                <div class="col form-group mt-4">
+                  <label for="nombreMedidaEditar" class="text-secondary"><strong>Nombre de la medida</strong></label>
+                  <input type="text" class="form-control" id="nombreMedidaEditar" name="nombreMedidaEditar" data-rule="required" maxlength="35"  value="{{medida.nombre}}" required oninput="generarUrl()"/>
+                  <input type="text" class="form-control" id="urlMedidaEditar" name="urlMedidaEditar" data-rule="required" maxlength="100" value="{{medida.url}}" hidden />
+                </div>
+              </div>
+              <div class="row my-auto">
+                <div class="col form-group">
+                  <label for="normaMedidaEditar" class="text-secondary"><strong>Norma / Decreto</strong></label>
+                  <input type="text" class="form-control" id="normaMedidaEditar" name="normaMedidaEditar" data-rule="required" value="{{medida.norma}}" required/>
+                </div>
+              </div>
+              <div class="row my-auto">
+                <div class="col form-group">
+                  <label for="resumenMedidaTarjetaEditar" class="text-secondary"><strong>Información para la tarjeta</strong></label>
+                  <input type="text" class="form-control" id="resumenMedidaTarjetaEditar" name="resumenMedidaTarjetaEditar" data-rule="required" maxlength="100" value="{{medida.resumen_tarjeta}}" required/>
+                </div>
+              </div>
+              <div class="row my-auto">
+                <div class="col form-group">
+                  <label for="resumenMedidaEditar" class="text-secondary"><strong>Resumen de la medida</strong></label>
+                  <textarea name="resumenMedidaEditar" class="form-control" id="resumenMedidaEditar" rows="3" maxlength="180" >{{medida.resumen_medida}}</textarea>
+                </div>
+              </div>
+              <div class="row my-2">
+                <div class="col-sm-12">
+                  <label for="descripcionMedida" class="text-secondary"><strong>Descripción de la medida</strong></label>
+                  <div class="text-center my-2">
+                    {{ formEditarMedida.descripcionMedida }}
+                  </div>
+                </div>
+              </div>
+              <div class="row my-auto">
+                <div class="col form-group">
+                  <label for="keywordsMedidaEditar" class="text-secondary"><strong>Meta Keywords</strong><a href="" class="mx-1" title="obtener información sobre los keywords" data-toggle="modal" data-target="#modalInfoKeywordsMedidasEditar" style="color: #eba43d"><i
+                    class="fa-solid fa-circle-info fa-lg"></i></a></label>
+                  <input type="text" class="form-control" id="keywordsMedidaEditar" name="keywordsMedidaEditar" data-rule="required" placeholder="radiactividad, medidas, aguas de consumo, agua potable" value="{{medida.meta_keywords}}"required/>
+                </div>
+              </div>
+    
+              <div class="row my-2">
+                <div class="col form-group">
+                  <label for="metaDescriptionMedidaEditar" class="text-secondary"><strong>Meta Description</strong><a href="" class="mx-1" title="obtener información sobre las metaDescriptions" data-toggle="modal" data-target="#modalInfoMetaDescriptionMedidasEditar" style="color: #eba43d"><i
+                    class="fa-solid fa-circle-info fa-lg"></i></a></label>
+                  <textarea name="metaDescriptionMedidaEditar" class="form-control" id="metaDescriptionMedidaEditar" rows="3"  maxlength="150"  placeholder="Obtenga información sobre las medidas de radiactividad en aguas de consumo. Aprenda sobre los estándares de calidad y los métodos de análisis utilizados para garantizar la seguridad del agua potable."data-rule="required" required >{{ medida.meta_descripcion }}</textarea>
+                </div>
+              </div>
+              
+            <div class="row my-2">
+              <div class="col-sm-12 d-flex justify-content-center">
+                <div class="form-group">
+                  <label for="nuevaImagenMedidaEditar">
+                    <i class="fa-duotone fa-image fa-6x addImagen" id="iconoImagen"></i>
+                  </label>
+                  <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                    id="nuevaImagenMedidaEditar" name="nuevaImagenMedidaEditar"
+                    onchange="mostrarNombreImagen(this.value)"/>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+                  <spam id="imagen-medida-editar"></spam>
+                </div>
+              </div>
+            </div>
+              
+              <div class="d-flex justify-content-center">
+                <button type="submit" value="submit" class="btn btn-info">
+                  Guardar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section><!-- End Contact Section -->
+
+
+<script>
+  // mostramos el titulo de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+    document.getElementById('imagen-medida-editar').innerHTML = value;
+    document.getElementById('mostrarNombreImagen').style.display = 'none';   
+    var iconoImagen = document.getElementById('iconoImagen');
+    iconoImagen.classList.remove("fa-image", "fa-6x", "addImagen");
+    iconoImagen.classList.add("fa-circle-check", "fa-6x", "imagenCargada");
+  }
+
+  function generarUrl() {
+      // OBTENER EL NOMBRE DE LA MEDIDA
+      var nombre = document.getElementById('nombreMedidaEditar').value;
+      var nombreMedida = nombre.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      nombreMedida = nombreMedida.replace(/\s+/g, "-");
+      nombreMedida = nombreMedida.toLowerCase();
+
+      // asignar nombre de la medida al input urlMedidaEditar
+      document.getElementById('urlMedidaEditar').value = nombreMedida;
+  
+    }
+
+</script>

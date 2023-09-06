@@ -1,0 +1,163 @@
+{% extends "public/template.html" %}
+{% load static %}
+
+{% block meta %}
+  <title>Noticias - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+<style>
+  
+  .checkboxDiv input[type="checkbox"]:checked{
+    
+    background-color: #1d8896 !important;
+    border: 2px solid #1d8896 !important;
+    color: #fff;
+    accent-color: #1d8896;
+  }
+</style>
+
+<main id="main">
+
+  <div class="breadcrumbs"></div>
+
+  <div class="blog-page area-padding">
+    <div class="container">
+      <div class="row d-flex justify-content-center ">
+        <div class="col-8 my-auto text-center border border-info rounded" >
+          <h5 class="text-info"><strong>Filtrar noticias</strong></h5>
+          <div class="form-check form-check-inline checkboxDiv">
+            <input class="form-check-input" type="checkbox" id="categoriaSeleccionada0" value="0">
+            <label class="form-check-label" for="categoriaSeleccionada0">Todas</label>
+          </div>
+          {% for categoria in categorias %}
+          <div class="form-check form-check-inline checkboxDiv">
+            <input class="form-check-input" type="checkbox" id="categoriaSeleccionada{{ categoria.id }}" value="{{categoria.id}}">
+            <label class="form-check-label" for="categoriaSeleccionada{{ categoria.id }}">{{ categoria.categoria }}</label>
+          </div>
+          {% endfor %}
+        </div>
+        
+        <div class="col-2 my-auto">
+          <button class="btn btn-outline-info my-2 my-sm-0" title="Filtrar seledccionados" onclick="enviarSeleccionados()" style="color: #0C5864">
+            <b>Filtrar</b>
+          </button>
+        </div>
+      </div>
+      <div class="row my-4">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <div class="page-head-blog">
+            <form class="form-inline my-2 my-lg-0" action="/buscarNoticias/" method="post">
+              {% csrf_token %}
+              <input class="form-control mr-sm-2" type="search" placeholder="Buscar" aria-label="Search" name="busqueda">
+              <button class="btn btn-outline-info my-2 my-sm-0" type="submit" ><b>Buscar</b></button>
+            </form>
+            <br>
+            <div class="single-blog-page">
+              <a class="twitter-timeline" data-width="350" data-height="800" data-theme="light" href="https://twitter.com/laruexcc?ref_src=twsrc%5Etfw">Tweets by laruexcc</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            </div>
+          </div>
+        </div>
+        <!-- End left sidebar -->
+        <!-- Start single blog -->
+        <div class="col-md-8 col-sm-8 col-xs-12">
+
+          {% for noticia in page_obj %}
+          <!-- Single new -->
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="single-blog">
+                  <div class="single-blog-img">
+                    <a href="/noticia/{{ noticia.id }}">
+                      <div style="width:100%; height:400px; background: url('{% static "img/news/" %}{{ noticia.img_portada }}') no-repeat; background-size: contain; background-position: left;"></div>
+                    </a>
+                  </div>
+                  <div class="blog-meta">
+                    <span class="comments-type">
+                      <i class="fa-duotone fa-comments"></i>
+                        <a href="#">{{ noticia.n_comentarios }} comentarios</a>
+                    </span>
+                    <span class="date-type">
+                      <i class="fa-solid fa-calendar "></i>                  
+                      {{ noticia.fecha }}
+                    </span>
+                  </div>
+                  <div class="blog-text">
+                    <h4>
+                      <a href="/noticia/{{ noticia.id }}">{{ noticia.titulo }}</a>
+                    </h4>
+                    <p>{{ noticia.resumen|safe }}</p>
+                  </div>
+                  <span>
+                    {% if noticia.noticia%}
+                      <a href="/noticia/{{ noticia.id }}" class="ready-btn">LEER MÁS</a></br></br>
+                    {% else %}
+                      </br></br></br>
+                    {% endif %}
+                  </span>
+                </div>
+              </div>
+            </div>
+          <!-- end single new -->
+          {% endfor %}
+          <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; Primero</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                {% endif %}
+        
+                <span class="current">
+                    Page {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                </span>
+        
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                {% endif %}
+            </span>
+          </div>
+
+        </div>
+        <!-- end single blog-->
+      </div>
+    </div>
+  </div><!-- End Blog Page -->
+</main><!-- End #main -->
+
+
+  <script>
+    function enviarSeleccionados(){
+      var categorias = document.querySelectorAll('input[type="checkbox"]:checked');
+      var valores = [];
+      var baderaTodas = false;
+
+      
+      for (var i=0;i<categorias.length;i++){
+        if (categorias[i].checked){
+          
+          valor = categorias[i].value;
+          if (valor != 0){
+            valores.push(valor.toString());
+          }
+          else{
+            baderaTodas = true;
+          }
+        }
+      } 
+      
+      if (baderaTodas == true || valores.length == 0){
+        var url = "/noticias/";
+        location.href=url;
+      }else{
+        var url = "/noticiasFiltradas/"+valores+"/";
+        location.href=url;
+      }
+    }
+  </script>
+
+
+{% endblock %}

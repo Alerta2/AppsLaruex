@@ -1,0 +1,117 @@
+{% extends "public/template.html" %}
+{% load static %}
+
+{% block meta %}
+  <title>Nosotros - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+<div class="my-5"></div>
+
+<!-- ======= noticia completa ======= -->
+<section id="about" class="about">
+
+  <div class="container contenidoNoticia" data-aos="fade-up">
+      <div class="section-title">
+            <h2>{{ noticia.categoria }}</h2>
+            <p>{{ noticia.fecha }}</p>
+            
+        {% if user.is_superuser %}
+        <a href="{% url 'public:publicEditarNoticia' id=noticia.id %}" class="btn btn-outline-info my-auto" title="Editar noticia" ><span>Editar</span></a>
+    {% endif %}
+      </div>
+          
+    <div class="row">
+      <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
+        <img src="{% static 'img/news/' %}{{ noticia.img_portada }}" class="img-fluid" alt="">
+      </div>
+      <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content get" id="contenidoNoticiaDiv">
+        <h3>{{ noticia.titulo }}</h3>
+        <div id="resumen">
+          {{ noticia.resumen|safe }}
+        </div>
+        {{ noticia.noticia|safe }}
+        {% if request.get_full_path == "/" %}<a href="{% url 'public:publicNosotros' %}" class="learn-more-btn">Saber más</a>{% endif %}
+      </div>
+    </div>
+    
+    {% if user.is_superuser %}
+    <div class="row my-3">
+      <div class="col d-flex justify-content-center">
+        <a href="" class="mx-1 btn btn-danger" title="Eliminar Noticia" data-toggle="modal" data-target="#modalEliminarNoticia"><span>Eliminar</span></a>
+        
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+</section><!-- noticia completa -->
+
+
+<div id="modalEliminarNoticia" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalEliminarNoticia">Eliminar Noticia</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioModal" action="\eliminarNoticia/" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="text" class="form-control" id="idNoticia" name="idNoticia" value="{{noticia.id}}"
+            data-rule="required" hidden />
+          <label for="seguroNoticia"><strong>¿Está seguro que desea eliminar la noticia {{noticia.titulo}}?</strong></label>
+    
+          <div class="modal-footer">
+            <button id="cerrarModalEliminarNoticia" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button type="submit" value="submit" class="btn btn-danger">
+              Eliminar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+
+  // Obtén todos los elementos <li> dentro del div con la clase "contenidoNoticia"
+  var elementosLi = document.querySelectorAll('.contenidoNoticia li');
+
+  // Recorre todos los elementos <li>
+  for (var i = 0; i < elementosLi.length; i++) {
+    var itemLi = elementosLi[i];
+
+    // Crea un nuevo elemento <i> con la clase "icofont-check-circled"
+    var icono = document.createElement('i');
+    icono.classList.add('icofont-check-circled');
+
+    // Agrega el elemento <i> como el primer hijo del elemento <li>
+    itemLi.insertBefore(icono, itemLi.firstChild);
+  }
+
+
+  // Obtén el div con el id "contenidoNoticiaDiv"
+var divResumen = document.getElementById('resumen');
+
+// Obtén todos los elementos <p> dentro del div
+var elementosP = divResumen.getElementsByTagName('p');
+
+// Recorre todos los elementos <p>
+for (var i = 0; i < elementosP.length; i++) {
+  var parrafo = elementosP[i];
+  // agrega la clase "font-italic" al elemento <p>
+  parrafo.classList.add('font-italic');
+}
+</script>
+
+{% endblock %}

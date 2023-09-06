@@ -1,0 +1,1217 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+
+    /*--------------------------------------------------------------
+    # Botón agregar proveedor
+    --------------------------------------------------------------*/
+    .cta {
+    position: relative;
+    margin: auto;
+    padding: 12px 18px;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    }
+
+    .cta:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    border-radius: 50px;
+    background: #d4e4e2;
+    width: 45px;
+    height: 45px;
+    transition: all 0.3s ease;
+    }
+
+    .cta span {
+    position: relative;
+    font-family: "Ubuntu", sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #087B6C;
+    }
+
+
+
+    .cta:hover:before {
+    width: 100%;
+    background: #d4e4e2;
+    }
+
+    .cta:active {
+    transform: scale(0.95);
+    }
+
+  /* ===============================
+  *  Estilo del los botones
+  =================================*/
+  
+.agregarFormacion:hover {
+    color: #051925;
+  }
+  .descargaPDF:hover {
+    color: #ffa60a;
+  }
+  .retirarStock:hover{
+    color: #492160;
+  }
+
+  .retirarStockUbicacion:hover{
+    color: #042e37;
+  }
+  
+  /* ===============================
+  *  Estilo del las pestañas
+  =================================*/
+  
+  .nav-tabs-bordered .nav-link {
+    margin-bottom: -2px;
+    border: none;
+    color: #2c384e;
+}
+  .nav-tabs-bordered .nav-link.active {
+    background-color: #fff;
+    color: #4154f1;
+    border-bottom: 2px solid #4154f1;
+}
+.nav-tabs {
+    --bs-nav-tabs-border-color: #dee2e6;
+    --bs-nav-tabs-border-radius: 0.375rem;
+    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
+    --bs-nav-tabs-link-active-color: #495057;
+    --bs-nav-tabs-link-active-bg: #fff;
+    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+}
+</style>
+
+
+
+<!-- breadcrumb   -->
+<div class="card-body" >
+  <h5 class="card-title">{{ itemStock.item }}</h5>
+  <nav >
+    <ol class="breadcrumb"style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/listadoStock">Listado de Stock</a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">{{  itemStock.item }}</li>
+    </ol>
+  </nav>
+</div>
+
+
+
+
+
+<!-- =================== Información de Proveedor =================== -->
+
+<section class="section profile">
+  <div class="row">
+    <div class="col-xl-4">
+
+      <div class="card">
+        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+          
+          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+            style="background-color: #41c9ef52;"><i class="fa-solid fa-cubes fa-4x" style="color: #18414b; "></i>
+          </div>
+             
+          <div class="text-center my-auto">
+            {% if itemStock.cantidad > itemStock.min_cantidad %}
+              <span class="badge text-white"
+                style="background-color: #21b563;">Stock Suficiente</span>
+            {% else %}
+              <span class="badge text-white"
+                  style="background-color: #b52121;">Sin stock mínimo</span>
+            {% endif %} 
+          </div> 
+  
+          <h2>{{itemStock.item}}</h2>
+          <h3>{{itemStock.descripcion}}</h3>          
+          <h6 class="d-flex justify-content-end">
+            {% if habilitacionNecesaria in habilitacionesUsuario or administrador %}
+            
+            <a href="" class="mx-1" title="Agregar Stock" data-toggle="modal"
+              data-target="#modalFormularioAgregarUnidadesStockProveedor" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-2x agregarFormacion"></i></a>
+            
+            <a href="" class="mx-1" title="Agregar Stock" data-toggle="modal"
+              data-target="#modalFormularioAgregarUnidadesStock" style="color: #db870a"><i
+                class="fa-duotone fa-grid-2-plus fa-2x descargaPDF"></i></a>
+
+            <a href="" class="mx-1"
+              title="retirar Stock" style="color: #9768b2" data-toggle="modal" data-target="#modalFormularioRetirarStock" ><i class="fa-duotone fa-share-from-square fa-2x retirarStock"></i></a>
+
+            <a href="" class="mx-1" title="Retirar Stock a ubicación determinada" data-toggle="modal" data-target="#modalRetirarStockUbicacion" style="color: #005F73"><i class="fa-duotone fa-dolly fa-2x retirarStockUbicacion"></i></a>
+            {% endif %}
+          </h6>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-xl-8">
+
+      <div class="card">
+        <div class="card-body pt-3">
+          <!-- Bordered Tabs -->
+          <ul class="nav nav-tabs nav-tabs-bordered">
+
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Información</button>
+            </li>  
+
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-proveedores">Proveedores</button>
+            </li> 
+
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-retiradas">Retiradas Stock</button>
+            </li>           
+
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-retiradas-error">Retiradas por Error</button>
+            </li>   
+            {% if administrador %}
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-eliminar">Eliminar</button>
+            </li>
+            {% endif %}
+
+          </ul>
+          <div class="tab-content pt-2">
+
+            <div class="tab-pane fade show active profile-overview" id="profile-overview">
+              <h5 class="card-title">Información de {{itemStock.item}}</h5>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Cantidad</div>
+                {% if itemStock.cantidad > 1 %}
+                  <div class="col-lg-9 col-md-8">{{itemStock.cantidad}} {{itemStock.unidad__nombre}}</div>
+                {% else %}
+                <div class="col-lg-9 col-md-8">{{itemStock.cantidad}} {{itemStock.unidad__nombre}}</div>
+                {% endif %}
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Estante / Contendedor</div>
+                <div class="col-lg-9 col-md-8">{{itemStock.num_estanteria}}-{{itemStock.num_contenedor}}</div>
+              </div>
+
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Ubicación</div>
+                <div class="col-lg-9 col-md-8">{{itemStock.id_ubicacion__id__nombre}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Categoría</div>
+                <div class="col-lg-9 col-md-8">{{itemStock.categoria__categoria }}</div>
+              </div>
+
+
+              {% if ultimoProveedor.proveedor__id %}
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Último proveedor</div>
+                <div class="col-lg-9 col-md-8"><a href="{% url 'docLaruex:docLaruexVerProveedor' id=ultimoProveedor.proveedor__id %}" style="text-decoration:none; color: #0a9396;">{{ultimoProveedor.proveedor__nombre }}</a></div>
+              </div>  
+              
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Último pedido</div>
+                <div class="col-lg-9 col-md-8">{{ultimoProveedor.fecha}}</div>
+              </div>
+              
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Último precio</div>
+                <div class="col-lg-9 col-md-8">{{ultimoProveedor.coste}} €</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Teléfono último proveedor</div>
+                {% if ultimoProveedor.proveedor__telefono == "" %}
+                <div class="col-lg-9 col-md-8">--</div>
+                {% else %}
+                <div class="col-lg-9 col-md-8">{{ ultimoProveedor.proveedor__telefono|slice:"0:3" }} {{ultimoProveedor.proveedor__telefono|slice:"3:18" }}</div>
+                {% endif %}
+              </div>
+              {% endif %}
+
+
+            </div>
+
+            <!-- Histórico de precios -->
+            <div class="tab-pane fade profile-proveedores pt-3" id="profile-proveedores">
+
+
+               <!-- Bubble Chart -->
+              <div class="rol" hidden>
+                <div class="col">
+                  <canvas id="bubbleChart" style="max-height: 400px;"></canvas>
+                </div>
+              </div>
+              <!-- End Bubble Chart -->
+
+              <div class="row my-2" hidden>              
+                <div class="col d-flex justify-content-center">
+                  <input type="hidden" id="listaProveedores" value="{% for label in labels %}{{ label }},{% endfor %}">
+                  <input type="hidden" id="listaData" value="{% for data in datas %}{{ data }},{% endfor %}">
+                  <input type="hidden" id="listaFechas" value="{% for fecha in fechas %}{{ fecha }},{% endfor %}">
+                  <button id="botonMostrarGrafica"class="cta" title="Agregar proveedor" onclick="mostrarGrafica()">
+                    <span>Mostrar Gráficas</span>
+                  </button>  
+                
+                  <div class="col-12" id="modalVerGrafica" style="display:none;">
+                    <canvas id="graficaProveedores" style="max-height: 400px; "></canvas> 
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-12">
+                  <div class="accordion accordion-flush" id="accordionFlushTablaHistorico">
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="flush-heading2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                          data-bs-target="#flush-collapse2" aria-expanded="false" aria-controls="flush-collapse2">
+                          <h1 class="card-title">Tabla Historico de precios</h1>
+                        </button>
+                      </h2>
+                      <div id="flush-collapse2" class="accordion-collapse collapse" aria-labelledby="flush-heading2"
+                        data-bs-parent="#accordionFlushTablaHistorico">
+                        <div class="accordion-body">            
+                          <table id="tabla_historico_proveedores" data-toggle="table" data-search="true" data-show-columns="true"
+                          data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+                          data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+                          data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div><!-- End Accordion without outline borders -->
+
+                </div>
+              </div>
+              
+            </div>
+
+            <!-- Histórico de precios -->
+            <div class="tab-pane fade profile-retiradas pt-3" id="profile-retiradas">
+
+              <h5 class="card-title">Histórico de retiradas </h5>
+              <table id="tabla_retiradas_stock" data-toggle="table" data-search="true" data-show-columns="true"
+              data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+              data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+              data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+              </table>
+
+            </div>
+
+            <!-- Histórico de precios -->
+            <div class="tab-pane fade profile-retiradas-error pt-3" id="profile-retiradas-error">
+
+              <h5 class="card-title">Retiradas por error </h5>
+              <table id="tabla_retiradas_stock_error" data-toggle="table" data-search="true" data-show-columns="true"
+              data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+              data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+              data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+              </table>
+
+            </div>
+            <!-- Editar Stock -->
+            <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+              <!-- Edit Form -->
+              <form id="formularioEditarStock"  action="/private/docLaruex/editarStock/{{itemStock.id}}/" method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label for="nuevoNombre" class="col-md-4 col-lg-3 col-form-label">Nombre</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevoNombre" type="text" class="form-control" id="nuevoNombre" value="{{itemStock.item}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaUbicacion" class="col-md-4 col-lg-3 col-form-label">Ubicación</label>
+                    <div class="col-md-8 col-lg-9">
+                      <select class="form-control" id="nuevaUbicacion" name="nuevaUbicacion">
+                        <option value="{{itemStock.id_ubicacion}}" selected hidden>{{itemStock.id_ubicacion__id__nombre}}
+                        </option>
+                        {% for ubicacion in ubicaciones %}
+                        <option value="{{ubicacion.id}}">
+                          {% if ubicacion.id__padre__nombre == NONE %}
+                          {{ubicacion.id__nombre}}
+                          {% else %}
+                          [{{ubicacion.id__padre__nombre}}] - {{ubicacion.id__nombre}}
+                          {% endif %}
+
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                </div>
+
+
+                <div class="row mb-3">
+                  <label for="nuevaCategoria" class="col-md-4 col-lg-3 col-form-label">Categoria</label>
+                    <div class="col-md-8 col-lg-9">
+                      <select class="form-control" id="nuevaCategoria" name="nuevaCategoria">
+                        <option value="{{itemStock.categoria}}" selected hidden>{{itemStock.categoria__categoria}}
+                        </option>
+                        {% for categoria in categorias %}
+                        <option value="{{categoria.id}}">
+                          {{categoria.categoria}}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                </div>
+                
+
+                <div class="row mb-3">
+                  <label for="nuevaEstanteria" class="col-md-4 col-lg-3 col-form-label">Estanteria</label>
+                  <div class="col-md-2 col-lg-2">
+                    <input name="nuevaEstanteria" type="text" class="form-control" id="nuevaEstanteria" value="{{itemStock.num_estanteria}}" >
+                  </div>
+                  <label for="nuevoContenedor" class="col-md-4 col-lg-3 col-form-label d-flex justify-content-end">Estante/Contenedor</label>
+                  <div class="col-md-2 col-lg-2 ">
+                    <input name="nuevoContenedor" type="text" class="form-control" id="nuevoContenedor" value="{{itemStock.num_contenedor}}" >
+                  </div>
+                </div>            
+                
+                <div class="row mb-3">
+                  <label for="nuevaCantidad" class="col-md-4 col-lg-3 col-form-label">Cantidad</label>
+                  <div class="col-md-2 col-lg-2">
+                    <input type="number" step="0.01" placeholder="{{itemStock.cantidad}}"class="form-control" name="nuevaCantidad" id="nuevaCantidad" value="{{itemStock.cantidad|safe}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaCantidadMinima" class="col-md-4 col-lg-3 col-form-label">Cantidad Mínima</label>
+                  <div class="col-md-2 col-lg-2">
+                    <input type="number" step="0.05" placeholder="{{itemStock.min_cantidad}}"class="form-control" name="nuevaCantidadMinima" id="nuevaCantidadMinima" value="{{itemStock.min_cantidad|safe}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaUnidad" class="col-md-4 col-lg-3 col-form-label">Unidades</label>
+                    <div class="col-md-8 col-lg-9">
+                      <select class="form-control" id="nuevaUnidad" name="nuevaUnidad">
+                        <option value="{{itemStock.unidad__id}}" selected hidden>{{itemStock.unidad__nombre}}
+                        </option>
+                        {% for unidad in unidades %}
+                        <option value="{{unidad.id}}">
+                          {{unidad.nombre}}
+                        </option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoUrgente" class="col-md-4 col-lg-3 col-form-label">¿Es urgente?</label>
+                    <div class="col-md-2 col-lg-2">
+                      <select class="form-control" id="nuevoUrgente" name="nuevoUrgente">
+                        <option value="{{itemStock.urgente}}" selected hidden>
+                          {%if itemStock.urgente == 0 or itemStock.urgente == None or itemStock.urgente == "" or itemStock.urgente == NONE %}
+                          No
+                        {% else %}
+                          Si
+                        {% endif%}
+                        </option>
+                        <option value="0">No
+                        </option>
+                        <option value="1">Si
+                        </option>
+                      </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="nuevoAvisado" class="col-md-4 col-lg-3 col-form-label">¿Hay que avisar?</label>
+                    <div class="col-md-2 col-lg-2">
+                      <select class="form-control" id="nuevoAvisado" name="nuevoAvisado">
+                        <option value="{{itemStock.avisado}}" selected hidden>
+                          {%if itemStock.avisado == 0 or itemStock.avisado == None or itemStock.avisado == "" or itemStock.avisado == NONE %}
+                            No
+                          {% else %}
+                            Si
+                          {% endif%}
+                        </option>
+                        <option value="0">No
+                        </option>
+                        <option value="1">Si
+                        </option>
+                      </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaDescripcion" class="col-md-4 col-lg-3 col-form-label">Descripción</label>
+                  <div class="col-md-8 col-lg-9">
+                    <textarea name="nuevaDescripcion" class="form-control" id="nuevaDescripcion" style="height: 100px">{{itemStock.descripcion}}</textarea>
+                  </div>
+                </div>
+
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+
+            <!-- Eliminar Proveedor -->
+            <div class="tab-pane fade profile-edit pt-3" id="profile-eliminar">
+
+              <!-- Edit Form -->
+              <form form id="fomularioEliminarStock" action="/private/docLaruex/eliminarStock/{{ itemStock.id }}/"
+              method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label class="text-center">¿Estás seguro de eliminar el proveedor {{itemStock.item}}?</label>
+                </div>
+                <div class="text-center">
+                  <button id="eliminarStock" type="submit" class="btn btn-danger" onclick="crearAviso('guardarEliminarProveedor', 'Proveedor {{ proveedor.nombre }} eliminado con éxito', 'alert-success', 3000)">Eliminar</button>
+
+                  <button  id="canclearEliminarStock" type="reset" class="btn btn-secondary" onclick="crearAviso('cerrarEliminarProveedor', 'No se ha podido eliminar el proveedor {{ proveedor.nombre }}', 'alert-warning', 3000); location.reload()">Cancelar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+
+
+
+
+          </div><!-- End Bordered Tabs -->
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== Formulario Agregar Unidades Stock ===================== -->
+
+<div id="modalFormularioAgregarUnidadesStock" class="modal fade" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalAgregar">Agregar Unidades Stock</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioAgregarUnidadesStock"
+          action="/private/docLaruex/agregarUnidadesStock/{{itemStock.id}}/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div id="formularioAgregarUnidadesStockDiv" class="divFormularios">
+            <div class="row d-flex justify-content-center">
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="cantidadAgregada">Cantidad</label>
+                  <input type="number" step="0.01" class="form-control" id="cantidadAgregada" name="cantidadAgregada"
+                    data-rule="required" placeholder="0" required/>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="modal-footer">
+              <button id="cerrarAgregarStock" type="button" class="btn btn-secondary" data-dismiss="modal">
+                Cerrar
+              </button>
+              <button id="reset" type="reset" class="btn btn-secondary" hidden>
+              </button>
+              <button type="submit" value="submit" class="btn btn-primary">
+                Guardar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===================== Formulario Agregar Unidades Stock ===================== -->
+
+<div id="modalFormularioAgregarUnidadesStockProveedor" class="modal fade" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalAgregarUnidadesStockProveedor">Agregar Unidades de distinto Proveedor</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioAgregarUnidadesStockProveedor"
+          action="/private/docLaruex/agregarUnidadesStockProveedor/{{itemStock.id}}/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div id="formularioAgregarUnidadesStockProveedorDiv" class="divFormularios">
+            
+            <div class="row d-flex justify-content-center">
+              <div class="col-4">
+                <div class="form-group">
+                  <label for="fechaAgregarStockProveedor">Fecha de Compra</label>
+                  <input type="date" class="form-control" id="fechaAgregarStockProveedor" name="fechaAgregarStockProveedor" data-rule="required" required/>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="proveedorAgregarStock">Proveedor</label>
+                  <select class="form-select" data-rule="required" id="proveedorAgregarStock" name="proveedorAgregarStock">
+                    {% for proveedor in proveedores %}
+                    <option value="{{proveedor.id}}">
+                      {{proveedor.nombre}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="row d-flex justify-content-center">
+              <div class="col-5">
+                <div class="form-group">
+                  <label for="cantidadAgregadaProveedor">Cantidad</label>
+                  <input type="number" step="0.01" class="form-control" id="cantidadAgregadaProveedor" name="cantidadAgregadaProveedor" data-rule="required" placeholder="0,01" required/>
+                </div>
+              </div>
+              <div class="col-5">
+                <div class="form-group">
+                  <label for="costeAgregarStockProveedor">Precio</label>
+                  <input type="number" step="0.01" class="form-control" id="costeAgregarStockProveedor" name="costeAgregarStockProveedor" data-rule="required" placeholder="0,01" required/>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="modal-footer">
+              <button id="cerrarAgregarStockProveedor" type="button" class="btn btn-secondary" data-dismiss="modal">
+                Cerrar
+              </button>
+              <button id="resetAgregarStockProveedor" type="reset" class="btn btn-secondary" hidden>
+              </button>
+              <button type="submit" value="submit" class="btn btn-primary">
+                Guardar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Formulario retirar Stock ===================== -->
+
+<div id="modalFormularioRetirarStock" class="modal fade" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Retirar Stock</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioRetirarStock"
+          action="/private/docLaruex/retirarStock/{{itemStock.id}}/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div id="formularioRetirarStockDiv" class="divFormularios">
+            <div class="row">
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="fechaRetirada">Fecha de Retirada</label>
+                  <input type="date" id="fechaRetirada" name="fechaRetirada" class="form-control" required/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="cantidadRetirada">Cantidad</label>
+                  <input type="number" step="0.01" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
+                    data-rule="required" placeholder="0" required/>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="empleadoQueRetira">Empleado</label>
+                  <select class="form-select"  id="empleadoQueRetira" name="empleadoQueRetira">
+                    {% for empleado in empleados %}
+                    <option data-tokens="{{empleado.first_name}}" value="{{empleado.id}}">
+                      {{empleado.first_name}} {{empleado.last_name}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+  
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col d-flex justify-content-center align-items-center">              
+                <div class="form-check my-auto align-items-center">
+                  <input class="form-check-input" type="checkbox" id="error" name="error" >
+                  <label class="form-check-label" for="error" style="font-size: 1.2rem;">
+                    <i class="fa-duotone fa-triangle-exclamation" style="color: #ae2012"></i>
+                    Marcar si es retirarda por error
+                  </label>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="modal-footer">
+              <button id="cerrarStock" type="button" class="btn btn-secondary" data-dismiss="modal">
+                Cerrar
+              </button>
+              <button id="reset" type="reset" class="btn btn-secondary" hidden>
+              </button>
+              <button type="submit" value="submit" class="btn btn-primary">
+                Guardar
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============= FORMULARIO Retirar Stock de Ubicación ============= -->
+<!-- formulario retirar stock Ubicación  -->
+<div id="modalRetirarStockUbicacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalRetirarStockUbicacion"><strong>Retirar Stock a otra Ubicacion</strong></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalRetirarStockUbicacion" action="/private/docLaruex/retirarStockUbicacion/{{itemStock.id}}/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+            <div class="row">
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="fechaRetirada">Fecha de Retirada</label>
+                  <input type="date" id="fechaRetirada" name="fechaRetirada" class="form-control" required/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="cantidadRetirada">Cantidad</label>
+                  <input type="number" step="0.5" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
+                    data-rule="required" placeholder="0" required/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="empleadoQueRetira">Empleado</label>
+                  <select class="form-select"  id="empleadoQueRetira" name="empleadoQueRetira">
+                    {% for empleado in empleados %}
+                    <option data-tokens="{{empleado.first_name}}" value="{{empleado.id}}">
+                      {{empleado.first_name}} {{empleado.last_name}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="nuevaUbicacion">Ubicacion</label>
+                  <select class="form-select"  id="nuevaUbicacion" name="nuevaUbicacion">
+                    {% for ubicacion in ubicaciones %}
+                    <option data-tokens="{{ubicacion.id}}" value="{{ubicacion.id}}">{{ubicacion.id__nombre}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          <div class="modal-footer">
+            <button id="cerrarRetirarStockUbicacion" data-dismiss="modal" hidden>Cerrar</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancelRetirarStockUbicacion" name="cancelRetirarStockUbicacion" onclick="crearAviso('cancelarRetirarStockUbicacion', 'No retirar stock de {{ itemStock.item }}', 'alert-warning', 3000)">
+              Cancelar
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('RetirarStockUbicacionGuardar', 'Se ha retirado stock de {{ itemStock.item }} ', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div><!-- END formulario retirar Stock Ubicación  -->
+
+
+
+<script type="text/javascript">
+    $('#tabla_retiradas_stock').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/retiradasStockDatos/{{itemStock.id}}",
+        cache: false,
+        columns: [{
+            title: 'Fecha',
+            field: 'fecha',
+            align: "center",
+            sortable: "true",
+          formatter: function (value, row) {
+            var fecha = new Date(row.fecha);
+            return (
+              $.datepicker.formatDate("dd-mm-yy", fecha))
+          },
+        }, {
+            title: 'Cantidad',
+            field: 'cantidad',
+            align: "center",
+        },{
+            title: 'Ubicacion',
+            field: 'ubicacion',
+            align: "center",
+            formatter: function (value, row) {
+              
+              var ubicacion = row.ubicacion__id__nombre;
+
+              if (row.ubicacion != null){
+
+                return (ubicacion);
+              }else{
+                return ("-");
+              }
+            }
+        },{
+            title: 'Empleado',
+            field: 'empleado',
+            align: "center",
+            formatter: function (value, row) {
+              var empleado = row.empleado__first_name +" "+ row.empleado__last_name;
+              return (empleado);
+            }
+        },
+    ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'fecha',
+        sortOrder: 'desc',
+
+    });
+
+
+    
+    $('#tabla_retiradas_stock_error').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/retiradasStockErrorDatos/{{itemStock.id}}",
+        cache: false,
+        columns: [{
+            title: 'Fecha',
+            field: 'fecha',
+            align: "center",
+            sortable: "true",
+          formatter: function (value, row) {
+            var fecha = new Date(row.fecha);
+            return (
+              $.datepicker.formatDate("dd-mm-yy", fecha))
+          },
+        }, {
+            title: 'Cantidad',
+            field: 'cantidad',
+            align: "center",
+        },{
+            title: 'Empleado',
+            field: 'empleado',
+            align: "center",
+            formatter: function (value, row) {
+              var empleado = row.empleado__first_name +" "+ row.empleado__last_name;
+              return (empleado);
+            }
+        },
+    ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'fecha',
+        sortOrder: 'desc',
+
+    });
+
+    // TABLA HISTORICO DE PROVEEDORES
+
+    $('#tabla_historico_proveedores').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/historicoProveedoresDatos/{{itemStock.id}}",
+        cache: false,
+        columns: [{
+            title: 'Fecha',
+            field: 'fecha',
+            align: "center",
+            sortable: "true",
+          formatter: function (value, row) {
+            var fecha = new Date(row.fecha);
+            return (
+              $.datepicker.formatDate("dd-mm-yy", fecha))
+          },
+        }, {
+            title: 'Cantidad',
+            field: 'cantidad',
+            align: "center",
+        },{
+            title: 'Unidades',
+            field: 'unidad__nombre',
+            align: "center",
+        },{
+            title: 'Precio',
+            field: 'coste',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              var precio = row.coste + " €";
+              return (precio);
+            },
+        },{
+            title: 'Proveedor',
+            field: 'proveedor__nombre',
+            align: "center",
+        },
+    ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'fecha',
+        sortOrder: 'desc',
+
+    });
+
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioEditarStock").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarStock/{{itemStock.id}}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Item modificado con éxito', 'alert-success', 2000);
+        location.reload(true);
+
+      }
+    });
+  });
+
+     // cambiamos la funcionalidad del boton submit del formulario
+     $("#formularioAgregarUnidadesStock").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarUnidadesStock/{{itemStock.id}}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Retirada de Stock realizada con éxito', 'alert-success', 2000);
+        document.getElementById('formularioAgregarUnidadesStock').remove();
+        $('#tabla_retiradas_stock').bootstrapTable('refresh');
+        $('#tabla_retiradas_stock_error').bootstrapTable('refresh');
+        $('#modalFormularioAgregarUnidadesStock').trigger('reset');
+        $('#cerrarAgregarStock').trigger('click');
+        location.reload(true);
+
+      }
+    });
+  });
+
+
+
+  function mostrarGrafica(){
+      const btnMostrarModal = document.getElementById("botonMostrarGrafica");
+      const modalGrafica = document.getElementById("modalVerGrafica");
+
+      modalGrafica.style.display = "block";
+      btnMostrarModal.style.display = "none";
+    }
+    
+
+
+
+/*
+  document.addEventListener("DOMContentLoaded", () => {
+    
+    // obtengo los proveedores
+    var proveedoresStr = document.getElementById('listaProveedores').value;
+    var proveedoresArr = proveedoresStr.split(',');
+
+    // obtengo las fechas
+    var fechasStr = document.getElementById('listaFechas').value;
+    var fechasArr = fechasStr.split(',');
+
+    console.log("----------+------------");
+    console.log(fechasArr);
+    console.log("-----------+-----------");
+    //obtengo los datos
+    var dataStr = document.getElementById('listaData').value;
+    var dataArr = dataStr.split(',');
+    console.log("----------------------");
+    console.log(dataArr);
+    console.log("----------------------");
+  
+    new Chart(document.querySelector('#graficaProveedores'), {
+      type: 'line',
+      data: {
+        labels: fechasArr,
+        datasets: [{
+          label: dataArr,
+          data: proveedoresArr,
+          fill: false,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+
+  });*/
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+
+    // array con los colores para cada proveedor
+    var colores = ['rgb(75, 192, 192)', 'rgb(255, 99, 132)', 'rgb(54, 162, 235)'];
+    
+    // obtengo los proveedores
+    var proveedoresStr = document.getElementById('listaProveedores').value;
+    var proveedoresArr = proveedoresStr.split(',');
+
+    // obtengo las fechas
+    var fechasStr = document.getElementById('listaFechas').value;
+    var fechasArr = fechasStr.split(',');
+
+    // obtengo los datos
+    var dataStr = document.getElementById('listaData').value;
+    var dataArr = dataStr.split(',');
+    
+    // creo un objeto de datos del gráfico vacío
+    var chartData = {
+      labels: fechasArr,
+      datasets: []
+    };
+    
+    // recorro los proveedores y creo una serie de datos y un dataset para cada proveedor
+    for (var i = 0; i < proveedoresArr.length; i++) {
+      
+      // creo una serie de datos para el proveedor actual
+      var proveedorDataArr = [];
+      for (var j = 0; j < fechasArr.length; j++) {
+        var dataIndex = (i * fechasArr.length) + j;
+        var dato = parseFloat(dataArr[dataIndex]);  
+        if (!isNaN(dato) && dato !== null && dato !== '') {
+          proveedorDataArr.push(dato);
+        }
+      }
+      
+      // creo un dataset para el proveedor actual
+      var dataset = {
+        label: proveedoresArr[i],
+        data: {
+                  Precio: 15,
+                  Cantidad: 42,
+                  Formato: 33
+                },
+        fill: false,
+        borderColor: colores[i % colores.length],
+        tension: 0.1
+      };
+      
+      // agrego el dataset al objeto de datos del gráfico
+      chartData.datasets.push(dataset);
+    }
+    
+    // creo un objeto de opciones del gráfico
+    var chartOptions = {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    };
+    
+    // creo el gráfico
+    new Chart(document.querySelector('#graficaProveedores'), {
+      type: 'line',
+      data: chartData,
+      options: chartOptions
+    });
+    
+});
+
+
+/*=============================================
+=            GRÁFICO DE BURBUJAS            = 
+==============================================*/
+    document.addEventListener("DOMContentLoaded", () => {
+
+      
+    // array con los colores para cada proveedor
+    var borderColor = ['rgb(255, 99, 132)', 'rgb(75, 192, 192)', 'rgb(75, 192, 15)'];
+    var backGroundColor =['rgba(255, 99, 132, 0.5)', 'rgba(75, 192, 192, 0.5)' ,'rgba(75, 192, 15, 0.5)']
+    
+    // obtengo los proveedores
+    var proveedoresStr = document.getElementById('listaProveedores').value;
+    var proveedoresArr = proveedoresStr.split(',');
+    
+
+    // obtengo las fechas
+    var fechasStr = document.getElementById('listaFechas').value;
+    var fechasArr = fechasStr.split(',');
+
+    // obtengo los datos
+    var dataStr = document.getElementById('listaData').value;
+    var dataArr = dataStr.split(',');
+      new Chart(document.querySelector('#bubbleChart'), {
+        type: 'bubble',
+        data: {
+          labels: fechasArr,
+          datasets: [{
+              label: proveedoresArr[0],
+              data: [{
+                  x: 20,
+                  y: 30,
+                  r: 15
+                },
+                {
+                  x: 40,
+                  y: 10,
+                  r: 10
+                },
+                {
+                  x: 15,
+                  y: 37,
+                  r: 12
+                },
+                {
+                  x: 32,
+                  y: 42,
+                  r: 33
+                }
+              ],
+              borderColor: borderColor[0],
+              backgroundColor: backGroundColor[0],
+            },
+            {
+              label: proveedoresArr[1],
+              data: [{
+                  x: 40,
+                  y: 25,
+                  r: 22
+                },
+                {
+                  x: 24,
+                  y: 47,
+                  r: 11
+                },
+                {
+                  x: 65,
+                  y: 11,
+                  r: 14
+                },
+                {
+                  x: 11,
+                  y: 55,
+                  r: 8
+                }
+              ],
+              borderColor: borderColor[1],
+              backgroundColor: backGroundColor[1],
+            },
+            {
+              label: proveedoresArr[2],
+              data: [{
+                  x: 45,
+                  y: 17,
+                  r: 12
+                },
+                {
+                  x: 64,
+                  y: 47,
+                  r: 15
+                },
+                {
+                  x: 36,
+                  y: 18,
+                  r: 14
+                },
+                {
+                  x: 5,
+                  y: 20,
+                  r: 8
+                }
+              ],
+              borderColor: borderColor[2],
+              backgroundColor: backGroundColor[2],
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Leyenda de Compras a Proveedores',
+              position: 'bottom',
+            }
+          }
+        }
+      });
+    });
+  </script>
+{% endblock %}

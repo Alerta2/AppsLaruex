@@ -1,0 +1,1249 @@
+{% extends "base/base_docLaruex.html" %} {% load static %}
+{% block content %}
+
+<style>
+
+    /*===========================
+    Nav bar CSS
+  ===========================*/
+
+  .nav-tabs-bordered .nav-link {
+    margin-bottom: -2px;
+    border: none;
+    color: #2c384e;
+}
+  .nav-tabs-bordered .nav-link.active {
+    background-color: #fff;
+    color: #4154f1;
+    border-bottom: 2px solid #4154f1;
+}
+.nav-tabs {
+    --bs-nav-tabs-border-color: #dee2e6;
+    --bs-nav-tabs-border-radius: 0.375rem;
+    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
+    --bs-nav-tabs-link-active-color: #495057;
+    --bs-nav-tabs-link-active-bg: #fff;
+    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+}
+
+  /*===========================
+    Otros CSS
+  ===========================*/
+  
+  hr {
+    height: 10px;
+    width: 20%;
+    margin: auto;
+    background-color: rgb(5, 215, 243);
+    color: rgb(5, 215, 243);
+  }
+
+    /*----------------------
+  Enviar Notificaciones
+  -----------------------*/
+    .enviarNotificacion:hover {
+    color: #064061;
+  }
+
+  /*----------------------
+  Descarga de archivos
+  -----------------------*/
+
+  .descargaWord:hover {
+    color: #064061;
+  }
+
+  .modificarObjeto:hover {
+    color: #bb3e03;
+  }
+
+
+  .descargaPDF:hover {
+    color: #ce8312;
+  }
+    
+  .enviarNotificacion:hover {
+    color: #064061;
+  }
+
+
+</style>
+
+<!-- ============= breadcrumb ============= -->
+<div class="card-body">
+  <nav>
+    <div class="row">
+      <div class="col-8">
+        <ol class="breadcrumb" style="background-color:#fff !important">
+          <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                class="bi bi-house-door"></i></a></li>
+          <li class="breadcrumb-item" style="font-size: large;"><a
+              href="\private/docLaruex/tipoObjeto/Acta/">Listado de actas</a>
+          </li>
+          <li class="breadcrumb-item active" style="font-size: large;">Acta nº {{ acta.sesion }} del {{ acta.fecha_inicio|date:"Y" }}
+          </li>
+        </ol>
+      </div>
+
+    </div>
+    <div class="d-flex justify-content-end">
+      <a class="mx-1" title="Enviar nota relacionada con {{ acta.id.nombre }}" data-toggle="modal" data-target="#modalFormularioEnviarNota" style="color: #001219; align-items: md-center"><i class="fa-duotone fa-message-pen fa-2x enviarNotificacion"></i></a>
+      <a class="mx-1" title="Notas relacionadas con {{ acta.sesion }}" data-toggle="modal" data-target="#modalFormularioVerNotas" style="color: #001219; align-items: md-center"><i class="fa-duotone fa-messages fa-2x enviarNotificacion"></i></a>
+    </div>
+  </nav>
+</div>
+
+<!-- ========== Modal Enviar Notificacion ================= -->
+<div id="modalFormularioEnviarNota" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Generar notificación asociada al Acta {{ acta.sesion }} de {{ acta.fecha_inicio|date:"Y" }} del {{ acta.consejo }} </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioModalEnviarNota" action="/private/docLaruex/agregarNotificacion/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <input type="text" class="form-control" id="id_doc" name="id_doc" data-rule="required" 
+                  value="{{ acta.id.id }}" hidden  />
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" id="estadoNotificacion" name="estadoNotificacion" data-rule="required" 
+                  value="1" hidden />
+              </div>
+            </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+              <div class="form-group">
+                <label for="tituloNotificacion">Título</label>
+                <input type="text" class="form-control" id="tituloNotificacion" name="tituloNotificacion" data-rule="required" required />
+              </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group">
+              <label for="resumenNotificacion">Resumen</label>
+              <textarea class="form-control" id="resumenNotificacion" name="resumenNotificacion" rows="5" data-rule="required"
+                placeholder="Escriba un comentario" required></textarea>
+            </div>
+
+          </div>
+        </div>
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" >
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========== Modal Ver Notas ================= -->
+<div id="modalFormularioVerNotas" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Notas del {{ acta.id.tipo }} nº {{ acta.sesion }} de {{ acta.fecha_inicio|date:"Y" }} </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioModalEnviarNota" action="/private/docLaruex/agregarNotificacion/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col">
+              <table class="table-sm table-hover" id="tabla_notificaciones" data-search="true"
+              data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10]"
+              data-toolbar="#toolbar"></table>
+            </div>
+        </div>
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" >
+              Cerrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========== Modal Cambiar Estado ================= -->
+<div id="modalFormularioCambiarEstado" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalCambiarEstado">Cambiar estado del Acta {{acta.sesion}} de {{acta.fecha_inicio|date}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioCambiarEstado" action="/private/docLaruex/editarEstado/{{acta.id.id}}/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <input type="text" class="form-control" id="id" name="id" data-rule="required" 
+                  value="{{ acta.id.id }}" hidden />
+              </div>
+            </div>
+        </div>
+        <div class="row">
+          <div class="col-4">
+            <div class="form-group">
+              <label>Estado actual</label>
+              <input type="text" value ="{{acta.id.id_estado.nombre}}" class="form-control" disabled>
+            
+            </div>
+          </div>
+          <div class="col-8">
+            <div class="form-group">
+              <label for="nuevoEstado">Nuevo estado</label>
+               <select class="form-select my-auto" id="nuevoEstado" name="nuevoEstado" >
+                {% for estado in estados %}
+                  <option value="{{estado.id}}">
+                    {{estado.nombre}}
+                  </option>
+                {% endfor %}
+                </select>
+            </div>
+          </div>
+        </div>
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" >
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Modal Añadir Acuerdos ================= -->
+<div id="modalFormularioAddAcuerdos" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalAddAcuerdos">Agregar acuedos al Acta {{acta.sesion}} de {{acta.fecha_inicio|date}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioAddAcuerdos" action="/private/docLaruex/agregarAcuerdos/{{acta.id.id}}/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+        <div class="row">
+          <div class="col-4">
+            <div class="form-group">
+              <label for="numPuntos">Acuerdos del Acta</label>
+              <select class="form-select" data-rule="required" id="numPuntos" name="numPuntos"
+                onchange="mostrarAcuerdos(this.value)">
+                {% with i="1" %}
+          
+                  {% for i in range %}
+                  <option value="{{i}}">{{i}}</option>
+                  {% endfor %}
+                {% endwith %}
+              </select>
+            </div>
+          </div>
+        </div>
+                
+        <div class=" row">
+          <div class="col-3">
+            <div class="form-group" id="divOrdenAcuerdos">
+            </div>
+          </div>
+          <div class="col-9">
+            <div class="form-group" id="divAcuerdos">
+            </div>
+          </div>
+        </div>
+
+          <div class="modal-footer">
+            <button id="cerrarAcuerdos" type="button" class="btn btn-secondary" data-dismiss="modal" >
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- =================== Información de Acta =================== -->
+
+<section class="section profile">
+  <div class="row">
+    <div class="col-xl-4">
+
+      <div class="card">
+        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+          
+          <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+            style="background-color: #41c9ef52;">
+            <i class="fa-solid fa-typewriter fa-4x" style="color: #18414b; "></i>
+          </div>      
+          <div>
+            {% if acta.id.id_estado.id == 1 or acta.id.id_estado.id == 2 %}
+              <span class="badge text-white"
+                  style="background-color: #21b563; vertical-align:middle">{{acta.id.id_estado.nombre}}</span>
+            {% elif acta.id.id_estado.id == 3 or acta.id.id_estado.id == 4 %}
+              <span class="badge text-white"
+                  style="background-color: #EB8E34; vertical-align:middle">{{acta.id.id_estado.nombre}}</span>
+            {% elif acta.id.id_estado.id == 5 %}
+              <span class="badge text-white"
+                  style="background-color: #524e4e; vertical-align:middle">{{acta.id.id_estado.nombre}}</span>
+            {% else %}
+              <span class="badge text-white"
+                  style="background-color: #b52121; vertical-align:middle">{{acta.id.id_estado.nombre}}</span>
+            {% endif %} 
+
+          </div>   
+           
+          <h2 class="my-2 text-center">
+            Acta nº {{ acta.sesion }} de {{ acta.fecha_inicio|date:"Y" }} del {{ acta.consejo }}
+          </h2>
+
+          <h6 class="d-flex justify-content-end">
+            {% if habilitacionNecesaria in habilitacionesUsuario or administrador %}
+            <a href="{{media}}/{{ acta.id.tipo }}/{{ acta.id.ruta }}" class="mx-1" title="download"
+              style="color: #eba43d" download><i class="fa-solid fa-file-pdf fa-2x descargaPDF"> </i></a>
+              {% if acta.id.ruta_editable %}
+
+              <a href="{{ media }}/{{ acta.id.tipo }}/{{ acta.id.ruta_editable }}" class="mx-1" title="upload"
+                style="color: #1d6893" download><i class="fa-solid fa-file-word fa-2x descargaWord"> </i></a>
+              {% endif %}    
+              
+              {% if not acuerdos %}
+              <a class="mx-1" title="agregar acuerdos" data-target="#modalFormularioAddAcuerdos" data-toggle="modal"
+              style="color: #1d6893; align-items: md-center"><i class="fa-duotone fa-ballot-check fa-2x descargaWord"></i></a> 
+              {% endif %}
+              
+              <a class="mx-1" title="cambiar estado" data-target="#modalFormularioCambiarEstado" data-toggle="modal"
+              style="color: #001219; align-items: md-center"><i class="fa-duotone fa-sign-hanging fa-2x enviarNotificacion"></i></a>   
+            {% if administrador %}
+              <!-- boton que permite asociar elementos al formato actual-->
+              <a href="" title="Asociar Archivo" class="mx-" data-toggle="modal" data-toggle="tooltip"
+                data-target="#modalAsociarArchivo" style="color: #0A9396; " download><i class="fa-duotone fa-link fa-2x enlace enviarNotificacion"></i></a>
+            {% endif %}
+            {% endif %}
+            </h6>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-xl-8">
+
+      <div class="card">
+        <div class="card-body pt-3">
+          <!-- Bordered Tabs -->
+          <ul class="nav nav-tabs nav-tabs-bordered">
+
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Información</button>
+            </li>
+
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-puntos">Puntos del Acta</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-eliminar">Acuerdos del Acta</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-subida">Información de Subida</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar</button>
+            </li>
+            {% if administrador %}
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-delete">Eliminar</button>
+            </li>
+            {% endif %}
+
+          </ul>
+          <div class="tab-content pt-2">
+
+
+            <!-- Información del Acta-->
+            <div class="tab-pane fade show active profile-overview" id="profile-overview">
+              <h5 class="card-title">Información del Acta nº{{acta.sesion}}</h5>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Fecha de la reunión</div>
+                <div class="col-lg-9 col-md-8 font-weight-bold" style="color: #a6914e;">{{ acta.fecha_inicio|date:"j" }} de {{ acta.fecha_inicio|date:"F" }} de {{ acta.fecha_inicio|date:"Y" }}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Hora de inicio</div>
+                <div class="col-lg-9 col-md-8">{{ acta.fecha_inicio|date:"H:i" }}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Convocante</div>
+                <div class="col-lg-9 col-md-8 font-weight-bold" style="color: #a6914e;">{{ acta.convocante.first_name }} {{ acta.convocante.last_name }}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Secretario</div>
+                <div class="col-lg-9 col-md-8">{{ acta.secretario.first_name }} {{ acta.secretario.last_name }}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Miembros convocados</div>
+                <div class="col-lg-9 col-md-8">
+                  
+                  {% for miembro in miembros %}
+                    {{miembro.id_miembro__first_name}} {{miembro.id_miembro__last_name}},
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Hora de finalización</div>
+                <div class="col-lg-9 col-md-8">
+                  {% if acta.fecha_cierre is  None %}
+                    <p>--</p>
+                  {% else %}
+                    <p>{{ acta.fecha_cierre|date:"H:i"}}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Puntos del Acta -->
+            <div class="tab-pane fade pt-3 profile profile-overview" id="profile-puntos">
+
+              <h5 class="card-title">Puntos del Acta</h5>
+              {% for punto in puntos %}
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label">Punto {{ punto.orden }}</div>
+                  <div class="col-lg-9 col-md-8">{{ punto.descripcion }}</div>
+                </div>
+              {% endfor %}
+
+            </div>
+
+
+            <!-- Acuerdos del Acta -->
+            <div class="tab-pane fade profile profile-overview pt-3" id="profile-eliminar">
+
+              <h5 class="card-title">Acuerdos del Acta</h5>
+              {% for acuerdo in acuerdos %}
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label">Punto {{ acuerdo.orden }}</div>
+                  <div class="col-lg-9 col-md-8">{{ acuerdo.descripcion }}</div>
+                </div>
+              {% endfor %}
+
+            </div>
+
+            <!-- Información de la subida del Acta -->
+            <div class="tab-pane fade profile-puntos pt-3 profile profile-overview" id="profile-subida">
+
+              <h5 class="card-title">Información del subida</h5>
+     
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Subido por</div>
+                <div class="col-lg-9 col-md-8">{{ acta.id.creador.first_name }} {{ acta.id.creador.last_name }}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Fecha de subida</div>
+                <div class="col-lg-9 col-md-8">{{ acta.id.fecha_subida|date }}</div>
+              </div>
+
+
+            </div> 
+            
+            <!-- Editar Acta -->
+            <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+              <!-- Edit Form -->
+              <form id="formularioEditarActa"  action="/private/docLaruex/editarObjeto/{{acta.id.id}}/" method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                    <label for="nuevaSesion" class="col-md-4 col-lg-3 col-form-label">Sesión</label>
+                    <div class="col-md-2 col-lg-2">
+                      <input type="number" name="nuevaSesion" type="text" class="form-control" id="nuevaSesion" value="{{acta.sesion}}">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoConsejo" class="col-md-3 col-lg-3 col-form-label">Consejo</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input type="text" id="nuevoConsejo" name="nuevoConsejo" class="form-control" value="{{acta.consejo}}" />
+                  </div>
+                </div>
+              
+                <div class="row mb-3">
+                  <label for="nuevaFechaInicio" class="col-md-3 col-lg-3 col-form-label">Fecha y Hora de inicio</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input type="datetime-local" id="nuevaFechaInicio" name="nuevaFechaInicio" class="form-control"  value="{{ acta.fecha_inicio|date:'Y-m-d\TH:i' }}" />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaFechaCierre" class="col-md-3 col-lg-3 col-form-label">Fecha y Hora de Finalización</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input type="datetime-local" id="nuevaFechaCierre" name="nuevaFechaCierre" class="form-control"  value="{{acta.fecha_cierre|date:'Y-m-d\TH:i' }}" />
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaUbicacion" class="col-md-3 col-lg-3 col-form-label">Ubicación</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input type="text" id="nuevaUbicacion" name="nuevaUbicacion" class="form-control" value="{{acta.ubicacion}}" />
+                  </div>
+                </div>
+
+                <div class="row mb-3 ">
+                  <label for="nuevoConvocante" class="col-md-4 col-lg-3 col-form-label">Convocante</label>
+                  <div class="col-md-8 col-lg-9">
+                    <select class="form-control" id="nuevoConvocante" name="nuevoConvocante">
+                      <option value="{{ acta.convocante.id }}">
+                        {{ acta.convocante.first_name }} {{ acta.convocante.last_name }}
+                      </option>
+                      {% for con in convocantes %}
+                      <option value="{{con.id}}">
+                        {{con.first_name}} {{con.last_name}}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row mb-3 ">
+                  <label for="nuevoSecretario" class="col-md-4 col-lg-3 col-form-label">Secretario</label>
+                  <div class="col-md-8 col-lg-9">
+                    <select class="form-control" id="nuevoSecretario" name="nuevoSecretario">
+                      <option value="{{ acta.secretario.id }}">
+                        {{ acta.secretario.first_name }} {{ acta.secretario.last_name }}
+                      </option>
+                      {% for sec in secretarios %}
+                      <option value="{{sec.id}}">
+                        {{sec.first_name}} {{sec.last_name}}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                {% if puntos is not null%}
+                <h5 class="card-title">Puntos</h5>
+                  {% for punto in puntos %}
+                    <div class="row mb-3">
+                      <label for="nuevoPunto" class="col-md-3 col-lg-3 col-form-label">Punto {{punto.orden}}</label>
+                      <div class="col-md-8 col-lg-9">
+                        <input type="text" id="nuevoPuntoOrden" name="nuevoPuntoOrden" class="form-control" value="{{punto.orden}}" hidden/>
+                        <input type="text" id="nuevoPunto" name="nuevoPunto" class="form-control" value="{{punto.descripcion}}" />
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+
+                {% if acuerdos is not null%}
+                <h5 class="card-title">Acuerdos</h5>
+                {% for acuerdo in acuerdos %}
+                  <div class="row mb-3">
+                    <label for="nuevoAcuerdo" class="col-md-3 col-lg-3 col-form-label">Punto {{acuerdo.orden}}</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input type="text" id="nuevoAcuerdoOrden" name="nuevoAcuerdoOrden" class="form-control" value="{{acuerdo.orden}}" hidden/>
+                      <input type="text" id="nuevoAcuerdo" name="nuevoAcuerdo" class="form-control" value="{{acuerdo.descripcion}}" />
+                    </div>
+                  </div>
+                {% endfor %}
+              {% endif %}
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+            <!-- Eliminar Acta -->
+            <div class="tab-pane fade profile-delete pt-3" id="profile-delete">
+
+              <!-- Edit Form -->
+              <form id="formularioEliminarActa"  action="/private/docLaruex/eliminarObjeto/{{acta.id.id}}/" method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="row mb-3">
+                <label class="text-center">¿Estás seguro de eliminar el Acta nº {{ acta.sesion }}
+                  de {{ acta.fecha_inicio|date:"Y" }} del {{ acta.consejo }}?</label>
+              </div>
+              <div class="text-center">
+                <button id="eliminarActa" type="submit" class="btn btn-danger"
+                  onclick="crearAviso('guardarEliminarActa', 'Acta nº {{ acta.sesion }} eliminada con éxito', 'alert-success', 3000)">Eliminar</button>
+
+                <button id="canclearEliminar" type="reset" class="btn btn-secondary"
+                  onclick="crearAviso('cerrarEliminarActa', 'No se ha podido eliminar el acta nº {{ acta.sesion }} ', 'alert-warning', 3000); location.reload()">Cancelar</button>
+              </div>
+              </form><!-- End Profile Elininar Form -->
+            </div>
+          </div><!-- End Bordered Tabs -->
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ========== Modal para asociar Documentos al acta ========== -->
+<div id="modalAsociarArchivo" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+  aria-labelledby="modalAsociarArchivo" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">
+          <strong>
+            Seleccione los archivos que desea asociar.
+          </strong>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+      </div>
+      <!-- END Cabecera del modalAsociarArchivo -->
+
+      <!-- Body del modalAsociarArchivo -->
+      <div class="modal-body">
+        <form id="formularioAsociarArchivo" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="row justify-content-center">
+            <div class="col-lg-5">
+              <div class="card card p-4 ">
+                <h5 class="card-title text-center">Lista de Archivos</h5>
+                <table class="table-sm table-hover" id="tabla_archivos_para_asociar" data-search="true"
+                  data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10]"
+                  data-toolbar="#toolbar" data-pagination="true" ></table>
+              </div>
+            </div>
+
+            <div class="col-lg-1 col-12 my-auto text-center">
+              <i id="flechas" class="fa-solid fa-arrow-right-arrow-left fa-3x" style="color: rgb(41,68,87)"></i>
+            </div>
+
+            <div class="col-lg-5">
+              <div class="card p-4">
+                <h5 class="card-title text-center">Archivos seleccionados</h5>
+                <table id="tabla_archivos_para_asociar_seleccionados" class="table-sm table-hover" data-search="true"
+                  data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10]"
+                  data-toolbar="#toolbar"></table>
+              </div>
+            </div>
+          </div>
+      </div>
+      <input type="text" id="idArchivoActual" value="{{ id }}" hidden name="idArchivoActual" data-rule="required" />
+      <input type="text" id="idArchivosSeleccionados" value="{{ id }}" hidden name="idArchivosSeleccionados"
+        data-rule="required" />
+
+      <!-- Footer del ModalAsociarHabilitacion -->
+      <div class="modal-footer d-flex">
+
+        <button id="cerrarAsociar" type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cerrar
+        </button>
+        <button type="submit" value="submit" class="btn btn-primary">
+          Guardar
+        </button>
+      </div>
+      <!-- END Footer del ModalAsociarHabilitacion -->
+    </div>
+  </div>
+</div><!-- END Body del ModalAsociarHabilitacion -->
+</form>
+</div> <!-- END ModalAsociarHabilitacion -->
+
+<!-- ===================== Separacón ===================== -->
+<div class="section-title">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="text-center">
+          <div class="content">
+            <br>
+            <h2 class="fw-bold">Documentos relacionados</h2>
+            <hr>
+            <br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============= COLLAPSE REFERENCIAS Y DOCUMENTOS RELACIONADOS ============= -->
+<!--collapse con historico de versiones de los procedimientos -->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Referencias / Documentos Relacionados</h6>
+      <!-- Accordion without outline borders -->
+      <div class="accordion accordion-flush" id="accordionFlushReferencias">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingReferencias">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseReferencias" aria-expanded="false"
+              aria-controls="flush-collapseReferencias">Documentos relacionados con {{ acta.id.tipo }} nº {{ acta.sesion }} de
+              {{ acta.fecha_inicio|date:"j" }} de {{ acta.fecha_inicio|date:"F" }} de {{ acta.fecha_inicio|date:"Y" }}
+            </button>
+          </h2>
+          <div id="flush-collapseReferencias" class="accordion-collapse collapse"
+            aria-labelledby="flush-headingReferencias" data-bs-parent="#accordionFlushReferencias">
+            <div class="accordion-body">
+              <table id="tabla_referencias_asociadas" data-toggle="table" data-show-export="true"
+                data-export-types="['excel', 'pdf']" data-page-list="[10, 25, 50, 100, All]" data-search="true"
+                data-show-columns="true" data-show-columns-toggle-all="true" data-buttons="buttons"
+                data-buttons-class="light"></table>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Accordion without outline borders -->
+    </div>
+  </div>
+</section>
+
+
+<!-- ============= Modal Eliminar Asociación ====================-->
+
+<div id="modalEliminarAsociacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarAsociacion"><strong>¿Estas seguro que deseas eliminar esta asociación?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarAsociacion" action="/private/docLaruex/eliminarAsociacion/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarAsociacion" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarAsociacion" name="cancel" onclick="crearAviso('eliminarObjetoCancelar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarObjetoGuardar', 'Objeto  eliminado', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+<script  type="text/javascript">
+
+  // ===================== Tabla con lista de notificaciones =====================
+  $("#tabla_notificaciones").bootstrapTable({
+    method: "get",
+    url: "/private/docLaruex/notificacionesDatos/{{ acta.id.id }}/",
+    cache: false,
+    locale: navigator.language,
+    columns: [
+      {
+        title: "Fecha",
+        field: "fecha",
+        sortable: "true",
+        align: "center",
+        formatter: function (value, row) {
+          var fecha = new Date(row.fecha);
+          return (
+            $.datepicker.formatDate("dd-mm-yy", fecha)
+          );
+        },
+      },
+      {
+        title: "Título",
+        field: "titulo",
+        align: "center",
+      },
+      {
+        title: "Resumen",
+        field: "resumen",
+        align: "center",
+      },
+      {
+        title: "Creador",
+        field: "creador",
+        align: "center",
+        formatter: function (value, row) {
+          return row.creador__first_name + " " + row.creador__last_name;
+        },
+      },
+      {
+        title: "Estado",
+        field: "estado_notificacion__nombre",
+        align: "center",
+        formatter: function (value, row) {
+          var defecto = '<span class="badge" style="background-color: #524e4e;">Enviada</span>';
+          switch (row.estado_notificacion__id) {
+            case 1:
+              estado = '<span class="badge badge-success" style="background-color: #524e4e;">Enviada</span>';
+              return estado;
+              break;
+            case 2:
+              estado = '<span class="badge" style="background-color: #0A9396;">Recibida</span>';
+              return estado;
+              break;
+
+            case 3:
+              estado = '<span class="badge" style="background-color: #EB8E34;">En tramite</span>';
+              return estado;
+              break;
+            case 4:
+              estado = '<span class="badge" style="background-color: #21b563;">Cerrada</span>';
+              return estado;
+              break;
+            case 5:
+              estado = '<span class="badge" style="background-color: #b52121;">No atendida</span>';
+              return estado;
+              break;
+
+            default:
+              return defecto;
+
+          }
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "desc",
+  });
+
+
+      // cambiamos la funcionalidad del boton submit del formulario de envio de notificaciones
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  $("#formularioModalEnviarNota").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarNotificacion/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Notificacion guardado con éxito', 'alert-success', 2000)
+        $('#tabla_notificaciones').bootstrapTable('refresh');
+        $(".divFormularios").remove();
+        $("#reset").trigger("click");
+        $('#cerrar').trigger('click');
+        
+      }
+    });
+  });
+
+
+
+  function addZero(i) {
+    if (i < 10) { i = "0" + i }
+    return i;
+  }
+
+   // Tabla con lista de referencias asociadas
+  $("#tabla_referencias_asociadas").bootstrapTable({
+    method: "get",
+    url: "/private/docLaruex/archivosAsociados/{{ acta.id.id }}/",
+    cache: false,
+    locale: navigator.language,
+    columns: [
+      {
+        title: "ID",
+        field: "id_relacionado",
+        align: "center",
+      },
+      {
+        title: "Nombre",
+        field: "id_relacionado__nombre",
+        align: "center",
+      },
+      {
+        title: "Tipo",
+        field: "id_relacionado__tipo",
+        align: "center",
+      },
+      {
+        title: "Creador",
+        field: "creador",
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            row.id_relacionado__creador__first_name +
+            " " +
+            row.id_relacionado__creador__last_name
+          );
+        },
+      },
+      {
+        title: "Fecha",
+        field: "id_relacionado__fecha_subida",
+        sortable: "true",
+        align: "center",
+        formatter: function (value, row) {
+          var fecha = new Date(row.id_relacionado__fecha_subida);
+          return (
+            $.datepicker.formatDate("dd-mm-yy", fecha) +
+            " " +
+            addZero(fecha.getHours()) +
+            ":" +
+            addZero(fecha.getMinutes())
+          );
+        },
+      },
+      {
+        title: "Estado",
+        field: "id_relacionado__id_estado__id",
+        align: "center",
+        
+        formatter: function (value, row) {
+          var defecto = '<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+          switch (row.id_relacionado__id_estado__id) {
+            case 1:
+              estado = '<span class="badge badge-success" style="background-color: #21b563;">Operativo</span>';
+              return estado;
+              break;
+            case 2:
+              estado = '<span class="badge" style="background-color: #21b563;">En Vigor</span>';
+              return estado;
+              break;
+
+            case 3:
+              estado = '<span class="badge" style="background-color: #EB8E34;">En Mantenimiento</span>';
+              return estado;
+              break;
+            case 4:
+              estado = '<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+              return estado;
+              break;
+            case 5:
+              estado = '<span class="badge" style="background-color: #524e4e;">Obsoleto</span>';
+              return estado;
+              break;
+            case 6:
+              estado = '<span class="badge" style="background-color: #b52121;">No operativo</span>';
+              return estado;
+              break;
+            case 7:
+              estado = '<span class="badge" style="background-color: #b52121;">Baja</span>';
+              return estado;
+              break;
+
+            default:
+              console.log("No se ha encontrado el estado", row.id_relacionado__id)
+              return defecto;
+
+          }
+        },
+    },{
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          objeto = '{{acta.id.id}}'  
+          var botonVerDocumento = '<a href="/private/docLaruex/verObjeto/' + row.id_relacionado + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+          var botonDescargarDocumentoPDF = '<a href="/private/docLaruex/consultarArchivo/' + row.id_relacionado + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-lg" style="color:#A11020"></i></a>';
+          var botonDescargarDocumentoWord = '<a href="/private/docLaruex/consultarArchivoEditable/' + row.id_relacionado + '/' + '" class="mx-1" title="Descargar" download><i class="fa-duotone fa-file-signature fa-lg" style="color:#266353"></i></a>';
+          var botonEliminarAsociacion = '<a href="/private/docLaruex/eliminarAsocicion/' + row.id_relacionado + '/' +  objeto + '/" class="mx-1" title="Eliminar Asociacion" data-toggle="modal" data-target="#modalEliminarAsociacion" onclick="$('+"'#formularioModalEliminarAsociacion').attr('action', '/private/docLaruex/eliminarAsocicion/"+ row.id_relacionado +"/"+ objeto + "/');"+'"  style="color:#AE2012"><i class="fa-duotone fa-link-slash" ></i></a>';
+
+            
+          // Definimos las variables  
+          var admin = '{{administrador}}';
+          var habilitacionesUsuario = '{{ habilitacionesUsuario }}';
+          var habilitacionNecesaria = row.id_relacionado__id_habilitacion;
+          var existeHabilitacion = 'False'
+
+          // Comprobamos si las habilitaciones del procedimiento está entre las habilitaciones del usuario logueado  
+          for (var i = 0; i < habilitacionesUsuario.length; i++) {
+            if (habilitacionesUsuario[i] == habilitacionNecesaria) {
+              existeHabilitacion = 'True';
+            }
+          }
+          if (existeHabilitacion == 'True') {
+            if (admin == 'True') {
+              return (botonVerDocumento + botonDescargarDocumentoPDF + botonDescargarDocumentoWord + botonEliminarAsociacion);
+            } else {
+              return (botonVerDocumento + botonDescargarDocumentoPDF);
+            }
+          } 
+        },
+      },
+    ],
+    search: true,
+    sortOrder: "desc",
+  });
+
+
+  
+  /*
+    ------------ TABLAS Y FUNCIONES DEL MODAL ASOCIAR USUARIOS ------------
+  */
+
+  //tabla del modal asociar objetos
+  $("#tabla_archivos_para_asociar").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/docLaruex/archivosDatosAsociar",
+    cache: false,
+    columns: [
+      {
+        title: "ID",
+        field: "id",
+        align: "center",
+      }, {
+        title: 'Empleado',
+        field: "nombre",
+        align: "center",
+      },{
+        title: 'Tipo',
+        field: "tipo",
+        align: "center",
+      }, {
+        title: "",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            '<div onclick="addValueTable(' + row.id + ', &apos;' + row.nombre + '&apos;)" class="mx-1" title="select"><i class="fa-solid fa-angles-right fa-lg" style="color:#68B29E"></i></div>'
+          );
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+  function addValueTable(id, 
+  nombre, tipo) {
+    $("#tabla_archivos_para_asociar_seleccionados").bootstrapTable('insertRow', {
+      index: 0,
+      row: {
+        id: id,
+        nombre: nombre ,
+      }
+    });
+  }
+
+  // tatbla de elementos seleccionados
+  $("#tabla_archivos_para_asociar_seleccionados").bootstrapTable({
+    locale: navigator.language,
+    cache: false,
+    columns: [
+      {
+        title: "ID",
+        field: 'id',
+        align: "center",
+      }, {
+        title: "Empleado",
+        field: 'nombre',
+        align: "center"
+      },{
+        title: "",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            '<div onclick="deleteValue(' + row.id + ')" class="mx-1" ><i class="fa-solid fa-xmark fa-lg" style="color:#F52220"></i></div>'
+
+          );
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+  function deleteValue(id) {
+    $("#tabla_archivos_para_asociar_seleccionados").bootstrapTable('remove', {
+      field: 'id',
+      values: [id]
+    })
+  }
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioAsociarArchivo").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    $table = $("#tabla_archivos_para_asociar_seleccionados");
+    var idSeleccionado = "";
+    var cargoIDSeleccionado = "";
+    for (let value of $table.bootstrapTable('getData')) {
+      console.log("info file");
+      console.log(value);
+      idSeleccionado = idSeleccionado + value["id"] + "#";
+      
+      console.log(idSeleccionado);
+    }
+    
+    $("#idArchivosSeleccionados").val(idSeleccionado);
+    console.log($("#idArchivosSeleccionados").val());
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    
+    $.ajax({
+      url: "/private/docLaruex/asociarArchivo/{{ acta.id.id }}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        $table.bootstrapTable('removeAll');
+        $("#idArchivosSeleccionados").val("");
+        $('#tabla_referencias_asociadas').bootstrapTable('refresh');
+        $('#cerrarAsociar').trigger('click');
+      }
+    });
+  });
+
+    // cambiamos la funcionalidad del boton submit del formulario
+    $("#formularioAddAcuerdos").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarAcuerdos/{{acta.id.id}}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Acuerdos guardada con éxito', 'alert-success', 2000);
+        document.getElementById('formularioAddAcuerdos').remove();
+        //$('#tabla_acuerdos').bootstrapTable('refresh');
+        $('#modalFormularioAddAcuerdos').trigger('reset');
+        $('#cerrarAcuerdos').trigger('click');
+        location.reload(true);
+
+      }
+    });
+  });
+    // cambiamos la funcionalidad del boton submit del formulario
+    $("#formularioEditarActa").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarObjeto/{{ acta.id.id }}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('actaGuardar', 'Acta modificada con éxito', 'alert-success', 2000);
+        location.reload();
+
+      }
+    });
+  });
+
+  
+  function mostrarAcuerdos(value){
+   
+   const divAcuerdos = document.querySelector('#divAcuerdos');
+   const divOrdenAcuerdos = document.querySelector('#divOrdenAcuerdos');
+   for (var i = 0; i < value; i++) {
+
+     var input = document.createElement('input');
+     var inputOrden = document.createElement('input');
+     // creamos los item de input
+     input.type = 'text';
+     input.name = 'acuerdo' + i;
+     input.id = 'acuerdo' + i;
+     input.value = '';
+     input.className = 'form-control my-2';
+     input.placeholder = 'Describa el acuerdo';
+     divAcuerdos.appendChild(input);
+
+     inputOrden.type = 'number';
+     inputOrden.value = i+1;
+     inputOrden.name = 'ordenAcuerdo' + i;
+     inputOrden.id = 'ordenAcuerdo' + i;
+     inputOrden.className = 'form-control my-2';
+     divOrdenAcuerdos.appendChild(inputOrden);
+   }
+ }
+
+
+
+
+</script>
+
+
+
+
+{% endblock%}

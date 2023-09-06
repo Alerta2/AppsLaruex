@@ -1,0 +1,515 @@
+{% extends "base/base_mapa.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+
+    <link href="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.js"></script>
+
+{% endblock %}
+{% block css %}
+    .leaflet-marker-icon .number{
+        position: relative;
+        top: 0px;
+        left: -20px;
+        font-size: 16px;
+        font-weight: bold;
+        width: 25px;
+        text-shadow: 1px 1px #000;
+    }
+    .leaflet-left{
+        width: 100%;
+    }
+
+    .icon-normal{
+        color: #1E5024;
+    }
+    .icon-retraso-1{
+        color: #BFB600;
+    }
+    .icon-retraso-2{
+        color: #EE5F0D;
+    }
+    .divider
+    {
+        position: relative;
+        margin-top: 20px;
+        height: 1px;
+    }
+
+    .div-transparent:before
+    {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 5%;
+        right: 5%;
+        width: 90%;
+        height: 1px;
+        background-image: linear-gradient(to right, transparent, rgb(48,49,51), transparent);
+    }
+    .progress{
+        position:absolute;
+        width:100%;
+        bottom: 0px;
+        z-index: 1;
+        background-color: rgba(255, 255, 255, 0);
+    }
+{% endblock %}
+{% block content %}
+    <div id="mapid" class="w-100 h-100"></div>
+    <div id="sidebarMapa" class="leaflet-sidebar collapsed">
+      <!-- Nav tabs -->
+        <div class="leaflet-sidebar-tabs">
+            <ul role="tablist"> <!-- top aligned tabs -->
+                <li onclick="rellenarTablas();$('.do-nicescrol').getNiceScroll().resize();centerMap();"><a href="#network" role="tab"><i class="pt-2 fas fa-network-wired"></i></a></li>
+                <li><a href="#station" role="tab"><i class="pt-2 fas fa-laptop-house"></i></a></li>
+                <!-- <li><a href="#vehicles" role="tab"><i class="pt-2 fab fa-wpexplorer"></i></a></li>-->
+            </ul>
+        </div>
+
+        <!-- Tab panes -->
+        <div class="leaflet-sidebar-content do-nicescrol">
+            <div class="leaflet-sidebar-pane" id="network">
+                <h1 class="leaflet-sidebar-header">Red<div class="leaflet-sidebar-close"><i class="pt-2 fas fa-network-wired"></i></div></h1>
+                <div class="content">
+                    <table 
+                        id="tableEstaciones"
+                        data-row-style="rowStyleStation"
+                        class="table w-auto small"
+                    >
+                        <thead class="thead-dark">
+                            <tr>
+                                <th data-field="nombre">Nombre</th>
+                                <th data-field="valor">Tasa de Dosis</th>
+                                <th data-field="fecha">Fecha última</th>
+                                <th data-field="fondo">Fondo radiológico</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <table 
+                        id="tableMensajes"
+                        data-total-rows="5"
+                        class="table w-auto small table-condensed"
+                        style="max-height: 600px; height: 600px"
+                    >
+                        <thead class="thead-dark">
+                            <tr>
+                                <th data-field="fecha">Fecha</th>
+                                <th data-field="hora_envio">Hora</th>
+                                <th data-field="mensaje">Mensaje</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="leaflet-sidebar-pane" id="station">
+                <h1 class="leaflet-sidebar-header">Estación<div class="leaflet-sidebar-close"><i class="pt-2 fas fa-laptop-house"></i></div></h1>
+                <div class="row">
+                    <div id="stationCard" class="card mt-3" style="width:100%">
+                        <img id="station_photo" class="card-img-top" alt="Card image cap">
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <div class="row">
+                                        <div class="col-4"><h2><i class="fa-solid fa-sensor-on fa-beat" style="--fa-animation-duration: 3s;"></i></h2></div>
+                                        <div class="col-8"><h4>Último dato:<br><span id="station_dose">station_dose</span> &mu;Sv/h</h4></div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="row">
+                                        <div class="col-4"><h2><i class="far fa-clock"></i></h2></div>
+                                        <div class="col-8"><h4><span id="station_date">station_date</span></h4></div>
+                                    </div>
+                                </li>
+                                <li class="list-group-item">
+                                    <div class="row">
+                                        <div class="col-4"><h2><i class="far fa-analytics"></i></h2></div>
+                                        <div class="col-8"><h4>Fondo radiológico:<br><span id="station_avg">station_avg</span> &mu;Sv/h</h4></div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="divider div-transparent"></div>
+                            <div class="d-flex justify-content-center my-3">
+                                <a id="url_station" class="btn btn-outline-primary">Entrar estación</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="leaflet-sidebar-pane" id="vehicles">
+                <h1 class="leaflet-sidebar-header">Vehiculos<div class="leaflet-sidebar-close"><i class="pt-2 fab fa-wpexplorer"></i></div></h1>
+            </div>
+        </div>
+    </div>
+    <script>
+        // listas de información de tablas
+        var listaEstaciones = [];
+        var listaMensajes = [];
+
+        // nice scroll para los paneles de la tabla
+        $(".do-nicescrol").niceScroll();
+
+        // inicio el mapa de leaflet
+        var map = L.map('mapid',{
+            minZoom:5, //especifico zoom minimo del mapa
+            attributionControl: false,
+            zoomControl: false,
+            timeDimension: true,
+            timeDimensionOptions: {
+                period: "PT1H",
+            },
+        }).setView([39.4034522,-6.7628017], 8);
+        //DEFINO EL CONTROL DE CAPAS O PANEL LAYER
+        var baselayers = [];
+        var overLayers = []; //otras capas
+        var myLayersControl = L.control.panelLayers(baselayers, overLayers, {
+            compact: true,
+            collapsed: true,
+            collapsibleGroups: true 
+        });
+
+        //DEFINO LAS CAPAS BASE
+        var layer_OpenStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); //calle
+        var layer_ArcgisSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'); //satelite
+        var layer_OpenStreetMapMunicipios = L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png');
+        var layer_OpenTopMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png');
+        var layer_StamenTerrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png');
+
+        myLayersControl.addBaseLayer({
+            name:  "Open Street Map",
+            layer: layer_OpenStreetMap
+        },'','<i id="icon-title" class="fas fa-layer-group"></i><span style="font-weight: bold;">Capas base del Mapa</span>',true);
+
+        myLayersControl.addBaseLayer({
+            name:  "ArcGIS Satelite",
+            layer: layer_ArcgisSat
+        },'','<i id="icon-title" class="fas fa-layer-group"></i><span style="font-weight: bold;">Capas base del Mapa</span>');
+
+        myLayersControl.addBaseLayer({
+            name: "Open Street Map Municipios",
+            layer: layer_OpenStreetMapMunicipios
+        },'','<i id="icon-title" class="fas fa-layer-group"></i><span style="font-weight: bold;">Capas base del Mapa</span>');
+
+        myLayersControl.addBaseLayer({
+            name: "Open Top Map",
+            layer: layer_OpenTopMap
+        },'','<i id="icon-title" class="fas fa-layer-group"></i><span style="font-weight: bold;">Capas base del Mapa</span>');
+
+        myLayersControl.addBaseLayer({
+            name: "Stamen Terrain",
+            layer: layer_StamenTerrain
+        },'','<i id="icon-title" class="fas fa-layer-group"></i><span style="font-weight: bold;">Capas base del Mapa</span>');
+
+        map.addControl(myLayersControl);
+
+        var ubicacionesInteres = L.layerGroup();
+        map.addLayer(ubicacionesInteres);
+        var estaciones = L.layerGroup();
+        map.addLayer(estaciones);
+    
+        //DEFINO EL BOTOM HOME (CENTRA EL MAPA EN EXTREMADURA)
+        var botonHome = L.easyButton({
+            states: [{
+                    stateName: 'zoom-to', // nombre del estado
+                    icon: '<i class="fas fa-home pt-1" style="font-size:20px;"></i>', // nombre del icono
+                    title: 'Ajustar mapa', // titulo del boton
+                    onClick: function(btn, map) { // evento del boton
+                        centerMap();
+                    }
+            }]
+        });
+        map.addControl(botonHome);
+
+        L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+        function ubicaciones(){
+             $.ajax({
+                type: 'GET',
+                url: "/private/rare/ubicacionesInteres/",
+                success: function (data) {
+                    data.forEach(function (item, index) {
+                        var icon;
+                        if (item.tipo == 'Central'){
+                            icon = L.icon({
+                                iconUrl: '{% static img %}'+'img/rare/nuclear-plant.png',
+                                iconSize:     [48, 48], // size of the icon
+                                iconAnchor:   [48, 48], // point of the icon which will correspond to marker's location
+                            });
+                            imagen = '{% static img %}'+'img/rare/nuclear-plant.png';
+                        }
+                        else if (item.tipo == 'Almacenamiento'){
+                            icon = L.icon({
+                                iconUrl: '{% static img %}'+'img/rare/container.png',
+                                iconSize:     [48, 48], // size of the icon
+                                iconAnchor:   [48, 48], // point of the icon which will correspond to marker's location
+                            });
+                            imagen = '{% static img %}'+'img/rare/container.png';
+                        }
+                        auxMarker = new L.marker([item.lat,item.lon], {icon: icon});
+                        ubicacionesInteres.addLayer(auxMarker);
+                    });
+                }
+            })
+        }
+        ubicaciones();
+        // metodo de recarga de valores de las estaciones
+        function recargarValores(){
+            crearAviso(Date.now(), "Solicitando valores de estaciones...",2000);
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url:"/private/rare/mapLive/recarga/",
+                success: function(data)
+                {
+                    estaciones.clearLayers();
+                    listaEstaciones = JSON.parse(data).lista;
+                    $(".do-nicescrol").getNiceScroll().resize();
+
+                    var imagen = "";
+                    for (let i = 0; i < listaEstaciones.length; i++) {
+                        var estacion = listaEstaciones[i];
+                        if (estacion.tipo == 'aire')
+                            imagen = '{% static img %}'+'img/rare/station_air.png';
+                        else if (estacion.tipo == 'agua')
+                            imagen = '{% static img %}'+'img/rare/station_water.png';
+                        var clase_icono = "icon-normal";
+                        if (estacion.retraso == 1)
+                            clase_icono = "icon-retraso-1";
+                        else if (estacion.retraso == 2)
+                            clase_icono = "icon-retraso-2";
+
+                        marker = new L.marker([estacion.lat,estacion.lon], {
+                                icon:	new L.NumberedDivIcon(
+                                        {
+                                            iconUrl: imagen, 
+                                            number: estacion.valor+'&mu;Sv/h',
+                                            className: clase_icono
+                                        }
+                                    )
+                            }).on('click', openMarker);
+                        
+                        marker.feature = {
+                            id: estacion.id,
+                            nombre: estacion.valor,
+                            lat: estacion.lat,
+                            lon: estacion.lon,
+                            tipo: estacion.tipo,
+                            fondo: estacion.fondo,
+                            valor: estacion.valor,
+                            unidad: estacion.unidad,
+                            fecha: estacion.fecha,
+                            retraso: estacion.retraso
+                        };
+                        estaciones.addLayer(marker);
+                    }
+                },
+
+            })
+        }
+        function recargarMensajes(){
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url:"/private/rare/mapLive/recargaMensajes/",
+                success: function(data)
+                {
+                    listaMensajes = data.mensajes;
+                    $(".do-nicescrol").getNiceScroll().resize();
+                },
+
+            })
+        }
+
+        function rellenarTablas(){
+            if (listaEstaciones.length > 0){
+                $('#tableEstaciones').bootstrapTable({
+                    data: listaEstaciones
+                });
+            }   
+            if (listaMensajes.length > 0){
+                $('#tableMensajes').bootstrapTable({
+                    data: listaMensajes
+                });
+            }   
+            $(".do-nicescrol").getNiceScroll().resize();
+        }
+        function rowStyleStation(row, index) {
+            var classes = [
+                'bg-blue',
+                'bg-green',
+                'bg-orange',
+                'bg-yellow',
+                'bg-red'
+            ]
+            
+            if (row.valor > row.fondo+0.11){
+                return{
+                    css: {
+                        color: 'red'
+                    }
+                }
+            }
+            else if (row.valor > row.fondo+0.057){
+                return{
+                    css: {
+                        color: 'orange'
+                    }
+                }
+            }
+            else if (row.retraso == 2){
+                return{
+                    css: {
+                        color: 'orange'
+                    }
+                }
+            }
+            else if (row.retraso == 1){
+                return{
+                    css: {
+                        color: '#BFB600'
+                    }
+                }
+            }
+            else if (row.valor > row.fondo){
+                return{
+                    
+                    css: {
+                        color: 'blue'
+                    }
+                }
+            }
+            else{
+                return{
+                    css: {
+                        color: 'green'
+                    }
+                }
+            }
+        }
+        function openMarker(e){
+            $('#stationCard').show();
+            sidebar.open('station');
+            var url = '{% static "img/rare/estaciones/" %}' + e.target.feature.id + '.png';
+            $("#station_photo").attr("src", url);
+            $("#station_photo").css("background-image", "url('" + url + "')");
+            $("#station_date").html(e.target.feature.fecha);
+            $("#station_dose").html(e.target.feature.valor);
+            $("#station_avg").html(e.target.feature.fondo);
+            $("#url_station").attr("href","/private/rare/station/"+e.target.feature.id);
+            map.flyTo([e.target.feature.lat,e.target.feature.lon], 11, {
+                "animate": true,
+                "pan": {
+                    "duration": 10
+                }
+            });
+        }
+
+        function centerMap(){
+            map.flyTo([39.4034522,-6.7628017], 8, {
+                "animate": true,
+                "pan": {
+                    "duration": 10
+                }
+            });
+        }
+
+        var sidebar = L.control.sidebar({
+            autopan: true,       // whether to maintain the centered map point when opening the sidebar
+            closeButton: true,    // whether t add a close button to the panes
+            container: 'sidebarMapa', // the DOM container or #ID of a predefined sidebar container that should be used
+            position: 'right',     // left or right
+        }).addTo(map);
+        $('#stationCard').hide();
+
+        var progressBar = L.control({ position: "bottomleft" });
+
+        progressBar.onAdd = function(map) {
+            var div = L.DomUtil.create("div", "progress");
+            div.innerHTML += '<div id="bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="300"></div>';
+            return div;
+        };
+        var tiempo_actualizar=300; //segundos (5 minutos)
+        var progreso = tiempo_actualizar;
+        var idIterval = setInterval(function(){
+            progreso +=1;
+            if(progreso >= tiempo_actualizar){
+                progreso=0;
+                $('#bar').css('width', progreso + '%');
+                recargarValores();
+                recargarMensajes();
+                rellenarTablas();
+            }
+            else{      
+                var valorAncho = (progreso/tiempo_actualizar) * 100;
+                $('#bar').css('width', valorAncho + '%');
+            }
+        },1000);
+        map.addControl(progressBar);
+
+        /* Salvapantallas */
+        // Cierra el panel de la estación y centra el mapa
+        function resetMap(){
+            sidebar.close('station');
+            centerMap();
+        }
+
+        // actuacion cuando el raton se mueve, si se ha llegado a activar el salvapantallas cierra el panel si está abierto y centra el mapa
+        // resetea el temporizador de tiempo con el raton parado
+        document.onmousemove = function(){
+            if (salvapantallas_activo){
+                salvapantallas_activo = false;
+                pasa = 0;
+                resetMap();
+            }
+            clearTimeout(tempor);
+            clearTimeout(temporAnimacion);
+            controlar();
+        };
+        // arranca el temporizador de raton parado al iniciar
+        window.onload=controlar();
+        // bandera del salvapantallas activo
+        var salvapantallas_activo = false;
+        var tempor, temporAnimacion;
+        // bandera de actuacion, si false voy a abrir estacion, si false reseteo el mapa
+        var vuelta = false;
+        // temporizador de arranque del salvapantallas
+        function controlar(){
+            tempor=setInterval("salvapantallas()",30000);
+        }
+        // si el terminal tiene una pantalla mayor a 480 activo el salvapantallas
+        function salvapantallas(){
+            var w = $(window).width();
+            if ((w > 480)&&(salvapantallas_activo == false)){
+                salvapantallas_activo = true;
+                temporAnimacion=setInterval("animacionSalvapantallas()",10000);
+            }
+        }
+
+        // si vuelta es false obtengo un marcador aleatorio
+        // vuelo al marcador
+        // pulso el marcado y activo la bandera de vuelta
+        // si vuelta es true, reseteo el mapa 
+        function animacionSalvapantallas(){
+            if(!vuelta){
+                var aleatorio = Math.ceil(Math.random() * estaciones.getLayers().length);
+                map.flyTo(estaciones.getLayers()[aleatorio-1].getLatLng(), 12, {
+                    "animate": true,
+                    "pan": {
+                        "duration": 4
+                    }
+                });
+                estaciones.getLayers()[aleatorio-1].fire('click');
+                vuelta = true;
+            }
+            else{
+                resetMap();
+                vuelta = false;
+            }
+        }
+    </script>
+{% endblock %}
+

@@ -1,0 +1,132 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+{% block content %}
+
+
+<style>
+  /*--------------------------------------------------------------
+# Tabla
+--------------------------------------------------------------*/
+ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Tareas</h5>
+  <nav>
+      <ol class="breadcrumb" style="background-color:#fff !important">
+          <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                      class="bi bi-house-door"></i></a></li>
+          <li class="breadcrumb-item active" style="font-size: large;">Listado de
+            Tareas</li>
+      </ol>
+  </nav>
+</div>
+
+
+<div class="section my-2">
+  <table id="tabla_tareas" data-toggle="table" data-search="true" data-show-columns="true"
+  data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+  data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+  data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+  </table>
+</div>
+
+
+
+<script>
+  
+  $('#tabla_tareas').bootstrapTable({
+    //--/" + tipoEvento +"/
+        method: 'get',
+        url: "/private/docLaruex/tareasDatos",
+        cache: false,
+        columns: [{
+            title: 'Nombre',
+            field: 'id_evento__nombre',
+            align: "center"
+        }, {
+            title: 'Objeto',
+            field: 'id_objeto__nombre',
+            align: "center",
+        formatter: function (value, row) {
+          if (row.id_objeto__tipo== 'Ubicacion'){
+            if (row.id_objeto__padre){
+
+              return( "[" + row.id_objeto__padre__nombre +"] "+ row.id_objeto__nombre);
+            }else{
+              return(row.id_objeto__nombre);
+            }
+          }
+          else{
+            return(row.id_objeto__id + " - " + row.id_objeto__nombre);
+          }
+        },
+        }, {
+            title: 'Próximo mantenimiento',
+            field: 'fecha_proximo_mantenimiento',
+            align: "center",
+            formatter: function (value, row) {
+                var proximo = new Date(row.fecha_proximo_mantenimiento);
+                
+                if (!proximo){
+                  return ('<p class="text-danger my-auto">Aún por definir</p>');
+                }
+                else{
+                  return $.datepicker.formatDate('dd-mm-yy', proximo);
+
+                }
+            }
+        }, {
+            title: 'Observaciones',
+            field: 'observaciones',
+            align: "center"
+        },  {
+            title: "Acciones",
+            field: "action",
+            align: "center",
+            formatter: function (value, row) {
+
+              var botonVerTarea = '<a href="/private/docLaruex/verTarea/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+              
+              return (botonVerTarea );
+                
+            }
+        },
+        ],
+        locale: "es-ES",
+        search: true,
+        sortOrder: 'desc',
+
+    });
+
+</script>
+
+{% endblock %}

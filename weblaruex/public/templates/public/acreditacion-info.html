@@ -1,0 +1,235 @@
+{% extends "public/template.html" %}
+{% load static %}
+
+
+{% block meta %}
+  <title{{ curso.titulo }}></title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+<style>
+  /*--------------------------------------------------------------
+  # Añadir Archivo
+  --------------------------------------------------------------*/
+
+  .addArchivo {
+  color: #961d1d;
+}
+
+.addArchivo:hover {
+  color: rgba(150, 29, 29, 20);
+  filter: brightness(80%);
+}
+
+  .imagenCargada{
+    color: #1d9678;
+  }
+  
+  .close:focus {
+    outline: none;
+  }
+
+  .checkboxDiv input[type="checkbox"]:checked{
+    
+    background-color: #1d8896 !important;
+    border: 2px solid #1d8896 !important;
+    color: #fff;
+    accent-color: #1d8896;
+  }
+
+
+
+  </style>
+
+<div class="my-5"></div>
+<!-- ======= noticia completa ======= -->
+<section id="about" class="about">
+  
+
+
+
+  {% if alerta %}
+  {% if alerta.tipo == "success" %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fa-solid fa-circle-check"></i> {{ alerta.mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% else %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="fa-sharp fa-solid fa-circle-exclamation"></i> {{ alerta.mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endif %}
+{% endif %}
+
+  <div class="container" data-aos="fade-up">
+    <nav aria-label="breadcrumb" class="my-3 mx-auto" >
+      <ol class="breadcrumb" style="background-color: transparent;">
+        <li class="breadcrumb-item"><a href="\">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="\acreditaciones">Acreditaciones</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{acreditacion.nombre}}</li>
+      </ol>
+    </nav>
+    <div class="section-title">
+      <div class="row">
+        <div class="col col-sm-12 col-md-12 col-lg-7">
+          
+        <h2>{{ acreditacion.nombre }}</h2>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-5 d-flex justify-content-sm-center justify-content-lg-start">
+          
+        {% if user.is_superuser %}
+            <a href="" class="btn btn-outline-info my-auto" title="Editar Slider" data-toggle="modal"
+              data-target="#modalEditarAcreditacion"><span>Editar</span></a>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="row d-flex justify-content-sm-center" >
+        <div class="col-lg-6 col-xs-12 col-sm-12 pb-sm-3 order-1 d-flex justify-content-sm-center justify-content-lg-end pt-4" data-aos="fade-left" data-aos-delay="100">
+          <a class="pdf-mobile get-started-btn mb-3" href="{% static 'files/' %}{{ acreditacion.archivo }}">Si no ve el documento descarguelo aquí</a>
+          <embed src="{% static 'files/' %}{{ acreditacion.archivo }}" type="application/pdf" width="100%" height="450px"/>      
+        </div>
+        <div class="col-lg-6 col-xs-12 col-sm-12 order-2 pt-4 content get d-flex justify-content-sm-center justify-content-lg-start"><div>
+            <h3>{{ acreditacion.nombre|upper }}</h3>
+
+            <p class="font-italic my-4"><strong>Secciones donde se muestra</strong></p>
+
+            {% for g in acreditacion.secciones %}
+              {% if not g.strip  == "" %}
+                <p class="font-italic"><i class="fa-duotone fa-circle-check mx-2" style="color: #1d8896"></i>{{ g }}</p>
+              {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+  </div>
+
+</section><!-- noticia completa -->
+
+<div id="modalEditarAcreditacion" class="modal fade  pt-5" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalEditarAcreditacion">Editar datos de {{acreditacion.nombre}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioEditarAcreditacion" action="\editarAcreditacion/" method="POST" enctype="multipart/form-data" class="php-email-form"  role="form">
+          {% csrf_token %}
+          
+          {% for g in acreditacion.secciones %}
+            <input type="text" class="form-control" id="idSeccionAcreditacion{{g}}" data-rule="required" value="{{g}}" hidden/>            
+          {% endfor %} 
+          <input type="text" class="form-control" id="idAcreditacionEditar" name="idAcreditacionEditar" data-rule="required" value="{{acreditacion.id}}" hidden />
+          <div class="row">
+            <div class="col form-group">
+              <label for="nuevoNombreAcreditacion" class="text-secondary"><strong>Nombre de la acreditación</strong></label>
+              <input type="text" class="form-control" id="nuevoNombreAcreditacion" name="nuevoNombreAcreditacion" data-rule="required" value="{{acreditacion.nombre}}" required/>
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col form-group">
+              <div>
+                <label for="paginasAcreditacionEditar" class="text-secondary"><strong>Secciones</strong></label>
+              </div>
+              <div>
+                <div class="checkboxDiv form-check form-check-inline">
+                  <div class="mx-2">
+                    <input class="form-check-input" type="checkbox" id="nuevaSeccionAcreditacionSeleccionadaLaboratorio" name="checkboxEditarAcreditacion" value="laboratorios" onchange="comprobarSeleccionadoEditar(this)">
+                    <label class="form-check-label" for="nuevaSeccionAcreditacionSeleccionadaLaboratorio">Laboratorios</label></div>
+                  <div class="mx-2">
+                    <input class="form-check-input" type="checkbox" id="nuevaSeccionAcreditacionSeleccionadaRedes" name="checkboxEditarAcreditacion"  value="redes"  onchange="comprobarSeleccionadoEditar(this)">
+                    <label class="form-check-label" for="nuevaSeccionAcreditacionSeleccionadaRedes">Redes</label>
+                  </div>
+                  <div class="mx-2">
+                    <input class="form-check-input" type="checkbox" id="nuevaSeccionAcreditacionSeleccionadaHome" name="checkboxEditarAcreditacion" value="home" onchange="comprobarSeleccionadoEditar(this)">
+                    <label class="form-check-label" for="nuevaSeccionAcreditacionSeleccionadaHome">Home</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        <div class="row my-2">
+          <div class="col-sm-12 d-flex justify-content-center">
+            <div class="form-group">
+              <label for="nuevoArchivoAcreditacionEditar">
+                <i class="fa-duotone fa-file-pdf fa-6x addArchivo" id="iconoArchivoEditar"></i>
+              </label>
+              <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                id="nuevoArchivoAcreditacionEditar" name="nuevoArchivoAcreditacionEditar"
+                onchange="mostrarNombreImagenNuevaAcreditacion(this.value)"/>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="text-center"><strong id="mostrarNombreImagenNuevaAcreditacion"><br></strong>
+              <spam id="imagen-name-nueva-acreditacion"></spam>
+            </div>
+          </div>
+        </div>
+          
+          <div class="modal-footer d-flex justify-content-center">
+            <button type="submit" value="submit" class="btn btn-info">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // mostramos el titulo de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagenNuevaAcreditacion(value) {
+    document.getElementById('imagen-name-nueva-acreditacion').innerHTML = value;
+    document.getElementById('mostrarNombreImagenNuevaAcreditacion').style.display = 'none';   
+    var iconoImagen = document.getElementById('iconoArchivoEditar');
+    iconoImagen.classList.remove("fa-file-pdf", "fa-6x", "addArchivo");
+    iconoImagen.classList.add("fa-file-check", "fa-6x", "imagenCargada");
+  }
+
+
+
+  // obtener el valor de los input con id="idSeccion*" y marcar los checkbox correspondientes
+  var secciones = document.querySelectorAll('[id^="idSeccionAcreditacion"]');
+  
+  for (var i = 0; i < secciones.length; i++) {
+    var seccion = secciones[i].value;
+    if (seccion == "laboratorios"){
+      document.getElementById("nuevaSeccionAcreditacionSeleccionadaLaboratorio").checked = true;
+    }
+    if (seccion == "redes"){
+      document.getElementById("nuevaSeccionAcreditacionSeleccionadaRedes").checked = true;
+    }
+    if (seccion == "home"){
+      document.getElementById("nuevaSeccionAcreditacionSeleccionadaHome").checked = true;
+    }
+  }
+
+
+  function comprobarSeleccionadoEditar(checkbox) {
+  var checkboxes = document.getElementsByName("checkboxEditarAcreditacion");
+  checkboxes.forEach(function(cb) {
+    if (cb !== checkbox) {
+      cb.checked = false;
+    }
+  });
+  }
+
+
+
+</script>
+
+{% endblock %}

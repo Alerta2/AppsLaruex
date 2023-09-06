@@ -1,0 +1,27 @@
+{% extends "public/template.html" %}
+
+
+{% block meta %}
+  <title>LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+  <main id="main" style="margin-top:100px">
+    <h1>Web de consulta de informes del LARUEX</h1>
+    <h3>Por favor, introduzca la contraseña de su empresa en el formulario para descargar el informe</h3>
+    <div class="row">
+      <div class="col-lg-4 col-md-6 footer-newsletter">
+        <form action="/comprobacionInforme/" method="post">
+            {% csrf_token %}
+            <input type="text" name="informe" value='{{ informe }}'>
+            <input type="password" name="password">
+            <input type="submit" value="Enviar">
+        </form>
+      </div>
+    </div>
+  </main><!-- End #main -->
+
+{% endblock %}

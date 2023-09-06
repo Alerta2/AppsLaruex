@@ -1,0 +1,300 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+
+  /* estilo añadirFichero PDF*/
+  .addFicheroPDF {
+    color: rgb(161, 16, 32);
+  }
+
+  .addFicheroPDF:hover {
+    color: rgb(99, 10, 20);
+  }
+    .add:hover {
+    color: #ce8312;
+  }
+
+  .file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+
+</style>
+
+
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Listado de Equipos</h5>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Listado de Equipos</li>
+    </ol>
+  </nav>
+</div>
+
+
+<!-- breadcrumb   -->
+
+
+
+<table id="tabla_equipos" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
+  data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+  data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+  data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-row-style="rowStyle"></table>
+
+<div id="toolbar">
+  <a href="" class="mx-1" title="añadir Equipo" data-toggle="modal" data-target="#modalFormulario" style="color: #eba43d"><i
+      class="fa-solid fa-square-plus fa-2x add"></i></a>
+</div>
+
+<!-- Modal tipo de Equipo  -->
+<div id="modalTipoEquipo" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalTipoEquipo">Añadir categoría al Equipo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioModalTipoEquipo"  action="/private/docLaruex/agregarTipoEquipo/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="nombreTipoEquipo">Nombre de la categoría del Equipo</label>
+                <input required type="text" class="form-control" id="nombreTipoEquipo" placeholder="Periferico"
+                  name="nombreTipoEquipo" data-rule="required" required />
+              </div>
+            </div>
+          </div>
+
+          <!-- modal-footer -->
+        <div class="modal-footer">
+          <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+            Cerrar
+          </button>
+          <button id="reset" type="reset" class="btn btn-secondary" hidden>
+          </button>
+          <button type="submit" value="submit" class="btn btn-primary"
+            onclick="crearAviso('agregarCategoriaEquipoGuardar', 'Categoría creada con éxito', 'alert-success', 2000)">
+            Guardar
+          </button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div><!-- END modal tipoEquipo  -->
+
+
+
+<script type="text/javascript">
+  $("#tabla_equipos").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/docLaruex/equiposDatos",
+    cache: false, 
+    columns: [
+      {
+        title: "",
+        field: "id__icono",
+        align: "center",
+      },
+      {
+        title: "Código Laruex",
+        field: "cod_laruex",
+        align: "center",
+        sortable: "true",
+        formatter: function (value, row) {
+          var codigo = row.cod_laruex;
+          var fecha = new Date(row.fecha_alta);
+          return (
+            codigo + '/' + fecha.getFullYear()
+          );
+        },
+      },
+      {
+        title: "Código Uex",
+        field: "cod_uex",
+        align: "center",
+        sortable: "true",
+      },
+      {
+        title: "Nombre",
+        field: "id__nombre",
+        align: "center",
+      },
+      {
+        title: "Tipo",
+        field: "tipo_equipo__nombre",
+        align: "center",
+      },
+      {
+        title: "Ubicación actual",
+        field: "ubicacion",
+        align: "center",
+      },
+      {
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-eye fa-lg" style="color:#68B29E"></i></a>' + '<a href="/private/docLaruex/editarEquipo/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#9768b2"></i></a>'
+
+          );
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+
+    /* obtiene el id de la row y accede al elemento
+  $("#tabla_objetos").on("click-row.bs.table", function (e, row, $element) {
+    window.location.href = "/private/docLaruex/verObjeto/" + row.id + "/";
+  });*/
+
+
+  function rowStyle(row, index) {
+        if (row.fecha_baja == null ) {
+            return {
+                css: {
+                    'color': 'black'
+                }
+            }
+        } else {
+            return {
+                css: {
+                    'color': 'black',
+                    // background color light red
+                    'background-color': '#f5c6cb'
+                }
+            }
+        }
+    }
+  
+  // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreArchivo(value) {
+
+    document.getElementById('file-name').innerHTML = value;
+
+    document.getElementById('mostrarNombreArchivo').style.display = 'none';
+  }
+
+
+
+
+
+
+
+ // cambiamos la funcionalidad del boton submit del formulario
+ addEventListener('reset', function() {
+    $(".modalFormulario").reset();
+  });
+
+
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioModal").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Equipo guardado con éxito', 'alert-success', 2000)
+
+        $(".modalFormulario").remove();
+        $("#reset").trigger("click");
+        $('#tabla_equipos').bootstrapTable('refresh');
+        $('#modalFormulario').modal('toggle');
+        $('#cerrar').trigger('click');
+        
+        location.reload(true);
+        
+      }
+    });
+    
+  });
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioModalTipoEquipo").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarTipoEquipo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        $(".modalTipoEquipo").remove();
+        $("#reset").trigger("click");
+        $('#cerrar').trigger('click');
+      }
+    });
+    
+  });
+
+
+
+
+
+
+</script>
+{% endblock %}

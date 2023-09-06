@@ -1,0 +1,320 @@
+{% extends "base/base_spd.html" %}
+
+{% load static %}
+
+{% block imports %}
+<!-- Custom css login -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/login_spd.css' %}">
+<style>
+    .drop {
+        width: 500px;
+        height: 500px;
+        border-radius: 51% 49% 33% 67% / 39% 48% 52% 61%;
+        background: transparent;
+        box-shadow: inset 15px 15px 30px #00000020, inset -15px -15px 30px #fff,
+            20px 60px 40px #00000010;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.5s ease;
+    }
+
+    /*.drop::before {
+        content: "";
+        position: absolute;
+        top: 100px;
+        left: 90px;
+        background: #fff;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+    }*/
+
+    /*.drop::after {
+        content: "";
+        position: absolute;
+        top: 150px;
+        left: 150px;
+        background: #fff;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+    }*/
+
+    .drop p {
+        color: #333;
+        font-size: 30px;
+        font-family: sans-serif;
+        font-weight: 600;
+    }
+
+    .drop:hover {
+        border-radius: 50%;
+    }
+
+    /*.cards .container {
+        width: 100%;
+        margin: 0 auto;
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        place-items: center;
+        gap: 5rem;
+    }
+
+    .cards .drop {
+        width: 350px;
+        height: 350px;
+        position: relative;
+        box-shadow: inset 20px 20px 20px rgba(0, 0, 0, 0.1),
+            25px 35px 20px rgba(0, 0, 0, 0.1), 25px 30px 30px rgba(0, 0, 0, 0.1),
+            inset -20px -20px 25px rgba(255, 255, 255, 0.8);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem 0;
+        padding: 4rem;
+        transition: border-radius 0.5s;
+        overflow: hidden;
+        text-align: center;
+        animation: drop 2s infinite alternate ease-in-out;
+    }
+
+    .cards .drop:nth-child(1) {
+        border-radius: 38% 62% 46% 54% / 46% 51% 49% 54%;
+    }
+
+    .cards .drop:nth-child(2) {
+        border-radius: 38% 62% 46% 54% / 46% 51% 49% 54%;
+    }
+
+    .cards .drop:nth-child(3) {
+        border-radius: 38% 62% 46% 54% / 46% 51% 49% 54%;
+    }
+
+    @keyframes drop {
+        from {
+            border-radius: 38% 62% 46% 54% / 46% 51% 49% 54%;
+        }
+
+        to {
+            border-radius: 50%;
+        }
+    }
+
+    .cards .drop::before {
+        content: "";
+        position: absolute;
+        top: 50px;
+        left: 75px;
+        width: 35px;
+        height: 35px;
+        background: white;
+        border-radius: 50%;
+        opacity: 0.7;
+    }
+
+    .cards .drop::after {
+        content: "";
+        position: absolute;
+        top: 90px;
+        left: 100px;
+        width: 15px;
+        height: 15px;
+        background: white;
+        border-radius: 50%;
+        opacity: 0.7;
+    }
+
+    .read-btn {
+        text-decoration: none;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        font-family: inherit;
+        color: inherit;
+        font-weight: 600;
+        padding: 0.5rem;
+        cursor: pointer;
+    }
+
+    @media screen and (max-width: 1200px) {
+        .cards .container {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media screen and (max-width: 768px) {
+        .cards .container {
+            grid-template-columns: 1fr;
+        }
+    }*/
+</style>
+{% endblock %}
+
+
+{% block content %}
+<!--<div class="container-login100" style="background: rgba(27,27,28,0.5);">
+    <div class="wrap-login100 p-l-55 p-r-55 p-t-50 p-b-30">
+        <form class="login100-form validate-form" method="post">
+            <span class="login100-form-title p-b-15">
+                <i class="p fas fa-user-lock color-animate" style="font-size: 50px"></i>
+            </span>
+            
+            <span class="login100-form-title p-b-37">
+                Acceso privado
+            </span>
+
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="wrap-input100 validate-input m-b-20" data-validate="Introduce el usuario">
+                <input class="input100" type="username" name="username" placeholder="Usuario">
+                <span class="focus-input100"></span>
+            </div>
+
+            <div class="wrap-input100 validate-input m-b-25" data-validate = "Introduce la contraseña">
+                <input class="input100" type="password" name="password" placeholder="Contraseña">
+                <span class="focus-input100"></span>
+            </div>
+
+            <div class="container-login100-form-btn">
+                <button class="login100-form-btn" type="submit">
+                    INICIAR SESIÓN
+                </button>
+            </div>
+
+        </form>
+
+        
+    </div>
+</div>-->
+<div class="container-login100" style="background: rgba(27,27,28,0.7);">
+
+    <div class="drop">
+        <div class="p-l-55 p-r-55 p-t-50 p-b-30">
+            <form class="login100-form validate-form" method="post" style="font-family: 'Bradley Hand ITC'; color: #eee;">
+                <span class="login100-form-title p-b-15" style="color: #eee;">
+                    <i class="p fas fa-user-lock color-animate" style="font-size: 50px"></i>
+                </span>
+
+                <span class="login100-form-title p-b-37">
+                    Acceso privado
+                </span>
+
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+
+                <div class="wrap-input100 validate-input m-b-20" data-validate="Introduce el usuario">
+                    <input class="input100" type="username" name="username" placeholder="Usuario">
+                    <span class="focus-input100"></span>
+                </div>
+
+                <div class="wrap-input100 validate-input m-b-25" data-validate="Introduce la contraseña">
+                    <input class="input100" type="password" name="password" placeholder="Contraseña">
+                    <span class="focus-input100"></span>
+                </div>
+
+                <div class="container-login100-form-btn">
+                    <button class="login100-form-btn" type="submit">
+                        INICIAR SESIÓN
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <!--<section class="cards">
+        <div class="container">
+          <div class="drop">
+            <h2>Card Title</h2>
+            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Voluptas, voluptatem.</p>
+            <a class="read-btn" href="#">Read More</a>
+          </div>
+        </div>
+    </section>-->
+</div>
+
+
+<script>
+    (function ($) {
+        "use strict";
+
+        /*==================================================================
+        [ Validate after type ]*/
+        $('.validate-input .input100').each(function () {
+            $(this).on('blur', function () {
+                if (validate(this) == false) {
+                    showValidate(this);
+                }
+                else {
+                    $(this).parent().addClass('true-validate');
+                }
+            })
+        })
+
+
+        /*==================================================================
+        [ Validate ]*/
+        var input = $('.validate-input .input100');
+
+        $('.validate-form').on('submit', function () {
+            var check = true;
+
+            for (var i = 0; i < input.length; i++) {
+                if (validate(input[i]) == false) {
+                    showValidate(input[i]);
+                    check = false;
+                }
+            }
+
+            return check;
+        });
+
+
+        $('.validate-form .input100').each(function () {
+            $(this).focus(function () {
+                hideValidate(this);
+                $(this).parent().removeClass('true-validate');
+            });
+        });
+
+        function validate(input) {
+            if ($(input).attr('type') == 'email' || $(input).attr('name') == 'email') {
+                if ($(input).val().trim().match(/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{1,5}|[0-9]{1,3})(\]?)$/) == null) {
+                    return false;
+                }
+            }
+            else {
+                if ($(input).val().trim() == '') {
+                    return false;
+                }
+            }
+        }
+
+        function showValidate(input) {
+            var thisAlert = $(input).parent();
+
+            $(thisAlert).addClass('alert-validate');
+
+            $(thisAlert).append('<span class="btn-hide-validate"><i class="fas fa-exclamation"></i></span>')
+            $('.btn-hide-validate').each(function () {
+                $(this).on('click', function () {
+                    hideValidate(this);
+                });
+            });
+        }
+
+        function hideValidate(input) {
+            var thisAlert = $(input).parent();
+            $(thisAlert).removeClass('alert-validate');
+            $(thisAlert).find('.btn-hide-validate').remove();
+        }
+
+
+
+    })(jQuery);
+</script>
+
+{% endblock %}

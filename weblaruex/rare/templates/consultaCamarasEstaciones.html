@@ -1,0 +1,56 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+<section class="row">
+    <div class="col-12 mb-5">
+        <h1 class="text-center">Cámaras de estaciones</h1>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="row">
+            <img src="{% static 'papel/saucedilla_papel.jpg' %}" class="img-fluid" alt="Responsive image">
+            <p class="text-center">Saucedilla</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="row">
+            <img src="{% static 'papel/serrejon_papel.jpg' %}" class="img-fluid" alt="Responsive image">
+            <p class="text-center">Serrejón</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="row">
+            <img src="{% static 'papel/azuaga_papel.jpg' %}" class="img-fluid" alt="Responsive image">
+            <p class="text-center">Azuaga</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="row">
+            <img src="{% static 'papel/fregenal_papel.jpg' %}" class="img-fluid" alt="Responsive image">
+            <p class="text-center">Fregenal de la Sierra</p>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-12">
+        <div class="row">
+            <img src="{% static 'papel/atalaya_papel.jpg' %}" class="img-fluid" alt="Responsive image">
+            <p class="text-center">Santiago de Alcántara</p>
+        </div>
+    </div>
+
+    <!-- Info programa cards -->
+    <div class="row"></div>
+</section>
+<script>
+    $('.btnright').hide();
+    $('.btnleft').hide();
+</script>
+{% endblock %}

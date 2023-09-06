@@ -1,0 +1,288 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+    button, input[type="submit"], input[type="reset"] {
+        background: none;
+        color: inherit;
+        border: none;
+        padding: 0;
+        font: inherit;
+        cursor: pointer;
+        outline: inherit;
+    }
+    .param-adicional div:hover{
+        background-color: #D7E9FC;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Insertar nueva muestra</h5>
+            <!-- Multi Columns Form -->
+            <form class="g-3" action="{% url 'gestionmuestras:gestmuesInsertarMuestra' %}" method="POST" enctype="multipart/form-data"> 
+                {% csrf_token %}
+                <div class="row">
+                    <div class="card-header my-4">Información muestra</div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputMemoria" class="form-label">Memoria</label>
+                        <select id="inputMemoria" name="memoria" class="form-select">
+                            {% for m in memorias %}
+                                <option>{{ m.memoria }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputCodigoCSN" class="form-label">Codigo CSN <i onclick="cargarParametros()" class="fa-solid fa-arrows-rotate"></i></label>
+                        <select id="inputCodigoCSN" onchange="cargarParametros()" name="codigoCSN" class="form-select">
+                            {% for c in codMuestras %}
+                                <option value="{{ c.tipo_id }}_{{ c.nombre }}">{{ c.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputFrecuencia" class="form-label">Frecuencia</label>
+                        <select id="inputFrecuencia" name="frecuencia" class="form-select">
+                            {% for f in frecuencias %}
+                                <option>{{ f.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputSuministrador" class="form-label">Suministrador</label>
+                        <select id="inputSuministrador" name="suministrador" class="form-select">
+                            {% for s in suministradores %}
+                                <option>{{ s.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputClientes" class="form-label">Clientes</label>
+                        <select id="inputClientes" name="cliente" class="form-select">
+                            {% for c in clientes %}
+                                <option>{{ c.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputLocalizaciones" class="form-label">Localizacion</label>
+                        <select id="inputLocalizaciones" name="localizacion" class="form-select">
+                            {% for l in localizaciones %}
+                                <option>{{ l.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputReferencia" class="form-label">Referencia:</label>
+                        <input type="text" id="referencia" name="referencia" class="form-control" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="card-header my-4">Información de fechas</div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="inputFechaRecogidaInicio" class="form-label">Fecha Recogida Inicio</label>
+                            </div>
+                            <div class="col-6">
+                                <input type="date" id="fechaRecogidaInicio" name="fechaRecogidaInicio" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <input type="time" id="horaRecogidaInicio" name="horaRecogidaInicio" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="inputFechaRecogidaFin" class="form-label">Fecha Recogida Fin</label>
+                            </div>
+                            <div class="col-6">
+                                <input type="date" id="fechaRecogidaFin" name="fechaRecogidaFin" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <input type="time" id="horaRecogidaFin" name="horaRecogidaFin" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>               
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="inputFechaRecogidaReferencia" class="form-label">Fecha Recogida Referencia</label>
+                            </div>
+                            <div class="col-6">
+                                <input type="date" id="fechaRecogidaReferencia" name="fechaRecogidaReferencia" class="form-control" readonly>
+                            </div>
+                            <div class="col-6">
+                                <input type="time" id="horaRecogidaReferencia" name="horaRecogidaReferencia" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="inputFechaRecepcion" class="form-label">Fecha Recepcion <i onclick="cargarFechaActual()" class="fa-solid fa-arrows-rotate"></i></label>
+                            </div>
+                            <div class="col-6">
+                                <input type="date" id="fechaRecepcion" name="fechaRecepcion" class="form-control" required>
+                            </div>
+                            <div class="col-6">
+                                <input type="time" id="horaRecepcion" name="horaRecepcion" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="card-header my-4">Observaciones</div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <label for="inputComentarioGeneral" class="form-label">Comentario general:</label>
+                            <textarea rows="4" cols="50" id="inputComentarioGeneral" name="inputComentarioGeneral" class="form-control"></textarea>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <label for="inputComentarioParticular" class="form-label">Comentario particular:</label>
+                            <textarea rows="4" cols="50" type="text" id="inputComentarioParticular" name="inputComentarioParticular" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="card-header my-4">Parámetros requeridos</div>
+                    <div id="placeHolderParametrosRequerido" class="row">
+
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="card-header my-4">Parámetros adicionales</div>
+                    <div id="placeHolderParametro" hidden></div>
+                    <button type="button" class="param-adicional col-lg-2 col-md-3 col-xs-6" data-bs-toggle="modal" data-bs-target="#modalParametroNuevo">
+                        <div class="border-primary rounded d-flex justify-content-center flex-nowrap" style="border-style: dashed">
+                            <div>
+                                <i class="fa-solid fa-plus fa-4x fa-fade" style="--fa-animation-duration: 3s; --fa-fade-opacity: 0.4; color: Dodgerblue;"></i>
+                            </div>
+                        </div>
+                    </button>
+                    <!-- Basic Modal -->
+                    <div class="modal fade" id="modalParametroNuevo" tabindex="-1">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Agregar parámetro</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <select id="inputParametroAdicional" name="inputParametroAdicional" class="form-select">
+                                    {% for p in parametros %}
+                                        <option>{{ p.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="button" class="btn btn-primary" onclick="agregarParametro()" data-bs-dismiss="modal">Cargar</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div><!-- End Basic Modal-->
+                </div>
+                <div class="row">
+                    <div class="card-header my-4">Fotografía</div>
+                    <button type="button" class="col-lg-2 col-md-3 col-xs-6" onclick="activar_webcam()">
+                        <div class="border-primary rounded d-flex justify-content-center flex-nowrap" style="border-style: dashed">
+                            <div>
+                                <i id="logo_webcam" class="fa-solid fa-camera-web-slash fa-4x" style="color: Dodgerblue;"></i>
+                            </div>
+                        </div>
+                    </button>
+                    <div class="row">
+                        <div class="col-md-6 col-xs-12">
+                            <video id="webcam" class="camara" autoplay playsinline></video>
+                            <audio id="snapSound" src="" preload = "auto" width="320" height="240"></audio>
+                        </div>
+                        <div class="col-md-6 col-xs-12">
+                            <canvas id="canvas" class="camara border border-primary" style="width: 320; height: 240;"></canvas>
+                            <input id="foto_webcam" name="foto_webcam" type="file" hidden></input>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="card-header my-4"></div>
+                    <button type="submit" class="btn btn-primary">Insertar</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </div>
+            </form><!-- End Multi Columns Form -->
+        </div>
+    </div>
+</section>
+<!-- End Info programa -->
+
+<script>
+    $( "#horaRecogidaFin" ).bind("change paste keyup", function() {
+        var dateInicio = new Date($("#fechaRecogidaInicio").val() + " " + $("#horaRecogidaInicio").val());
+        var dateFin = new Date($("#fechaRecogidaFin").val() + " " + $("#horaRecogidaFin").val());
+        var dif = (((dateFin.getTime() - dateInicio.getTime())  / 1000) / 2)+3600;
+        dateInicio.setSeconds(dateInicio.getSeconds() + dif);
+        var isoString =  dateInicio.toISOString();
+        $("#fechaRecogidaReferencia").val(isoString.split("T")[0]);
+        $("#horaRecogidaReferencia").val(isoString.split("T")[1].split(":")[0]+":"+isoString.split("T")[1].split(":")[1]);
+    });
+    function cargarFechaActual(){
+        var fecha = new Date();
+        $("#fechaRecepcion").val(fecha.toISOString().split("T")[0]);
+        $("#horaRecepcion").val(fecha.toISOString().split("T")[1].split(":")[0]+":"+fecha.toISOString().split("T")[1].split(":")[1]);
+    }
+    function cargarParametros(){
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url:"/private/gestionmuestras/insertarMuestra/consultarParametrosTipo/"+$("#inputCodigoCSN option:selected").val().split("_")[0]+"/",
+            success: function(data)
+            {
+                $("#placeHolderParametrosRequerido").html("");
+                for(var i=0; i<data.parametros.length; i++){
+                    var valor = "";
+                    if (data.parametros[i].valor_recomendado != null)
+                        valor = data.parametros[i].valor_recomendado;
+                    $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'>"+data.parametros[i].parametro__descripcion+":</label><input type='text' id='"+data.parametros[i].parametro__nombre+"' name='"+data.parametros[i].parametro__nombre+"' value='"+valor+"' class='form-control'>");
+                }
+            }
+
+        });
+    }
+    function agregarParametro(){
+        // deberia consultar el parametro en una funcion de view y devolver o bien un input o bien un select en funcion del tipo de parametro con un switch case. Despues hacer el replace con el placeholder detras
+        $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#inputParametroAdicional").val()+":</label><input type='text' id='"+$("#inputParametroAdicional").val()+"' name='"+$("#inputParametroAdicional").val()+"' class='form-control'></div><div id='placeHolderParametro' hidden></div>");
+        $("#inputParametroAdicional").val($("#inputParametroAdicional option:first").val());
+    }
+    $(".camara").hide();
+    function activar_webcam(){
+        $("#logo_webcam").removeClass("fa-camera-web-slash");
+        $("#logo_webcam").addClass("fa-camera-web");
+        $(".camara").show();
+        const webcamElement = document.getElementById('webcam');
+        const canvasElement = document.getElementById('canvas');
+        const webcam = new Webcam(webcamElement, 'user', canvasElement);
+        webcam.start();
+        var image = document.getElementById("foto_webcam");
+        let picture = webcam.snap();
+        image.src = canvasElement.toDataURL("image/png");
+        console.log(image.src);
+        webcam.stop();
+    }
+</script>
+{% endblock %}

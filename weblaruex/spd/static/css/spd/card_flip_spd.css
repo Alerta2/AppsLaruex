@@ -1,0 +1,92 @@
+/* -------------------------------------------------------
+# Flip Cards CSS 
+--------------------------------------------------------*/
+
+.card-block .btn-outline-primary {
+    width: 100%;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    bottom: 0;
+    left: 0;
+    position: absolute;
+  }
+  
+  .card {
+    margin: 20px 0;
+    padding-top:20px;
+    padding-bottom:20px;
+    border-radius:10px;
+    box-shadow: 2px 2px 1px rgba(0,206,209,0.5);
+    background: white;
+  }
+  
+  .card-container {
+    perspective: 700px;
+  }
+  .card-flip {
+    position: relative;
+    width: 100%;
+    transform-style: preserve-3d;
+    height: auto;
+    transition: all 0.5s ease-out;
+    background: white;
+    border: none;
+  }
+  
+  .card-flip div {
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    height: 100%;
+    width: 100%;
+    border: none;
+    background: white;
+  }
+  
+  .card-flip .front {
+    position: relative;
+    z-index: 1;
+    background: white;
+  }
+  
+  .card-flip .back {
+    position: relative;
+    z-index: 0;
+    transform: rotateY(-180deg);
+    background: white;
+  }
+  
+  .card-container:hover .card-flip {
+    transform: rotateY(180deg);
+    background: white;
+  }
+  
+  .card-title{
+    font-family: "Brush Script MT", cursive;
+    color: rgba(0, 206, 209);
+    font-style: normal;
+    font-variant: normal;
+    font-size:2rem;
+  }
+  
+  .card-text{
+      padding: 0px 20px 20px 20px;
+  }
+  
+  .btn-primary:hover,
+  .btn-primary:focus {
+      background-color: #343a40;
+      border-color: #343a40;
+      box-shadow: none;
+      outline: none;
+  }
+  
+  .btn-primary {
+      color: #fff;
+      background-color: rgba(0, 206, 209);
+      border-color: rgba(0, 206, 209);
+      bottom:0px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      text-align: center;
+  }

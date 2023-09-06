@@ -1,0 +1,53 @@
+{% load static %}
+
+<!-- ======= Header ======= -->
+<header id="header" class="fixed-top" >
+  <div class="container d-flex align-items-center">
+    <a href="{% url 'public:publicHome' %}" class="logo mr-auto"><img
+          src="{% static 'img/logos/logo_laruex.png' %}" alt="" class="img-fluid"></a>
+
+    <nav class="nav-menu d-none d-lg-block">
+      <ul>
+        <li><a href="{% url 'public:publicHome' %}">Inicio</a></li>
+        <li class="drop-down"><a href="{% url 'public:publicLaboratorios' %}">Laboratorios</a>
+          <ul>
+            <li><a href="#capacidades" onclick="scrollSeccion('laboratorios','capacidades');">Capacidades</a></li>
+            <li><a href="#certification" onclick="scrollSeccion('laboratorios','certification');">Acreditaciones</a></li>
+            <li><a href="#vraex" onclick="scrollSeccion('laboratorios','vraex');">VRAEX</a></li>
+            <li><a href="#blog" onclick="scrollSeccion('laboratorios','blog');">I+D+I</a></li>
+          </ul>
+        </li>
+        <li class="drop-down"><a href="{% url 'public:publicRedes' %}">Redes</a>
+          <ul>
+            <li><a href="#capacidades" onclick="scrollSeccion('redes','capacidades');">Capacidades</a></li>
+            <li class="drop-down"><a href="#nuestras-redes" onclick="scrollSeccion('redes','nuestras-redes');">Nuestras Redes</a>
+              <ul>
+                <li><a href="#rarex" onclick="scrollSeccion('redes','rarex');">RAREx</a></li>
+                <li><a href="#spida" onclick="scrollSeccion('redes','spida');">SPIDA</a></li>
+              </ul>
+            </li>
+            <!--<li><a href="#funcionamiento" onclick="scrollSeccion('redes','funcionamiento');">Funcionamiento</a></li>-->
+            <li><a href="#certification" onclick="scrollSeccion('redes','certification');">Acreditaciones</a></li>
+            <li><a href="#blog" onclick="scrollSeccion('redes','blog');">I+D+I</a></li>
+          </ul>
+        </li>
+        <li><a href="{% url 'public:publicNoticias' %}">Noticias</a></li>
+
+        <li><a href="{% url 'public:publicContacto' %}">Contacto</a></li>
+
+        {% if request.resolver_match.url_name == 'servicios' and user.is_authenticated %}
+        <li>
+          <a class="dropdown-item d-flex align-items-center" href="/accounts/logout/?next={{request.path}}">
+            <i class="fa-solid fa-person-to-door"></i>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+
+
+    </nav><!-- .nav-menu -->
+    <a href="{% url 'structure:servicios' %}" class="get-started-btn">Área Privada</a>
+    
+
+  </div>
+</header><!-- End Header -->

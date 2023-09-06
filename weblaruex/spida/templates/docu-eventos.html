@@ -1,0 +1,791 @@
+{% extends "base/base_spida.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+
+
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/spida/docu-eventos.css' %}" />
+
+<!--<link rel="stylesheet" type="text/css" href="{% static 'css/spida/data-table.css' %}"/>-->
+    
+
+<!-- Moment.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js" integrity="sha256-VBLiveTKyUZMEzJd6z2mhfxIqz3ZATCuVMawPZGzIfA=" crossorigin="anonymous"></script>
+
+<!-- Tempus Dominus Bootstrap 4 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/css/tempusdominus-bootstrap-4.min.css" integrity="sha256-XPTBwC3SBoWHSmKasAk01c08M6sIA5gF5+sRxqak2Qs=" crossorigin="anonymous" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js" integrity="sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4=" crossorigin="anonymous"></script>
+
+
+<!--<script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>-->
+<!--Bootstrap Table-->
+<link href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css" rel="stylesheet">
+<script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table-locale-all.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.18.3/dist/extensions/export/bootstrap-table-export.min.js"></script>
+
+
+ 
+ <!-- the fileinput plugin styling CSS file -->
+ <link href="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.2.3/css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
+
+ <!-- alternatively you can use the font awesome icon library if using with `fas` theme (or Bootstrap 4.x) by uncommenting below. -->
+ <!--<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" crossorigin="anonymous">-->
+
+
+  <!-- if using RTL (Right-To-Left) orientation, load the RTL CSS file after fileinput.css by uncommenting below -->
+ <!-- link href="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.2.3/css/fileinput-rtl.min.css" media="all" rel="stylesheet" type="text/css" /-->
+ 
+ <!-- piexif.min.js is needed for auto orienting image files OR when restoring exif data in resized images and when you
+     wish to resize images before upload. This must be loaded before fileinput.min.js -->
+ <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.2.3/js/plugins/piexif.min.js" type="text/javascript"></script>
+ 
+ <!-- sortable.min.js is only needed if you wish to sort / rearrange files in initial preview. 
+     This must be loaded before fileinput.min.js -->
+ <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.2.3/js/plugins/sortable.min.js" type="text/javascript"></script>
+ 
+ <!-- bootstrap.bundle.min.js below is needed if you wish to zoom and preview file content in a detail modal
+     dialog. bootstrap 5.x or 4.x is supported. You can also use the bootstrap js 3.3.x versions. -->
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+ 
+ <!-- the main fileinput plugin script JS file -->
+ <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.2.3/js/fileinput.min.js"></script>
+ 
+ <script src =" https://cdnjs.cloudflare.com/ajax/libs/bootstrap-fileinput/4.5.0/themes/fas/theme.js "> </script>
+ 
+ <!-- following theme script is needed to use the Font Awesome 5.x theme (`fas`). Uncomment if needed. -->
+ <!-- script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.2.3/themes/fas/theme.min.js"></script -->
+ 
+ <!-- optionally if you need translation for your language then include the locale file as mentioned below (replace LANG.js with your language locale) -->
+ <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.2.3/js/locales/es.js"></script>
+
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" crossorigin="anonymous">
+ <style>
+
+  * {
+    box-sizing: border-box;
+  }
+
+
+  .bootstrap-datetimepicker-widget {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Ab hier für dich interessant :) */
+
+  .bootstrap-datetimepicker-widget table thead tr:first-child th:hover,
+  .bootstrap-datetimepicker-widget table td.day:hover,
+  .bootstrap-datetimepicker-widget table td.hour:hover,
+  .bootstrap-datetimepicker-widget table td.minute:hover,
+  .bootstrap-datetimepicker-widget table td.second:hover,
+  .bootstrap-datetimepicker-widget table td span:hover {
+    /* Hintergrundfarbe für die angehoverte Auswahl */
+    background: #f5f5f5;
+  }
+  .bootstrap-datetimepicker-widget table td.active,
+  .bootstrap-datetimepicker-widget table td.active:hover,
+  .bootstrap-datetimepicker-widget table td span.active {
+    /* Hintergrundfarbe für die aktive Auswahl */
+    background-color: #ff007d;
+    color: #ffffff;
+  }
+  .bootstrap-datetimepicker-widget table td.today:before {
+    /* Dreieckfarbe für den aktuellen Tag */
+    border-bottom-color: #ff007d;
+  }
+  .bootstrap-datetimepicker-widget table td.active.today:before {
+    /* Dreieckfarbe, wenn aktueller Tag und Auswahl gleicher Tag ist */
+    border-bottom-color: #fff;
+  }
+  .bootstrap-datetimepicker-widget a {
+    /* Für das Kalender-Icon, das Uhrzeit-Icon und die Pfeile in der Uhrzeitauswahl*/
+    color: #ff007d;
+  }
+  .timepicker-picker .btn-primary {
+    /* Für den Button AM / PM*/
+    color: #fff;
+    background-color: #ff007d;
+    border-color: #ff007d;
+  }
+  p{
+      font-family: 'Roboto', sans-serif;
+  }
+
+  .alert-box {
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 1px solid transparent;
+      border-radius: 4px;  
+      width: 100%;
+  }
+
+  .success {
+      color: #3c763d;
+      background-color: #dff0d8;
+      border-color: #d6e9c6;
+      display: none;
+  }
+
+  .failure {
+      color: #a94442;
+      background-color: #f2dede;
+      border-color: #ebccd1;
+      display: none;
+  }
+
+  .fade-in {
+      opacity: 1;
+      animation-name: fadeInOpacity;
+      animation-iteration-count: 1;
+      animation-timing-function: ease-out;
+      animation-duration: 0.5s;
+      display: block;
+      position: fixed;
+  }
+  .fade-out {
+      opacity: 0;
+      animation-name: fadeOutOpacity;
+      animation-iteration-count: 1;
+      animation-timing-function: ease-in;
+      animation-duration: 0.5s;
+  }
+
+  @keyframes fadeInOpacity {
+      0% {
+          opacity: 0;
+      }
+      100% {
+          opacity: 1;
+      }
+  }
+  @keyframes fadeOutOpacity {
+      0% {
+          opacity: 1;
+      }
+      100% {
+          opacity: 0;
+      }
+  }
+
+
+
+  /*titulo de la tabla*/
+  .table-title{
+  background-color: slategrey;
+  color: white;
+  padding: 10px;
+  border-radius: 5px 5px 0px 0px;;
+  }   
+
+  .select,
+  #locale {
+    width: 100%;
+  }
+  .like {
+    margin-right: 10px;
+  }
+
+  .fullscreen{
+    padding-top: 60px;
+  }
+
+  .disabled {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.5;
+  }
+
+
+/* para eliminar los bordes de las columnas de la tabla solo del footer donde va el logo alerta2*/
+.table-bordered > tfoot > tr > th {
+    border: none;
+}
+
+/*file input*/
+.krajee-default .file-caption-info, .krajee-default .file-size-info {
+    height: 30px;
+    margin: none;
+}
+thead{
+  color: slategrey;
+}
+#kvFileinputModal{
+  z-index: 2002;
+}
+
+.table-dark {
+    --bs-table-bg: #1a252f;
+    --bs-table-striped-bg: #1a252f;
+    --bs-table-striped-color: #fff;
+    --bs-table-active-bg: #1a252f;
+    --bs-table-active-color: #fff;
+    --bs-table-hover-bg: #1a252f;
+    --bs-table-hover-color: #fff;
+    color: #fff;
+}
+
+.detail-view{
+  background-color:rgba(127, 255, 212,0.5);
+}
+
+</style>
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+
+<div class="alert-box success" id="MensajeSuccess">
+  {{MensajeSuccess}}
+</div>
+<div class="alert-box failure" id="MensajeError">
+  {{MensajeError}}
+</div>
+
+
+
+
+
+<section>
+<div class="container">
+  <h2 class="text-center" id="titulo">Eventos detectados</h2>
+
+
+  {% if user.is_authenticated %} <!-- Si el usuario esta logeado ... -->
+		{% if perms.auth.spida_eventos %}	<!-- Si el usuario tiene permisos de acceso a la documentacion de los eventos ... -->
+      <!--Boton añadir evento-->
+      <div id="addEvento" style="text-align: center;margin-top:5%">
+          <button class="icon-btn add-btn">
+            <div class="add-icon"></div>
+            <div class="btn-txt" data-toggle="modal" data-target="#form" onclick="changeTextModalFechaInicio()">Añadir un nuevo evento</div>
+          </button>
+      </div><!--END Boton añadir evento-->
+
+      <!--Linea divisoria-->
+      <hr class="linea-hr" />
+
+      <!--Modal Form para iniciar o concluir un evento de inundacion-->
+      <div class="modal fade" id="form" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index: 2001;"><!--MODAL FECHA INICIAL-->
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+              <h2 class="modal-title" id="titulo" style="font-size: 35px;">Información del evento de inundacion</h2>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form  method="post" enctype="multipart/form-data" class="p-3">
+                  {% csrf_token %}
+                  <p id="tituloEvento"> Título del evento detectado *</p>
+                  {{ form.titulo | as_crispy_field }}
+                  <p id="tipoFecha">Tipo de Fecha</p>
+                  <div class="input-group date" id="datetimepicker1" data-target-input="nearest" >
+                      {{ form.fecha }}
+                      <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                      </div>
+                  </div>
+                  {{ form.tipoFecha.as_hidden }}
+                  {{ form.idEvento.as_hidden }}
+                  <div class="modal-footer border-top-0 d-flex justify-content-center">
+                      <button id="btnFormFechaEvento" type="submit" class="btn btn-success" style="background-color: mediumpurple; border-color: white;" onclick="clicked()">Crear nuevo Evento</button>
+                  </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div><!--END Modal Form para iniciar o concluir un evento de inundacion-->
+
+      <!-- Modal Form para adjuntar la documentacion de un evento de inundacion -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index: 2001;">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 class="modal-title" id="titulo" style="font-size: 35px;">Adjuntar Documentacion Relacionada con el Evento de Inundación</h2>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">         
+              <form  method="post" enctype="multipart/form-data" class="p-3">
+                {% csrf_token %}
+                <label for="tituloAdjunto" class="form-label">Titulo de la documentación adjunta *:</label>
+                <span id="remaining1"></span><span id="limit1">(Límite de carácteres 50)</span>
+                <input class="form-control" type="text" id="tituloAdjunto" name="titulo" maxlength="50" required>
+                <br>
+                <label for="descripcionAdjunto" class="form-label">Descripción detallada si lo desea:</label>
+                <span id="remaining2"></span><span id="limit2">(Límite de carácteres 500)</span>
+                <textarea class="form-control" id="descripcionAdjunto" name="descripcion" rows="3" maxlength="500"></textarea>
+                <br>
+                <input id="input-b3" name="docspida" type="file" class="file" multiple data-show-upload="true" data-show-caption="true" data-msg-placeholder="Select {files} for upload...">
+                <input type="hidden" id="idEvento" name="idEvento">
+              </form>
+            </div>
+            <!--<div class="modal-footer">
+              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>-->
+          </div>
+        </div>
+      </div>
+      <!-- END Modal Form para adjuntar la documentacion de un evento de inundacion -->
+
+
+      <!-- Acordeon para mostrar los eventos de inundacion detectados -->
+      <div class="tabs">
+        {% for evento in Eventos %} <!-- Recorro todos los eventos -->
+          <div class="tab"><!-- Creo una barra del acordeon para cada evento y defino su contenido-->
+            
+            <input type="radio" id="{{ evento.fecha_hora_inicio }}" name="rd" style="position: absolute; opacity: 0; z-index: -1;"> 
+            
+            {% if evento.estado == 0 %} <!-- En funcion del estado del evento (0=Abierto o 1=Cerrado) le asigno el rotulo -->
+              <label class="tab-label" for="{{ evento.fecha_hora_inicio }}" style="box-shadow: 10px 10px 10px 10px rgba(60, 255, 103, 0.5);"> {{ evento.titulo }} ({{ evento.fecha_hora_inicio | date}}) </label>       
+            {% else %}
+              <label class="tab-label" for="{{ evento.fecha_hora_inicio }}" style="box-shadow: 10px 10px 10px 10px rgba(240, 27, 27, 0.5);"> {{ evento.titulo }} ({{ evento.fecha_hora_inicio | date}} - {{ evento.fecha_hora_fin | date}}) </label>
+            {% endif %}
+
+            <div class="tab-content" style="overflow-y: auto;">  <!-- Defino el contenido del acordeon -->
+              
+              {% if evento.estado == 0 %}
+                <!-- Boton para cerrar evento de inundacion -->
+                <div class="row" style="padding-bottom: 20px;">
+                  <div class="col">
+                  <button type="button" id="btn-close-event-{{ evento.id_evento }}" name="{{ evento.id_evento }}" class="btn btn-primary btn-sm" onclick="changeTextModalFechaCierre(this.name, '{{ evento.titulo}}')" data-toggle="modal" data-target="#form" style="background-color: indianred; border-color: white;">
+                    <i class="fas fa-window-close"></i>
+                    <span>CONCLUIR EVENTO</span>
+                  </button>
+                  </div>
+                </div><!-- END Boton para cerrar evento de inundacion -->
+              {% endif %}
+
+                 
+              <div class="container">
+                <!-- Rotulo Documentacion con el boton de adjuntar documentacion -->
+                <div class="table-title">
+                  <div class="row">
+                    <div class="col-sm-4" style="margin-top: auto; margin-bottom: auto;">
+                      <h3 class="table-rotulo">Documentación</h3>
+                    </div>
+                    {% if perms.auth.spida_eventos_subida %} <!-- Si el usuario tiene permisos para adjuntar documentacion -->
+                    <div class="col-sm-8" style="margin-top: auto; margin-bottom: auto;">
+                      <button type="button" id="btn-add-files-{{ evento.id_evento }}" name="{{ evento.id_evento }}" onclick="openModalAdjuntarArchivos(this.name)" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" style="float:right; background-color: #63c76a; border-color: slategrey;">
+                        <i class="fas fa-paperclip"></i>
+                        <span>ADJUNTAR</span>
+                      </button>
+                    </div>
+                    {% endif %} <!-- END Si el usuario tiene permisos para adjuntar documentacion -->
+                  </div>
+                </div> <!-- END Rotulo Documentacion con el boton de adjuntar documentacion -->
+
+                <!-- Tabla con la documentacion adjuntada del evento de inundacion -->
+                <div class="table-responsive">
+                  <table  class="table table-bordered"
+                  id="table-{{evento.id_evento}}"
+                  name = "{{evento.id_evento}}"
+                  data-toggle="table"
+                  data-show-toggle="false"
+                  data-locale="es-ES"
+                  data-show-columns="false"
+                  data-show-fullscreen="true"
+                  data-search="true" 
+                  data-show-pagination-switch="true"
+                  data-pagination="true"
+                  data-page-list="[4, 8, 12, All]"
+                  data-page-size="4"
+                  data-detail-filter="detailFilter"
+                  data-detail-formatter="detailFormatter"
+                  data-detail-view="true"
+                  data-sort-name="id"
+                  data-sort-order="desc"
+                  data-show-footer="true"
+                  data-footer-style="footerStyle"
+                  data-show-refresh="true"
+                  data-loading-template="loadingTemplate"
+                  data-sort-order="desc">
+                  </table>
+                </div> <!-- END Tabla con la documentacion adjuntada del evento de inundacion -->             
+              </div>
+
+            </div> <!-- END Defino el contenido del acordeon -->
+          </div> <!-- END Creo una barra del acordeon para cada evento y defino su contenido-->
+        {% endfor %}
+
+        <div class="tab">
+            <input type="radio" id="rd3" name="rd" style="position: absolute; opacity: 0; z-index: -1;">
+            <label for="rd3" class="tab-close">Close others &times;</label>
+        </div>
+
+      </div><!-- END Acordeon para mostrar los eventos de inundacion detectados -->
+
+    {% endif %} <!-- END Si el usuario tiene permisos de acceso a la documentacion de los eventos ... -->
+  {% endif %} <!-- END Si el usuario esta logeado ... -->
+</div>
+</section>
+
+
+<script type="text/javascript">
+
+  $('#descripcionAdjunto').keyup(function(){
+    
+    if (this.value.length === 0) {
+        $('#limit2').show();
+        $('#remaining2').hide();
+    }
+    else {
+        $('#limit2').hide();
+        $('#remaining2').show();
+    }
+    
+    if (this.value.length > 500){
+        return false;
+    }
+    
+    $("#remaining2").html("(Carácteres restantes: " + (500 - this.value.length)+")");
+  });
+  $('#tituloAdjunto').keyup(function(){
+    
+    if (this.value.length === 0) {
+        $('#limit1').show();
+        $('#remaining1').hide();
+    }
+    else {
+        $('#limit1').hide();
+        $('#remaining1').show();
+    }
+    
+    if (this.value.length > 50){
+        return false;
+    }
+    
+    $("#remaining1").html("(Carácteres restantes: " + (50 - this.value.length)+")");
+  });
+
+  $("#input-b3"). fileinput ({
+    theme: "fas", //iconos utilizados
+    language: "es", //idioma del file input
+    /*uploadUrl: 'file-upload-batch',*/ //url for ajax
+    maxFilePreviewSize: 10240, //tamaño maximo del archivo
+    showClose: false, //boton cerrar vista previa de archivos cuando los adjunto
+    showCancel: false,
+    //allowedFileExtensions: ['jpg', 'gif', 'png', 'txt', 'pdf'], //extensiones de archivos permitidos
+    removeClass: "btn btn-danger",
+    removeLabel: "Eliminar",
+    elErrorContainer: "#errorBlock"
+  });
+
+
+  //https://getdatepicker.com/4/Options/
+  //https://codepen.io/ittik/pen/JzZeZw
+  $(function () {
+      $('#datetimepicker1').datetimepicker({
+              inline: true,
+              sideBySide: true,
+              locale: 'es-es',
+              format: 'DD/MM/YYYY',
+              //minDate: new Date(2021,7,2), //fecha minima
+              maxDate: Date.now(), //fecha maxima
+              defaultDate: Date.now(),
+      });
+  });
+
+  if("{{MensajeError}}"!=""){
+      $('#MensajeError').addClass('fade-in');
+      setTimeout(fadeOutError, 3000);
+  }
+
+  if("{{MensajeSuccess}}"!=""){
+      $('#MensajeSuccess').addClass('fade-in');
+      setTimeout(fadeOutSuccess, 3000);
+  }
+
+  function fadeOutError() {
+      $('#MensajeError').addClass('fade-out');
+  }
+  
+  function fadeOutSuccess() {
+      $('#MensajeSuccess').addClass('fade-out');
+  }
+
+  function changeTextModalFechaCierre(idEvento, titulo){
+    document.getElementById("tipoFecha").innerHTML = "Fecha de Finalización del Evento detectado *";
+    document.getElementById("tituloEvento").innerHTML = "Título definitivo del evento detectado *"
+    document.getElementById("id_titulo").value = titulo
+    document.getElementById("id_tipoFecha").value="fin";
+    document.getElementById("id_idEvento").value= idEvento;
+    document.getElementById("btnFormFechaEvento").innerHTML = "Cerrar el Evento"
+
+  }
+  function changeTextModalFechaInicio(){
+    document.getElementById("tipoFecha").innerHTML="Fecha de Inicio del Evento detectado *";
+    document.getElementById("tituloEvento").innerHTML = "Título provisional del evento detectado *"
+    document.getElementById("id_tipoFecha").value="inicio";
+    document.getElementById("btnFormFechaEvento").innerHTML = "Crear nuevo Evento"
+  }
+
+  function openModalAdjuntarArchivos(idEvento){
+    document.getElementById("idEvento").value=idEvento;
+  }
+
+  function headerStyle() {
+    return {
+      css: { 'text-align' : 'center'}
+    }
+  }
+</script>
+
+<script>
+
+
+  console.log('PRUEBA USUARIO','{{user.get_full_name}}');
+
+  function buildSubTableDocumentos1($el, idAdjunto) {
+    var numCol
+
+    $el.bootstrapTable({
+      method: 'get',
+      url : "/spida/documentos-adjunto-evento/?adjunto="+idAdjunto, //"/spida/docu-evento/?evento="+idEvento,
+      cache: false,
+      columns: [{
+        title: 'Id Doc',
+        field: 'id'
+      }, {
+        title: 'Id Adjunto',
+        field: 'adjunto'
+      }, {
+        title: 'Documento',
+        field: 'doc',
+        sortable: 'true',
+        formatter: function (value, row) {
+          var icon = 'fas fa-file';
+          var color = 'violet';
+          //https://blog.filestack.com/thoughts-and-knowledge/document-file-extensions-list/
+          switch (row.ext) {
+              case 'pdf':
+              icon = 'fas fa-file-pdf';
+              color = 'red';
+              break;
+              case 'doc': 
+              case 'docx':
+              icon = 'fas fa-file-word';
+              color ='steelblue';
+              break;
+              case 'xls':
+              case 'xlsx':
+              icon = 'fas fa-file-excel';
+              color = 'green';
+              break;
+              case 'ppt':
+              case 'pptx':
+              icon = 'fas fa-file-powerpoint';
+              color = 'orange';
+              break;
+              case 'txt':
+              icon = 'fas fa-file-alt';
+              color ='gray';
+              break;
+              case 'jpg':
+              case 'jpeg': 
+              case 'jpe': 
+              case 'jif': 
+              case 'jfif': 
+              case 'jfi':
+              case 'png': 
+              case 'gif': 
+              case 'tiff': 
+              case 'tif': 
+              case 'heif': 
+              case 'heic':
+              icon = 'fas fa-image';
+              color = 'teal';
+              break;
+              default:
+              icon = 'fas fa-file'
+              color = 'violet'
+              break;
+          }
+          return '<i class="' + icon + '" style="color: ' + color + '; margin-right:10px"></i><span>'+ row.doc +'.'+ row.ext +'</span>' 
+        }
+      }, {
+        title: 'Tipo documento',
+        field: 'ext',
+        sortable: 'true'
+      },{
+        title: 'Tamaño',
+        field: 'size',
+        align: 'center',
+        formatter: function (value, row) {
+          if(row.size>=1000)
+            return value/1000 +' KB';
+          else if(row.size>=1000000)
+            return value/1000000+' MB';
+          else
+            return value +' B';
+        }
+      },{
+        title: 'Ruta',
+        field: 'path'   
+      },{
+        title: 'Acciones',
+        field: 'action',
+        align: 'center',
+        formatter: function (value, row) {
+          //'<a href="javascript:" class="like disabled"><i class="fas fa-eye"></i></a>'
+          // + '<a href="javascript:" class="like"><i class="fas fa-trash-alt"></i></a>'
+          console.log(row.doc)
+          return '<a href="/spida/download_docu-eventos/'+row.id+'" class="like"><i class="fas fa-download"></i></a>'
+        },
+        /*events: {
+          'click .like': function (e, value, row) {
+              alert("Hola",JSON.stringify(row));
+          }
+        }*/
+      }],
+      locale: "es-ES",
+      search: true,
+      sortName: 'doc',
+      sortOrder: 'asc',
+    });
+
+    var classes = ["table", "table-bordered", "table-sm", "table-striped","table-light"];
+    $el.bootstrapTable('refreshOptions', {
+      classes: classes.join(' ')
+    })
+
+    $el.bootstrapTable('hideColumn', 'id');
+    $el.bootstrapTable('hideColumn', 'adjunto');
+    $el.bootstrapTable('hideColumn', 'ext');
+    $el.bootstrapTable('hideColumn', 'path');
+  }
+
+
+  //https://bootstrap-table.com/docs/api/table-options/#showcolumnssearch
+  //var SecctionsEventos = document.getElementsByClassName("table table-bordered table-hover table-striped");
+  var SecctionsEventos = document.getElementsByClassName("table table-bordered");
+  console.log(SecctionsEventos, SecctionsEventos.length);
+  numEventos = SecctionsEventos.length;
+
+  
+  for (let i = 0; i < numEventos; i++) {
+    (function(rowIndex){
+      //console.log("ROWINDEX", rowIndex);
+      //console.log("Ha entrado en una tabla: ",SecctionsEventos[rowIndex].id);
+      var idEvento = SecctionsEventos[rowIndex].attributes['name'].value;
+      var idTable= '#'+SecctionsEventos[rowIndex].id;
+      var $tabla = $(idTable);
+            
+      $(idTable).bootstrapTable('showLoading');
+
+      $(idTable).bootstrapTable({
+            method: 'get',
+            url : "/spida/adjuntos-evento/?evento="+idEvento, //"/spida/docu-evento/?evento="+idEvento,
+            cache: false,
+            columns: [{
+              title: 'Id Adjunto',
+              field: 'id'
+            }, {
+              title: 'Id Evento',
+              field: 'evento'
+            }, {
+              title: 'Documentacion',
+              field: 'titulo',
+              sortable: 'true',
+            }, {
+              title: 'Usuario',
+              field: 'usuario',
+              align: 'center',
+              sortable: 'true',
+              formatter: function (value, row) {
+                return '<span style="border-radius: 2px;"> ' + row.usuario + ' </span>' //<i class="fas fa-user"></i>
+              }
+            },{
+              title: 'Descripcion',
+              field: 'descripcion'
+            },{             
+              title: 'Fecha de Subida',
+              field: 'fecha_subida',
+              align: 'center',
+              sortable: 'true',
+              footerFormatter: LogoFooter,
+              formatter: function(value, row){
+                var fecha = new Date(row.fecha_subida);
+                return ("0" + fecha.getDate()).slice(-2)+"-"+("0" + (fecha.getMonth()+1)).slice(-2)+"-"+fecha.getFullYear()+" "+("0" + fecha.getHours()).slice(-2)+":"+("0" + fecha.getMinutes()).slice(-2)
+              }
+            }],
+            sortName: 'fecha_subida',
+            sortOrder: 'desc',
+            expandByColumnOnly: true,
+            onExpandRow: function(index, row, $detail) {
+              console.log(index, row);
+              if(row.descripcion!=""){
+                buildSubTableDocumentos1($detail.html('<p style="background-color:rgba(127, 255, 212, 1);"><span style="font-weight: bold;">Descripción detallada: </span>'+row.descripcion+'</p><div class="table-responsive"><table class="table table-sm table-striped"></table></div>').find('table'), row.id);    
+              }
+              else{
+                buildSubTableDocumentos1($detail.html('<div class="table-responsive"><table></table></div>').find('table'), row.id);    
+              }
+              
+            }
+      });
+      
+      var classes = ["table", "table-bordered"];
+      $(idTable).bootstrapTable('refreshOptions', {
+        classes: classes.join(' ')
+      })
+
+
+      $(idTable).bootstrapTable('hideColumn', 'id');
+      $(idTable).bootstrapTable('hideColumn', 'evento');
+      $(idTable).bootstrapTable('hideColumn', 'descripcion');
+    })(i);
+  }
+
+
+
+  //https://bootstrap-table.com/docs/api/table-options/#showcolumnssearch
+  //Para configurar las columnas
+  /*function detailFilter(data, row) {
+      return row.descripcion!='' || row.estacion!='' //filtrar que registros tienen el boton + de descripcion en funcion de si tiene o no una descripcion
+  };
+  function detailFormatter(index, row, element){ 
+      var html = []
+      if(row.descripcion!=''){
+        html.push('<p><b>Descripción: </b> ' + row.descripcion + '</p>');
+      }
+      if(row.estacion!=''){
+        html.push('<p><b>Estación: </b> ' + row.estacion + '</p>');
+      }
+      return html.join('') Para definir que aparece en el boton + de descripcion
+  };*/
+
+  function LogoFooter(){
+      var html = []
+      html.push('<img src="/static/img/spida/logos/logo_alerta2.jpg" style="max-height:50px; float:right" alt="">');
+      return html.join('')
+  }
+
+  function footerStyle(column) {
+    /*return {
+      action: {
+        css: {'border-color': 'rgba(0, 0, 0, 0)'}
+      }
+    }[column.field]*/
+    return {
+      css: { 'border-color': 'rgba(0, 0, 0, 0)' }
+    }
+  }
+
+  function loadingTemplate(message) {
+      return '<i class="fa fa-spinner fa-spin fa-fw fa-2x"></i>'
+  }
+</script>
+
+<!--<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>-->
+<!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>-->
+<!--<script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>-->
+{% endblock %}

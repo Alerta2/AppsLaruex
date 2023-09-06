@@ -1,0 +1,15 @@
+{% load static %}
+{% load i18n %}
+{% if lista_radon_yodo %}
+    <section id="radon_yodo">
+        <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 d-flex">
+            {% for valor in lista_radon_yodo %}
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                    <button type="button" class="btn btn-info text-white p-4 m-2 w-100 {% if valor.retraso > 24 %}border border-danger{% elif valor.retraso > 8 %}border border-warning{% endif %}"  data-toggle="tooltip" data-placement="bottom" title='{% translate "Medido un valor de" %} {{ valor.valor }} &#181;Bq/m3 {% translate "donde la actividad mínima detectable es" %} {{ valor.amd }} &#181;Bq/m3 {% translate "en la fecha de" %} {{ valor.fecha }}' onclick="graficaCanal({{ estacion }}, {{ valor.id_canal }})">
+                        {{ valor.nombre }}
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}

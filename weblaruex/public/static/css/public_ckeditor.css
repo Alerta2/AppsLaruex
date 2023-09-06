@@ -1,0 +1,188 @@
+  /*-----------------------------
+  # ckeditor
+  -----------------------------**/
+
+
+/* Estilos para el contenedor principal de CKEditor */
+/*--------.cke_editor {
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  padding: 10px !important;
+  background-color: #640505 !important;
+}-----------------------**/
+
+/* Estilos para el área de edición del contenido */
+
+/*--------
+.cke_editable {
+  font-family: Arial, sans-serif !important;
+  font-size: 14px !important;
+  color: #333 !important;
+}-----------------------**/
+
+/* Estilos para la barra de herramientas */
+/*--------
+.cke_toolbar {
+  background-color: none !important;
+  padding: 10px !important;
+  border: none !important;
+}-----*/
+
+/* Estilos para los botones de la barra de herramientas */
+
+/*--------
+.cke_button {
+  background-color: none !important;
+  color: #560c0c !important;
+  padding: 6px 12px !important;
+}-----*/
+
+
+/*--------
+.cke_button_icon{
+  color: #560c0c !important;
+  background-color: #1d8896;
+}-----*/
+
+
+/*--------
+.cke_ltr{
+  color: #560c0c !important;
+  background-color: none;
+
+}-----*/
+
+
+/*--------
+.cke_button_label {
+  display: none;
+  padding-left: 3px;
+  margin-top: 1px;
+  line-height: 17px;
+  vertical-align: middle;
+  float: left;
+  cursor: default;
+  color: #b51313;
+}-----*/
+
+
+/*--------
+.cke_toolbar_separator {
+  background-color: none !important;
+  margin: 4px 2px 0 2px;
+  height: 10px;
+  width: 1px;
+}-----*/
+
+
+/* Estilos para los cuadros de diálogo */
+
+/*--------
+.cke_dialog {
+  background-color: #fff !important;
+  border: 1px solid #ccc !important;
+}-----*/
+
+
+/* Estilos para los paneles desplegables */
+/*--------
+.cke_panel {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+}
+-----*/
+
+/*--------
+.cke_inner{
+  background-color: none !important;
+  border: 0.12rem solid #1d8896 !important;
+}
+
+.cke_reset{
+  border: none;
+  background-color: none !important;
+
+}
+
+-----*/
+
+
+
+.django-ckeditor-widget{
+  border: none !important;
+  padding: 6px 12px !important;
+  height: auto !important;
+  width: auto !important;
+  background-color: none !important;
+
+}
+.cke_editor_id_resumenNoticia{
+  border: none !important;
+  padding: 6px 12px !important;
+  
+  height: auto !important;
+  width: auto !important;
+}
+.cke_editor_id_resumenNoticia .cke_inner{
+  background-color: none !important;
+  border: 0.12rem solid #1d8896 !important;
+  /* border: 1px solid #d1d1d1 !important; */
+}
+.cke_editor_id_resumenNoticia .cke_reset{
+  border: none;
+  background-color: none !important;
+}
+.cke_top {
+  padding: 6px 8px 2px;
+  position: relative;
+  border-bottom: none; 
+  background: #eff7f8;
+}
+.cke_reset_all{
+  background-color: none !important;
+  border: none !important;
+}
+.cke_bottom {
+  padding: 6px 8px 2px;
+  position: relative;
+  border-top: none; 
+  background: #eff7f8;
+}
+
+.cke_button_icon{
+  color: #560c0c !important;
+  background-color: #1d8896 !important;
+}
+
+.cke_combo_text{
+  color: #fff !important;
+  background-color: #1d8896;
+}
+
+.cke_toolgroup{
+  background-color: none !important;
+  color: #560c0c !important;
+}
+
+a.django-ckeditor-widget{
+  background-color: none !important;
+  color: #1d8896 !important;
+}
+
+.cke_button_label{
+  background-color: none !important;
+  color: #1d8896 !important;
+}
+.cke_1_top{
+  background-color: none !important;
+  color: #1d8896 !important;
+}
+.cke_button_icon .cke_button__bold_icon{
+  background-color: none !important;
+  color: #1d8896 !important;
+}
+
+/* Estilo personalizado para cambiar el color de fondo del icono */
+.cke_button__exportpdf_icon {
+  background-color: #ff0000; /* Cambia el color de fondo a rojo */
+}

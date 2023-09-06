@@ -1,0 +1,578 @@
+{% extends "base/base_mapa.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    RARE
+{% endblock %}
+
+{% block imports %}
+    <!-- scripts de grafica -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- aos -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+{% endblock %}
+
+{% block css %}
+        html, body{
+            background-image: url('https://cdn.pixabay.com/photo/2016/04/04/10/15/meander-1306617_960_720.jpg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+        /* Zoom In #1 */
+        .hoverZoomIn figure img {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            -webkit-transition: .3s ease-in-out;
+            transition: .3s ease-in-out;
+        }
+        .hoverZoomIn figure:hover img {
+            -webkit-transform: scale(1.3);
+            transform: scale(1.3);
+        }
+        section {
+                background-color: rgba(255,255,255,0.75);
+                margin-top: 20px;
+                margin-bottom: 20px;
+        }
+        #mapid{
+            height: 500;
+        }
+        #chart_popup{
+            background-color: rgba(255,255,255,0.95);
+            z-index: 9700;
+        }
+        #close_station{
+            position: relative;
+            top: -15px;
+            right: 10px;
+            z-index: 9800;
+        }
+        #carouselControls{
+            margin-top: 40px;
+        }
+        .carousel-caption span {
+            font-size: 40px;
+        }
+        .circle-icon {
+            background: rgba(0, 0, 0, 0.5);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 60px;
+            vertical-align: middle;
+        }
+        @media only screen and (max-width : 800px) {
+            #carouselControls{
+                margin-top: 60px;
+            }
+            .circle-icon {
+                width: 40px;
+                height: 40px;
+                line-height: 40px;
+            }
+            #boton_acceder {
+                position: absolute;
+                right: 15%;
+                bottom: -20px;
+                left: 15%;
+                z-index: 10;
+            }
+            .carousel-caption span {
+                font-size: 20px;
+            }
+            .carousel-indicators{
+                position: absolute;
+                top: 60px;
+            }
+        }
+        
+        .carousel-indicators .active{
+            background-color: #0bba00;
+        }
+
+        @keyframes bouncing-loader {
+            to {
+              opacity: 0.1;
+              transform: translate3d(0, -16px, 0);
+            }
+          }
+          
+          .bouncing-loader {
+            display: flex;
+            justify-content: center;
+          }
+          
+          .bouncing-loader > div {
+            width: 36px;
+            height: 36px;
+            margin: 0rem 0.2rem;
+            background: #08B798;
+            border-radius: 50%;
+            animation: bouncing-loader 0.6s infinite alternate;
+          }
+          
+          .bouncing-loader > div:nth-child(2) {
+            animation-delay: 0.2s;
+          }
+          
+          .bouncing-loader > div:nth-child(3) {
+            animation-delay: 0.4s;
+          }
+{% endblock %}
+
+{% block content %}
+
+    <section>
+        <div id="carouselControls" class="carousel slide" data-ride="carousel" data-interval="false" data-pause="hover">
+            {% with indice=0 %}
+                <ol class="carousel-indicators">
+                    {% for est in estaciones %}
+                        {% if est.nombre == estacion.id_estacion.nombre %}
+                            <li data-target="#carouselIndicators" class="active"></li>
+                        {% else %}
+                            <li data-target="#carouselIndicators"></li>
+                        {% endif %}
+                    {% endfor %}
+            {% endwith %}
+            </ol>
+            <div class="carousel-inner">
+                {% for est in estaciones %}
+                    {% if est.id_estacion.nombre == estacion.id_estacion.nombre %}
+                        <div class="carousel-item active">
+                    {% else %}
+                        <div class="carousel-item">
+                    {% endif %}
+                            <img class="d-block w-100" src="{% static 'img/rare/estaciones' %}/{{ est.id_estacion.id }}.png" alt="{{ est.id_estacion.nombre }}">
+                            {% if est.id_estacion.nombre != estacion.id_estacion.nombre %}
+                                <div id="boton_acceder" class="carousel-caption">
+                                    <a class="door-station" href="/private/rare/station/{{ est.id_estacion.id }}/" onclick="$('.door-station').hide();$('.bouncing-loader').show();">
+                                        <span>
+                                            <i class="fas fa-door-open circle-icon"></i>
+                                        </span>
+                                    </a>
+                                    <div class="bouncing-loader">
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                {% endfor %}
+                </div>
+                <a class="carousel-control-prev" href="#carouselControls" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselControls" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+    </section>
+    <section id="estado_actual" class="p-3">
+        <div class="row">
+            <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
+                <div class="bg-light rounded m-2 p-2">
+                    <div id="chart_div"></div>
+                    <img src="{% static 'img/logos/' %}/logo_enac.jpg" width="128px" data-toggle="tooltip" data-placement="bottom"/>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 w-100 h-100">
+                <div id="mapid"></div>
+            </div>
+        </div>
+    </section>
+    <div id="info_conexiones"></div>
+    <div id="info_equipos"></div>
+    <div id="info_meteorologia"></div>
+    <div id="info_detectores"></div>
+    <div id="info_radon_yodo"></div>
+    <div id="info_yodo_cesio"></div>
+
+    <div id="chart_popup" class="w-100  h-50 fixed-bottom">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 w-100 h-100">
+            <div id="close_station"><button type="button" class="btn btn-dark btn-circle ml-5" onclick="$('#chart_popup').fadeOut();"><i class="fa fa-times"></i></button></div>
+            <div id="chart_div_popup"></div>
+        </div>
+    </div>
+    
+
+    <script type="text/javascript">
+        $('.bouncing-loader').hide();
+        AOS.init();
+        $('.btnright').hide();
+        $('.btnleft').hide();
+        $('#chart_popup').hide();
+
+        // activación del tooltiptext de bootstrap
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+        $(document).ready(function(){
+            $('.dropdown-toggle').dropdown()
+        })
+
+        // mapa estacion
+        var map = L.map('mapid',{
+            minZoom:5, //especifico zoom minimo del mapa
+            attributionControl: false,
+            zoomControl: false,
+        }).setView([{{ estacion.id_estacion.map_lat|safe }},{{ estacion.id_estacion.map_lon|safe }}], 9);
+        var layer_OpenStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        L.control.zoom({ position: 'bottomleft' }).addTo(map);
+        
+        var ubicacionesInteres = L.layerGroup();
+        map.addLayer(ubicacionesInteres);
+
+        var imagen = "";
+
+        {% if estacion.tipo == 'AIRE' %} 
+            imagen = '{% static img %}'+'img/rare/station_air.png';
+        {% elif estacion.tipo == 'AGUA' %} 
+            imagen = '{% static img %}'+'img/rare/station_water.png';
+        {% endif %}
+
+        marker = new L.marker([{{ estacion.id_estacion.map_lat|safe }},{{ estacion.id_estacion.map_lon|safe }}], {icon:	new L.NumberedDivIcon({iconUrl: imagen})}).addTo(map);
+
+        // Grafica dosis
+        var fechas = [];
+        var valores = [];
+        var alerta = [];
+        var emergencia = [];
+        
+        {% for dato in valores_dosis %}
+            fechas.push(new Date("{{ dato.fecha.isoformat }}").toISOString());
+            valores.push({{ dato.valor|safe }});
+            alerta.push({{ dato.alerta|safe }});
+            emergencia.push({{ dato.emergencia|safe }});
+        {% endfor %}
+        /**** grafica de valores de dosis ****/
+        var options = {
+            series: [{
+                name: "Valores",
+                data: valores
+            },{
+                name: "Alerta",
+                data: alerta
+            },{
+                name: "Emergencia",
+                data: emergencia
+            }],
+            colors: ['#08AC00', '#FCB400', '#E10000'],
+            chart: {
+                height: 380,
+                type: 'line',
+                zoom: {
+                    enabled: true
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            title: {
+                text: '{% translate "Valores de tasa registrados últimas 4 horas" %}',
+                align: 'left'
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                    opacity: 0.5
+                },
+            },
+            xaxis: {
+                categories: fechas,
+                labels: {
+                    datetimeFormatter: {
+                        year: 'yyyy',
+                        month: 'MMM \'yy',
+                        day: 'dd MMM',
+                        hour: 'HH:mm'
+                    }
+                },
+                type: 'datetime',
+                title: {
+                    text: 'Fecha',
+                },
+            },
+            yaxis: {
+                title: {
+                    text: 'Tasa de Dosis (uSv/h)',
+                },
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart_div"), options);
+        chart.render();
+
+        var chart;
+        var filled = false;
+        function drawChartPopup(datos, amd) {
+            $('#chart_popup').fadeIn();
+            var fechas = [];
+            var valores = [];
+            var valoresAMD = [];
+            var series = [];
+            if (amd && (datos.Values[0].amd > 0)){
+                for (var i = 0; i < datos.Values.length; i++){
+                    fechas.push(new Date(datos.Values[i].fecha).toISOString().replace(/T/, ' ').replace(/\..+/, ''));
+                    valores.push(datos.Values[i].valor);
+                    valoresAMD.push(datos.Values[i].amd);
+                };
+                series = [{
+                        name: "Valores",
+                        data: valores
+                    },{
+                        name: "AMD",
+                        data: valoresAMD
+                    }];
+            }
+            else{
+                for (var i = 0; i < datos.Values.length; i++){
+                    fechas.push(new Date(datos.Values[i].fecha).toISOString().replace(/T/, ' ').replace(/\..+/, ''));
+                    valores.push(datos.Values[i].valor);
+                };
+                series = [{
+                        name: "Valores",
+                        data: valores
+                    }];
+            }
+
+            /**** grafica de valores de dosis ****/
+            var options = {
+                series: series,
+                colors: ['#08AC00', '#FCB400'],
+                chart: {
+                    id: 'popupchart',
+                    height: 350,
+                    type: 'line',
+                    zoom: {
+                        enabled: true
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'straight'
+                },
+                title: {
+                    text: datos.Medida,
+                    align: 'left'
+                },
+                grid: {
+                    row: {
+                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                        opacity: 0.5
+                    },
+                },
+                xaxis: {
+                    title: {
+                        text: 'Fecha',
+                    },
+                    categories: fechas,
+                    labels: {
+                        datetimeFormatter: {
+                            year: 'yyyy',
+                            month: 'MMM \'yy',
+                            day: 'dd MMM',
+                            hour: 'HH:mm'
+                        }
+                    },
+                    type: 'datetime',
+                },
+                yaxis: {
+                    title: {
+                        text: datos.Unidades,
+                    },
+                }
+            };
+
+            if (filled){
+                chart.updateOptions(options);
+            }
+            else{
+                chart = new ApexCharts(document.querySelector("#chart_div_popup"), options);
+                chart.render();
+                filled = true;
+            }
+            document.getElementById('chart_div_popup').style.display = 'none';
+            document.getElementById('chart_div_popup').style.display = 'block';
+        }
+        function removeData() {
+            var arr = chart.w.globals.series.slice()
+            arr.pop()
+            return arr;
+        }
+
+        function graficaIsotopos(id_detector, id_isotopo){
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url:"/private/rare/station/chartIsotope/"+id_detector+"/"+id_isotopo+"/",
+                success: function(data)
+                {
+                    if (data.Values.length != 0)
+                        drawChartPopup(data, true);
+                    else
+                        crearAlerta(Date.now(), "No hay datos en existentes",500);
+                },
+
+            })
+        }
+        function graficaCanal(id_estacion, id_canal){
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url:"/private/rare/station/chartChannel/"+id_estacion+"/"+id_canal+"/",
+                success: function(data)
+                {
+                    if (data.Values.length != 0)
+                        drawChartPopup(data, true);
+                    else
+                        crearAlerta(Date.now(), "No hay datos en existentes",500);
+                },
+
+            })
+        }
+        crearAviso(Date.now(), "Cargando información detallada estación",500);
+
+        function infoMapa(){
+            $.ajax({
+                type: 'GET',
+                url: "/private/rare/station/info/{{ estacion.id_estacion.id }}/infomapa/",
+                success: function (data) {
+                    var icono = "";
+                    if (data.precipitacion == 0)
+                        icono = "{% static 'img/rare/iconomet' %}/sol.png";
+                    else if (data.precipitacion < 10)
+                        icono = "{% static 'img/rare/iconomet' %}/llovizna.png";
+                    else
+                        icono = "{% static 'img/rare/iconomet' %}/lluvia.png";
+                        
+                    var actualPrecipitation = L.control.info({
+                        position: 'topleft',
+                        title: '<img src="'+icono+'" alt="Precipitación" width="32" height="32">',
+                        titleTooltip: 'Precipitacion actual',
+                    });
+                    map.addControl(actualPrecipitation);
+
+                    var actualWind = L.control.info({
+                        position: 'topleft',
+                        title: '<i class="fas fa-arrow-up fa-3x" style="transform: rotate('+data.direccion_viento+'deg);"></i>',
+                        titleTooltip: "Viento dirección " + data.direccion_viento + "° con velocidad " + data.velocidad_viento + "m/s",
+                    });
+                    map.addControl(actualWind);
+                    var riskWind = L.control.info({
+                        position: 'topleft',
+                        title: '<i class="fas fa-arrow-up fa-3x" style="color: coral; transform: rotate('+data.direccion_riesgo+'deg);"></i>',
+                        titleTooltip: "Viento desde ubicación de interés debería tener un ángulo aproximado " + data.direccion_riesgo + "° y esta se encuentra a " + data.distancia_riesgo + "m de distancia",
+                    });
+                    map.addControl(riskWind);
+                }
+            })
+        }
+        infoMapa();
+
+        function ubicaciones(){
+             $.ajax({
+                type: 'GET',
+                url: "/private/rare/ubicacionesInteres/",
+                success: function (data) {
+                    data.forEach(function (item, index) {
+                        var icon;
+                        if (item.tipo == 'Central'){
+                            icon = L.icon({
+                                iconUrl: '{% static img %}'+'img/rare/nuclear-plant.png',
+                                iconSize:     [48, 48], // size of the icon
+                                iconAnchor:   [48, 48], // point of the icon which will correspond to marker's location
+                            });
+                            imagen = '{% static img %}'+'img/rare/nuclear-plant.png';
+                        }
+                        else if (item.tipo == 'Almacenamiento'){
+                            icon = L.icon({
+                                iconUrl: '{% static img %}'+'img/rare/container.png',
+                                iconSize:     [48, 48], // size of the icon
+                                iconAnchor:   [48, 48], // point of the icon which will correspond to marker's location
+                            });
+                            imagen = '{% static img %}'+'img/rare/container.png';
+                        }
+                        auxMarker = new L.marker([item.lat,item.lon], {icon: icon});
+                        ubicacionesInteres.addLayer(auxMarker);
+                    });
+                }
+            })
+        }
+        ubicaciones();
+        function seccionConexiones(){
+            $.ajax({
+                type: 'GET',
+                url: "/private/rare/station/info/{{ estacion.id_estacion.id }}/conexiones/",
+                success: function (data) {
+                    $('#info_conexiones').html(data);
+                }
+            })
+        }
+        seccionConexiones();
+        function seccionEstado(){
+            $.ajax({
+                type: 'GET',
+                url: "/private/rare/station/info/{{ estacion.id_estacion.id }}/estado/",
+                success: function (data) {
+                    $('#info_equipos').html(data);
+                }
+            })
+        }
+        seccionEstado();
+        function seccionMeteorologia(){
+            $.ajax({
+                type: 'GET',
+                url: "/private/rare/station/info/{{ estacion.id_estacion.id }}/meteorologia/",
+                success: function (data) {
+                    $('#info_meteorologia').html(data);
+                }
+            })
+        }
+        seccionMeteorologia();
+        function seccionDetectores(){
+            $.ajax({
+                type: 'GET',
+                url: "/private/rare/station/info/{{ estacion.id_estacion.id }}/detectores/",
+                success: function (data) {
+                    $('#info_detectores').html(data);
+                }
+            })
+        }
+        seccionDetectores();
+        function seccionRadonYodo(){
+            $.ajax({
+                type: 'GET',
+                url: "/private/rare/station/info/{{ estacion.id_estacion.id }}/radon_yodo/",
+                success: function (data) {
+                    $('#info_radon_yodo').html(data);
+                }
+            })
+        }
+        seccionRadonYodo();
+        function seccionYodoCesio(){
+            $.ajax({
+                type: 'GET',
+                url: "/private/rare/station/info/{{ estacion.id_estacion.id }}/yodo_cesio/",
+                success: function (data) {
+                    $('#info_yodo_cesio').html(data);
+                }
+            })
+        }
+        seccionYodoCesio();
+    </script>
+{% endblock %}

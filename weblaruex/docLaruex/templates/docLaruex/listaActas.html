@@ -1,0 +1,560 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+    .add:hover {
+    color: #ce8312;
+  }
+  /*  3 estilo del campo añadir archivo*/
+
+  .addFicheroEditable {
+    color: rgb(9, 58, 65);
+  }
+
+  .addFicheroEditable:hover {
+    color: rgb(133, 198, 228);
+  }
+
+  /* estilo añadirFichero PDF*/
+  .addFicheroPDF {
+    color: rgb(161, 16, 32);
+  }
+
+  .addFicheroPDF:hover {
+    color: rgb(99, 10, 20);
+  }
+
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Actas</h5>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Actas</li>
+    </ol>
+  </nav>
+</div>
+
+{% if administrador %}
+<div id="toolbar">
+  <!-- boton que permite añadir un nuevo fabricante -->
+  <a href="" class="mx-1" title="Agregar una nueva acta" data-toggle="modal" data-target="#modalFormularioActa" style="color: #eba43d"><i
+      class="fa-solid fa-square-plus fa-2x add"></i></a>
+</div>
+{% endif %}
+
+
+<!--- modalFormularioActa que los proyectos-->
+<div id="modalFormularioActa" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Acta</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioActa"  action="/private/docLaruex/agregarArchivo/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}  
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="habilitacion">Habilitación</label>
+                <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                  {% for habilitacion in habilitaciones %}
+                  <option value="{{habilitacion.id}}">
+                    {{habilitacion.titulo}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="estado">Estado</label>
+                <select class="form-select" data-rule="required" id="estado" name="estado">
+                  {% for estado in estados %}
+                  <option value="{{estado.id}}">
+                    {{estado.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+          </div>      
+          <div class="row">
+             <div class="col-6">
+               <div class="form-group">
+                 <label for="nombreObjeto">Título del Acta</label>
+                 <input type="text" class="form-control" id="nombreObjeto" name="nombreObjeto"
+                   data-rule="required" />
+               </div>
+             </div> 
+             <div class="col-6">
+                <div class="form-group">
+                  <label for="ubicacion">Ubicación</label>
+                  <input type="text" class="form-control" id="ubicacion" name="ubicacion" value="Sala de Reuniones Edificio Alerta2"
+                    data-rule="required" />
+                </div>
+             </div>       
+           <div class="row">
+            <div class="col-3">
+              <div class="form-group">
+                <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+                  value="Acta" hidden />
+                <label for="fecha_inicio">Fecha y Hora de Inicio</label>
+                <input type="datetime-local" id="fecha_inicio" name="fecha_inicio" class="form-control" required />
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label for="nombreConsejo">Nombre del Consejo</label>
+                <input type="text" class="form-control" id="nombreConsejo" name="nombreConsejo" value="Consejo de Laruex"
+                  data-rule="required" />
+              </div>
+            </div>
+              <div class="col-2">
+                <div class="form-group">
+                  <label for="numSesion">Nº de Sesión</label>
+                  <input type="number" class="form-control" id="numSesion" name="numSesion"
+                    data-rule="required" placeholder="3"/>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group ">              
+                  <label for="labelMiembros"></label>
+                    <button class="btn btn-outline  d-flex align-items-center" type="button" data-toggle="modal" data-target="#modalMiembros" 
+                      style="color: #005f73; border-color: #005f73;">
+                      Miembros
+                    </button>
+                    <select name="miembros" id="miembros" multiple="multiple" hidden>
+                    </select>
+                </div>
+              </div>
+            </div>
+          <div class="row">
+            <div class="col-4">
+              <div class="form-group">
+                <label for="convocante">Convocante</label>
+                <select class="form-select" data-rule="required" id="convocante" name="convocante">
+                  {% for convocante in convocantes %}
+                  <option value="{{convocante.id}}">
+                    {{convocante.first_name}} {{convocante.last_name}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label for="secretario">Secretario</label>
+                <select class="form-select" data-rule="required" id="secretario" name="secretario">
+                  {% for secretario in secretarios %}
+                  <option value="{{secretario.id}}">
+                    {{secretario.first_name}} {{secretario.last_name}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="form-group">
+                <label for="fecha_cierre">Fecha y Hora de Cierre</label>
+                <input type="datetime-local" id="fecha_cierre" name="fecha_cierre" class="form-control" />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              
+              <div class="form-group">
+                <label for="numPuntos">Puntos del Acta</label>
+                <select class="form-select" data-rule="required" id="numPuntos" name="numPuntos" onchange="mostrarPuntos(this.value)">
+                  {% with i="1" %}
+                    
+                    {% for i in range %}
+                    <option value="{{i}}" ">
+                      {{i}}
+                    </option>
+                    {% endfor %}
+                  {% endwith %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class ="col-3">
+              <div class="form-group" id="divOrdenPuntos">
+              </div>
+            </div>
+            <div class ="col-9" >
+              <div class="form-group" id="divPuntos">
+              </div>
+            </div>
+          </div>
+          <div class="row" hidden>
+            <div class="col">
+              <div class="form-group">
+                <label for="numAcuerdos">Acuerdo del Acta</label>
+                <select class="form-select" data-rule="required" id="numAcuerdos" name="numAcuerdos" onchange="mostrarAcuerdos(this.value)">
+                    {% for i in range %}
+                    <option value="{{i}}">
+                      {{i}}
+                    </option>
+                    {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class ="col-3">
+              <div class="form-group" id="divOrdenAcuerdos">
+              </div>
+            </div>
+            <div class ="col-9" >
+              <div class="form-group" id="divAcuerdos">
+              </div>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center">
+            <div class="col-md-auto" id="adjuntoNoEditable">
+              <div class="form-group">
+                <label for="ficheroAdjuntoActa"><i class="fa-solid fa-file-pdf fa-4x addFicheroPDF"></i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="ficheroAdjuntoActa" name="ficheroAdjuntoActa"
+                  onchange="mostrarNombreArchivo(this.value)" />
+                <spam class="text-center"><strong id="mostrarNombreArchivo"><br></strong>
+                  <spam id="file-name"></spam>
+                </spam>
+              </div>
+            </div>
+
+            
+          </div>
+          <div class="modal-footer">
+            <button id="cerrarActa" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+</form>
+</div> <!-- END ModalAgregarProyecto -->
+
+
+
+<!-- Modal con listado de Miembros -->
+<div class="modal fade" id="modalMiembros" tabindex="-1" role="dialog" aria-labelledby="modalMiembrosLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalMiembrosLabel">Seleccionar Miembros</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div>
+          {% for miembro in miembros %}
+          <button class="dropdown-item" type="button" id="miembrosModalExtra" >
+            <input type="checkbox" value="{{miembro.id}}" name="miembrosModalExtra" onclick="mostrarMiembros(this.value)">
+            {{miembro.first_name}} {{miembro.last_name}}
+          </button>
+          {% endfor %}
+          <select name="miembrosSelect" id="miembrosSelect" multiple="multiple"
+            hidden>
+            {% for miembro in miembros %}
+            <option value="{{miembro.id}}"></option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cerrarMiembros">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="obtenerSeleccionados()">Guardar Selecionados</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============= Tablas ============= -->
+
+<!-- Tabla con lista de proyectos -->
+
+    <table id="tabla_actas" data-toggle="table" data-search="true" data-show-columns="true"
+      data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+      data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+      data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+    </table>
+
+ 
+
+<script type="text/javascript">
+  // Función para mostrar el nombre del financiador en el modal
+  function mostrarMiembros(value) {
+    console.log("hola")
+    $('#miembrosSelect option[value="' + value + '"]').attr("selected", "selected");
+    miembrosSeleccionados = $('#miembrosSelect').val();
+    return miembrosSeleccionados;
+  }
+
+  $('#tabla_actas').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/actasDatos",
+    cache: false,
+    columns: [{
+      title: 'Sesión',
+      field: 'sesion',
+      align: "center"
+    },{
+      title: 'Fecha',
+      field: 'fecha_inicio',
+      align: 'center',
+      sortable: 'true',
+      formatter: function (value, row) {
+          var fecha = new Date(row.fecha_inicio);
+          return $.datepicker.formatDate('dd-mm-yy', fecha);
+      }
+    },{
+      title: 'Convocante',
+      field: 'convocante',
+      align: "center"
+    },{
+      title: 'Ubicación',
+      field: 'ubicacion',
+      align: 'center',
+    },{
+      title: 'Consejo',
+      field: 'consejo',
+      align: "center",
+    },{
+      title: "Acciones",
+      field: "action",
+      align: "center",
+      formatter: function (value, row) {        
+
+        var botonDescargarPDF = '<a href="/private/docLaruex/consultarArchivo/' + row.id + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-lg" style="color:#A11020"></i></a>';
+        var botonDescargarExcel = '<a href="/private/docLaruex/consultarArchivo/' + row.id + '/' + '" class="mx-1" title="Descargar" download><i class="fa-duotone fa-file-excel fa-lg" style="color:#128C33"></i></a>';
+        var botonDescargarEditable = '<a href="/private/docLaruex/consultarArchivoEditable/' + row.id + '/' + '" class="mx-1" title="Descargar" download><i class="fa-duotone fa-file-signature fa-lg" style="color:#266353"></i></a>';
+
+        var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+        var botonEditar = '<a href="/private/docLaruex/editarObjeto/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#4F5775"></i></a>';
+
+
+
+        var admin = '{{administrador}}';
+        if (row.id__ruta)
+          extension_ruta = row.id__ruta.split(".").pop();
+        if (row.id__ruta_editable)
+          extension_ruta_editable = row.id__ruta_editable.split(".").pop();
+      
+        if (admin == 'True') {
+          if (row.id__ruta && row.id__ruta_editable){
+            if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
+              return (botonVer + botonDescargarPDF + botonDescargarExcel + botonEditar )
+            }else{
+              return (botonVer + botonDescargarPDF + botonDescargarEditable + botonEditar  )
+            }
+          }else if (!row.id__ruta && row.id__ruta_editable){
+            if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
+              return (botonVer  + botonDescargarExcel + botonEditar)
+            }else{
+              return (botonVer + botonDescargarEditable + botonEditar)
+            }
+          }else{
+            return (botonVer  + botonDescargarPDF + botonEditar )
+          }
+        }else{
+          
+          if (row.id__ruta && row.id__ruta_editable){
+            if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
+              return (botonVer + botonDescargarPDF + botonDescargarExcel)
+            }else{
+              return (botonVer + botonDescargarPDF + botonDescargarEditable)
+            }
+          }else if (!row.id__ruta && row.id__ruta_editable){
+            if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
+              return (botonVer  + botonDescargarExcel)
+            }else{
+              return (botonVer + botonDescargarEditable)
+            }
+          }else{
+            return (botonVer  + botonDescargarPDF)
+          }
+        }
+
+      },
+  },
+    ],
+    locale: "es-ES",
+    search: true,
+    sortName: 'id',
+    sortOrder: 'desc',
+
+  });
+  function mostrarPuntos(value){
+    var puntos = document.getElementById('numPuntos');
+   
+    const divPuntos = document.querySelector('#divPuntos');
+    const divOrdenPuntos = document.querySelector('#divOrdenPuntos');
+    for (var i = 0; i < value; i++) {
+
+      var input = document.createElement('input');
+      var inputOrden = document.createElement('input');
+      // creamos los item de input
+      input.type = 'text';
+      input.name = 'punto' + i;
+      input.id = 'punto' + i;
+      input.className = 'form-control my-2';
+      input.placeholder = 'Describa el punto';
+      if( i == 0) {
+        input.value = 'Lectura y aprobación, del acta de la sesión anterior.';
+      }
+      else{
+        input.value = '';
+      }
+
+      inputOrden.type = 'number';
+      inputOrden.value = i+1;
+      inputOrden.name = 'ordenPunto' + i;
+      inputOrden.id = 'ordenPunto' + i;
+      inputOrden.className = 'form-control my-2';
+      divPuntos.appendChild(input);
+      divOrdenPuntos.appendChild(inputOrden);
+      // crear el input para el or
+
+    }
+  }
+
+  function mostrarAcuerdos(value){
+   
+    const divAcuerdos = document.querySelector('#divAcuerdos');
+    const divOrdenAcuerdos = document.querySelector('#divOrdenAcuerdos');
+    for (var i = 0; i < value; i++) {
+
+      var input = document.createElement('input');
+      var inputOrden = document.createElement('input');
+      // creamos los item de input
+      input.type = 'text';
+      input.name = 'acuerdo' + i;
+      input.id = 'acuerdo' + i;
+      input.value = '';
+      input.className = 'form-control my-2';
+      input.placeholder = 'Describa el acuerdo';
+      divAcuerdos.appendChild(input);
+
+      inputOrden.type = 'number';
+      inputOrden.value = i+1;
+      inputOrden.name = 'ordenAcuerdo' + i;
+      inputOrden.id = 'ordenAcuerdo' + i;
+      inputOrden.className = 'form-control my-2';
+      divOrdenAcuerdos.appendChild(inputOrden);
+    }
+  }
+
+
+  // Función para mostrar los nombresSeleccionados en el modal
+  function obtenerSeleccionados(){ 
+    var miembros = $('#miembrosSelect').val();
+    document.getElementById('miembrosSelect').value = miembrosSeleccionados;
+
+    console.log("//////VALORES///////");
+    console.log(miembros);
+    console.log("/////////////");
+    // cerrar el modal
+    $('#modalMiembros').trigger('click');
+
+  }
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioActa").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // bucle que recorrra el array de miembrosSeleccionados
+    for (var i = 0; i < miembrosSeleccionados.length; i++) {
+      // añadimos los miembros seleccionados al select multiple
+      //$("#miembros option[value='" + miembrosSeleccionados[i] + "']");
+      //$('#miembros option[value="' + miembrosSeleccionados[i] + '"]').attr("selected", "selected");
+      $('#miembros').append('<option value="' + miembrosSeleccionados[i] + '" selected></option>');
+      console.log("---------",$('#miembros'), "---------");
+    }
+    
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Acta guardada con éxito', 'alert-success', 2000);
+        document.getElementById('formularioActa').remove();
+        $('#tabla_actas').bootstrapTable('refresh');
+        $('#modalFormularioActa').trigger('reset');
+        $('#cerrarProyecto').trigger('click');
+        location.reload(true);
+
+      }
+    });
+  });
+
+    // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+    function mostrarNombreArchivo(value) {
+
+        document.getElementById('file-name').innerHTML = value;
+
+        document.getElementById('mostrarNombreArchivo').style.display = 'none';
+    }    
+</script>
+{% endblock %}

@@ -1,0 +1,381 @@
+/*--------------------------------------------------------------------
+#Cambio el tamaño del Content para añadir el footer con los logos
+--------------------------------------------------------------------*/
+
+#content{
+  bottom: 55px;
+  /* position: fixed; */
+}
+ 
+html,body{
+  position: fixed;
+  /*position: -webkit-sticky;  required for Safari
+  position: sticky; */
+}
+
+/*------------------------------------------------------------------
+#Estilo del Mapa Leaflet
+--------------------------------------------------------------------*/
+
+#map {
+    width: 100%;
+    height: 100%;
+    font-family: 'Roboto', sans-serif;
+    position: absolute;
+}
+
+/*---------------------------------------------------------------------
+#Ajusto las dimensiones de un boton easy buton a su contenido, ya que si 
+no el boton de Datos provisionales no se ve 
+----------------------------------------------------------------------*/
+.leaflet-touch .leaflet-bar button  {
+  width: auto;
+  height: auto;
+}
+.easy-button-button.leaflet-bar-part.leaflet-interactive.zoom-to-active{
+  padding: 0px;
+}
+
+
+/*-----------------------------------------------------------------------
+#Cuadro de Info Avisos
+------------------------------------------------------------------------*/
+.leaflet-control-layers.leaflet-control.contentStyle{
+  max-height: 500px;
+  margin-left: 10px;
+
+}
+
+#title-aviso {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    color: #fff;
+    margin: 0px;
+}
+#cabecera-aviso{
+    color:#00CED1;
+    font-family: 'Brush Script MT', cursive;
+    font-size:30px;
+}
+.titleStyle {
+  background-color: rgba(52, 58, 64, 0.6);
+}
+.contentStyle {
+  /*background-color: rgba(245, 245, 245, 0.8);*/
+  background-color: rgba(52, 58, 64, 0.6);
+  font-size: 13px;
+  color: #fff;
+  text-align: justify;
+}
+
+.leaflet-popup-content-wraper{
+  max-height: 500px;
+  overflow: auto;
+}
+
+
+
+
+/*------------------------------------------------------------------------
+#Barra para tener dos vistas de las capas base de mapa (satelite y calle)
+-------------------------------------------------------------------------*/
+.range {
+  position:absolute;
+  width:100%;
+  bottom: 3px;
+}
+
+
+/*-------------------------------------------------------------------------
+#Capa de Imagenes Spida
+--------------------------------------------------------------------------*/
+.leaflet-popup-photo a.leaflet-popup-close-button {
+top: -13px;
+right: -13px;
+background-color: #343a40;
+padding: 5px;
+border-radius: 0px;
+width: 15px;
+height: 15px;
+box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+color: #555;
+display: none;
+}
+.leaflet-popup-photo a.leaflet-popup-close-button:hover {
+color: #333;
+background-color: #343a40;
+}
+.leaflet-popup-photo .leaflet-popup-content-wrapper {
+padding: 6px;
+border-radius: 4px;
+background-color: #343a40;
+}
+.leaflet-popup-photo .leaflet-popup-content {
+margin: 0;
+background-color: #343a40;
+}
+.leaflet-popup-photo .leaflet-popup-tip {
+background: white;
+}
+.leaflet-popup-photo img,
+.leaflet-popup-photo video {
+display: block;
+width: 100%;
+}
+.leaflet-popup-photo p {
+margin: 5px 0 0 0;
+}
+
+#titleBindPopUp{
+color:#00CED1;
+font-family: 'Brush Script MT', cursive;
+font-size:35px;
+text-align:center;
+}
+
+#contentBindPopUp{
+color:#fff;
+font-family: 'Roboto', sans-serif;
+text-align:center;
+font-size:15px;
+}
+
+/*---------------------------------------------------------------------------------
+#Estilo de los margenes del mapa donde inserto otros controles
+-----------------------------------------------------------------------------------*/
+
+/*.leaflet-bottom.leaflet-left{
+  margin-bottom: 20px;
+}*/
+
+/*.leaflet-bottom.leaflet-right{
+  margin-bottom: 12px;
+ 
+}*/
+
+.leaflet-top.leaflet-right{
+  z-index: 1001;
+}
+
+
+/*-----------------------------------------------------------------------------------
+#Estilo de la tabla de datos de HighChart
+------------------------------------------------------------------------------------*/
+
+.highcharts-data-table table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  background: white;
+  min-width: 100%;
+  margin-top: 10px;
+  font-family: sans-serif;
+  font-size: 0.9em;
+}
+.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+  border: 1px solid silver;
+  padding: 0.5em;
+text-align:center;
+}
+.highcharts-data-table tr:nth-child(even), .highcharts-data-table thead tr {
+  background: #f8f8f8;
+}
+.highcharts-data-table tr:hover {
+  background: #eff;
+}
+.highcharts-data-table caption {
+  border-bottom: none;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+
+
+#myImg {
+border-radius: 5px;
+cursor: pointer;
+transition: 0.3s;
+}
+
+#myImg:hover {opacity: 0.7;}
+
+/* The Modal (background) */
+
+
+/* Modal Content (image) */
+.modal-content-img {
+margin: auto;
+display: block;
+width: 80%;
+max-width: 900px;
+max-height:100%;
+}
+
+/* Caption of Modal Image */
+#caption {
+margin: auto;
+display: block;
+width: 80%;
+max-width: 700px;
+text-align: center;
+color: #ccc;
+padding: 10px 0;
+height: 150px;
+}
+
+/* Add Animation */
+.modal-content-img, #caption {
+-webkit-animation-name: zoom;
+-webkit-animation-duration: 0.6s;
+animation-name: zoom;
+animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+from {-webkit-transform:scale(0)}
+to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+from {transform:scale(0)}
+to {transform:scale(1)}
+}
+
+/* The Close Button */
+.closeImg {
+position: absolute;
+top: 15px;
+right: 35px;
+color: #f1f1f1;
+font-size: 40px;
+font-weight: bold;
+transition: 0.3s;
+}
+
+.closeImg:hover,
+.closeImg:focus {
+color: #bbb;
+text-decoration: none;
+cursor: pointer;
+}
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px){
+  .modal-content-img {
+  width: 100%;
+  }
+}
+
+
+.botonInfo{
+  color: '3381CF';
+}
+.leaflet-tooltip {
+position: absolute;
+border-radius: 15px;
+padding: 20px;
+box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.progress-bar-vertical {
+width: 20px;
+height: 100%;
+display: flex;
+align-items: flex-end;
+margin-right: 20px;
+float: left;
+position: relative;
+top: 0;
+}
+
+.progress-bar-vertical .progress-bar {
+width: 100%;
+-webkit-transition: height 0.6s ease;
+-o-transition: height 0.6s ease;
+transition: height 0.6s ease;
+}
+
+
+/*---------------------------------------------------------------------------
+#LEYENDA PRECIPITACION ACUMULADA 1 HORA AEMET (IMAGENES TIME DIMENSION)
+----------------------------------------------------------------------------*/
+/*Legend specific*/
+.legendPreAcum1h {
+  padding: 6px 8px;
+  font: 14px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255, 255, 255, 0);
+  /*box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);*/
+  /*border-radius: 5px;*/
+  line-height: 24px;
+  color: #555;
+  width: 100%;
+  text-align: center;
+}
+.legendPreAcum1h h4 {
+  text-align: center;
+  font-size: 16px;
+  margin: 2px 12px 8px;
+  color: black; /*#777;*/
+}
+
+.legendPreAcum1h span {
+  position: relative;
+  bottom: 3px;
+}
+
+.legendPreAcum1h i {
+  width: 18px;
+  height: 18px;
+  float: left;
+  margin: 0 8px 0 0;
+  opacity: 0.7;
+}
+
+.legendPreAcum1h i.icon {
+  background-size: 18px;
+  background-color: rgba(255, 255, 255, 1);
+}
+
+
+
+/*------------------------------------------------------------------------------------
+#Barra de progreso para volver a cargar datos
+-------------------------------------------------------------------------------------*/
+.progress{
+  /* position:absolute; */
+  width:100%;
+ /*  bottom: 3px; */
+  /*z-index: 1; */
+  background-color: rgba(255, 255, 255, 0);
+}
+
+/*-----------------------------------------------------------------------------------
+#Leyenda colores Precipitacion Acum 1 hora (Imagenes Aemet)
+-------------------------------------------------------------------------------------*/
+.info { 
+  padding: 6px 8px; 
+  font: 14px/16px Roboto, sans-serif; 
+  background: white; 
+  background: rgba(255,255,255,0.2); 
+  box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+  border-radius: 5px;
+}
+.info.legend.leaflet-control{
+  /*width: 100%;*/
+  vertical-align: middle;
+  text-align: center; /* requerido para alineación horizontal */
+  align-items: center;
+  left: 50%;
+  transform: translate(-50%);
+}
+.legend span {
+  display: block;
+  width: 50px;
+  height: 16px;
+  float: left;
+  opacity: 0.7;
+  font-size: 80%;
+  font-weight: bold;
+}
+
+

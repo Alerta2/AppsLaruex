@@ -1,0 +1,112 @@
+<!-- ======= Contact Section ======= -->
+<style>
+  .contacto{
+    background-image: linear-gradient(to right bottom, #f5f9fa 0%, #edfbfd 100%);
+    /* background-image: linear-gradient(100deg, #fbfdfd 0%, #ebeeee 100%); */
+    border-radius: 20px;
+    box-shadow: 0 0 5px rgba(1, 10, 12, 0.6);
+   }
+   
+  .columna-contacto{
+    background: transparent !important;
+  }
+
+
+</style>
+
+<!-- reCAPTCHA API -->
+<script src='https://www.google.com/recaptcha/api.js?render={{site_key}}'></script>
+
+<section id="contact" class="contact">
+  <div data-aos="fade-up">
+    <iframe style="border:0; width: 100%; height: 350px;" src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12318.19303986715!2d-6.346793!3d39.479533!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x5d53a7a2412e919c!2sLARUEX!5e0!3m2!1ses!2ses!4v1603874246085!5m2!1ses!2ses" frameborder="0" allowfullscreen></iframe>
+  </div>
+
+  <div class="container contacto" data-aos="fade-up" >
+    <div class="row mt-5">
+      <div class="col mt-5 text-center">
+        <h2 style="color: #1d8896;"><strong>Contacta con nosotros</strong></h2>
+        <p class="text-dark"><spam>Puedes contactar con nosotros vía telefónica o email. <br> Si lo prefieres puedes dejar tus datos y nos pondremos en contacto contigo.
+        </spam></p>
+      </div>
+    </div>
+    <div class="row mt-3 mx-3">
+      <div class="col-lg-5 ">
+        <div class="info columna-contacto">
+          <div class="address">
+            <i class="icofont-google-map"></i>
+            <h4 style="color: #1d8896;">Localización</h4>
+            <p class="text-secondary"><strong>Avda. Universidad S/N, LARUEX</strong></p>
+            <p class="text-secondary"><strong>10003 Cáceres</strong></p>
+          </div>
+
+          <div class="email">
+            <i class="icofont-envelope"></i>
+            <h4 style="color: #1d8896;">Email</h4>
+            <p class="text-secondary"><strong>laruexcaceres@gmail.com</strong></p>
+            <!-- <p class="text-secondary"><strong>alerta2.caceres@gmail.com</strong></p> -->
+          </div>
+
+          <div class="phone">
+            <i class="icofont-phone"></i>
+            <h4 style="color: #1d8896;" >Teléfonos</h4>
+            <p class="text-secondary"><strong>+34 927 251 389</strong></p>
+            <p class="text-secondary"><strong>+34 927 257 170</strong></p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="col-lg-7 mt-5 mt-lg-5 mb-5">
+
+        <form action="/contacto/" method="post" role="form" class="php-email-form columna-contacto" id="formContacto">
+          {% csrf_token %}
+
+          <div class="form-row">
+            <div class="col-md-6 form-group">
+              <input type="text" name="name" class="form-control" id="name" placeholder="Tu nombre" data-rule="minlen:4" data-msg="Por favor, introduce al menos 4 caracteres"  required/>
+              <div class="validate"></div>
+            </div>
+            <div class="col-md-6 form-group">
+              <input type="email" class="form-control" name="email" id="email" placeholder="Tu Email" data-rule="email" data-msg="Por favor, introduce un email valido"  required/>
+              <div class="validate"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" name="subject" id="subject" placeholder="Asunto" data-rule="minlen:4" data-msg="Por favor, introduce al menos 4 caracteres"  required/>
+            <div class="validate"></div>
+          </div>
+          <div class="form-group">
+            <textarea class="form-control" name="message" rows="5" data-rule="required" data-msg="Escribe tu consulta para nosotros" placeholder="Escribe tu consulta para nosotros" required></textarea>
+            <div class="validate"></div>
+          </div>
+          <div class="mb-3">
+
+            <div class="loading">Cargando</div>
+            <div class="error-message"></div>
+            <div class="sent-message">Tu mensaje ha sido enviado. Gracias.</div>
+          </div>
+          <!-- {{ form.captcha }} -->
+
+            <div class="text-center">
+              <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+              <button type="submit">Enviar</button>
+            </div>
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+</section><!-- End Contact Section -->
+
+  <script>
+    //global grecaptcha
+    grecaptcha.ready(function() {
+      grecaptcha.execute('{{site_key}}', {action: "/contacto/"}).then(function(token) {
+        document.getElementById('g-recaptcha-response').value = token;
+      });
+    });
+  </script>

@@ -1,0 +1,496 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+    .add:hover {
+    color: #ce8312;
+  }
+  /*  3 estilo del campo añadir archivo*/
+
+  .addFicheroEditable {
+    color: rgb(9, 58, 65);
+  }
+
+  .addFicheroEditable:hover {
+    color: rgb(133, 198, 228);
+  }
+
+  /* estilo añadirFichero PDF*/
+  .addFicheroPDF {
+    color: rgb(161, 16, 32);
+  }
+
+  .addFicheroPDF:hover {
+    color: rgb(99, 10, 20);
+  }
+
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Proyectos</h5>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Proyectos</li>
+    </ol>
+  </nav>
+</div>
+
+{% if administrador %}
+<div id="toolbar">
+  <!-- boton que permite añadir un nuevo fabricante -->
+  <a href="" class="mx-1" title="Agregar un nuevo proyecto" data-toggle="modal" data-target="#modalFormularioProyecto" style="color: #eba43d"><i
+      class="fa-solid fa-square-plus fa-2x add"></i></a>
+</div>
+{% endif %}
+
+
+<!--- modalFormularioProyecto que los proyectos-->
+<div id="modalFormularioProyecto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Proyecto</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioProyecto"  action="/private/docLaruex/agregarArchivo/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row" >  
+            <div class="form-group">
+              <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+                value="Proyecto" hidden />
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="habilitacion">Habilitación</label>
+                <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                  {% for habilitacion in habilitaciones %}
+                  <option value="{{habilitacion.id}}">
+                    {{habilitacion.titulo}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="estado">Estado</label>
+                <select class="form-select" data-rule="required" id="estado" name="estado">
+                  {% for estado in estados %}
+                  <option value="{{estado.id}}">
+                    {{estado.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>             
+         <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="nombreObjeto">Nombre del Archivo</label>
+                <input type="text" class="form-control" id="nombreObjeto" name="nombreObjeto"
+                  data-rule="required" />
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="codigoProyecto">Código</label>
+                <input type="text" id="codigoProyecto" name="codigoProyecto" class="form-control" required />
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="presupuestoProyecto">Presupuesto</label>
+                <input type="number" step="0.01" class="form-control" id="presupuestoProyecto" placeholder="4,16"
+                  name="presupuestoProyecto" data-rule="required" />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-3">
+              <div class="form-group">
+                <label for="fechaInicioProyecto">Fecha de Inicio</label>
+                <input type="date" id="fechaInicioProyecto" name="fechaInicioProyecto" class="form-control"
+                  required />
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="fechaFinProyecto">Fecha de Fin</label>
+                <input type="date" id="fechaFinProyecto" name="fechaFinProyecto" class="form-control" required />
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="financiadoresProyecto"></label>
+                <div class="dropdown">
+                  <button class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown"
+                    style="color: #005f73; border-color: #005f73;">
+                    Financiadores
+                  </button>
+                  <div class="dropdown-menu">
+                    {% for financiador in financiadores %}
+                    <button class="dropdown-item" type="button" id="financiadoresProyecto">
+                      <input type="checkbox" value="{{financiador.id}}" onclick="mostrarFinanciadores(this.value)">
+                      {{financiador.nombre}}
+                    </button>
+                    {% endfor %}
+                    <select name="financiadoresProyecto" id="financiadoresProyectoSelect" multiple="multiple"
+                      hidden>
+                      {% for financiador in financiadores %}
+                      <option value="{{financiador.id}}"></option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="form-group">
+                <label for="colaboradoresProyecto"></label>
+                <div class="dropdown">
+                  <button class="btn btn-outline dropdown-toggle" type="button" data-toggle="dropdown"
+                    style="color: #005f73; border-color: #005f73;">
+                    Colaboradores
+                  </button>
+                  <div class="dropdown-menu">
+                    {% for colaborador in colaboradores %}
+                    <button class="dropdown-item" type="button" id="colaboradoresProyecto">
+                      <input type="checkbox" value="{{colaborador.id}}" onclick="mostrarColaboradores(this.value)">
+                      {{colaborador.nombre}}
+                    </button>
+                    {% endfor %}
+                    <select name="colaboradoresProyecto" id="colaboradoresProyectoSelect" multiple="multiple"
+                      hidden>
+                      {% for colaborador in colaboradores %}
+                      <option value="{{colaborador.id}}"></option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group">
+              <textarea class="form-control" id="objetivoProyecto" name="objetivoProyecto" rows="3"
+                data-rule="required" placeholder="Objetivo del proyecto" required></textarea>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center">
+            <div class="col-md-auto" id="adjuntoNoEditable">
+              <div class="form-group">
+                <label for="ficheroAdjuntoProyecto"><i class="fa-solid fa-file-pdf fa-4x addFicheroPDF"></i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="ficheroAdjuntoProyecto" name="ficheroAdjuntoProyecto"
+                  onchange="mostrarNombreArchivo(this.value)" />
+                <spam class="text-center"><strong id="mostrarNombreArchivo"><br></strong>
+                  <spam id="file-name"></spam>
+                </spam>
+              </div>
+            </div>
+
+            <div class="col-md-auto" id="adjuntoEditable" style="display: block;">
+              <div class="form-group">
+                <label for="ficheroAdjuntoProyectoEditable"><i
+                    class="fa-solid fa-file-signature fa-4x addFicheroEditable">
+                  </i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="ficheroAdjuntoProyectoEditable" name="ficheroAdjuntoProyectoEditable"
+                  onchange="mostrarNombreArchivoEditable(this.value)" />
+                <spam class="text-center"><strong id="mostrarNombreArchivoEditable"><br></strong>
+                  <spam id="file-name-editable"></spam>
+                </spam>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button id="cerrarProyecto" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+</form>
+</div> <!-- END ModalAgregarProyecto -->
+
+<!-- ============= Tablas ============= -->
+
+<!-- Tabla con lista de proyectos -->
+
+    <table id="tabla_proyectos" data-toggle="table" data-search="true" data-show-columns="true"
+      data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+      data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+      data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+    </table>
+
+<!-- ============= Modal Eliminar ====================-->
+
+<div id="modalEliminarObjeto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarObjeto"><strong>¿Estas seguro que deseas eliminar el objeto?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarObjeto" action="/private/docLaruex/eliminarObjeto/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarObjeto" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarObjeto" name="cancel" onclick="crearAviso('eliminarObjetoCancelar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarObjetoGuardar', 'Objeto  eliminado', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  $('#tabla_proyectos').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/proyectosDatos",
+    cache: false,
+    columns: [{
+      title: 'Nombre',
+      field: 'id__nombre',
+      align: "center"
+    },{
+      title: 'Expediente',
+      field: 'expediente',
+      align: "center"
+    },{
+      title: 'Código',
+      field: 'codigo',
+      align: "center"
+    },{
+      title: 'Desde',
+      field: 'fecha_inicio',
+      align: 'center',
+      sortable: 'true',
+      formatter: function (value, row) {
+          var fecha = new Date(row.fecha_inicio);
+          return $.datepicker.formatDate('dd-mm-yy', fecha);
+      }
+    },{
+      title: 'Hasta',
+      field: 'fecha_fin',
+      align: 'center',
+      sortable: 'true',
+      formatter: function (value, row) {
+          var fecha = new Date(row.fecha_fin);
+          return $.datepicker.formatDate('dd-mm-yy', fecha);
+      }
+    },{
+      title: 'Estado',
+      field: 'id__id__nombre',
+      align: "center",
+        formatter: function (value, row) {
+          var defecto = '<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+          switch (row.id__id_estado__id) {
+            case 1:
+              estado = '<span class="badge badge-success" style="background-color: #21b563;">Operativo</span>';
+              return estado;
+              break;
+            case 2:
+              estado = '<span class="badge" style="background-color: #21b563;">En Vigor</span>';
+              return estado;
+              break;
+
+            case 3:
+              estado = '<span class="badge" style="background-color: #EB8E34;">En Mantenimiento</span>';
+              return estado;
+              break;
+            case 4:
+              estado = '<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+              return estado;
+              break;
+            case 5:
+              estado = '<span class="badge" style="background-color: #524e4e;">Obsoleto</span>';
+              return estado;
+              break;
+            case 6:
+              estado = '<span class="badge" style="background-color: #b52121;">No operativo</span>';
+              return estado;
+              break;
+            case 7:
+              estado = '<span class="badge" style="background-color: #b52121;">Baja</span>';
+              return estado;
+              break;
+
+            default:
+              console.log("No se ha encontrado el estado", row.id__id_estado__id)
+              return defecto;
+
+          }
+        },
+    },{
+      title: "Acciones",
+      field: "action",
+      align: "center",
+      formatter: function (value, row) {
+              
+
+        var botonDescargarPDF = '<a href="/private/docLaruex/consultarArchivo/' + row.id + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-lg" style="color:#A11020"></i></a>';
+        var botonDescargarExcel = '<a href="/private/docLaruex/consultarArchivo/' + row.id + '/' + '" class="mx-1" title="Descargar" download><i class="fa-duotone fa-file-excel fa-lg" style="color:#128C33"></i></a>';
+        var botonDescargarEditable = '<a href="/private/docLaruex/consultarArchivoEditable/' + row.id + '/' + '" class="mx-1" title="Descargar" download><i class="fa-duotone fa-file-signature fa-lg" style="color:#266353"></i></a>';
+          
+        
+        var botonVerObjeto = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+        var botonEditar = '<a href="/private/docLaruex/editarObjeto/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#4F5775"></i></a>';
+        var botonEliminar = '<a href="/private/docLaruex/eliminarObjeto/' + row.id + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarObjeto" onclick="$('+"'#formularioModalEliminarObjeto').attr('action', '/private/docLaruex/eliminarObjeto/"+ row.id +"/');"+'" ><i class="fa-solid fa-x" style="color:#AE2012"></i></a>';
+
+
+        var admin = '{{administrador}}';
+        if (row.id__ruta)
+          extension_ruta = row.id__ruta.split(".").pop();
+        if (row.id__ruta_editable)
+          extension_ruta_editable = row.id__ruta_editable.split(".").pop();
+      
+        if (admin == 'True') {
+          if (row.id__ruta && row.id__ruta_editable){
+            if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
+              return (botonVerObjeto + botonDescargarPDF + botonDescargarExcel + botonEditar )
+            }else{
+              return (botonVerObjeto + botonDescargarPDF + botonDescargarEditable + botonEditar )
+            }
+          }else if (!row.id__ruta && row.id__ruta_editable){
+            if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
+              return (botonVerObjeto  + botonDescargarExcel + botonEditar )
+            }else{
+              return (botonVerObjeto + botonDescargarEditable + botonEditar)
+            }
+          }else{
+            return (botonVerObjeto  + botonDescargarPDF + botonEditar )
+          }
+        }else{
+          return (botonVerObjeto  + botonDescargarPDF)
+        }
+
+      },
+  },
+    ],
+    locale: "es-ES",
+    search: true,
+    sortName: 'id',
+    sortOrder: 'desc',
+
+  });
+
+  // Función para mostrar el nombre del colaborador en el modal
+  function mostrarColaboradores(value) {
+    $('#colaboradoresProyectoSelect option[value="' + value + '"]').attr("selected", "selected");
+  }
+
+  // Función para mostrar el nombre del financiador en el modal
+  function mostrarFinanciadores(value) {
+    $('#financiadoresProyectoSelect option[value="' + value + '"]').attr("selected", "selected");
+  }
+/*
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioProyecto").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Proyecto guardado con éxito', 'alert-success', 2000);
+        document.getElementById('formularioProyecto').remove();
+        $('#tabla_proyectos').bootstrapTable('refresh');
+        $('#modalFormularioProyecto').trigger('reset');
+        $('#cerrarProyecto').trigger('click');
+        location.reload(true);
+
+      }
+    });
+  });
+*/
+    // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+    function mostrarNombreArchivo(value) {
+
+      document.getElementById('file-name').innerHTML = value;
+
+      document.getElementById('mostrarNombreArchivo').style.display = 'none';
+    }    
+    function mostrarNombreArchivoEditable(value) {
+
+      document.getElementById('file-name-editable').innerHTML = value;
+
+      document.getElementById('mostrarNombreArchivoEditable').style.display = 'none';
+
+    }
+
+
+
+
+</script>
+{% endblock %}

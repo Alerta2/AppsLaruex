@@ -1,0 +1,314 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    ul.pagination li .page-link {
+      background-color: rgb(255, 255, 255) !important;
+      color: rgb(41, 68, 87);
+  
+    }
+  
+    ul.pagination li.active .page-link {
+      background-color: rgb(41, 68, 87) !important;
+      border-color: rgb(41, 68, 87) !important;
+    }
+  
+    ul.pagination li .page-link:hover {
+      filter: brightness(85%);
+  
+    }
+  
+    ul.pagination li.active .page-link:hover {
+      filter: brightness(120%);
+  
+    }
+  
+    .btn-light {
+      color: rgb(41, 68, 87);
+    }
+  
+    th {
+      color: rgb(41, 68, 87);
+    }
+     /* estilo añadirFichero PDF*/
+     .addFicheroPDF {
+        color: rgb(161, 16, 32);
+    }
+
+    .addFicheroPDF:hover {
+        color: rgb(99, 10, 20);
+    }
+    .add:hover {
+    color: #ce8312;
+  }
+
+    .file-upload {
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+    }
+  </style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+    <h5 class="card-title">Documentos</h5>
+    <nav>
+        <ol class="breadcrumb" style="background-color:#fff !important">
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                        class="bi bi-house-door"></i></a></li>
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/objetos">Listado de
+                    Archivos</a>
+            <li class="breadcrumb-item active" style="font-size: large;">Documentos</li>
+        </ol>
+    </nav>
+</div>
+
+{% if administrador %}
+<div id="toolbar">
+    <a href="" class="mx-1" title="Añadir nuevo documento" data-toggle="modal" data-target="#modalFormulario" style="color: #eba43d"><i
+            class="fa-solid fa-square-plus fa-2x add"></i></a>
+</div>
+{% endif %}
+
+<table id="tabla_Documentos" data-toggle="table" data-search="true" data-show-columns="true"
+data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+</table>
+
+
+<div id="modalFormulario" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Documento</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioModal" action="/private/docLaruex/agregarArchivo/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col">
+                <div class="form-group">
+                  <label for="tipoObjeto">Tipo de Archivo</label>
+                  <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+                    value="Documento" />
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="habilitacion">Habilitación</label>
+                    <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                        {% for habilitacion in habilitaciones %}
+                        <option value="{{habilitacion.id}}">
+                            {{habilitacion.titulo}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+                    <!-- formulario de Documento -->
+                    <div id="formularioDocumento" class="divFormularios">
+                      <div class="row">
+                        <div class="col-4">
+                          <div class="form-group">
+                            <label for="fechaActualizacion">Fecha</label>
+                            <input type="date" id="fechaActualizacion" name="fechaActualizacion" class="form-control" required />
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div class="form-group">
+                            <label for="editable">¿Es editable?</label>
+                            <select class="form-select" data-rule="required" id="editable" name="editable">
+                              <option value="1">Si</option>
+                              <option value="0">No</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col">
+                          <div class="form-group">
+                            <label for="nombreObjeto">Nombre del Archivo</label>
+                            <input type="text" class="form-control" id="nombreObjeto" placeholder="Ej. Manual de usuario ..."  title="No permite guiones ni otros caracteres que no sean espacios"
+                              name="nombreObjeto" data-rule="required" pattern="[a-zA-Z\w\s\sáéíóúÁÉÍÓÚüÜñÑ,]{1,255}"/>
+                          </div>
+                        </div>
+        
+                      </div>
+
+                      
+                      <div class="row d-flex justify-content-center" style="text-align: center">
+                        <div class="col-6">
+                          <div class="form-group">
+                            <label for="ficheroAdjuntoDocumento"><i class="fa-solid fa-file-pdf fa-4x addFicheroPDF">
+                            </i>
+                          </label>
+                          <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                            id="ficheroAdjuntoDocumento" name="ficheroAdjuntoDocumento"
+                            onchange="mostrarNombreArchivo(this.value)"/>
+                          <spam class="text-center"><strong id="mostrarNombreArchivo"><br></strong><spam id="file-name"></spam>
+                            
+                        </div>
+                      </div>
+                    </div>
+                    </div>
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" >
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============= Modal Eliminar ====================-->
+
+<div id="modalEliminarObjeto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarObjeto"><strong>¿Estas seguro que deseas eliminar el objeto?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarObjeto" action="/private/docLaruex/eliminarObjeto/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarObjeto" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarObjeto" name="cancel" onclick="crearAviso('eliminarObjetoCancelar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarObjetoGuardar', 'Objeto  eliminado', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+    $('#tabla_Documentos').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/documentosDatos",
+        cache: false,
+        columns: [{
+            title: 'Nombre',
+            field: 'id_doc__nombre',
+            align: "center"
+        },{
+            title: 'Subido por',
+            field: 'id_doc__creador',
+            align: "center",
+            formatter: function (value, row) {
+                return (
+                        row.id_doc__creador__first_name + " " + row.id_doc__creador__last_name
+             );
+            },
+        }, {
+            title: 'Fecha',
+            field: 'fecha_actualizacion',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              var fecha = new Date(row.fecha_actualizacion);
+              return (
+                $.datepicker.formatDate("dd-mm-yy", fecha)
+              );
+            },
+        },{
+                title: "Acciones",
+                field: "action",
+                align: "center",
+                formatter: function (value, row) {
+                  
+                  var admin = '{{administrador}}';
+                  var botonEliminar = '<a href="/private/docLaruex/eliminarObjeto/' + row.id_doc + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarObjeto" onclick="$('+"'#formularioModalEliminarObjeto').attr('action', '/private/docLaruex/eliminarObjeto/"+ row.id_doc +"/');"+'" ><i class="fa-solid fa-x" style="color:#AE2012"></i></a>';
+                  var botonDescargarObjeto = '<a href="/private/docLaruex/consultarArchivo/' + row.id_doc + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-lg" style="color:9b2226"></i></a>';
+                  var botonVerObjeto = '<a href="/private/docLaruex/verObjeto/' + row.id_doc + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+                  if (admin == 'True'){
+                    return (botonVerObjeto + botonDescargarObjeto + botonEliminar);
+                  }else{
+                    return (botonVerObjeto + botonDescargarObjeto );
+                  }
+                },
+            },
+    ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'id_doc__nombre',
+        sortOrder: 'desc',
+
+    });
+
+    /*
+    $('#tabla_Curriculums').on('click-row.bs.table', function (e, row, $element) {
+        window.location.href = "/private/docLaruex/verObjeto/"+ row.id_doc + "/" ;
+    });*/
+
+    function addZero(i) {
+        if (i < 10) { i = "0" + i }
+        return i;
+    }
+    
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioModal").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Archivo guardado con éxito', 'alert-success', 2000)
+        $(".divFormularios").remove();
+        $("#reset").trigger("click");
+        $('#tabla_Documentos').bootstrapTable('refresh');
+        $('#cerrar').trigger('click');
+        location.reload();
+      }
+    });
+  });
+
+      // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+      function mostrarNombreArchivo(value) {
+
+        document.getElementById('file-name').innerHTML = value;
+
+        document.getElementById('mostrarNombreArchivo').style.display = 'none';
+      }
+
+
+
+
+</script>
+{% endblock %}

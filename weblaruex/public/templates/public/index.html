@@ -1,0 +1,30 @@
+{% extends "public/template.html" %}
+
+
+{% block meta %}
+  <title>LARUEX</title>
+  <meta content="Laboratorio de Radiactividad Ambiental en Extremadura, donde se realizan medidas de radiactividad en agua, aire y suelo de elementos radiactivos como el radón. Además gestionamos redes de alerta temprana tanto para radiación como para inundaciones" name="description">
+  <meta content="medidas de radiactividad, Extremadura, Cáceres, redes de alerta temprana, control de radiactividad en aire, control de radiactividad en agua, control de radiactividad en suelo, investigación, norma UNE-EN ISO/IEC 17025, UNE-EN ISO 9001" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+  {% include "public/parts/hero.html" %}
+
+  <main id="main">
+    
+    {% include "public/parts/laruex-resumen-section.html" %}
+
+    {% include "public/parts/testimonials-nuestraHistoria-section.html" %}
+
+    {% include "public/parts/medidas-section.html" %}
+
+    {% include "public/parts/trainers-section.html" %}
+
+    {% include "public/parts/employees-section.html" %}
+    
+    {% include "public/parts/news-section.html" %}
+
+  </main><!-- End #main -->
+
+{% endblock %}

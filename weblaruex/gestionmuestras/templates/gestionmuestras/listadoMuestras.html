@@ -1,0 +1,88 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <table class="table"
+            id="table"
+            data-toggle="table"
+            data-pagination="true"
+            data-page-size="25"
+            data-height="800"
+            data-search="true"
+            data-show-columns="true"
+            data-show-refresh="true"
+            data-show-columns-toggle-all="true"
+            data-show-fullscreen="true"
+            data-buttons="buttons"
+            data-buttons-class="light"
+            data-show-export="true"
+            data-url="/private/gestionmuestras/listadoMuestrasDatos">
+            <thead>
+                <tr>
+                    <th data-field="identificador" data-sortable="true">ID</th>
+                    <th data-field="codigo_recogida__codigo_csn__nombre" data-sortable="true">MUESTRA</th>
+                    <th data-field="cliente__nombre" data-sortable="true">CLIENTE</th>
+                    <th data-field="codigo_recogida__codigo_procedencia__nombre" data-sortable="true">PROCEDENCIA</th>
+                    <th data-field="fecha_hora_recogida" data-sortable="true" data-formatter="dateFormat">FECHA RECOGIDA</th>
+                    <th data-field="fecha_hora_recepcion" data-sortable="true" data-formatter="dateFormat">FECHA RECEPCION</th>
+                    <th data-field="referencia_cliente" data-sortable="true">REFERENCIA</th>
+                    <th data-field="estado_de_muestra__descripcion" data-sortable="true">ESTADO</th>
+                    <th data-field="recepcionado_por__nombre" data-sortable="true">RECEPCIONADO POR</th>
+                    <th data-field="codigo_recogida__codigo_memoria__memoria" data-sortable="true">MEMORIA</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+<script>
+    $('#table').bootstrapTable({
+        onClickRow: function (row, $element) {
+            window.location.href = '/private/gestionmuestras/infoMuestra/'+row.identificador+'/';
+        },
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+    })
+
+    function dateFormat(value, row, index) {
+        return moment(value).format('DD/MM/YYYY HH:mm');
+    }
+
+    function buttons () {
+        return {
+          btnAdd: {
+            text: 'Add new row',
+            icon: 'fa-plus',
+            event: function () {
+              alert('Do some stuff to e.g. add a new row')
+            },
+            attributes: {
+              title: 'Add a new row to the table'
+            }
+          }
+        }
+    }
+    
+</script>>
+{% endblock %}

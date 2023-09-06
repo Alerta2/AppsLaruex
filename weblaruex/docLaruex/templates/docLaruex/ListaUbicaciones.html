@@ -1,0 +1,330 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+</style>
+
+
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Listado de Ubicaciones</h5>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Listado de Ubicaciones</li>
+    </ol>
+  </nav>
+</div>
+
+<table id="tabla_ubicaciones" data-toggle="table" data-search="true" data-show-columns="true"
+  data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+  data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+  data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+
+{% if administrador %}
+<div id="toolbar">
+  <a href="" class="mx-1" title="upload" data-toggle="modal" data-target="#modalFormulario" style="color: #eba43d"><i
+      class="fa-solid fa-square-plus fa-2x"></i></a>
+</div>
+{% endif %}
+
+<!-- formulario añadir archivo  -->
+<div id="modalFormulario" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Ubicación</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioModal" action="/private/docLaruex/agregarArchivo/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="tipoObjeto">Tipo de Archivo</label>
+                <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+                  value="Ubicacion" />
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="habilitacion">Habilitación</label>
+                <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                  {% for habilitacion in habilitaciones %}
+                  <option value="{{habilitacion.id}}">
+                    {{habilitacion.titulo}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col my-auto botonPadre" >
+              <div class="btn btn-outline"  style="color: #005f73; border-color: #005f73;" onclick="mostrarPadre()" >
+                Añadir Ubicación Padre
+              </div>
+            </div>
+            <div class="col ubicacionPadre" style="display: none;">
+              <div class="form-group ubicacionPadre" disabled>
+                <label for="padre">Ubicación Padre</label>
+                <select class="form-select" id="padre" name="padre">
+                  {% for ubicacion in ubicacionesExistentes %}
+                    {% if ubicacion.id__padre == None %}
+                      <option id="ubicacionSeleccionada"  value="{{ubicacion.id}}" disabled>
+                        {{ubicacion.id__nombre}}
+                      </option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <!-- formulario de Ubicación -->
+          <div id="formularioUbicacion" class="divFormularios">
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="tipo_ubicacion">Tipo de Ubicación</label>
+                  <select class="form-select" data-rule="required" id="tipo_ubicacion" name="tipo_ubicacion">
+                    {% for tipoUbicacion in tipoUbicacionesExistentes %}
+                    <option value="{{tipoUbicacion.id}}">
+                      {{tipoUbicacion.nombre}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="latitud">Latitud</label>
+                  <input type="text" class="form-control" id="latitud" placeholder="41.40338"
+                    name="latitud" data-rule="required" />
+                </div>
+              </div>              
+              <div class="col-3">
+                <div class="form-group">
+                  <label for="longitud">Longitud</label>
+                  <input type="text" class="form-control" id="longitud" placeholder="-2.17403 "
+                    name="longitud" data-rule="required" />
+                </div>
+              </div> 
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="nombreObjeto">Nombre de la Ubicación</label>
+                  <input type="text" class="form-control" id="nombreObjeto" placeholder="Alerta2 "
+                    name="nombreObjeto" data-rule="required"  title="No permite guiones ni otros caracteres que no sean espacios" />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="alias">Alias</label>
+                  <input type="text" class="form-control" id="alias" placeholder="Edificio Departamentos, Planta 0 Dependencia 12"
+                    name="alias" data-rule="required"  title="No permite guiones ni otros caracteres que no sean espacios" />
+                </div>
+              </div>
+            </div>
+
+            </div>
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" onclick="crearAviso('ubicacionesCerrar', 'No se ha podido añadir ubicación', 'alert-warning', 2000)">
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('ubicacionesGuardar', 'Ubicación creada con éxito', 'alert-success', 2000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============= Modal Eliminar ====================-->
+
+<div id="modalEliminarObjeto" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarObjeto"><strong>¿Estas seguro que deseas eliminar la ubicación?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarObjeto" action="/private/docLaruex/eliminarObjeto/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarObjeto" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarObjeto" name="cancel" onclick="crearAviso('eliminarObjetoCancelar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarObjetoGuardar', 'Objeto  eliminado', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $("#tabla_ubicaciones").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/docLaruex/ubicacionesDatos",
+    cache: false,
+    columns: [
+      {
+        title: "",
+        field: "id__icono",
+        align: "center",
+      },
+      {
+        title: "ID",
+        field: "id",
+        align: "center",
+      },
+      {
+        title: "Padre",
+        field: "id__padre__nombre",
+        align: "center",
+      },
+      {
+        title: "Nombre",
+        field: "id__nombre",
+        align: "center",
+      },
+      {
+        title: "Latitud",
+        field: "latitud",
+        align: "center",
+      },
+      {
+        title: "Longitud",
+        field: "longitud",
+        align: "center",
+      },
+      {
+        title: "Tipo",
+        field: "tipo_ubicacion__nombre",
+        align: "center",
+      },
+      {
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          var botonEditar = '<a href="/private/docLaruex/editarObjeto/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#4F5775"></i></a>';
+          var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+          
+          var botonEliminar = '<a href="/private/docLaruex/eliminarObjeto/' + row.id + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarObjeto" onclick="$('+"'#formularioModalEliminarObjeto').attr('action', '/private/docLaruex/eliminarObjeto/"+ row.id +"/');"+'" ><i class="fa-solid fa-x" style="color:#AE2012"></i></a>';
+
+          var admin = '{{administrador}}';
+          var secretaria = '{{secretaria}}';
+          var direccion = '{{direccion}}';
+      
+        if (admin == 'True') {
+          return(botonVer + botonEditar + botonEliminar)
+        }else{
+          return(botonVer)
+        }
+          },
+      },
+    ],
+    search: true,
+    sortName: "id__nombre",
+    sortOrder: "desc",
+  });
+
+  /* Obtiene el id de la row y accede al elemento */
+  /*$("#tabla_ubicaciones").on("click-row.bs.table", function (e, row, $element) {
+    window.location.href = "/private/docLaruex/verObjeto/" + row.id + "/";
+  });*/
+
+
+  function mostrarPadre() {
+      $(".botonPadre").hide();
+      $(".ubicacionPadre").show();
+      $("#ubicacionSeleccionada").prop('disabled', false);   
+  }
+
+
+
+  
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioModal").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        $(".divFormularios").remove();
+        $("#reset").trigger("click");
+        $('#tabla_ubicaciones').bootstrapTable('refresh');
+        $('#cerrar').trigger('click');
+        $("#formularioUbicacion").trigger('reset');
+        location.reload(true);
+      }
+    });
+  });
+
+
+
+</script>
+{% endblock %}

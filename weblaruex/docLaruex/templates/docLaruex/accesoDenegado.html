@@ -1,0 +1,24 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+{% block content %}
+<div class="row">
+
+  <div class="col">
+    <div class="align-middle">
+        <img class="mx-auto d-block" src="{% static 'niceAdminAssets' %}/img/cancel.svg" alt="Profile"
+            style="max-width: 30em; max-height: 30em;  margin: 0 auto;">
+    </div>
+  </div>
+  <div class="col align-middle my-auto">
+    <div class="d-flex justify-content-center ">
+      <h3 class="display-3 font-weight-bold text-center " style="color: #087B6C;">No puedes acceder al contenido</h3>
+      
+    </div>
+    <div>
+      <h6 class="display-6 font-weight-bold text-center" style="color: #07313d;">Si consideras que debes disponer de acceso solicítalo a administración.</h6>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

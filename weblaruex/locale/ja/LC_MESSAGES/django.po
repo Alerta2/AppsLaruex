@@ -1,0 +1,236 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-04-23 06:40+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: .\rare\templates\datos_estacion.html:224
+msgid "Fecha últimos valores"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:231
+#: .\rare\templates\datos_estacion.html:238
+msgid "Tasa de dosis"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:247
+#: .\rare\templates\datos_estacion.html:340
+msgid "Caudal"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:263
+#: .\rare\templates\datos_estacion.html:277
+msgid "Temperatura dentro"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:263
+#: .\rare\templates\datos_estacion.html:287
+msgid "Temperatura fuera"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:311
+msgid ""
+"Tiempo calculado en función del a distancia de la central a la ubicación de "
+"interés y la velocidad del viento en la última medida recogida"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:311
+msgid "Distancia"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:319
+msgid "Humedad relativa"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:328
+msgid "Radiación solar"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:351
+msgid "Bateria"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:368
+msgid "Voltaje Entrada"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:374
+msgid "Voltaje Salida"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:389
+msgid "Carga SAI"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:397
+msgid "Temperatura Agua"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:421
+msgid "Caudal Cartucho"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:483
+#: .\rare\templates\datos_estacion.html:489
+#: .\rare\templates\datos_estacion.html:507
+#: .\rare\templates\datos_estacion.html:520
+msgid "Medido un valor de"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:483
+#: .\rare\templates\datos_estacion.html:489
+#: .\rare\templates\datos_estacion.html:507
+msgid "donde la actividad mínima detectable es"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:483
+#: .\rare\templates\datos_estacion.html:489
+#: .\rare\templates\datos_estacion.html:507
+#: .\rare\templates\datos_estacion.html:520
+msgid "en la fecha de"
+msgstr ""
+
+#: .\rare\templates\datos_estacion.html:609
+msgid "Valores de tasa registrados últimas 4 horas"
+msgstr ""
+
+#: .\rare\templates\guardia_rare.html:180
+#: .\weblaruex\templates\header\header_items.html:29
+msgid "Revisión diaria"
+msgstr ""
+
+#: .\rare\templates\guardia_rare.html:191
+msgid "Comenzar revisión"
+msgstr ""
+
+#: .\rare\templates\guardia_rare.html:193
+msgid "Desbloquear todo"
+msgstr ""
+
+#: .\rare\templates\mapaRareLive.html:176
+#: .\rare\templates\mapaRareMedia.html:211
+msgid "Estación"
+msgstr ""
+
+#: .\rare\templates\mapaRareLive.html:183
+msgid "Último valor"
+msgstr ""
+
+#: .\rare\templates\mapaRareLive.html:190
+msgid "Fondo radiológico histórico"
+msgstr ""
+
+#: .\rare\templates\mapaRareLive.html:197
+#: .\rare\templates\mapaRareMedia.html:251
+msgid "Fecha último valor"
+msgstr ""
+
+#: .\rare\templates\mapaRareLive.html:204
+#: .\rare\templates\mapaRareMedia.html:281
+msgid "Salvapantallas activo"
+msgstr ""
+
+#: .\rare\templates\mapaRareLive.html:211
+msgid ""
+"Explicación de los valores mostrados en esta web. El valor mostrado es el "
+"último valor registrado en el sistema (no verificados) en la ubicación "
+"indicada. Si existe un retraso en los valores de la estación aparecerá en "
+"color naranja para retraso de una horas y rojo en retraso de dos horas. "
+"Pulsando en la estación podrá ver la fecha así como el valor de fondo de "
+"cada estación, es decir, el valor medio histórico debido a la radiación "
+"natural de la ubicación."
+msgstr ""
+
+#: .\rare\templates\mapaRareMedia.html:225
+msgid "Último valor media diaria"
+msgstr ""
+
+#: .\rare\templates\mapaRareMedia.html:238
+msgid "Fondo radiológico ambiental histórico"
+msgstr ""
+
+#: .\rare\templates\mapaRareMedia.html:264
+msgid "Operatividad"
+msgstr ""
+
+#: .\rare\templates\mapaRareMedia.html:286
+msgid "Cargando estaciones..."
+msgstr ""
+
+#: .\tesis\templates\tesis.html:39
+msgid "Title"
+msgstr ""
+
+#: .\tesis\views.py:66
+msgid "Radiactive Source Finder Algorithm v1.0"
+msgstr ""
+
+#: .\weblaruex\settings.py:206
+msgid "English"
+msgstr ""
+
+#: .\weblaruex\settings.py:207
+msgid "Spanish"
+msgstr ""
+
+#: .\weblaruex\settings.py:208
+msgid "Portuguese"
+msgstr ""
+
+#: .\weblaruex\settings.py:209
+msgid "German"
+msgstr ""
+
+#: .\weblaruex\settings.py:210
+msgid "Chinese"
+msgstr ""
+
+#: .\weblaruex\settings.py:211
+msgid "Japanese"
+msgstr ""
+
+#: .\weblaruex\settings.py:212
+msgid "Rusian"
+msgstr ""
+
+#: .\weblaruex\templates\header\header_items.html:9
+msgid "Logo APA"
+msgstr ""
+
+#: .\weblaruex\templates\header\header_items.html:10
+msgid "Logo Union Europea"
+msgstr ""
+
+#: .\weblaruex\templates\header\header_items.html:11
+msgid "Logo fondos Feder"
+msgstr ""
+
+#: .\weblaruex\templates\header\header_items.html:23
+msgid "Mapa de valores medios"
+msgstr ""
+
+#: .\weblaruex\templates\header\header_items.html:26
+msgid "Mapa de valores actuales"
+msgstr ""
+
+#: .\weblaruex\templates\header\header_items.html:32
+msgid "Histórico revisiones"
+msgstr ""
+
+#: .\weblaruex\templates\header\header_items.html:48
+msgid "Editar perfil"
+msgstr ""

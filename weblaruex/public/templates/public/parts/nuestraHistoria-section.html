@@ -1,0 +1,35 @@
+{% load static %}
+<!-- ======= About Section ======= -->
+<section id="about" class="about">
+  <div class="container" data-aos="fade-up">
+    {% if request.resolver_match.url_name == "home" %}
+      <div class="section-title">
+        <h2>Nosotros</h2>
+        <p>Quienes somos</p>
+      </div>
+    {% endif %}
+    <div class="row">
+      <div class="col-lg-6 order-1 order-lg-2" data-aos="fade-left" data-aos-delay="100">
+        <img src="{% static 'img/personal/trabajadores/antonio_baeza.png' %}" class="img-fluid" alt="">
+      </div>
+      <div class="col-lg-6 pt-4 pt-lg-0 order-2 order-lg-1 content get">
+        <h3>En 1985, se funda el Laboratorio de Radiactividad Ambiental de la Universidad de Extremadura (LARUEX), bajo la dirección del destacado físico Antonio Salvador Baeza Espasa.</h3>
+        <p class="font-italic">
+          El objetivo principal del laboratorio era abordar las preocupaciones relacionadas con la central nuclear de Almaraz, la central en construcción de Valdecaballeros y las minas de uranio en la región. A través de rigurosos controles y análisis, el LARUEX se dedicó a monitorear y evaluar la radiactividad ambiental, brindando valiosa información sobre la seguridad y protección de la población en relación con estas actividades nucleares.
+        </p>
+        <ul>
+          <li><i class="icofont-check-circled"></i> En 1989, se implementaron las primeras estaciones de medida automática de radiactividad en el área circundante de Almaraz. Con el tiempo, esta red, conocida como RAREx, ha crecido hasta contar actualmente con 17 estaciones de medida en aire y agua en España y Portugal. Además, se ha incorporado una estación móvil y un vehículo no tripulado. </li>
+          <li><i class="icofont-check-circled"></i> En 2008, se ampliaron las labores de medida para atender a clientes y se logró la acreditación del laboratorio según la norma ISO 17025 por parte de la Entidad Nacional de Acreditación ENAC.</li>
+          <li><i class="icofont-check-circled"></i> En 2014, se inaugura del edificio ALERTA2, conocido como el Centro Hispano-Luso de Redes de Alerta Temprana. Este proyecto tuvo como objetivo principal fortalecer y expandir las capacidades en materia de protección civil, proporcionando un centro especializado para la detección y respuesta temprana ante posibles situaciones de emergencia. </li>
+          <li><i class="icofont-check-circled"></i> En 2015, se dio inicio al desarrollo de la red de inundaciones de Extremadura, un proyecto ambicioso que ha resultado en la creación de la Red SPIDA. Esta red cuenta actualmente con 21 estaciones de monitorización distribuidas estratégicamente, permitiendo un seguimiento en tiempo real de las condiciones de inundación en la región de Extremadura. El objetivo principal de esta iniciativa es brindar información precisa y oportuna para una mejor gestión y prevención de los riesgos asociados a las inundaciones. </li>
+          <li><i class="icofont-check-circled"></i> En 2017, el LARUEx (Laboratorio de Radiactividad Ambiental de la Universidad de Extremadura) logró un hito significativo al convertirse en la primera entidad en obtener la acreditación para la medida de tasa de dosis en aire en la red RAREx por ENAC (Entidad Nacional de Acreditación). Esta distinción reconoce la excelencia y precisión en las mediciones de radiactividad atmosférica realizadas por el laboratorio, consolidando su posición como referente en el campo de la evaluación y monitoreo de la radiactividad ambiental. </li>
+          
+          <li><i class="icofont-check-circled"></i> En 2022, el LARUEX realizó una ampliación en su alcance de acreditación para incluir la medida de Radón, ya sea en aire interior o en suelos. Esta ampliación viene motivada por la creciente preocupación social sobre la presencia de este radionucleido en nuestras viviendas o en lugares de trabajo en los que puede estar presente, tales como balnearios, minas, etc. Nuestro laboratorio, mediante diferentes métodos, está preparado y acreditado para satisfacer las legislaciones vigentes en esta materia, tales como las UNE-ISO 11665-4, UNE-ISO 11665-5, UNE-ISO 11665-11, RD 732/2019 o el RD 783/2001.</li>
+        </ul>
+        <p>
+          A lo largo de todos estos años el LARUEX ha participado en múltiples proyectos nacionales e internacionales y mantiene convenios con múltiples entidades y empresas trabajando muy estrechamente sobre todo con la Junta de Extremadura y el Consejo de Seguridad Nuclear ampliando sus capacidades, realizando investigaciones y servicios y formando a personal cualificado en el ámbito de la medida de la radiactividad y la gestión de redes de alerta para la protección civil.
+        </p>
+      </div>
+    </div>
+  </div>
+</section><!-- End About Section -->

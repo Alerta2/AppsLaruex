@@ -1,0 +1,120 @@
+{% extends "base/base2.html" %}
+{% load static %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+    <link rel="stylesheet" href="{% static 'js/ol/ol.css' %}" type="text/css">
+    <script src="{% static 'js/ol/ol.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jsonmuestras.js' %}"></script>
+    <!-- scripts de grafica -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+{% endblock %}
+
+{% block css %}
+        #carga{
+            position: absolute;
+            top: 50px;
+            font-size: 30px;
+            left: 45%;
+            color: rgba(255, 255, 255, 0.9);
+            z-index: 9700;
+        }
+        #carga i {
+            display: block;
+            width: 100px;
+            font-size: 50px;
+            float: left;
+            text-align: center;
+            margin-right: 20px;
+            padding-right: 20px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        @media only screen and (max-width : 800px) {
+            #carga{
+                left: 100px;
+            }
+        }
+        .fondo-rojo{
+            background-color: #FCCAC0;
+        }
+        .fondo-amarillo{
+            background-color: #FCF6C0;
+        }
+{% endblock %}
+
+{% block content %}
+    <div class="row mx-5 px-5">
+        <div class="form-group col-12">
+            <h1>GENERACION INFORME</h1>
+        </div>
+        <div class="form-group col-12">
+            <form action="{% url 'rare:rarexInformeCSN' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="date_inicio">Fecha inicial:</label>
+                    <div class="col-sm-4">
+                        <input class="form-control" id="date_inicio" name="date_inicio" type="date"/>
+                    </div>
+                    <label class="col-sm-2 col-form-label" for="date_fin">Fecha final:</label>
+                    <div class="col-sm-4">
+                        <input class="form-control" id="date_fin" name="date_fin" type="date"/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-10">
+                        <button type="submit" class="btn btn-primary">Enviar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="form-group col-12">
+            <h1>SUBIDA CHURRO</h1>
+        </div>
+        <div class="form-group col-12">
+            <form id="formFicheroChurro" method="post">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="fichero_churro">Fichero Churro:</label>
+                    <div class="col-sm-4">
+                        <input class="form-control" id="fichero_churro" name="fichero_churro" type="file"/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-10">
+                        <button type="submit" class="btn btn-primary">Enviar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+    $('.btnright').hide();
+    $('.btnleft').hide();
+    $('#carga').hide();
+    function checkMobile(){
+        if( window.innerWidth < 1024)
+            $("#boton_collapse_sidebar").click();
+    }
+    checkMobile();
+
+    $("#formFicheroChurro").submit(function (e) {
+        e.preventDefault();
+        var data = new FormData(this);
+        $.ajax({
+            url: "/private/rare/subidaFicheroChurro/",
+            type: "POST",
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function () {
+                
+            }
+        });
+    });
+
+</script>
+{% endblock %}

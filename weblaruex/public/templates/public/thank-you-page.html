@@ -1,0 +1,26 @@
+{% extends "public/template.html" %}
+{% load static %}
+
+{% block meta %}
+  <title>Pagina Agradecimiento</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+  <main id="main">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs" data-aos="fade-in">
+      <div class="container">
+        <h1>Gracias por contactar con nosotros.</h1>
+        <h4>Tu mensaje ha sido enviado, nos pondremos en contacto lo antes posible.</h4>
+      </div>
+    </div><!-- End Breadcrumbs -->
+
+    <img src="{% static 'img/images/mensajes/check.png' %}" alt="" class="img-fluid" style="width: 20%; height: 20%; margin-left: auto; margin-right: auto; display: block;" >
+
+  </main><!-- End #main -->
+
+{% endblock %}

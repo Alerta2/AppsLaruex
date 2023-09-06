@@ -1,0 +1,367 @@
+{% extends "base/base_docLaruex.html" %} {% load static %} {% block content %}
+
+
+<style>
+
+
+
+  /**------------------ CSS Botón Imprimir ----------------------*/
+  .cta {
+  position: relative;
+  margin: auto;
+  padding: 12px 18px;
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  }
+
+  .cta:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border-radius: 50px;
+  background: #b1dae7;
+  width: 45px;
+  height: 45px;
+  transition: all 0.3s ease;
+  }
+
+  .cta span {
+  position: relative;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #234567;
+  }
+
+  .cta svg {
+  position: relative;
+  top: 0;
+  margin-left: 10px;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke: #234567;
+  stroke-width: 2;
+  transform: translateX(-5px);
+  transition: all 0.3s ease;
+  }
+
+  .cta:hover:before {
+  width: 100%;
+  background: #b1dae7;
+  }
+
+  .cta:hover svg {
+  transform: translateX(0);
+  }
+
+  .cta:active {
+  transform: scale(0.95);
+  }
+
+/*---------------------- FIN -------------------------------*/
+  .borderless tr,
+  .borderless td,
+  .borderless th {
+    border: none !important;
+  }
+
+
+  @page {
+    size: A4;
+  }
+  @media print {
+    html, body {
+      width: 210mm;
+      height: 297mm;    
+    }  
+
+  #imprimir  {
+      visibility: hidden;
+      display: none;
+    }
+  }
+</style>
+
+<section class="section dashboard ">
+  <div class="card-body">
+    <div class="row">
+      <div class="col">        
+        <h5 class="card-title fst-italic" style="color: #0a9396; text-align: center;">{{ubicacionActual.id__nombre}}</h5>
+        <button id="imprimir" class="cta" onclick="window.print()">
+          <span>Imprimir</span>
+          <svg viewBox="0 0 13 10" height="10px" width="15px">
+            <path d="M1,5 L11,5"></path>
+            <polyline points="8 1 12 5 8 9"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col col-sm-12 col-md-6 col-lg-6 my-auto d-flex justify-content-end">
+        <img src="{{ ruta }}archivos/Equipo/{{ equipo.id.ruta }}" class="img-fluid rounded float-left" alt=""
+          style="max-width: 300px; max-height: 300px;" />
+      </div>
+      <div class="col col-sm-12 col-md-6 col-lg-6 my-auto">
+        <table class="table table-responsive borderless">
+          <tbody>
+            <tr>
+              {% if equipo.fecha_baja %}
+              <th style="color: rgb(111, 17, 17)">Nombre:</th>
+              <td>{{ equipo.id.nombre }}</td>
+              {% else %}
+              <th style="color: #027F84;">Nombre:</th>
+              <td>{{ equipo.id.nombre }}</td>
+              {% endif %}
+            </tr>
+            <tr>
+              {% if equipo.fecha_baja %}
+              <th style="color: rgb(111, 17, 17)">Código:</th>
+              <td>{{ equipo.cod_laruex }}/{{ equipo.fecha_alta|date:"y"}}</td>
+              {% else %}
+              <th style="color: #027F84;">Código:</th>
+              <td>{{ equipo.cod_laruex }}/{{ equipo.fecha_alta|date:"y"}}</td>
+              {% endif %}
+            </tr><tr>
+              <th style="color: #027F84;">Ultima ubicación</th>
+              <td style="vertical-align: middle;">{{ equipo.ubicacion_actual.id.nombre }}</td>
+            </tr>
+            
+            <tr>
+              {% if equipo.fecha_baja %}
+              <th style="color: rgb(111, 17, 17)">Fecha de Baja:</th>
+              <td>{{ equipo.fecha_baja|date:"d-M-Y"}}</td>
+              {% else %}
+              <th style="color: #027F84;">Fecha de Baja:</th>
+              <td>--</td>
+              {% endif %}
+            </tr>
+            <tr>
+
+              {% if equipo.fecha_baja %}
+              <th style="color: rgb(111, 17, 17)">Motivo de Baja:</th>
+              <td>{{ equipo.motivo_baja }}</td>
+              {% endif %}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabla con la información más destacada del inventario-->
+    <div class="row">
+      {% if equipo.fecha_baja %}
+      <h5 class="card-title" style="color: rgb(36, 2, 2); text-align: center;">Información de Inventario</h5>
+      {% else %}
+      <h5 class="card-title" style="color: #014f52; text-align: center;">Información de Inventario</h5>
+      {% endif %}
+      <div class="col">
+        <table class="table table-sm" style="margin-left: auto; margin-right: auto;">
+          <thead>
+            <tr>
+              {% if equipo.fecha_baja %}
+              <th scope="col" style="color: rgb(111, 17, 17);" class="text-center">COD_LARUEX</th>
+              <th scope="col" style="color: rgb(111, 17, 17);" class="text-center">COD_UEX</th>
+              <th scope="col" style="color: rgb(111, 17, 17);" class="text-center">Fecha de Alta</th>
+              <th scope="col" style="color: rgb(111, 17, 17);" class="text-center">Fecha de Baja</th>
+              {% else %}
+              <th scope="col" style="color: #027F84;" class="text-center">COD_LARUEX</th>
+              <th scope="col" style="color: #027F84;" class="text-center">COD_UEX</th>
+              <th scope="col" style="color: #027F84;" class="text-center">Fecha de Alta</th>
+              <th scope="col" style="color: #027F84;" class="text-center">Fecha de Baja</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-center">{{ equipo.cod_laruex }}/{{ equipo.fecha_alta|date:"Y"}}</td>
+
+              {% if equipo.cod_uex %}
+              <td class="text-center">{{ equipo.cod_uex }}</td>
+              {% else %}
+              <td class="text-center">--</td>
+              {% endif %}
+
+              <td class="text-center">{{ equipo.fecha_alta|date:"d-M-Y" }}</td>
+              {% if equipo.fecha_baja %}
+              <td class="text-center" ">{{ equipo.fecha_baja|date:" d-M-Y" }}</td>
+                {% else %}
+              <td class="text-center">--</td>
+              {% endif %}
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <div class="row my-auto d-flex justify-content-start">
+      <!-- Tabla con información técnica -->
+      <div class="col col-sm-12 col-md-6 col-lg-6 ">
+        {% if equipo.fecha_baja %}
+        <h5 class="card-title" style="color: rgb(36, 2, 2);">Información Técnica</h5>
+        {% else %}
+        <h5 class="card-title" style="color: #014f52;">Información Técnica</h5>
+        {% endif %}
+        <table class="table table-responsive">
+          <tbody>
+            <tr>
+              {% if equipo.fecha_baja %}
+              <th style="color:  rgb(111, 17, 17);">Nº de serie</th>
+              <td>{{ equipo.num_serie }}</td>
+              {% else %}
+              <th style="color: #027F84;">Nº de serie</th>
+              <td>{{ equipo.num_serie }}</td>
+              {% endif %}
+            </tr>
+            <tr>
+              {% if equipo.fecha_baja %}
+              <th style="color:  rgb(111, 17, 17);">Tipo de dispositivo</th>
+              <td>{{ equipo.tipo_equipo.nombre }}</td>
+              {% else %}
+              <th style="color: #027F84;">Tipo de dispositivo</th>
+              <td>{{ equipo.tipo_equipo.nombre }}</td>
+              {% endif %}
+            </tr>
+            <tr>
+              {% if equipo.fecha_baja %}
+              <th style="color:  rgb(111, 17, 17);">Fabricante</th>
+              <td>{{ equipo.fabricante.nombre }}</td>
+              {% else %}
+              <th style="color: #027F84;">Fabricante</th>
+              <td>{{ equipo.fabricante.nombre }}</td>
+              {% endif %}
+            </tr>
+            <tr>
+              {% if equipo.fecha_baja %}
+              <th style="color:  rgb(111, 17, 17);">Modelo</th>
+              {% if equipo.modelo %}
+              <td>{{ equipo.modelo }}</td>
+              {% else %}
+              <td>--</td>
+              {% endif %}
+              {% else %}
+              <th style="color: #027F84;">Modelo</th>
+              {% if equipo.modelo %}
+              <td>{{ equipo.modelo }}</td>
+              {% else %}
+              <td>--</td>
+              {% endif %}
+              {% endif %}
+            </tr>
+            <tr>
+              {% if equipo.fecha_baja %}
+              <th style="color:  rgb(111, 17, 17);">Precio</th>
+              <td>{{ equipo.precio }} €</td>
+              {% else %}
+              <th style="color: #027F84;">Precio</th>
+              <td>{{ equipo.precio }} €</td>
+              {% endif %}
+            </tr>
+            <tr>
+              {% if equipo.fecha_baja %}
+              <th style="color:  rgb(111, 17, 17);">Descripción</th>
+              <td>{{ equipo.descripcion }}</td>
+              {% else %}
+              <th style="color: #027F84;">Descripción</th>
+              <td>{{ equipo.descripcion }}</td>
+              {% endif %}
+            </tr>
+          </tbody>
+        </table>
+      </div> <!-- Fin Tabla con información técnica -->
+
+      <!-- Historial de Ubicaciones -->
+      <div class="col col-sm-12 col-md-6 col-lg-6 mx-auto my-auto">
+        <h5 class="card-title text-center" style="color: #014f52;">Histórico de Ubicaciones</h5>
+        <div class="card-body d-flex justify-content-center">
+
+          <div class="activity">
+
+            {% for historico in historicoUbicaciones %}
+            {% if forloop.first %}
+            {% if equipo.fecha_baja %}
+            <div class="activity-item d-flex">
+              <div class="activite-label">{{ historico.fecha|date:"M d, Y"}}</div>
+              <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
+              <div class="activity-content">{{ historico.id_ubicacion__id__nombre }}</div>
+            </div>
+            {% else %}
+            <div class="activity-item d-flex">
+              <div class="activite-label">{{ historico.fecha|date:"M d, Y"}}</div>
+              <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>
+              <div class="activity-content"><a href="{% url 'docLaruex:docLaruexInfoVerObjeto' id=historico.id_ubicacion__id %}" style="text-decoration:none; color: #0a9396;">{{ historico.id_ubicacion__id__nombre }}</a></div>
+            </div><!-- End historial de ubicaciones item-->
+            {% endif %}
+            {% else %}
+            <div class="activity-item d-flex">
+              <div class="activite-label">{{ historico.fecha|date:"M d, Y"}}</div>
+              <i class='bi bi-circle-fill activity-badge text-muted align-self-start'></i>
+              <div class="activity-content">{{ historico.id_ubicacion__id__nombre }}
+              </div>
+            </div><!-- End historial de ubicaciones item-->
+            {% endif %}
+            {% endfor %}
+
+          </div>
+        </div>
+      </div><!-- End Recent Activity -->
+      
+
+    <div class="row mx-auto my-auto d-flex justify-content-start">
+      <h5 class="card-title" style="color: #014f52;">Información para Patrimonio</h5>
+      <div class="col my-auto">
+        <table class="table table-responsive borderless">
+          <tbody>
+            <tr>
+              <th style="color: #027F84;">Centro</th>
+              <td><strong style="color: #485050;">04 - Facultad de Veterinaria, Cáceres</strong></td>
+            </tr>
+            <tr>
+              <th style="color: #027F84;">Edificio</th>
+              <td><strong style="color: #485050;">11- Facultad de Veterinaria</strong></td>
+            </tr>
+            <tr>
+              <th style="color: #027F84;">Dependencia</th>
+              <td><strong style="color: #485050;">22 - Departamento de Física</strong></td>
+            </tr>
+            <tr>
+              {% for historico in historicoUbicaciones %}
+              {% if forloop.first %}
+              <th style="color: #027F84;">Ubicación Laruex</th>
+              <td><strong style="color: #485050;">{{ historico.id_ubicacion__alias }}</strong></td>
+              {% endif %}
+              {% endfor %}
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+    </div>
+    
+    <div class="row">
+      <div class="col-9 d-flex align-items-end justify-content-start">
+        <h5>Informe generado con fecha <strong>{% now "d" %} de {% now "F" %} de {% now "Y" %}</strong></h5>
+      </div>
+      <div class="col-3 d-flex justify-content-end justify-content-end">
+        <img src="{% static 'niceAdminAssets' %}/img/laruex.png" class="img-fluid" alt="Responsive image"
+          style=" max-width: 70%;">
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+
+
+
+<!--collapse con listado de equipos asociados a la estación -->
+{% endblock %}

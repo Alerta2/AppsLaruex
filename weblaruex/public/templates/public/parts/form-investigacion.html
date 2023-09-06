@@ -1,0 +1,279 @@
+{% load static %}{% load widget_tweaks %}
+
+<style>
+
+.card {
+ width: 70rem;
+ height: auto;
+ background: white;
+ border-radius: 10px;
+ transition: border-radius 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.shadow {
+ box-shadow: inset 0 -3em 3em rgba(0,0,0,0.1),
+             0 0  0 2px rgb(190, 190, 190),
+             0.3em 0.3em 1em rgba(0,0,0,0.3);
+}
+
+
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: #1d8896;
+  }
+  
+  .addImagen:hover {
+    color: rgba(29, 136, 150, 10);
+    filter: brightness(80%);
+  }
+
+  .imagenCargada{
+    color: #1d9649;
+  }
+
+  .sinBorde:focus {
+    outline: none;
+  }
+
+.checkboxDiv input[type="checkbox"]:checked{
+  
+  background-color: #1d8896 !important;
+  border: 2px solid #1d8896 !important;
+  color: #fff;
+  accent-color: #1d8896;
+}
+
+.checkboxDiv input,
+  .checkboxDiv label {
+    display: inline-block;
+    vertical-align: middle;
+  }
+</style>
+
+<!-- ======= Contact Section ======= -->
+<section id="contact" class="contact"  >
+  <div class="container d-flex justify-content-center" data-aos="fade-up" >
+    <div class="card shadow">
+      <div class="card-body">
+        <div class="row d-flex justify-content-center">
+          <div class="col-10">
+            <form action="/agregarInvestigacion/" method="POST" role="form" class="php-email-form" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="row d-flex justify-content-end">
+                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                  <label for="yearInvestigacion"><strong>Año de la investigación</strong><strong class="text-danger">*</strong></label>
+                  <input type="number" id="yearInvestigacion" name="yearInvestigacion" class="form-control" min="1950" max="2080" step="1" placeholder="1950">
+                </div>        
+                <div class="col-lg-3 col-md-6 col-sm-12 form-group formNoComunes" id="divlastYearInvestigation" hidden>
+                  <label for="lastYearInvestigacion"><strong>Fin de la investigación</strong></label>
+                  <input type="number" id="lastYearInvestigacion" name="lastYearInvestigacion" class="form-control" min="1950" max="2080" step="1" placeholder="2080">
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                  <label for="categoriaInvestigacion"><strong>Tipo de investigación</strong><strong class="text-danger">*</strong></label>
+                  <select type="form-select" id="categoriaInvestigacion" name="categoriaInvestigacion" class="form-control"  style="border-color: #1d8896;" required onchange="mostrarFormulario(this.value)">
+                    <option hidden></option>
+                    <option value="Intercomparación">Intercomparación</option>
+                    <option value="Proyecto">Proyecto</option>
+                    <option value="Publicación">Publicación</option>
+                    <option value="Tesis">Tesis</option>
+                  </select>
+                </div>        
+              </div>
+              <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                  <label for="tituloInvestigacion"><strong>Titulo de la investigación</strong><strong class="text-danger">*</strong></label>
+                  <input type="text" name="tituloInvestigacion" class="form-control" id="tituloInvestigacion" placeholder="Título de la investigación. Máximo 300 caracteres" data-rule="minlen:4" data-msg="Por favor introduce al menos 4 caracteres" required/>
+                  <div class="validate"></div>
+                </div>
+              </div> 
+              <div class="row formNoComunes" id="divRevistaInvestigacion" hidden>
+                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                  <label for="revistaInvestigacion"><strong>Revista</strong></label>
+                  <input type="text" name="revistaInvestigacion" class="form-control" id="revistaInvestigacion" placeholder="Nombre de la revista donde se ha publicado la investigación" data-rule="minlen:4" data-msg="Por favor introduce al menos 4 caracteres" />
+                  <div class="validate"></div>
+                </div>
+              </div>      
+              <div class="row formNoComunes" id="divAutorInvestigacion" hidden>
+                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                  <label for="autorInvestigacion"><strong>Autor</strong></label>
+                  <input type="text" name="autorInvestigacion" class="form-control" id="autorInvestigacion" placeholder="Nombre del autor o autores de la investigación" data-rule="minlen:4" data-msg="Por favor introduce al menos 4 caracteres" />
+                  <div class="validate"></div>
+                </div>
+              </div>
+              <div class="row formNoComunes" id="divEntidadInvestigacion" hidden>
+                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                  <label for="entidadInvestigacion"><strong>Entidad Financiadora</strong></label>
+                  <input type="text" name="entidadInvestigacion" class="form-control" id="entidadInvestigacion" placeholder="Nombre de la revista donde se ha publicado la investigación" data-rule="minlen:4" data-msg="Por favor introduce al menos 4 caracteres" />
+                  <div class="validate"></div>
+                </div>
+              </div>   
+              <div class="row formNoComunes" id="divLocalizacionInvestigacion" hidden >
+                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                  <label for="localizacionInvestigacion"><strong>Localización de la investigación</strong></label>
+                  <input type="text" name="localizacionInvestigacion" class="form-control" id="localizacionInvestigacion" placeholder="Ej de localización: Colección: Environmental Science and Engineering Vol:7 pags:70-93 Ed: STUDIUM PRESS LLC" />
+                  <div class="validate"></div>
+                </div>
+              </div>            
+              <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                  <label for="enlaceInvestigacion"><strong>Enlace de la investigación</strong></label>
+                  <input type="text" name="enlaceInvestigacion" class="form-control" id="enlaceInvestigacion" placeholder="https://www.google.es"/>
+                  <div class="validate"></div>
+                </div>
+              </div>
+              <div class="row my-2 formNoComunes" id="divResumenInvestigacion" hidden>
+                <div class="col-sm-12">
+                  <label for="resumenInvestigacion"><strong>Resumen de la investigación</strong></label>
+                  <div class="text-center my-2">
+                    {{ formularioInvestigacion.resumenInvestigacion }}
+                  </div>
+                </div>
+              </div>
+              <div class="row my-2">
+                <div class="col-sm-12">
+                  <label for="infoAdicionalInvestigacion"><strong>Información adicional de la investigación</strong></label>
+                    <textarea type="text" class="form-control" name="infoAdicionalInvestigacion" id="infoAdicionalInvestigacion" rows="3" 
+                    placeholder="Máximo 200 caracteres" style="white-space: pre-line; border-color: #1d8896;" maxlength="9000" ></textarea>
+                </div>
+              </div>
+
+              <div class="row my-3">
+                <div class="col form-group">
+                  <div>
+                    <label for="paginasSliderEditar"><strong>Sección donde se muestra</strong></label>
+                  </div>
+                  <div class="checkboxDiv form-check-inline" id="checkboxSinClase">
+                    <div class="mx-2 ">
+                      <input class="form-check-input" type="checkbox" id="paginaSeleccionadaLaboratorio" name="checkboxAgregarInvestigacion"  value="laboratorios" onchange="comprobarSeleccionado(this)">
+                      <label class="form-check-label" for="paginaSeleccionadaLaboratorio">Laboratorios</label>
+                    </div>
+                    <div class="mx-2">
+                      <input class="form-check-input" type="checkbox" id="paginaSeleccionadaRedes" name="checkboxAgregarInvestigacion"  value="redes" onchange="comprobarSeleccionado(this)">
+                      <label class="form-check-label" for="paginaSeleccionadaRedes">Redes</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row my-4 ">
+                <div class="col">
+                  <div class="text-center"><button type="submit" class="sinBorde">Enviar</button></div>
+
+                </div>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section><!-- End Contact Section -->
+
+
+<script>
+
+    
+    function comprobarSeleccionado(checkbox) {
+    var checkboxes = document.getElementsByName("checkboxAgregarInvestigacion");
+    checkboxes.forEach(function(cb) {
+      if (cb !== checkbox) {
+        cb.checked = false;
+      }
+    });
+    }
+
+
+    function ocultarNoComunes(){
+      // obtener todos los elementos que no son comunes, es decir, que tienen la clase formNoComunes
+      var elementos = document.getElementsByClassName("formNoComunes");
+      // recorrer todos los elementos y ocultarlos
+      for (var i = 0; i < elementos.length; i++) {
+        elementos[i].hidden = true;
+      }
+    }
+
+    function mostrarFormulario(tipo){
+      // entidad
+      var divEntidad = document.getElementById("divEntidadInvestigacion");
+      var entidad = document.getElementById("entidadInvestigacion");
+
+      // año final 
+      var divFinalYear = document.getElementById("divlastYearInvestigation");
+      var finalYear = document.getElementById("lastYearInvestigacion");
+
+      // autor
+      var divAutor = document.getElementById("divAutorInvestigacion");
+      var autor = document.getElementById("autorInvestigacion");
+
+      // revista
+      var divRevista = document.getElementById("divRevistaInvestigacion");
+      var revista = document.getElementById("revistaInvestigacion");
+
+      // resumen 
+      var divResumen = document.getElementById("divResumenInvestigacion");
+
+      // localizacion
+      var divLocalizacion = document.getElementById("divLocalizacionInvestigacion");
+      var localizacion = document.getElementById("localizacionInvestigacion");
+
+      // obtener todos los elementos que no son comunes
+
+      console.log(tipo);
+
+      switch (tipo) {
+            case "Publicación":
+
+              ocultarNoComunes();
+              // mostramos el formulario de autor
+              divAutor.hidden = false;
+              autor.required = true;
+              // mostramos el formulario de revista
+              divRevista.hidden = false;
+              revista.required = true;
+
+              // mostramos el formulario de localizacion
+              divLocalizacion.hidden = false;
+              localizacion.required = true;
+
+              break;
+            case "Proyecto":
+
+              ocultarNoComunes();
+              // mostramos el formulario de entidad
+              divEntidad.hidden = false;
+              entidad.required = true;
+
+              // mostramos el formulario de año final
+              divFinalYear.hidden = false;
+              finalYear.setAttribute('required', 'true');
+              break;
+
+            case "Tesis":
+              ocultarNoComunes();
+              // mostramos el formulario de autor
+              divAutor.hidden = false;
+              autor.required = true;
+
+              // mostramos el formulario de resumen
+              divResumen.hidden = false;
+              break;
+            case "Intercomparación":
+              ocultarNoComunes();
+              // mostramos el formulario de resumen
+              divResumen.hidden = false;
+              break;
+
+            default:
+              console.log("No existe ese tipo de investigación");
+
+          }
+
+    }
+</script>

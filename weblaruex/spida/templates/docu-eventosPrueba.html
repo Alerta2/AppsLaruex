@@ -1,0 +1,170 @@
+{% extends "base/base_spida.html" %}
+
+{% block content %}
+    <table  data-toggle="table"
+            data-show-columns="true"
+            data-locale="es-ES"
+            data-show-fullscreen="true"
+            data-search="true" 
+            data-pagination="true"
+            data-page-list="[4, 10, All]"
+            data-page-size="4"
+            data-detail-filter="detailFilter"
+            data-detail-formatter="detailFormatter"
+            data-detail-view="true"
+            data-sort-name="id"
+            data-sort-order="desc"
+            data-show-footer="true">
+                            
+      <thead>
+        <tr>
+          <th data-field="id" data-sortable="true">Item ID</th>
+          <th data-field="name">Item Name</th>
+          <th data-field="descripcion" data-footer-formatter="LogoFooter">Item Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Prueba 1</td>
+          <td>$1</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Hola Caracola 2</td>
+          <td>$2</td>
+        </tr>
+        <tr>
+        <td>1</td>
+            <td>Adios 1</td>
+            <td>$1</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Item 2</td>
+            <td>$2</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Item 1</td>
+            <td>$1</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Paula 2</td>
+            <td>$2</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>Prueba 1</td>
+            <td>$1</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Hola Caracola 2</td>
+            <td>$2</td>
+          </tr>
+          <tr>
+          <td>1</td>
+              <td>Adios 1</td>
+              <td>$1</td>
+          </tr>
+          <tr>
+              <td>2</td>
+              <td>Item 2</td>
+              <td>$2</td>
+          </tr>
+          <tr>
+              <td>1</td>
+              <td>Item 1</td>
+              <td>$1</td>
+          </tr>
+          <tr>
+              <td>2</td>
+              <td>Paula 2</td>
+              <td>$2</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>Prueba 1</td>
+            <td>$1</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Hola Caracola 2</td>
+            <td>$2</td>
+          </tr>
+          <tr>
+          <td>1</td>
+              <td>Adios 1</td>
+              <td>$1</td>
+          </tr>
+          <tr>
+              <td>2</td>
+              <td>Item 2</td>
+              <td>$2</td>
+          </tr>
+          <tr>
+              <td>1</td>
+              <td>Item 1</td>
+              <td>$1</td>
+          </tr>
+          <tr>
+              <td>2</td>
+              <td>Paula 2</td>
+              <td>$2</td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>Prueba 1</td>
+            <td>$1</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Hola Caracola 2</td>
+            <td>$2</td>
+          </tr>
+          <tr>
+          <td>1</td>
+              <td>Adios 1</td>
+              <td>$1</td>
+          </tr>
+          <tr>
+              <td>2</td>
+              <td>Item 2</td>
+              <td>$2</td>
+          </tr>
+          <tr>
+              <td>1</td>
+              <td>Item 1</td>
+              <td>$1</td>
+          </tr>
+          <tr>
+              <td>2</td>
+              <td>Paula 2</td>
+              <td>$2</td>
+          </tr>
+      </tbody>
+    </table>
+
+    <script>
+        function detailFilter(data, row) {
+            return row.id=='1' /*filtrar que registros tienen el boton + de descripcion en funcion de si tiene o no una descripcion*/
+        };
+        function detailFormatter(index, row, element){ 
+            var html = []
+            html.push('<p><b>Descripción: </b> ' + row.name + '</p>');
+            return html.join('') /*Para definir que aparece en el boton + de descripcion*/
+        };
+        function LogoFooter(){
+            var html = []
+            html.push('<img src="/static/img/spida/logos/logo_alerta2.jpg" style="max-height:50px; float:right" alt="">');
+            return html.join('') /*Para definir que aparece en el boton + de descripcion*/
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
+{% endblock %}

@@ -1,0 +1,245 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+
+
+{% block modal %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+  <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesListadoMuestras' %}">Listado</a></li>
+      </ol>
+  </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12">
+      <div class="row">
+        <!-- Card -->
+        <div class="col-xxl-4 col-md-4 col-sm-12">
+          <div class="card info-card sales-card">
+            <div class="card-body">
+              <h5 class="card-title">MUESTRA <span>| {{ muestra.identificador }}</span></h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  {% if muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Sin identificar' %}
+                    <i class="fa-solid fa-vial"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Aire' %}
+                    <i class="fa-solid fa-wind"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Lluvia - Deposito Seco' %}
+                    <i class="fa-solid fa-cloud-rain"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Agua' %}
+                    <i class="fa-solid fa-droplet"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Leches' %}
+                    <i class="fa-solid fa-cow"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Vegetales' %}
+                    <i class="fa-solid fa-carrot"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Carnes' %}
+                    <i class="fa-solid fa-meat"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Peces' %}
+                    <i class="fa-solid fa-fish"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Moluscos' %}
+                    <i class="fa-solid fa-crab"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Algas' %}
+                    <i class="fa-solid fa-wheat"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Suelos' %}
+                    <i class="fa-solid fa-mountain"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Sedimentos' %}
+                    <i class="fa-duotone fa-water"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Cartucho' %}
+                    <i class="fas fa-ring"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Huevos' %}
+                    <i class="fa-regular fa-egg"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Aves' %}
+                    <i class="fa-regular fa-bird"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Miel' %}
+                    <i class="fa-regular fa-honey-pot"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Hongos' %}
+                    <i class="fa-regular fa-mushroom"></i>
+                  {% elif muestra.codigo_recogida.codigo_csn.tipo.descripcion == 'Minerales' %}
+                    <i class="fa-regular fa-gem"></i>
+                  {% endif %}
+                </div>
+                <div class="ps-3">
+                  <h6>{{ muestra.codigo_recogida.codigo_csn.nombre }}</h6>
+                  <span class="text-success small pt-1 fw-bold">Muestra</span> <span class="text-muted small pt-2 ps-1">{{ muestra.identificador }}</span>
+                </div>
+              </div>
+              {% if informe %}
+                <h5 class="card-title">INFORME <span>| {{ informe.identificador }}_{{ informe.anio }}</span></h5>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <!-- End Card -->
+        <!-- Card -->
+        <div class="col-xxl-4 col-md-4 col-sm-12">
+          <div class="card info-card sales-card">
+            <div class="card-body">
+              <h5 class="card-title">RECOLECTOR <span>| {{ muestra.suministrador.nombre }}</span></h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="fa-regular fa-calendar-arrow-down"></i>
+                </div>
+                <div class="">
+                  <h6>{{ muestra.fecha_hora_recogida|date:"d/m/y H:m" }}</h6>
+                  <span class="text-success small pt-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida inicial</span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="fa-regular fa-calendar-arrow-up"></i>
+                </div>
+                <div class="">
+                  <h6>{{ muestra.fecha_hora_recogida|date:"d/m/y H:m" }}</h6>
+                  <span class="text-success small pt-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida final</span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="fa-regular fa-calendar-check"></i>
+                </div>
+                <div class="">
+                  <h6>{{ muestra.fecha_hora_recogida|date:"d/m/y H:m" }}</h6>
+                  <span class="text-success small pt-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida referencia</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Card -->
+        <!-- Card -->
+        <div class="col-xxl-4 col-md-4 col-sm-12">
+          <div class="card info-card sales-card">
+            <div class="card-body">
+              <h5 class="card-title">RECEPCIONADOR <span>| {{ muestra.recepcionado_por.nombre }}</span></h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="fa-regular fa-calendar-clock"></i>
+                </div>
+                <div class="ps-3">
+                  <h6>{{ muestra.fecha_hora_recepcion|date:"d/m/y H:m" }}</h6>
+                  <span class="text-success small pt-1 fw-bold">MEMORIA</span> <span class="text-muted small pt-2 ps-1">{{ muestra.codigo_recogida.codigo_memoria.memoria }}</span>
+                </div>
+              </div>
+              <h5 class="card-title">CLIENTE <span>| {{ muestra.cliente.nombre }}</span></h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="fa-regular fa-calendar-clock"></i>
+                </div>
+                <div class="ps-3">
+                  <h6>{{ muestra.referencia_cliente }}</h6>
+                  <span class="text-success small pt-1 fw-bold">ESTADO</span> <span class="text-muted small pt-2 ps-1">{{ muestra.estado_de_muestra.descripcion }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End Card -->
+        <!-- Card -->
+        <div class="col-md-6 col-sm-12">
+          <div class="card info-card">
+            <div class="card-body">
+              <h5 class="card-title">COMENTARIO <span>| MUESTRA GENERAL</span></h5>
+              {{ muestra.codigo_recogida.observaciones }}
+            </div>
+          </div>
+        </div>
+        <!-- End Card -->
+        <!-- Card -->
+        <div class="col-md-6 col-sm-12">
+          <div class="card info-card">
+            <div class="card-body">
+              <h5 class="card-title">COMENTARIO <span>| MUESTRA ESPECÍFICA</span></h5>
+              {{ muestra.comentarios }}
+            </div>
+          </div>
+        </div>
+        <!-- End Card -->
+    </div><!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+<!-- Info programa -->
+<section class="section dashboard">
+  <!-- Info programa cards -->
+  <div class="col-12">
+    <div class="row">
+      <!-- Card -->
+      <div class="col-12">
+        <div class="card info-card ">
+          <div class="card-body">
+            <h5 class="card-title">ALICUOTAS </h5>
+            <div id="tablaAlicuotas" class="table-responsive">
+              <table class="table"
+                  id="tableAlicuotas"
+                  data-toggle="table"
+                  data-pagination="true"
+                  data-page-size="10"
+                  data-search="true"
+                  data-show-columns="true"
+                  data-show-refresh="true"
+                  data-show-columns-toggle-all="true"
+                  data-show-fullscreen="true"
+                  data-buttons="buttons"
+                  data-buttons-class="light"
+                  data-show-export="true"
+                  data-url="/private/gestionmuestras/infoMuestra/solicitarAlicuotas/{{ muestra.identificador }}/">
+                  <thead>
+                      <tr>
+                          <th data-field="identificador" data-sortable="true">ID</th>
+                          <th data-field="id_analiticas__nombre" data-sortable="true">DETERMINACIÓN</th>
+                          <th data-field="fecha_hora_entrega" data-sortable="true" data-formatter="dateFormat">FECHA ENTREGA</th>
+                          <th data-field="analista_tecnico__nombre" data-sortable="true">ANALISTA</th>
+                          <th data-field="cantidad_muestra_analizada" data-sortable="true">CANTIDAD</th>
+                          <th data-field="estado_alicuota__descripcion" data-sortable="true">ESTADO</th>
+                      </tr>
+                  </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Card -->
+  </div><!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+<script>
+    $('#tableAlicuotas').bootstrapTable({
+        onClickRow: function (row, $element) {
+            // row: the record corresponding to the clicked row, 
+            // $element: the tr element.
+            // alert(row.identificador + " - " + row.codigo_recogida__codigo_csn__nombre + " - " + row.codigo_recogida__codigo_csn__nombre + " - " + row.codigo_recogida__codigo_procedencia__nombre + " - " + row.fecha_hora_recogida + " - " + row.fecha_hora_recepcion);
+            window.location.href = '/private/gestionmuestras/infoMuestra/'+row.identificador+'/';
+        },
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+    })
+
+    function dateFormat(value, row, index) {
+        return moment(value).format('DD/MM/YYYY HH:mm');
+    }
+
+    function buttons () {
+        return {
+          btnAdd: {
+            text: 'Add new row',
+            icon: 'fa-plus',
+            event: function () {
+              alert('Do some stuff to e.g. add a new row')
+            },
+            attributes: {
+              title: 'Add a new row to the table'
+            }
+          }
+        }
+    }
+</script>
+
+{% endblock %}

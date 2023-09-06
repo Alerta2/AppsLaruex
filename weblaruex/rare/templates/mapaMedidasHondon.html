@@ -1,0 +1,263 @@
+{% extends "base/base_mapa.html" %}
+{% load static %}
+{% load i18n %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+
+{% endblock %}
+{% block css %}
+    .leaflet-marker-icon .number{
+        position: relative;
+        top: 0px;
+        left: -8px;
+        font-size: 14px;
+        font-weight: bold;
+        width: 25px;
+        text-shadow: 0 0 1px #0f0;
+    }
+{% endblock %}
+{% block content %}      
+  <div id="mapid" class="w-100 h-100"></div>
+{% endblock %}
+
+{% block outMain %}             
+
+    <div id="sidebarMapaMedidas" class="leaflet-sidebar collapsed">
+      <!-- Nav tabs -->
+      <div class="leaflet-sidebar-tabs">
+          <ul role="tablist"> <!-- top aligned tabs -->
+              <li><a href="#home" role="tab"><i class="fas fa-bars"></i></a></li>
+          </ul>
+      </div>
+  
+      <!-- Tab panes -->
+      <div class="leaflet-sidebar-content">
+          <div class="leaflet-sidebar-pane" id="home">
+              <h1 class="leaflet-sidebar-header">
+                  Información del punto: <span id="puntoMedida"></span>&emsp;<button type="button" class="btn btn-warning" onclick="$('#formNuevoMapa').toggle();"><i class="far fa-plus-square"></i></button>
+                  <div onclick="$('#sidebarMapaMedidas').hide();" class="leaflet-sidebar-close"><i class="fas fa-times"></i></div>
+              </h1>
+              <div class="row py-4">
+                <h4 class="col-4">Latitud</h4>
+                <h4 class="col-8" id="latitudMedida"></h4>
+                <h4 class="col-4">Longitud</h4>
+                <h4 class="col-8" id="longitudMedida"></h4>
+                <h4 class="col-12">Ir a punto <a id="targetMap" href="" target="_new"><i class="fas fa-map-marked"></i></a></h4>
+              </div>
+              <form action="" method="post" role="form"  target="_blank">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="analistaSelect">Seleccione analista</label>
+                  <select class="form-control" id="analistaSelect" name="analista">
+                    <option>Paloma</option>
+                    <option>Manolo</option>
+                    <option>Antonio</option>
+                    <option>Juan</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <input type="text" class="form-control" id="idPunto" name="idPunto" value="" hidden>
+                </div>
+                <div class="form-group">
+                  <label for="tiempoMedidaInput">Tiempo medida:</label>
+                  <div class="row">
+                    <input type="number" class="form-control col-9" id="tiempoMedidaInput" name="tiempo_medida" placeholder="Tiempo medida">
+                    <select class="form-control col-3" id="tiempoMedidaUnidadInput" name="tiempo_medida_unidad">
+                      <option>s</option>
+                      <option>m</option>
+                      <option>h</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="dosisInput">Dosis:</label>
+                  <input type="text" class="form-control" id="dosisInput" name="dosis" placeholder="Dosis">
+                </div>
+                <div class="form-group">
+                  <label for="cuentasInput">Cuentas:</label>
+                  <input type="number" class="form-control" id="cuentasInput" name="cuentas" placeholder="Cuentas">
+                </div>
+                <div class="form-group">
+                  <label for="comentarioTextArea">Comentario</label>
+                  <textarea class="form-control" id="comentarioTextArea" name="comentario" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+              <div class="row">
+                <div id="cargaMedidas" class="col-12 py-3">Cargando informacion...</div>
+                <div id="medidasPunto" class="col-12"></div>
+              </div>
+              <form id="formNuevoMapa" action="/private/rare/puntosMedida/" method="post" role="form" target="_blank">
+                {% csrf_token %}
+                <div class="form-group">
+                  <input type="text" class="form-control" id="idPuntoCalculo" name="idPunto" value="" hidden>
+                  <input type="text" class="form-control" id="idPuntoCalculoLat" name="idPuntoLat" value="" hidden>
+                  <input type="text" class="form-control" id="idPuntoCalculoLon" name="idPuntoLon" value="" hidden>
+                </div>
+                <div class="form-group">
+                  <label for="mapaInput">Id nuevo mapa:</label>
+                  <input type="text" class="form-control" id="mapaInput" name="mapa" placeholder="Id mapa">
+                </div>
+                <div class="form-group">
+                  <label for="numPuntosInput">Numero de Puntos:</label>
+                  <input type="number" class="form-control" id="numPuntosInput" name="numPuntos" placeholder="Número de puntos">
+                </div>
+                <div class="form-group">
+                  <label for="lineaInput">Puntos por linea:</label>
+                  <input type="number" class="form-control" id="lineaInput" name="linea" placeholder="Puntos por línea">
+                </div>
+                <div class="form-group">
+                  <label for="metrosInput">Metros separacion:</label>
+                  <input type="number" class="form-control" id="metrosInput" name="metros" placeholder="Metros">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+          </div>
+      </div>
+    </div>
+    <script>
+        var map = L.map('mapid', { 
+          zoomControl: false,
+          downloadable: true,
+          printable: true,
+          editable: true,
+          measureControl: true
+        }).setView([{{ coords.0.lat }},{{ coords.0.lon }}], 18);
+
+        var layer_ArcgisSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          minZoom: 0,
+          maxZoom: 20
+        }); //satelite
+
+        const fontAwesomeIcon = L.divIcon({
+          html: '<i class="fas fa-circle"></i>',
+          iconSize: [20, 20],
+          className: 'myDivIcon',
+          color: '#0f0'
+        });
+        map.addLayer(layer_ArcgisSat);
+        
+        L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+        var medidas = L.layerGroup();
+        
+        {% for coord in coords %}
+          var numMarker = L.ExtraMarkers.icon({
+            icon: 'fa-number',
+            markerColor: 'blue',
+            number: {{ coord.npos }}
+          });
+          marker = L.marker([{{ coord.lat|safe }},{{ coord.lon|safe }}], { icon:  numMarker}).on('click', openMarker);
+          marker.bindTooltip("{{ coord.cuentas }}", {
+            permanent: true, 
+            direction : 'bottom',
+            className: 'transparent-tooltip',
+            offset: [0, -8]
+          });
+          marker.feature = {
+            id: "{{ coord.id }}",
+            npos: "{{ coord.npos }}"
+          };
+          medidas.addLayer(marker);
+        {% endfor %}
+        map.addLayer(medidas);
+        
+        function cargarInfoMedida(id){
+          // serialize the data for sending the form data.
+          var serializedData = $(this).serialize();
+          // make POST ajax call
+          $.ajax({
+            type: 'GET',
+            url: "/informacionMedida/"+id+"/",
+            data: serializedData,
+            success: function (data) {
+              $('#medidasPunto').html(data);
+              $('#cargaMedidas').fadeOut();
+            },
+            error: function (data) {
+                alert("Formulario fallido" + data);
+            }
+          })
+        }
+
+        function openMarker(e){
+          sidebar.open('home');
+          $('#sidebarMapaMedidas').show();
+          $("#idPunto").val(e.target.feature.id);
+          $("#idPuntoCalculo").val(e.target.feature.id);
+          $("#idPuntoCalculoLat").val(e.target.getLatLng().lat);
+          $("#idPuntoCalculoLon").val(e.target.getLatLng().lng);
+          
+          $('#puntoMedida').html(e.target.feature.npos);
+          $('#latitudMedida').html(e.target.getLatLng().lat);
+          $('#longitudMedida').html(e.target.getLatLng().lng);
+          $('#cargaMedidas').show();
+          $('#medidasPunto').html("");
+          var url = "http://maps.google.com/maps?z=12&t=k&q=loc:"+e.target.getLatLng().lat+"+"+e.target.getLatLng().lng;
+          $('#targetMap').attr("href", url)
+          cargarInfoMedida(e.target.feature.id)
+        }
+        
+        var sidebar = L.control.sidebar({
+            autopan: true,       // whether to maintain the centered map point when opening the sidebar
+            closeButton: true,    // whether t add a close button to the panes
+            container: 'sidebarMapaMedidas', // the DOM container or #ID of a predefined sidebar container that should be used
+            position: 'right',     // left or right
+          }).addTo(map);
+
+        $('#sidebarMapaMedidas').hide();
+        $('#formNuevoMapa').hide();
+
+        var gps = new L.Control.Gps({
+          //autoActive:true,
+          autoCenter:true
+        });//inizialize control
+        gps.on('gps:located', function(e) {
+          e.marker.bindPopup(e.latlng.toString()).openPopup()
+          console.log(e.latlng, map.getCenter())
+        }).on('gps:disabled', function(e) {
+          e.marker.closePopup()
+        });
+        gps.addTo(map);
+
+        /**
+        function afterRender(result) {
+          return result;
+        }
+
+        function afterExport(result) {
+          return result;
+        }
+        function downloadMap() {
+          console.log("Export map");
+          var downloadOptions = {
+            container: map._container,
+            caption: {
+            font: '30px Arial',
+            fillStyle: 'black',
+            position: [100, 200]
+          },
+            exclude: ['.leaflet-control-zoom', '.leaflet-control-attribution'],
+            format: 'image/png',
+            fileName: 'Map.png',
+            afterRender: afterRender,
+            afterExport: afterExport
+          };
+          var promise = map.downloadExport(downloadOptions);
+          var data = promise.then(function (result) {
+            return result;
+          });
+        }
+
+        **/
+        //downloadMap();
+
+        L.easyButton('fa-sync', function(btn, map){
+          window.location.href = '/private/rare/mapaMedidas/{{ id_mapa }}';
+        }).addTo( map );
+
+    </script>
+
+{% endblock %}

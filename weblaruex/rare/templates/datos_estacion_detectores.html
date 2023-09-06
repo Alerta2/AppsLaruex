@@ -1,0 +1,44 @@
+{% load static %}
+{% load i18n %}
+{% if valores_detectores %}
+    <section id="detectores">
+        <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 d-flex">
+            {% for valor in valores_detectores %}
+                {% if valor.lista_valores %}
+                    <div class="row col-lg-12 col-md-12 col-sm-12 col-xs-12 mb-3">
+                        <div class="col-lg-2 col-md-2 col-sm-4 col-xs-4">
+                            <div class="rounded bg-info m-2 text-white text-center p-4 m-2 w-100">
+                                {% if valor.nombre_detector == 'FRACCION GASEOSA' %}
+                                    <i class="fas fa-ring fa-2x" data-toggle="tooltip" data-placement="bottom" title='FRACCION GASEOSA'></i>
+                                {% elif valor.nombre_detector == 'FRACCION PARTICULADA' %}
+                                    <i class="fas fa-toilet-paper fa-2x" data-toggle="tooltip" data-placement="bottom" title='FRACCION PARTICULADA'></i>
+                                {% elif valor.nombre_detector == 'FRACCION ACUOSA' %}
+                                    <i class="fas fa-tint fa-2x" data-toggle="tooltip" data-placement="bottom" title='FRACCION ACUOSA'></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <br>
+                        {% for isotopo in valor.lista_valores %}
+                            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4">
+                                {% if isotopo.valor < isotopo.amd %}
+                                    <button type="button" class="btn btn-success p-4 m-2 w-100 {% if isotopo.retraso > 24 %}border border-danger{% elif isotopo.retraso > 8 %}border border-warning{% endif %}" data-toggle="tooltip" data-placement="bottom" title='{% translate "Medido un valor de" %} {{ isotopo.valor }} {{ isotopo.unidad }} {% translate "donde la actividad mínima detectable es" %} {{ isotopo.amd }} {{ isotopo.unidad }} {% translate "en la fecha de" %} {{ isotopo.fecha }} {{ isotopo.id }} {{ isotopo.id_detector }}' onclick="graficaIsotopos({{ isotopo.id_detector }}, {{ isotopo.id }})">
+                                        {{ isotopo.abreviado | safe }}
+                                    </button>
+                                {% elif isotopo.abreviado == 'GAMMA TOTAL' %}
+                                    <button type="button" class="btn btn-success p-4 m-2 w-100 {% if isotopo.retraso > 24 %}border border-danger{% elif isotopo.retraso > 8 %}border border-warning{% endif %}" data-toggle="tooltip" data-placement="bottom" title='{% translate "Medido un valor de" %} {{ isotopo.valor }} {{ isotopo.unidad }} {% translate "en la fecha de" %} {{ isotopo.fecha }} {{ isotopo.id }} {{ isotopo.id_detector }}' onclick="graficaIsotopos({{ isotopo.id_detector }}, {{ isotopo.id }})">
+                                        {{ isotopo.abreviado | safe }}
+                                    </button>
+                                {% else %}
+                                    <button type="button" class="btn btn-danger text-dark p-4 m-2 w-100 {% if isotopo.retraso > 24 %}border border-danger{% elif isotopo.retraso > 8 %}border border-warning{% endif %}" data-toggle="tooltip" data-placement="bottom" title='{% translate "Medido un valor de" %} {{ isotopo.valor }} &#181;{{ isotopo.unidad }} {% translate "donde la actividad mínima detectable es" %} {{ isotopo.amd }} &#181;{{ isotopo.unidad }} {% translate "en la fecha de" %} {{ isotopo.fecha }} {{ isotopo.id }} {{ isotopo.id_detector }}' onclick="graficaIsotopos({{ isotopo.id_detector }}, {{ isotopo.id }})">
+                                        {{ isotopo.abreviado | safe }}
+                                    </button>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        <br>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}

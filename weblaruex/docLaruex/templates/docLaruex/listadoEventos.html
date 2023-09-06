@@ -1,0 +1,776 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+{% block content %}
+
+
+<style>
+  /*--------------------------------------------------------------
+# Tabla
+--------------------------------------------------------------*/
+ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+  /*--------------------------------------------------------------
+# Ir a Eventos
+--------------------------------------------------------------*/
+.cta {
+position: relative;
+margin: auto;
+padding: 12px 18px;
+transition: all 0.2s ease;
+border: none;
+background: none;
+}
+
+.cta:before {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+display: block;
+border-radius: 50px;
+background: #d4e4e2;
+width: 45px;
+height: 45px;
+transition: all 0.3s ease;
+}
+
+.cta span {
+position: relative;
+font-family: "Ubuntu", sans-serif;
+font-size: 18px;
+font-weight: 700;
+letter-spacing: 0.05em;
+color: #087B6C;
+}
+
+
+
+.cta:hover:before {
+width: 100%;
+background: #d4e4e2;
+}
+
+.cta:active {
+transform: scale(0.95);
+}
+
+
+.form-check-input:checked {
+    background-color: #087B6C;
+    border-color: #087B6C;
+}
+
+.form-check-input:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(16, 223, 161, 0.432);
+}
+.select:hover{
+  color: #94d2bd;
+}
+
+.agregarFormacion:hover{
+  color: #ca6702;
+}
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Eventos</h5>
+  <nav>
+      <ol class="breadcrumb" style="background-color:#fff !important">
+          <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                      class="bi bi-house-door"></i></a></li>
+          <li class="breadcrumb-item active" style="font-size: large;">Listado de
+            Eventos</li>
+      </ol>
+  </nav>
+</div>
+
+<div class="row d-flex justify-content-center" >
+  <div class="col-auto my-auto " style="background-color: #d4e4e2;">
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="mantenimiento" value="1">
+      <label class="form-check-label" for="mantenimiento">Mantenimiento</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="verificacion" value="2">
+      <label class="form-check-label" for="verificacion">Verificación</label>
+    </div>    
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="calibrado" value="3">
+      <label class="form-check-label" for="calibrado">Calibrado</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="checkbox" id="suscripcion" value="4">
+      <label class="form-check-label" for="suscripcion">Suscripción</label>
+    </div>
+  </div>
+  <div class="col-auto">
+    <button class="cta" title="Filtrar seledccionados" onclick="enviarSeleccionados()">
+      <span>Filtrar</span>
+    </button>
+  </div>
+
+</div>
+
+<div class="section my-2">
+  <button class="cta " title="Agregar un evento" data-target="#modalAgregarEvento" data-toggle="modal">
+    <span>Agregar Evento</span>
+  </button>
+  <table id="tabla_eventos" data-toggle="table" data-search="true" data-show-columns="true"
+  data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+  data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+  data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+  </table>
+</div>
+
+
+
+
+<!-- ============= Modal Agregar Evento ====================-->
+<div id="modalAgregarEvento" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="TituloModalAgregarEvento">Agregar Evento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formularioAgregarEvento" 
+                    enctype="multipart/form-data" method="POST">
+                    {% csrf_token %}
+
+                        <!-- formulario de procedimiento -->
+                        <div id="divFormularioAgregarEvento" class="divFormularios">
+                            <div class="row">
+                              
+                              <div class="col-4 d-flex justify-content-center" style="align-items: center;">
+                                  <h5><strong>Periodicidad</strong></h5>
+                              </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="cantidad" class="col-md-auto">Cantidad</label>
+                                        <input type="number" class="form-control col-md-auto" id="cantidad"
+                                            name="cantidad" data-rule="required" required/>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="unidad">Unidad</label>
+                                        <select class="form-select" data-rule="required" id="unidad"
+                                            name="unidad">
+                                            <option value="Hora">Hora
+                                            </option>
+                                            <option value="Día">Día
+                                            </option>
+                                            <option value="Semana">Semana
+                                            </option>
+                                            <option value="Mes">Mes
+                                            </option>
+                                            <option value="Año">Año
+                                            </option>
+                                            
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                              <div class="col">
+                                <input type="text" id="estado" name="estado" value="2" hidden>
+                              </div>
+                            </div>  
+                            <div class="row">
+                              <div class="col-4"> 
+                                <div class="form-group">
+                                  <label for="tipoEvento">Tipo de Evento</label>
+                                  <select class="form-select" data-rule="required" id="tipoEvento"
+                                      name="tipoEvento">
+                                      <option value="1">Mantenimiento</option>
+                                      <option value="2">Verificación</option>
+                                      <option value="3">Calibrado</option>
+                                      <option value="4">Suscripción</option>                                        
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="col-4"> 
+                                <div class="form-group">
+                                  <label for="tipoPeriodicidad">Tipo de Periodicidad</label>
+                                  <select class="form-select" data-rule="required" id="tipoPeriodicidad"
+                                      name="tipoPeriodicidad">
+                                      <option value="1">Fija</option>
+                                      <option value="2">Relativa</option> 
+                                      
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="col-4">
+                                <div class="form-group">
+                                    <label for="procedimiento">Procedimientos</label>
+                                    <select class="form-select" data-rule="required" id="procedimiento"
+                                        name="procedimiento" onchange="filtrarFormato()">
+                                        <option value="0">
+                                          Ninguno
+                                        </option>
+                                        {% for procedimiento in procedimientos %}
+                                        <option value="{{procedimiento.id_doc__id}}">
+                                            {{procedimiento.id_doc__nombre}}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row" id="divFormatoPlantilla" style="display: none">
+                              <div class="col">
+                                <label for="formatoPlantilla">Formato Plantilla</label>
+                                <select class="form-select" data-rule="required" name="formatoPlantilla" id="formatoPlantilla"></select>
+                              </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label for="nombreEvento" class="col-md-auto">Título del
+                                            Evento</label>
+                                        <input type="text" class="form-control col-md-auto" id="nombreEvento"
+                                            name="nombreEvento" data-rule="required"
+                                            pattern="[a-zA-Z\w\s\sáéíóúÁÉÍÓÚüÜñÑ,]{1,255}"
+                                            title="No permite guiones ni otros caracteres que no sean espacios" />
+                                    </div>
+                                </div>
+                            </div>
+                            
+          
+                            <div class="row">
+                              <div class="col">
+                                <div class="form-group">
+                                  <label for="nombreEvento" class="col-md-auto">Estructura de Datos 
+                                    <a href="" class="mx-1 my-2" title="Información estructura Json" data-toggle="modal"
+                                      data-target="#modalMostrarInfoJason" style="color: #bb3e03"><i class="fa-duotone fa-circle-info fa-xl agregarFormacion "></i></a></label>
+                                  <textarea class="form-control" id="estructuraDatos" name="estructuraDatos"  rows="8"
+                                  data-rule="required" placeholder="Estructura de datos en formato JSON"></textarea>
+                                </div>
+                              </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button id="cerrarAgregarEvento" type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cerrar
+                            </button>
+                            <button id="resetAgregarEvento" type="reset" class="btn btn-secondary" hidden>
+                            </button>
+                            <button type="submitAgregarEvento" value="submit" class="btn btn-primary">
+                                Guardar
+                            </button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalMostrarInfoJason" tabindex="-1"
+     role="dialog" aria-labelledby="modalMostrarInfoJasonLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalMostrarInfoJasonLabel">
+          <strong>Información estructura Json</strong>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal"
+                aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col">
+            <p>La estructura de datos debe ser en formato JSON, ejemplo:</p>
+            <pre>
+              <code>
+                {
+                  "string": "Hola mundo",
+                  "boolean": true,
+                  "null": null,
+                  "datetime": "2023-05-10T12:34:56",
+                  "date": "2023-05-10",
+                  "time": "12:34",
+                  "boolean": true,
+                  "integer": 123,
+                  "float": 15.23,
+                  "select": "opcion1",
+                  "file": "archivo.pdf",
+                  "array": ["elemento 1", "elemento 2", "elemento 3"],
+                  "object": {
+                    "propiedad 1": "valor 1",
+                    "propiedad 2": "valor 2"
+                  }
+                }
+              </code>
+            </pre>
+            <p>Este JSON muestra los seis tipos de estructuras que se pueden almacenar en un objeto JSON:</p>
+            <ul>
+              <li><strong>"string":</strong> una cadena de texto</li>
+              <li><strong>"number":</strong> un número (puede ser entero o decimal)</li>
+              <li><strong>"boolean":</strong> un valor booleano (verdadero o falso)</li>
+              <li><strong>"null":</strong> un valor nulo</li>
+              <li><strong>"array":</strong> un arreglo de valores, delimitados por corchetes <strong>[ ]</strong></li>
+              <li><strong>"object":</strong> un objeto JSON, delimitado por llaves <strong>{ }</strong>, que a su vez contiene pares de nombre/valor.
+                <ul>
+                  <li><strong>"propiedad 1":</strong> valor 1</li>
+                  <li><strong>"propiedad 2":</strong> valor 2</li>
+                </ul>
+              </li>
+              <li><strong>"datetime":</strong> una fecha y hora: 2023-05-10T12:34:56</li>
+              <li><strong>"date":</strong> una fecha: 2023-05-10</li>
+              <li><strong>"time":</strong> una hora: 12:34</li>
+              <li><strong>"integer":</strong> un número entero: 123</li>
+              <li><strong>"float":</strong> un número decimal: 15.23</li>
+              <li><strong>"select":</strong> una opción seleccionada: opcion1</li>
+              <li><strong>"file":</strong> un archivo adjunto: archivo.pdf</li>
+            </ul>
+          </div>
+        </div>
+        <!-- Contenido del modal -->
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ============= Modal Eliminar ====================-->
+
+<div id="modalEliminarEvento" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarEvento"><strong>¿Estas seguro que deseas eliminar el evento?</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarEvento" action="/private/docLaruex/eliminarEvento/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarEliminarEvento" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarEvento" name="cancel" onclick="crearAviso('eliminarEventoCerrar', 'No se ha podido eliminar', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-danger" onclick="crearAviso('eliminarEventoGuardar', 'Objeto  eliminado', 'alert-success', 3000)">
+              Eliminar
+            </button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+
+<!-- ============= Modal Agregar Tarea ====================-->
+
+<div id="modalAgregarTarea" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalAgregarTarea"><strong>Agregar Tarea</strong> </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <form id="formularioModalAgregarTarea" action="/private/docLaruex/agregarTarea/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <div class="row d-flex justify-content-center">
+            <h5>Seleccione el equipo o ubicación a la que va a asignar la tarea</h5>
+          </div>
+          <div class="row d-flex justify-content-center">
+            <div class="col">
+              <div class="row d-flex justify-content-center" >
+                <div class="col-auto my-auto " style="background-color: #d4e4e2;">
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="Equipo" value="Equipo">
+                    <label class="form-check-label" for="Equipo">Equipo</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="Ubicacion" value="Ubicacion">
+                    <label class="form-check-label" for="Ubicacion">Ubicación</label>
+                  </div>    
+                </div>
+                <div class="col-auto">
+                  <button class="cta" title="Filtrar por selección" onclick="filtrarLista()">
+                    <span>Filtrar</span>
+                  </button>
+                </div>
+              
+              </div>
+              
+              <table id="tabla_objetos" data-toggle="table" data-search="true" data-show-columns="true"
+              data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+              data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+              data-pagination="true" data-id-field="id" data-page-list="[5, 10, 25, 50, 100, All]" data-toolbar="#toolbar" 
+              data-click-to-select="true" data-multiple-select-row="false" data-smart-display="true" data-page-size="3">
+              </table>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <input type="text" id="idObjeto" name="idObjeto" hidden>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center my-3">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="fecha_inicio">Fecha de Inicio del mantenimiento</label>
+                <input type="datetime-local" id="fecha_inicio" name="fecha_inicio" class="form-control" required />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <textarea class="form-control" id="observaciones" name="observaciones"  rows="3"
+                data-rule="required" placeholder="Observaciones"></textarea>
+              </div>
+            </div>
+          </div>
+          
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-footer d-flex justify-content-center">
+            <button id="cerrarAgregarTarea" type="button" class="btn btn-secondary" data-dismiss="modal" hidden>Cerrar</button>
+            <button class="btn btn-secondary" data-dismiss="modal"  id="cancelEliminarEvento" name="cancel" onclick="crearAviso('eliminarAgregarTarea', 'No se ha podido crear la tarea', 'alert-warning', 3000)">Cancelar</button>
+            <button type="submit" value="submit" class="btn btn-info" onclick="crearAviso('agregarTareaGuardar', 'Tarea Agregada con éxito', 'alert-success', 3000)">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  
+    // cambiamos la funcionalidad del boton submit del formulario
+    $("#formularioAgregarEvento").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    if (comprobarJSON('estructuraDatos') == true){
+      $.ajax({
+        url: "/private/docLaruex/agregarEvento/",
+        type: "POST",
+        data: data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        // gestiono el return del view
+        success: function () {
+          crearAviso('eventoGuardar', 'Evento guardado con éxito', 'alert-success', 2000)
+          $(".modalAgregarEvento").remove();
+          $("#resetAgregarEvento").trigger("click");
+          $('#cerrarAgregarEvento').trigger('click');
+          location.reload(true);
+        }
+      });
+    }
+  });
+
+  function comprobarJSON(value) {
+    var nombreJSON = String(value);
+    var bool = false;
+    try {
+        var ugly = document.getElementById(nombreJSON).value;
+        var obj = JSON.parse(ugly);
+        var pretty = JSON.stringify(obj, undefined, 4);
+        document.getElementById(nombreJSON).value = pretty;
+        alert("Esto esta bien, envia");
+        bool = true;
+        }
+    catch(err) {
+
+      document.getElementById(nombreJSON).classList.add('is-invalid')
+      alert("Esto esta mal");
+    }
+    return bool;
+}
+  
+
+
+  function enviarSeleccionados(){
+    var mantenimiento = document.getElementById("mantenimiento");
+    var verificacion = document.getElementById("verificacion");
+    var calibrado = document.getElementById("calibrado");
+    var suscripcion = document.getElementById("suscripcion");
+
+
+    var valores = [];
+
+    if (mantenimiento.checked) {
+      valores.push(mantenimiento.value);
+    }
+
+    if (verificacion.checked) {
+      valores.push(verificacion.value);
+    }
+
+    if (calibrado.checked) {
+      valores.push(calibrado.value);
+    }
+
+    if (suscripcion.checked) {
+      valores.push(suscripcion.value);
+    }
+    
+    var url = "/private/docLaruex/eventosDatosTipo/"+valores+"/";
+    // Actualizar la tabla con los valores seleccionados
+    $("#tabla_eventos").bootstrapTable('refresh', {url: url});
+
+
+
+    }
+
+
+    function filtrarLista(){
+    var equipo = document.getElementById("Equipo");
+    var ubicacion = document.getElementById("Ubicacion");
+
+
+    var valores = [];
+
+    if (equipo.checked) {
+      valores.push(equipo.value);
+    }
+
+    if (ubicacion.checked) {
+      valores.push(ubicacion.value);
+    }
+    
+    console.log(valores)
+    var url = "/private/docLaruex/equiposUbicacionesDatosFiltro/"+valores+"/";
+    // Actualizar la tabla con los valores seleccionados
+    $("#tabla_objetos").bootstrapTable('refresh', {url: url});
+
+
+
+  }
+
+  function mostrarTiposEventos() {
+  // Establecer el valor seleccionado del select
+  $('#tiposEventosSelect').val(value);
+  
+  // Obtener los elementos seleccionados y sus valores
+  var seleccionados = $('#tiposEventosSelect option:selected').map(function() {
+    return this.value;
+  }).get();
+  alert(seleccionados);
+  // Unir los valores seleccionados con comas
+  var tipoEvento = seleccionados.join('#');
+  
+  // Construir la URL con los valores seleccionados
+  var url = "/private/docLaruex/eventosDatosTipo/" + tipoEvento + "/";
+  
+ 
+  // Actualizar la tabla con los valores seleccionados
+  $("#tabla_eventos").bootstrapTable('refresh', {url: url });
+}
+
+  
+  $('#tabla_eventos').bootstrapTable({
+    //--/" + tipoEvento +"/
+        method: 'get',
+        url: "/private/docLaruex/eventosDatos",
+        cache: false,
+        columns: [{
+            title: 'Nombre',
+            field: 'nombre',
+            align: "center"
+        }, {
+            title: 'Tipo',
+            field: 'tipo_evento__nombre',
+            align: "center"
+        }, {
+            title: 'Procedimiento asociado',
+            field: 'procedimiento_asociado__id_doc__nombre',
+            align: "center"
+        }, {
+            title: 'Periodicidad',
+            field: 'periodicidad',
+            align: "center",
+            formatter: function (value, row) {
+                var periodicidad = row.periodicidad__cantidad + " " + row.periodicidad__unidad ;
+                return periodicidad;
+            }
+        }, {
+            title: "Acciones",
+            field: "action",
+            align: "center",
+            formatter: function (value, row) {
+
+              var botonAgregarTarea = '<a href="/private/docLaruex/agregarTarea/' + row.id + '/' + '" class="mx-1" title="Agregar Tarea" data-toggle="modal" data-target="#modalAgregarTarea" onclick="$('+"'#formularioModalAgregarTarea').attr('action', '/private/docLaruex/agregarTarea/"+ row.id +"/');"+'" ><i class="fa-solid fa-plus fa-lg" style="color:#CA6702"></i></a>';
+
+              var botonModificarEvento = '<a href="/private/docLaruex/editarEvento/' + row.id + '/" class="mx-1" title="Editar evento"><i class="fa-duotone fa-money-check-pen fa-lg" style="color:#032525" ></i></a>';
+
+
+              var botonEliminarEvento = '<a href="/private/docLaruex/eliminarEvento/' + row.id + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarEvento" onclick="$('+"'#formularioModalEliminarEvento').attr('action', '/private/docLaruex/eliminarEvento/"+ row.id +"/');"+'" ><i class="fa-solid fa-x fa-lg" style="color:#AE2012"></i></a>';
+
+              
+                return (botonAgregarTarea + botonModificarEvento + botonEliminarEvento);
+                
+            }
+        },
+        ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'fecha_verificacion',
+        sortOrder: 'desc',
+
+    });
+
+
+  
+    
+ // tabla de objetos 
+ 
+    // tatbla de elementos seleccionados
+    $("#tabla_objetos").bootstrapTable({
+    locale: navigator.language,
+    url:"/private/docLaruex/equiposUbicacionesDatos" ,
+    cache: false,
+    singleSelect: true,
+    columns: [
+      {
+        title: "",
+        field:"state",
+        checkbox:"true",
+      }, {
+        title: "nombre",
+        field: 'id__nombre',
+        align: "center", 
+        formatter: function (value, row) {
+          if (row.id__tipo== 'Ubicacion'){
+            if (row.id__padre){
+
+              return("[" + row.id__padre__nombre +"] "+ row.id__nombre);
+            }else{
+              return(row.id__nombre);
+            }
+          }
+          else{
+            if (row.cod_laruex != '0'){
+              fecha = new Date(row.fecha_alta).getFullYear().toString().slice(-2);
+              return(row.cod_laruex + "/" + fecha);
+            }else{
+              return(row.cod_uex);
+            }
+          }
+        },
+      }, {
+        title: "Tipo",
+        field: 'id__tipo',
+        align: "center",
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+  $('#tabla_objetos').on('check.bs.table', function (e, row) {
+    var id = row.id;
+    $('#idObjeto').val(id);
+    console.log('El ID seleccionado es :', id);
+  });
+
+
+
+  function filtrarFormato() {
+  
+    //obtener el valor del select de procedimiento
+    var procedimiento = document.getElementById("procedimiento");
+    var divFormatoPlantilla = document.getElementById("divFormatoPlantilla");
+    if (procedimiento.value != "0"){
+      console.log("HE ENTRADO");
+      divFormatoPlantilla.style.display = "block"; // mostrar el div
+      
+      console.log(procedimiento.value);
+
+      // obtener la lista de formatos del procedimiento seleccionado que se encuentra en la url private/docLaruex/formatoDatosFiltrados/<str:procedimiento>/
+      var url = "/private/docLaruex/formatoDatosFiltrados/" + procedimiento.value + "/";
+      // guardar el resultado de la lista de datos obtenidos en la views.py
+      var listaFormatos = $.get(url, function (data) {
+        console.log(data);
+        // obtener el select de formatos
+        var formatoPlantilla = document.getElementById("formatoPlantilla");
+        // limpiar el select de formatos
+        formatoPlantilla.innerHTML = "";
+
+        // recorrer la lista de formatos obtenidos
+        for (var i = 0; i < data.length; i++) {
+          // crear un option con el nombre del formato
+          var option = document.createElement("option");
+          option.text = data[i].id_doc__nombre + " " + data[i].titulo;
+          option.value = data[i].id_doc;
+          // agregar el option al select de formatos
+          formatoPlantilla.appendChild(option);
+        }
+        // crear un option vacio
+        var option = document.createElement("option");
+        // agregar el texto vacio al option
+        option.text = "Ninguno";
+        option.value = "0";
+        // agregar el option vacio al select de formatos
+        formatoPlantilla.appendChild(option);
+      });
+    }
+    else{
+      divFormatoPlantilla.style.display = "none"; // mostrar el div
+    }
+  }
+
+
+</script>
+
+{% endblock %}

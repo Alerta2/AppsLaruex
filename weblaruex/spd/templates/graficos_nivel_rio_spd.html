@@ -1,0 +1,338 @@
+{% extends "base/base_spd.html" %}
+{% load static %}
+
+
+
+{% block imports %}
+<!-- Estilo de la barra buscador -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/buscador_spd.css' %}">
+<!-- Custom css Graficos Highcharts  -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/highcharts_spd.css' %}" />
+<style>
+    .highcharts-contextmenu {
+        z-index: 1 !important;
+    }
+
+    #content {
+        background-color: #fff;
+    }
+
+    image {
+        opacity: 0.2;
+    }
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+<div style="background: #fff; padding-top: 25px; padding-bottom: 25px;">
+    <div class="row justify-content-center" style="padding-left: 35px; padding-right: 35px;">
+        <div class="search-box">
+            <input type="search" placeholder="Buscar..." name="search" class="searchbox-input" onkeyup="buttonUp();"
+                required>
+            <button class="btn" onclick="infoSearch()"><i class="fas fa-info-circle"
+                    style="font-size: 30px; color: #49A1A4;"></i></button>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">Nivel río</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">Precipitación</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">Imágenes</a>
+        </li>
+    </ul><!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="tabs-1" role="tabpanel">
+            <div id="row-GraficoNivel" class="row" style="padding: 20px;"></div>
+        </div>
+        <div class="tab-pane" id="tabs-2" role="tabpanel">
+            <div id="row-GraficoLluvia" class="row" style="padding: 20px;"></div>
+        </div>
+        <div class="tab-pane" id="tabs-3" role="tabpanel">
+            <div id="row-Imagenes" class="row" style="padding: 20px;"></div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+<script type="text/javascript" src="{% static 'js/spd/map_graficos_highchart_spd.js' %}"></script>
+<script type="text/javascript">
+
+    $(function () {
+        $('div[onload]').trigger('onload');
+    });
+
+
+    var menuChart = ["viewFullscreen", "separator", "downloadPNG", "downloadJPEG", "downloadPDF", "separator", "downloadXLS", "downloadCSV", "viewData"];/*"printChart",   "downloadSVG"*/
+
+    function CargarGraficoNivelRio(Grafico, idEstacion, nombreEstacion, N1, N2, N3) {
+
+        var options = GraficoNivelRio(nombreEstacion, N1, N2, N3);
+        const chart = Highcharts.chart(Grafico, options);
+
+        chart.showLoading();
+        //console.log(Grafico, parseFloat(N1), parseFloat(N2), parseFloat(N3), 0);
+        //console.log("URL ", "{% url 'spd:getValores24h'%}?estacion=" + idEstacion + "&canal=100")
+
+        $.ajax({
+            url: "{% url 'spd:getValoresPrediccion24h'%}?estacion=" + idEstacion + "&canal=100",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                var valormax_registrado = 0
+                var valormax_prediccion = 0
+
+
+                if (data.prediccion.length > 0) {
+                    //console.log("Hay prediccion")
+                    valores_prediccion = data.prediccion.map(Object.values)
+                    valormax_prediccion = Math.max.apply(Math, valores_prediccion.map(v => v[1]));
+                }
+                valores_registrados = data.valores.map(Object.values)
+                valormax_registrado = Math.max.apply(Math, valores_registrados.map(v => v[1]));
+
+                var valormax = Math.max(valormax_registrado, valormax_prediccion);
+                var ymax = ((N3 > valormax) ? N3 : valormax);
+                ymax = 1.15 * ymax;
+                /*console.log("YMAX",ymax, N3, valormax);*/
+
+                chart.yAxis[0].update({
+                    max: ymax
+                })
+
+                chart.series[0].setData(valores_registrados.map(function (point) {
+                    return [
+                        new Date(point[0]).getTime(),
+                        point[1]
+                    ];
+                }));
+
+                if (data.prediccion.length > 0) {
+                    chart.addSeries({
+                        name: "Nivel de Río predicho",
+                        data: valores_prediccion.map(function (point) {
+                            return [
+                                new Date(point[0]).getTime(),
+                                point[1]
+                            ];
+                        }),
+                        dashStyle: 'Dash',
+                        lineColor: '#1B1C1C',
+                    });
+                    /*chart.series[1].setData(valores_prediccion.map(function(point) {
+                                          return [
+                                          new Date(point[0]).getTime(),
+                                          point[1]
+                                          ];
+                                          }));*/
+                    chart.legend.update({
+                        enabled: true,
+                    });
+                }
+
+
+
+                ////////////////////////////////////////////////////////////////////////////////
+
+                /*data = data.map(Object.values)
+
+                //Corrijo el valor máximo del eje Y en función del valor mas alto de nivel de río y el N3
+                var valormax, valormin = 0;
+                if (data.length > 0) {
+                    valormax = Math.max.apply(Math, data.map(v => v[1]));
+                    valormin = Math.min.apply(Math, data.map(v => v[1]));
+                }
+                var ymin = ((0 > valormin) ? valormin : 0);
+                var ymax = ((N3 > valormax) ? N3 : valormax);
+                ymax = 1.15 * ymax;
+
+                chart.yAxis[0].update({
+                    max: ymax,
+                    min: ymin
+                })
+
+                //Añado la serie de datos al grafico
+                chart.series[0].setData(data.map(function (point) {
+                    return [
+                        new Date(point[0]).getTime(),
+                        point[1]
+                    ];
+                }));*/
+
+                chart.setTitle({ text: nombreEstacion });
+
+                //Si no se registran datos pongo una imagen de fondo
+                if (data.length == 0) {
+                    chart.update({
+                        chart: {
+                            plotBackgroundImage: 'http://www.molfx.com/wp-content/uploads/2016/10/sin_datos_de_prensa-1.jpg'
+                        },
+                        yAxis: [{ plotBands: undefined }]
+                    })
+                }
+                else {
+                    chart.update({
+                        chart: {
+                            plotBackgroundImage: undefined
+                        }
+                    })
+                }
+                chart.hideLoading();
+            },
+            cache: false
+        });
+    }
+
+
+    function CargarGraficoPrecipitacion(Grafico, idEstacion, nombreEstacion) {
+
+        var options = GraficoPrecipitacion(nombreEstacion);
+        var chart = Highcharts.chart(Grafico, options);
+
+        chart.showLoading();
+
+        $.ajax({
+            url: "{% url 'spd:getValoresPrediccion24h'%}?estacion=" + idEstacion + "&canal=301",
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+
+                if (data.prediccion.length > 0) {
+                    valores_prediccion = data.prediccion.map(Object.values)
+                }
+                valores_registrados = data.valores.map(Object.values)
+
+
+                chart.series[0].setData(valores_registrados.map(function (point) {
+                    return [
+                        new Date(point[0]).getTime(),
+                        point[1]
+                    ];
+                }));
+
+                if (data.prediccion.length > 0) {
+                    chart.addSeries({
+                        name: "Precipitación predicha",
+                        data: valores_prediccion.map(function (point) {
+                            return [
+                                new Date(point[0]).getTime(),
+                                point[1]
+                            ];
+                        }),
+                        type: 'column'
+                    });
+
+                    /*chart.series[1].setData(valores_prediccion.map(function(point) {
+                                          return [
+                                          new Date(point[0]).getTime(),
+                                          point[1]
+                                          ];
+                                          }));*/
+
+                    chart.legend.update({
+                        enabled: true,
+                    });
+                }
+
+                chart.setTitle({ text: nombreEstacion });
+
+                //Si no se registran datos pongo una imagen de fondo
+                if (data.valores.length == 0) {
+                    chart.update({
+                        chart: {
+                            //plotBackgroundImage: '../../../../static/img/spd/graficos/posit.png'
+                            plotBackgroundImage: 'http://www.molfx.com/wp-content/uploads/2016/10/sin_datos_de_prensa-1.jpg'
+                        },
+                        yAxis: [{ plotBands: undefined }]
+                    })
+                }
+                chart.hideLoading();
+            },
+            cache: false
+        });
+    }
+
+</script>
+
+
+<script>
+    var jsonEstaciones = JSON.parse("{{Estaciones|escapejs}}");
+    console.log(jsonEstaciones);
+
+
+    jsonEstaciones.forEach(function (estacion) {
+        var htmlGraficoNivel = '<div class="col-lg-3 col-md-6 grafico">' +
+            '<figure class="highcharts-figure">' +
+            '<div id="grafico-nivel-' + estacion.Id + '" class="grafico-highcharts" name="' + estacion.Id + '"' +
+            'style="width:100%; height: 250px; margin: 0 auto; padding: 10px;"' +
+            'onload="CargarGraficoNivelRio(\'' + ('grafico-nivel-' + estacion.Id) + '\', ' + estacion.Id + ', \'' + estacion.Nombre + '\', ' + estacion.N1 + ', ' + estacion.N2 + ', ' + estacion.N3 + '  )">' +
+            '</div>' +
+            '</figure>' +
+            '</div >';
+
+        $('#row-GraficoNivel').append(htmlGraficoNivel);
+
+        var htmlGraficoLluvia = '<div class="col-lg-3 col-md-6 grafico">' +
+            '<figure class="highcharts-figure">' +
+            '<div id="grafico-lluvia-' + estacion.Id + '" class="grafico-highcharts" name="' + estacion.Id + '"' +
+            'style="width:100%; height: 250px; margin: 0 auto; padding: 10px;"' +
+            'onload="CargarGraficoPrecipitacion(\'' + ('grafico-lluvia-' + estacion.Id) + '\', ' + estacion.Id + ', \'' + estacion.Nombre + '\')">' +
+            '</div>' +
+            '</figure>' +
+            '</div >';
+
+        $('#row-GraficoLluvia').append(htmlGraficoLluvia);
+    });
+
+</script>
+
+
+
+<script type="text/javascript">
+    var buttonUp = () => {
+        const input = document.querySelector(".searchbox-input");
+        const grafico = document.getElementsByClassName("grafico");
+        let filter = (input.value).normalize('NFD').replace(/[\u0300-\u036f]/g, "").toUpperCase();
+        console.log(grafico.length, filter)
+        for (let i = 0; i < grafico.length; i++) {
+            let title = grafico[i].querySelector(".highcharts-title");
+            console.log(title)
+            if (title.innerHTML.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toUpperCase().indexOf(filter) > -1) {
+                grafico[i].classList.remove("d-none")
+            } else {
+                grafico[i].classList.add("d-none")
+            }
+        }
+    }
+    $('input[type=search]').on('search', function () {
+        const cards = document.getElementsByClassName("grafico");
+        for (let i = 0; i < cards.length; i++) {
+            cards[i].classList.remove("d-none");
+        }
+    });
+
+
+    function infoSearch() {
+        Swal.fire({
+            title: "Buscador de Estaciones",
+            html: "En esta sección podreis consultar la evolución de los niveles de altura de río tomados de las estaciones Spida durante los últimos 7 días.",
+            timer: 20000,
+            timerProgressBar: true,
+        });
+    }
+
+</script>
+
+
+{% endblock %}

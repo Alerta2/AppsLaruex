@@ -1,0 +1,32 @@
+<div class="row" data-id_estacion="{{ id_estacion }}">
+    {% for p in parametros %}
+        <div class="col-6 border border-primary rounded">
+            <div class="row">
+                <div class="col-4 py-2"><!-- temperatura velocidadviento direccionviento humedad lluvia bateria altura distancia-->
+                    {% if p.canales.nombre == "Tª ESTACIÓN" %}
+                        <i class="fa-solid fa-temperature-half fa-2x" data-toggle="tooltip" data-placement="top" title="Temperatura estación"></i>
+                    {% elif p.canales.nombre == "VELOCIDAD DE VIENTO" %}
+                        <i class="fa-solid fa-wind fa-2x" data-toggle="tooltip" data-placement="top" title="Velocidad del viento"></i>
+                    {% elif p.canales.nombre == "DIRECCION DE VIENTO" %}
+                        <i class="fa-duotone fa-windsock fa-2x" data-toggle="tooltip" data-placement="top" title="Dirección del viento"></i>
+                    {% elif p.canales.nombre == "HUMEDAD RELATIVA" %}
+                        <i class="fa-solid fa-droplet-percent fa-2x" data-toggle="tooltip" data-placement="top" title="Humedad relativa"></i>
+                    {% elif p.canales.nombre == "LLUVIA" %}
+                        <i class="fa-solid fa-raindrops fa-2x" data-toggle="tooltip" data-placement="top" title="Lluvia"></i>
+                    {% elif p.canales.nombre == "BATERIA" %}
+                        <i class="fa-solid fa-battery-half fa-2x" data-toggle="tooltip" data-placement="top" title="Batería"></i>
+                    {% elif p.canales.nombre == "PRESION ATMOSFERICA" %}
+                        <i class="fa-solid fa-tire-pressure-warning fa-2x" data-toggle="tooltip" data-placement="top" title="Presión atmosférica"></i>
+                    {% elif p.canales.nombre == "ALTURA DE LA MEDIDA" %}
+                        <i class="fa-solid fa-drone-front fa-2x" data-toggle="tooltip" data-placement="top" title="Altura de medida"></i>
+                    {% elif p.canales.nombre == "DISTANCIA MEDIDA" %}
+                        <i class="fa-solid fa-ruler fa-2x" data-toggle="tooltip" data-placement="top" title="Distancia de medida"></i>
+                    {% endif%}
+                </div>
+                <div class="col-8 py-2">
+                    <h5>{{ p.valor }} {{ p.canales.unidades }}</h5>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

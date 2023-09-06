@@ -1,0 +1,251 @@
+
+{% extends "public/template.html" %}
+
+{% load static %}
+
+{% block meta %}
+  <title>Sliders - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+<style>  
+.addImagen {
+  color: #1d8896;
+}
+
+.addImagen:hover {
+  color: rgba(29, 136, 150, 10);
+  filter: brightness(80%);
+}
+
+.imagenCargada{
+  color: #1d9678;
+}
+
+.close:focus {
+  outline: none;
+}
+
+.checkboxDiv input[type="checkbox"]:checked{
+  
+  background-color: #1d8896 !important;
+  border: 2px solid #1d8896 !important;
+  color: #fff;
+  accent-color: #1d8896;
+}
+</style>
+  <main id="main" data-aos="fade-in">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+    </div>
+
+    {% if alerta %}
+    {% if alerta.tipo == "success" %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fa-solid fa-circle-check"></i> {{ alerta.mensaje }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% else %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="fa-sharp fa-solid fa-circle-exclamation"></i> {{ alerta.mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endif %}
+  {% endif %}
+
+    {% include "public/parts/sliders-list.html" %}
+
+  </main><!-- End #main -->
+
+  <div id="modalEliminarSlider" class="modal fade my-5" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="TituloModalEliminarSlider">Eliminar slider</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formularioEliminarSlider" action="\eliminarSlider/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" class="form-control" id="idSlider" name="idSlider" data-rule="required" hidden/>
+            <input type="text" class="form-control" id="inputNombreSliderEliminar" name="inputNombreSliderEliminar" data-rule="required" hidden/>
+            <label for="seguroEliminarSlider"><strong>¿Está seguro que desea eliminar la información del Slider <span class="text-danger" id="tituloSliderEliminar"></span> ?</strong></label>
+            <div class="modal-footer d-flex justify-content-center">
+              <div>
+                <button id="cerrarModalEliminarSlider" type="button" class="btn btn-secondary mx-1" data-dismiss="modal">
+                  Cerrar
+                </button>
+                <button type="submit" value="submit" class="btn btn-danger">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+<div id="modalAgregarSlider" class="modal fade pt-5" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalAgregarSlider">Agregar Slider</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioAgregarSlider" action="\agregarSlider/" method="POST" enctype="multipart/form-data" class="php-email-form"  role="form">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col form-group">
+              <label for="tituloSlider" class="text-secondary"><strong>Titulo del slider</strong></label>
+              <input type="text" class="form-control" id="tituloSlider" name="tituloSlider" data-rule="required" required/>
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col form-group">
+              <label for="urlSlider" class="text-secondary"><strong>Enlace del slider</strong></label>
+              <input type="text" class="form-control" id="urlSlider" name="urlSlider" placeholder="https://google.es/"/>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col form-group">
+              <label for="descripcionSlider" class="text-secondary"><strong>Descripción del slider</strong></label>
+              <textarea name="descripcionSlider" class="form-control" id="descripcionSlider" rows="3" style="white-space: pre-line; border-color: #1d8896;" maxlength="550" ></textarea>
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col form-group">
+              <div>
+                <label for="paginasSliderEditar" class="text-secondary"><strong>Páginas</strong></label>
+              </div>
+              <div class="checkboxDiv form-check-inline">
+                <div class="mx-2 ">
+                  <input class="form-check-input" type="checkbox" id="paginaSeleccionadaLaboratorio" name="checkboxAgregarSlider"  value="laboratorios" onchange="comprobarSeleccionado(this)">
+                  <label class="form-check-label" for="paginaSeleccionadaLaboratorio">Laboratorios</label>
+                </div>
+                <div class="mx-2">
+                  <input class="form-check-input" type="checkbox" id="paginaSeleccionadaRedes" name="checkboxAgregarSlider"  value="redes" onchange="comprobarSeleccionado(this)">
+                  <label class="form-check-label" for="paginaSeleccionadaRedes">Redes</label>
+                </div>
+                <div class="mx-2">
+                  <input class="form-check-input" type="checkbox" id="paginaSeleccionadaHome" name="checkboxAgregarSlider" value="home" onchange="comprobarSeleccionado(this)">
+                  <label class="form-check-label" for="paginaSeleccionadaHome">Home</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row my-3">
+            <div class="col form-group">
+              <div>
+                <label for="paginasSliderEditar" class="text-info"><strong>¿Es slider principal?</strong></label>
+              </div>
+              <div class="checkboxDiv form-check-inline">
+                <div class="mx-2">
+                  <input class="form-check-input" type="checkbox" id="paginaPrincipalSi" name="checkboxPrincipal" value="1" onchange="desSeleccionarOtro(this)">
+                  <label class="form-check-label text-secondary" for="paginaPrincipalSi"><strong>Si</strong></label>
+                </div>
+                <div class="mx-2">
+                  <input class="form-check-input" type="checkbox" id="paginaPrincipalNo" name="checkboxPrincipal" value="0" onchange="desSeleccionarOtro(this)">
+                  <label class="form-check-label text-secondary" for="paginaPrincipalNo"><strong>No</strong></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        <div class="row my-2">
+          <div class="col-sm-12 d-flex justify-content-center">
+            <div class="form-group">
+              <label for="imagenSliderAgregar">
+                <i class="fa-duotone fa-image fa-6x addImagen" id="iconoImagen"></i>
+              </label>
+              <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                id="imagenSliderAgregar" name="imagenSliderAgregar"
+                onchange="mostrarNombreImagenSlider(this.value)"/>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="text-center"><strong id="mostrarNombreImagenSlider"><br></strong>
+              <spam id="imagen-name"></spam>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer d-flex justify-content-center">
+          <button type="submit" value="submit" class="btn btn-info">
+            Guardar
+          </button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+<script>
+
+function agregarInfoSlider(id, nombre) {
+    document.getElementById('idSlider').value = id;
+    document.getElementById('tituloSliderEliminar').innerHTML = nombre;
+    document.getElementById('inputNombreSliderEliminar').value = nombre;
+    // mostrar modal modalEliminarServicio
+    $('#modalEliminarSlider').modal('show');
+  }
+
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagenSlider(value) {
+    
+    var iconoImagen = document.getElementById('iconoImagen');
+    var imagenName = document.getElementById('imagen-name');
+    var mostrarNombreImagen = document.getElementById('mostrarNombreImagenSlider');
+
+
+    imagenName.innerHTML = value;
+    mostrarNombreImagen.style.display = 'none';
+
+    iconoImagen.classList.remove("fa-image", "fa-6x", "addImagen");
+    iconoImagen.classList.add("fa-circle-check", "fa-6x", "imagenCargada");
+  }
+
+
+  function comprobarSeleccionado(checkbox) {
+  var checkboxes = document.getElementsByName("checkboxAgregarSlider");
+  checkboxes.forEach(function(cb) {
+    if (cb !== checkbox) {
+      cb.checked = false;
+    }
+  });
+  }
+
+  function desSeleccionarOtro(checkbox) {
+  var checkboxes = document.getElementsByName("checkboxPrincipal");
+  checkboxes.forEach(function(cb) {
+    if (cb !== checkbox) {
+      cb.checked = false;
+    }
+  });
+  }
+
+
+</script>
+  
+{% endblock %}
+

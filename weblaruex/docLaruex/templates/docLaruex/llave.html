@@ -1,0 +1,340 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  
+  /* ===============================
+  *  Estilo del las pestañas
+  =================================*/
+  
+  .nav-tabs-bordered .nav-link {
+    margin-bottom: -2px;
+    border: none;
+    color: #2c384e;
+}
+  .nav-tabs-bordered .nav-link.active {
+    background-color: #fff;
+    color: #4154f1;
+    border-bottom: 2px solid #4154f1;
+}
+.nav-tabs {
+    --bs-nav-tabs-border-color: #dee2e6;
+    --bs-nav-tabs-border-radius: 0.375rem;
+    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
+    --bs-nav-tabs-link-active-color: #495057;
+    --bs-nav-tabs-link-active-bg: #fff;
+    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+}
+
+:root {
+  --color: {{ llave.color }};
+}
+.llaveColor{
+  color: var(--color);;
+}
+</style>
+
+
+
+<!-- breadcrumb   -->
+<div class="card-body" >
+  <h5 class="card-title">Llave {{ llave.nombre }}</h5>
+  <nav >
+    <ol class="breadcrumb"style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/llaves">Listado de llaves</a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">{{ llave.nombre }}</li>
+    </ol>
+  </nav>
+</div>
+
+
+
+
+
+<!-- =================== Información de Proveedor =================== -->
+
+<section class="section profile">
+  <div class="row">
+    <div class="col-xl-4">
+
+      <div class="card">
+        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+          <img src="{% get_media_prefix %}/archivos/Llave/{{llave.imagen}}" class="img-fluid" alt="Responsive image" style=" max-width: 400px; ">
+
+          <h2 class="text-center">{{ llave.nombre }}</h2>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-xl-8">
+
+      <div class="card">
+        <div class="card-body pt-3">
+          <!-- Bordered Tabs -->
+          <ul class="nav nav-tabs nav-tabs-bordered">
+
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Información</button>
+            </li> 
+              
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-ubicaciones">Historial de localizaciones</button>
+            </li>           
+
+            {% if administrador %}
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-eliminar">Eliminar</button>
+            </li>
+            {% endif %}
+
+          </ul>
+          <div class="tab-content pt-2">
+
+            <div class="tab-pane fade show active profile-overview" id="profile-overview">
+              <h5 class="card-title">Información</h5>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Código</div>
+                <div class="col-lg-9 col-md-8"><strong>{{llave.id}}</strong></div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Color</div>
+
+                <div class="col-lg-9 col-md-8">  
+                  <i class="fa-solid fa-rectangle-wide fa-3x llaveColor"></i>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">¿Qué abre?</div>
+                <div class="col-lg-9 col-md-8"><a href="\private/docLaruex/verObjeto/{{llave.ubicacion__id}}" style="color:#005f73">[{{llave.ubicacion__id__padre__nombre}}] {{llave.ubicacion__id__nombre}}</a></div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">Responsable</div>
+                <div class="col-lg-9 col-md-8">{{llave.responsable__first_name}} {{llave.responsable__last_name}}</div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label">Habilitacion</div>
+                <div class="col-lg-9 col-md-8">{{llave.id_habilitacion__titulo}}</div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3 col-md-4 label ">¿Dónde puedo encontrarla?</div>
+                <div class="col-lg-9 col-md-8">
+                  {% with ubicacionesLlave|first as ultimaUbicacion %}
+                  <a href="\private/docLaruex/verObjeto/{{ultimaUbicacion.id_ubicacion__id}}" style="color:#005f73">
+                      {% if ultimaUbicacion.id_ubicacion__id__padre %}
+                        [{{ ultimaUbicacion.id_ubicacion__id__padre__nombre }}] {{ ultimaUbicacion.id_ubicacion__id__nombre }}
+                      {% else %}
+                        {{ ultimaUbicacion.id_ubicacion__id__nombre }}
+                      {% endif %}
+                  </a>
+                  {% endwith %}
+                </div>
+              </div>
+
+            </div>
+
+
+            <div class="tab-pane fade profile-ubicaciones pt-3 dashboard" id="profile-ubicaciones">
+              <h5 class="card-title text-center">Histórico de Ubicaciones</h5>
+              <div class="card-body d-flex justify-content-center">
+            
+
+                <div class="activity">
+    
+                  {% for historico in ubicacionesLlave %}
+                  {% if historico in ubicacionActual %}
+                  <div class="activity-item d-flex">
+                    <div class="activite-label">{{ historico.fecha|date:"M d, Y" }}</div>
+                    <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>    
+                    <div class="activity-content"><a href="\private/docLaruex/verObjeto/{{ historico.id_ubicacion__id }}" style="color:#005f73">{{ historico.id_ubicacion__id__nombre }}</a></div>
+                  </div>
+                  {% else %}
+                  <div class="activity-item d-flex">
+                    <div class="activite-label">{{ historico.fecha|date:"M d, Y" }}</div>
+                    <i class='bi bi-circle-fill activity-badge text-muted align-self-start'></i>
+                    <div class="activity-content">{{ historico.id_ubicacion__id__nombre }}
+                    </div>
+                  </div>
+    
+                  {% endif %}
+    
+                  {% endfor %}
+    
+                </div>
+    
+              </div>
+
+            </div>
+
+            <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+              <!-- Edit Form -->
+              <form id="formularioEditarProveedor"  action="/private/docLaruex/editarLlave/{{llave.id}}/" method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label for="nuevoNombre" class="col-md-4 col-lg-3 col-form-label">Nombre</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevoNombre" type="text" class="form-control" id="nuevoNombre" value="{{llave.nombre}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoResponsable" class="col-md-4 col-lg-3 col-form-label">Responsable</label>
+                  <div class="col-md-8 col-lg-9"><select class="form-control" id="nuevoResponsable" name="nuevoResponsable">
+                    <option value="{{llave.responsable__id}}" selected hidden>{{llave.responsable__first_name}}
+                      {{llave.responsable__last_name}}</option>
+                    {% for responsable in responsables %}
+                    <option value="{{responsable.id}}">
+                      {{responsable.first_name}} {{responsable.last_name}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoColor" class="col-md-4 col-lg-3 col-form-label">Color</label>
+                  <div class="col-md-2 col-lg-2">
+                    <input name="nuevoColor" type="color" class="form-control form-control-color" id="nuevoColor" value="{{llave.color}}" >
+                    
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="nuevaFecha" class="col-md-4 col-lg-3 col-form-label">Fecha</label>
+                  <div class="col-md-3 col-lg-3">
+                    <input name="nuevaFecha" type="datetime-local" class="form-control" id="nuevaFecha" value="{{ llave.fecha|date:'Y-m-d\TH:i' }}" >
+                    
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaHabilitacion" class="col-md-4 col-lg-3 col-form-label">Habilitación</label>
+                  <div class="col-md-8 col-lg-9"><select class="form-control" id="nuevaHabilitacion" name="nuevaHabilitacion">
+                    <option value="{{llave.id_habilitacion__id}}" selected hidden>{{llave.id_habilitacion__titulo}}</option>
+                    {% for habilitacion in habilitaciones %}
+                    <option value="{{habilitacion.id}}">
+                      {{habilitacion.titulo}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <label for="nuevaUbicacion" class="col-md-4 col-lg-3 col-form-label">¿Qué abre?</label>
+                  <div class="col-md-8 col-lg-9"><select class="form-control" id="nuevaUbicacion" name="nuevaUbicacion">
+                    <option value="{{llave.id_ubicacion__id}}" selected hidden>
+                      {% if llave.ubicacion__id__padre %}
+                      [{{ llave.ubicacion__id__padre__nombre }}] {{ llave.ubicacion__id__nombre }}
+                      {% else %}
+                      {{ llave.ubicacion__id__nombre }}
+                      {% endif %}
+                        
+                    </option>
+                    {% for ubicacion in ubicaciones %}
+                    <option value="{{ubicacion.id}}">
+                      {% if ubicacion.id__padre %}
+                      [{{ ubicacion.id__padre__nombre }}] {{ubicacion.id__nombre}}
+                      {% else %}
+                      {{ubicacion.id__nombre}}
+                      {% endif %}
+                    </option>
+                    {% endfor %}
+                  </select>
+                  </div>
+                </div> 
+
+                <div class="row mb-3">
+                  <label for="nuevaLocalizacion" class="col-md-4 col-lg-3 col-form-label">Nueva localización</label>
+                  <div class="col-md-8 col-lg-9"><select class="form-control" id="nuevaLocalizacion" name="nuevaLocalizacion">
+                    {% with ubicacionesLlave|first as ultimaUbicacion %}
+                    <option value="{{ultimaUbicacion.id_ubicacion__id}}" selected hidden>
+                      {% if ultimaUbicacion.id_ubicacion__id__padre %}
+                        [{{ ultimaUbicacion.id_ubicacion__id__padre__nombre }}] {{ ultimaUbicacion.id_ubicacion__id__nombre }}
+                      {% else %}
+                        {{ ultimaUbicacion.id_ubicacion__id__nombre }}
+                      {% endif %}
+                    </option>
+                    {% endwith %}
+                    {% for ubicacion in ubicaciones %}
+                    <option value="{{ubicacion.id}}">
+                      {% if ubicacion.id__padre %}
+                      [{{ ubicacion.id__padre__nombre }}] {{ubicacion.id__nombre}}
+                      {% else %}
+                      {{ubicacion.id__nombre}}
+                      {% endif %}
+                    </option>
+                    {% endfor %}
+                  </select>
+                  </div>
+                </div>
+
+
+
+
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary" onclick="crearAviso('llaveEditar', 'LLave modificada con éxito', 'alert-success', 2000);">Guardar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+
+            <!-- Eliminar Proveedor -->
+            <div class="tab-pane fade profile-eliminar pt-3" id="profile-eliminar">
+
+              <!-- Edit Form -->
+              <form form id="fomularioEliminarLlave" action="/private/docLaruex/eliminarLlave/{{ llave.id }}/"
+              method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label class="text-center">¿Estás seguro de eliminar la llave {{llave.nombre}}?</label>
+                </div>
+                <div class="text-center">
+                  <button id="eliminarLlave" type="submit" class="btn btn-danger" onclick="crearAviso('guardarEliminarLlave', 'Llave {{ llave.nombre }} eliminada con éxito', 'alert-success', 3000)">Eliminar</button>
+
+                  <button  id="cancelarEliminar" type="reset" class="btn btn-secondary" onclick="crearAviso('cerrarEliminarLlave', 'No se ha podido eliminar la llave {{ llave.nombre }}', 'alert-warning', 3000); location.reload()">Cancelar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+            </div>
+
+
+
+
+
+          </div><!-- End Bordered Tabs -->
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+<script type="text/javascript">
+
+
+
+
+  </script>
+{% endblock %}

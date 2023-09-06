@@ -1,0 +1,381 @@
+{% extends "base/base_docLaruex.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<head>
+  <style>
+    
+  /*--------------------------------------------------------------
+    # Sections General
+    --------------------------------------------------------------*/
+    section {
+      padding: 60px 0;
+      overflow: hidden;
+      }
+  
+      .section-bg {
+      background-color: #f3f5fa;
+      }
+  
+      .section-title {
+      text-align: center;
+      padding-bottom: 30px;
+      }
+      .section-title h2 {
+      font-size: 32px;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      position: relative;
+      color: #37517e;
+      }
+      .section-title h2::before {
+      content: "";
+      position: absolute;
+      display: block;
+      width: 120px;
+      height: 1px;
+      background: #ddd;
+      bottom: 1px;
+      left: calc(50% - 60px);
+      }
+      .section-title h2::after {
+      content: "";
+      position: absolute;
+      display: block;
+      width: 40px;
+      height: 3px;
+      background: #47b2e4;
+      bottom: 0;
+      left: calc(50% - 20px);
+      }
+      .section-title p {
+      margin-bottom: 0;
+      }
+
+    /*--------------------------------------------------------------
+    # Card Cursos
+    --------------------------------------------------------------*/
+    .card {
+    width: 190px;
+    height: 254px;
+    border-radius: 20px;
+    background: #f5f5f5;
+    position: relative;
+    padding: 1.8rem;
+    border: 2px solid #c3c6ce;
+    transition: 0.5s ease-out;
+    overflow: visible;
+    }
+
+    .card-details {
+    color: rgba(31, 92, 154, 0.796);
+    height: 100%;
+    gap: .5em;
+    display: grid;
+    place-content: center;
+    }
+
+    .card-button {
+    transform: translate(-50%, 125%);
+    width: 60%;
+    border-radius: 1rem;
+    border: none;
+    background-color: #005f73;
+    color: #fff;
+    font-size: 1rem;
+    padding: .5rem 1rem;
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    opacity: 0;
+    transition: 0.3s ease-out;
+    }
+
+    .text-body {
+    color: rgb(21, 83, 104) !important;
+    }
+
+    /*Text*/
+    .text-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    }
+
+    /*Hover*/
+    .card:hover {
+    border-color: #008ca8;
+    box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.25);
+    }
+
+    .card:hover .card-button {
+    transform: translate(-50%, 50%);
+    opacity: 1;
+    }
+
+  </style>
+</head>
+
+
+<!-- ======= Documentación ======= -->
+<section id="services" class="services section-bg">
+  <div class="row section-title">
+    <h2>Documentación</h2>
+  </div>
+
+  <!-- Acceso a Archivos -->
+  <div class="row mx-auto">
+    <div class="card mx-auto">
+      <div class="card-details mx-auto">
+        <h4 class="text-title "><i class="bi bi-folder-fill me-2"></i><br>Archivos</h4>
+        <p class="text-body text-center">Acceso al listado de archivos completo</p>
+      </div>
+      <button class="card-button" onclick="window.location.href='\\private/docLaruex/objetos'">Acceder</button>
+    </div>
+
+    <!-- Acceso a Procedimiento -->
+    <div class="card mx-auto">
+      <div class="card-details">
+        <h6 class="text-title"><i class="fa-solid fa-book-open-cover"></i>Procedimientos</h6>
+        <p class="text-body text-center">Acceso al listado de Procedimientos</p>
+      </div>
+      <button class="card-button" onclick="window.location.href='\\private/docLaruex/tipoObjeto/Procedimiento'">Acceder</button>
+    </div>
+
+    <!-- Acceso a Currriculum -->
+    <div class="card mx-auto">
+      <div class="card-details">
+        
+        <h6 class="text-title"><i class="fa-solid fa-user"></i>Curriculums</h6>
+        <p class="text-body text-center">Acceso al listado de Curriculums</p>
+      </div>
+      <button class="card-button" onclick="window.location.href='\\private/docLaruex/tipoObjeto/Curriculum'">Acceder</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ======= Administración ======= -->
+<section id="services" class="services section-bg">
+  <div class="row section-title">
+    <h2>Administración</h2>
+  </div>
+
+  <!-- Acceso a Calendario en la Nube -->
+  <div class="row mx-auto">
+    <div class="card mx-auto">
+      <img src="{% static 'niceAdminAssets' %}/img/administracion/calendario.jpg" alt="Profile"
+              class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details mx-auto">
+        <p class="text-body text-center"><br>Calendario del Laruex</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://158.49.111.38/owncloud/index.php/apps/calendar/', '_blank');">Acceder</button>
+    </div>
+
+    <!-- Acceso a conexiones VNC -->
+    <div class="card mx-auto">
+        
+      <img src="{% static 'niceAdminAssets' %}/img/administracion/vnc.jpg" alt="Profile"
+      class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details">
+        <p class="text-body text-center"><br>Conexiones habilitadas para VNC</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://alerta2.es/private/laruex/consultarConexionesRemotas/', '_blank');">Acceder</button>
+    </div>
+
+    <!-- Item 3 -->
+    <div class="card mx-auto">      
+      <img src="{% static 'niceAdminAssets' %}/img/administracion/owncloud.png" alt="Profile"
+      class="card-img-top rounded" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details">
+        <p class="text-body text-center">Nube con documentación de Laruex</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://158.49.111.38/owncloud/', '_blank');">Acceder</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======= RAREx ======= -->
+<section id="services" class="services section-bg">
+  <div class="row section-title">
+    <h2>RAREx</h2>
+  </div>
+
+  <!-- Acceso a RAREx -->
+  <div class="row mx-auto">
+    <div class="card mx-auto">
+      <img src="{% static 'niceAdminAssets' %}/img/rarex/rarex.png" alt="Profile"
+              class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details mx-auto">
+        <h6 class="text-title my-2">RAREx</h6>
+        <p class="text-body text-center">Web de valores actuales de la RAREx</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://alerta2.sytes.net/private/rare/', '_blank');">Acceder</button>
+    </div>
+
+  
+    <!-- Acceso a Rutina Diaria -->
+    <div class="card mx-auto">
+      <img src="{% static 'niceAdminAssets' %}/img/rarex/rutina_diaria.png" alt="Profile"
+              class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details mx-auto">
+        <h6 class="text-title my-2">Rutina Diaria</h6>
+        <p class="text-body text-center">Rutina diaria de RAREx</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://alerta2.sytes.net/private/rare/guardiaRare/', '_blank');">Acceder</button>
+    </div>
+
+    <!-- Acceso a Monitoriza -->
+    <div class="card mx-auto">
+      <img src="{% static 'niceAdminAssets' %}/img/rarex/monitoriza.png" alt="Profile"
+              class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details mx-auto">
+        <h6 class="text-title my-2">Monitoriza</h6>
+        <p class="text-body text-center">Visualizador del estado del monitoriza</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://alerta2.es/private/rare/monitoriza/', '_blank');">Acceder</button>
+    </div>
+
+    <!-- Acceso a Guardias -->
+    <div class="card mx-auto">
+      <img src="{% static 'niceAdminAssets' %}/img/rarex/guardias.png" alt="Profile"
+              class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details mx-auto">
+        <h6 class="text-title my-2">Guardias</h6>
+        <p class="text-body text-center">Visualizador del estado del monitoriza</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://alerta2.es/private/calendario/guardias/acceso/?next=/private/calendario/guardias/visor/', '_blank');">Acceder</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======= Otras Redes ======= -->
+<section id="services" class="services section-bg">
+  <div class="row section-title">
+    <h2>Otras Redes</h2>
+  </div>
+
+  <!-- VRaex -->
+  <div class="row mx-auto">
+    <div class="card mx-auto">
+      <img src="{% static 'niceAdminAssets' %}/img/otros_servicios/vraex.png" alt="Profile"
+              class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details mx-auto">
+        <h6 class="text-title my-2">VRAEx</h6>
+        <p class="text-body text-center">Red de vigilancia radiológica</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://alerta2.sytes.net/private/vraex/', '_blank');">Acceder</button>
+    </div>
+
+  
+    <!-- Acceso a SPIDA -->
+    <div class="card mx-auto">
+      <img src="{% static 'niceAdminAssets' %}/img/otros_servicios/spida.png" alt="Profile"
+              class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details mx-auto">
+        <h6 class="text-title my-2">SPIDA</h6>
+        <p class="text-body text-center">Red de control de inundaciones</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://alerta2.sytes.net/spida/inicio/', '_blank');">Acceder</button>
+    </div>
+</section>
+
+
+<!-- ======= Laboratorios ======= -->
+<section id="services" class="services section-bg">
+  <div class="row section-title">
+    <h2>Laboratorios</h2>
+  </div>
+
+  <!-- Gestión de Muestras -->
+  <div class="row mx-auto">
+    <div class="card mx-auto">
+      <div class="card-details mx-auto">
+        <h6 class="text-title"><i class="fa-solid fa-flask"></i><br>Gestión de Muestras</h6>
+        <p class="text-body text-center">Muestras recepcionadas</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://alerta2.es/accounts/login/?next=/private/gestionmuestras/listadoMuestras/', '_blank');">Acceder</button>
+    </div>
+
+  
+    <!-- Acceso a Ticketing Laboratorios -->
+    <div class="card mx-auto">
+      <div class="card-details mx-auto">
+        <h6 class="text-title">
+          <i class="fa-sharp fa-solid fa-clipboard-list-check"></i><br>Ticketing Laruex</h6>
+        <p class="text-body text-center">Incidencias relacionadas con laboratorios</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://158.49.111.94/login.php', '_blank');">Acceder</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ======= Alerta2 ======= -->
+<section id="services" class="services section-bg">
+  <div class="row section-title">
+    <h2>Alerta2</h2>
+  </div>  
+  
+  <div class="row mx-auto">
+    <!-- Acceso a Ticketing Alerta2 -->
+    <div class="card mx-auto">
+      <div class="card-details mx-auto">
+        <h6 class="text-title">
+          <i class="fa-sharp fa-solid fa-clipboard-list-check"></i><br>Ticketing Alerta2</h6>
+        <p class="text-body text-center">Incidencias relacionadas con Alerta2</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('http://158.49.111.220/login.php', '_blank');">Acceder</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ======= Servicios Externos ======= -->
+<section id="services" class="services section-bg">
+  <div class="row section-title">
+    <h2>Servicios Externos</h2>
+  </div>
+
+  
+  <div class="row mx-auto">
+    <!-- Servicios UEx -->
+    <div class="card mx-auto">
+      <img src="{% static 'niceAdminAssets' %}/img/unex/servicios.png" alt="Profile"
+              class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details mx-auto">
+        <h6 class="text-title my-2">Servicios UEx</h6>
+        <p class="text-body text-center">Web de servicios de la Uex</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('https://sso.unex.es/oam/server/obrareq.cgi?encquery%3D6lSXBalClEcnPK%2F2ut3HpR84Qxj%2FpCHGhp9l7yldajAxI2xZBkt8nd%2FEJ12Z3F%2FJm1b%2FfL7Q6%2F%2BOY%2BWiToBo4d9X1K%2FLL%2Fohpr4RbDlTVpJLlFzHw7jObyIVpMqhR7rnDBPsiaQy9FL06MSYHXOUOCz2Mf%2B7g2YUlFyGc4N65sT%2Fff0i85nbnMuMB5eB0hp4MuQG6ZoCzfhw5WhJU8qlzu2fnlDgZ1gVczYew3LA0GAKLMxnWYSl2vWqT1277y6qsC7NmBPu7vVAsPeP0tDEWhdON14LyMsnojjFBxZanHWCt1FHjxBzEEKDgQ21DwLn%20agentid%3Dsso.unex.es%20ver%3D1%20crmethod%3D2&ECID-Context=1.005pzS_NrBL7Y7H0qv7EFm000M3W0000t6%3BkXjE', '_blank');">Acceder</button>
+    </div>
+
+    <!-- Ticket CAU -->
+    <div class="card mx-auto">
+      <img src="{% static 'niceAdminAssets' %}/img/unex/cau.png" alt="Profile"
+              class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details mx-auto">
+        <h6 class="text-title my-2">CAU</h6>
+        <p class="text-body text-center">Registro de Incidencias Uex</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('https://cau.unex.es', '_blank');">Acceder</button>
+    </div>
+
+     <!-- Arquimides UEx -->
+    <div class="card mx-auto">
+      <img src="{% static 'niceAdminAssets' %}/img/unex/arquimides.png" alt="Profile"
+              class="card-img-top rounded mx-auto" style="max-width: 10em; max-height: 5em;">
+      <div class="card-details mx-auto">
+        <h6 class="text-title my-2">Arquímides</h6>
+        <p class="text-body text-center">Web de descarga de software de la UEx</p>
+      </div>
+      <button class="card-button" onclick="javascript:window.open('https://uex30.unex.es/cas5iduex/login?service=https%3a%2f%2farquimedes.unex.es%2f', '_blank');">Acceder</button>
+    </div>
+  </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends "base/base_spd.html" %}
+
+{% load static %}
+
+{% block imports %}
+
+
+<!-- Custom css home -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/clouds_spd.css' %}">
+
+<!-- Estilo propio css -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/sucesos_spd.css' %}">
+
+<!-- Estilo de la barra buscador -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/buscador_spd.css' %}">
+<style>
+    .block-sucesos,
+    /*#content {
+        background-color: #fff;
+        background: #fff;
+    }*/
+
+    .container {
+        padding-top: 40px;
+        padding-bottom: 40px;
+    }
+
+    .section-dark {
+        background-color: #1B1C1C;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Seccion ¿QUE ES SPIDA?-->
+<!--https://codepen.io/bhautikbharadava/pen/VwLxyLa-->
+<section class="section-dark">
+
+    <div class='container-clouds' style="position: fixed;">
+        <div class='clouds-1'></div>
+        <div class='clouds-2'></div>
+        <div class='clouds-3'></div>
+    </div>
+
+
+    <div class="container">
+        <h2 class="cursive-brush" style="font-size: 9vh;">Sucesos de Inundación</h2>
+
+        <!--Linea divisoria-->
+        <hr class="linea-hr" />
+
+
+
+        <div class="container">
+            <div class="row justify-content-center" style="padding-left: 20px; padding-right: 20px;">
+                <div class="search-box">
+                    <input type="search" placeholder="Buscar..." name="search" class="searchbox-input"
+                        onkeyup="buttonUp();" required style="color: white;">
+                    <button class="btn" onclick="infoSearch()"><i class="fas fa-info-circle"
+                            style="font-size: 30px; color: #49A1A4;"></i></button>
+                </div>
+            </div>
+            <div class="card-columns" style="padding-top:30px;padding-bottom:30px;">
+                {% for suceso in Sucesos %}
+                <div class="card" style="border: none !important;">
+                    <img class="card-img-top" src="data:image/jpg;base64,{{suceso.imagen}}" alt="">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ suceso.titulo }}</h5>
+                        <p class="card-text">
+                            {{ suceso.descripcion }}
+                        </p>
+                        <!--<a href="#" class="btn btn-primary"
+                            style="margin-bottom: 20px; color: #fff; background-color: #1B1C1C; border: transparent;"
+                            onclick="MoreInfo()">Leer más</a>-->
+                        <p class="card-text" style="text-align:right"><small class="text-muted">
+                                <!--<i
+                                    class="fas fa-calendar-alt"></i>--> {{ suceso.fecha }}
+                            </small></p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section><!-- End Section ¿QUE ES SPIDA? -->
+
+
+
+<!--<section class="cabecera">
+    <div class="container">
+        <h2 class="cursive-brush" style="font-size: 9vh;">Sucesos de Inundación</h2>
+        <hr class="linea-hr" />
+    </div>
+</section>
+
+
+<section class="block-sucesos">
+    <div class="container">
+        <div class="row justify-content-center" style="padding-left: 20px; padding-right: 20px;">
+            <div class="search-box">
+                <input type="search" placeholder="Buscar..." name="search" class="searchbox-input" onkeyup="buttonUp();"
+                    required>
+                <button class="btn" onclick="infoSearch()"><i class="fas fa-info-circle"
+                        style="font-size: 30px; color: #49A1A4;"></i></button>
+            </div>
+        </div>
+        <div class="card-columns" style="padding-top:30px;padding-bottom:30px;">
+            {% for suceso in Sucesos %}
+            <div class="card">
+                <img class="card-img-top" src="data:image/jpg;base64,{{suceso.imagen}}" alt="">
+                <div class="card-body">
+                    <h5 class="card-title">{{ suceso.titulo }}</h5>
+                    <p class="card-text">
+                        {{ suceso.descripcion }}
+                    </p>
+                    <a href="#" class="btn btn-primary"
+                        style="margin-bottom: 20px; color: #fff; background-color: #1B1C1C; border: transparent;"
+                        onclick="MoreInfo()">Leer más</a>
+                    <p class="card-text" style="text-align:right"><small class="text-muted"><i
+                                class="fas fa-calendar-alt"></i> {{ suceso.fecha }}</small></p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>-->
+
+<!-- Seccion Copyright SPIDA-->
+
+<div class="footer" style="padding:10px; color:white; position:fixed; bottom:0px;background: #1B1C1C; width:100%;">
+    <p style="line-height : 25px; font-size: 16px; margin: 0px;">
+        © Copyright 2021
+        <span class="text-alerta2" style="font-size: 22px;">alerta<span style="font-size: 25px;">2</span></span>
+        . Todos los derechos reservados.
+    </p>
+</div>
+
+<script>
+    function MoreInfo() {
+        Swal.fire({
+            text: "Servicio no disponible en estos momentos",
+            icon: 'info'
+        });
+    }
+
+    function infoSearch() {
+        Swal.fire({
+            title: "Buscador de Sucesos de Inundación",
+            html: "En esta sección podreis consultar los eventos de inundación registrados y monitorizados por el Sistema de Alerta Temprana <span class='text-spida'>SPIDA</span> en el Centro de Operaciones <span class='text-alerta2' style='font-size: 22px;'>alerta<span style='font-size: 25px;'>2</span></span>.",
+            timer: 20000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+        });
+    }
+
+    var buttonUp = () => {
+        const input = document.querySelector(".searchbox-input");
+        const cards = document.getElementsByClassName("card");
+        let filter = (input.value).normalize('NFD').replace(/[\u0300-\u036f]/g, "").toUpperCase();
+        for (let i = 0; i < cards.length; i++) {
+            let title = cards[i].querySelector(".card-body");
+            if (title.innerText.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toUpperCase().indexOf(filter) > -1) {
+                cards[i].classList.remove("d-none")
+            } else {
+                cards[i].classList.add("d-none")
+            }
+        }
+    }
+    $('input[type=search]').on('search', function () {
+        const cards = document.getElementsByClassName("card");
+        for (let i = 0; i < cards.length; i++) {
+            cards[i].classList.remove("d-none");
+        }
+    });
+</script>
+
+
+
+{% endblock %}

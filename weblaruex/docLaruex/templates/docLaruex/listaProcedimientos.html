@@ -1,0 +1,464 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    ul.pagination li .page-link {
+        background-color: rgb(255, 255, 255) !important;
+        color: rgb(41, 68, 87);
+
+    }
+
+    ul.pagination li.active .page-link {
+        background-color: rgb(41, 68, 87) !important;
+        border-color: rgb(41, 68, 87) !important;
+    }
+
+    ul.pagination li .page-link:hover {
+        filter: brightness(85%);
+
+    }
+
+    ul.pagination li.active .page-link:hover {
+        filter: brightness(120%);
+
+    }
+
+    .btn-light {
+        color: rgb(41, 68, 87);
+    }
+
+    th {
+        color: rgb(41, 68, 87);
+    }
+
+    .addFicheroEditable {
+        color: rgb(9, 58, 65);
+    }
+
+    .addFicheroEditable:hover {
+        color: rgb(133, 198, 228);
+    }
+
+    /* estilo añadirFichero PDF*/
+    .addFicheroPDF {
+        color: rgb(161, 16, 32);
+    }
+
+    .addFicheroPDF:hover {
+        color: rgb(99, 10, 20);
+    }
+
+    .file-upload {
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+    }
+
+    .add:hover {
+        color: #ce8312;
+    }
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+    <h5 class="card-title">Procedimientos</h5>
+    <nav>
+        <ol class="breadcrumb" style="background-color:#fff !important">
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                        class="bi bi-house-door"></i></a></li>
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/objetos">Listado de
+                    Archivos</a>
+            <li class="breadcrumb-item active" style="font-size: large;">Procedimientos</li>
+        </ol>
+    </nav>
+</div>
+
+<div id="toolbar">
+    <a href="" class="mx-1" title="upload" data-toggle="modal" data-target="#modalFormulario" style="color: #eba43d"><i
+            class="fa-solid fa-square-plus fa-2x add"></i></a>
+</div>
+<table id="tabla_procedimientos" data-toggle="table" data-search="true" data-show-columns="true"
+    data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+    data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+    data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+</table>
+
+
+<!-- formulario añadir archivo  -->
+<div id="modalFormulario" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="TituloModal">Añadir Procedimiento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formularioModal" action="/private/docLaruex/agregarArchivo/" method="POST"
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="tipoObjeto">Tipo de Archivo</label>
+                                <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto"
+                                    data-rule="required" readonly value="Procedimiento" />
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="habilitacion">Habilitación</label>
+                                <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                                    {% for habilitacion in habilitaciones %}
+                                    <option value="{{habilitacion.id}}">
+                                        {{habilitacion.titulo}}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="opcionFormulario">
+                        <!-- formulario de procedimiento -->
+                        <div id="formularioProcedimiento" class="divFormularios">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="fechaVerificacion">Fecha de Verificación</label>
+                                        <input type="date" id="fechaVerificacion" name="fechaVerificacion"
+                                            class="form-control" required />
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="nombreObjetoProcedimiento">Nombre del Archivo</label>
+                                        <input type="text" class="form-control" id="nombreObjetoProcedimiento"
+                                            placeholder="Ej. PR-20 "
+                                            pattern="[OD]{0,2}[MC]{0,2}[P]{0,1}[GC]{0,2}[L]{0,1}[R]{0,1}[S]{0,1}[-]{1}[0-9]{1,4}"
+                                            title="El nombre del procedimiento debe seguir la siguiente estructura: PR-01, PGC-20, PL-98, PS-129, PR-01, MC-02, ..."
+                                            name="nombreObjeto" data-rule="required" />
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="version">Version</label>
+                                        <input type="number" class="form-control" id="version" placeholder="3 "
+                                            name="version" data-rule="required" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="form-group">
+                                        <label for="tituloProcedimiento" class="col-md-auto">Titulo del
+                                            Procedimiento</label>
+                                        <input type="text" class="form-control col-md-auto" id="tituloProcedimiento"
+                                            name="tituloProcedimiento" data-rule="required" pattern="[a-zA-Z\w\s\sáéíóúÁÉÍÓÚüÜñÑ,]{1,255}"
+                                            title="No permite guiones ni otros caracteres que no sean espacios" />
+                                    </div>
+
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label for="plantilla">¿Tiene archivo editable?</label>
+                                        <select class="form-select" data-rule="required" id="plantilla" name="plantilla"
+                                            onchange="mostrarAdjuntoEditable(this.value)">
+                                            <option value="1">Si</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="responsable">Responsable</label>
+                                        <select class="form-select" data-rule="required" id="responsable"
+                                            name="responsable">
+                                            {% for responsable in responsables %}
+                                            <option value="{{responsable.id}}">
+                                                {{responsable.first_name}} {{responsable.last_name}}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label for="revisor">Revisor</label>
+                                        <select class="form-select" data-rule="required" id="revisor" name="revisor">
+                                            {% for revisor in revisores %}
+                                            <option value="{{revisor.id}}">
+                                                {{revisor.first_name}} {{revisor.last_name}}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="form-group">
+                                    <textarea class="form-control" name="modificaciones" rows="5" data-rule="required"
+                                        placeholder="Modificaciones realizadas" required></textarea>
+                                    <div class="validate"></div>
+                                </div>
+                            </div>
+                            <div class="row d-flex justify-content-center" style="text-align: center">
+                                <div class="col-md-auto">
+                                    <div class="form-group">
+                                        <label for="ficheroAdjuntoProcedimiento"><i
+                                                class="fa-solid fa-file-pdf fa-4x addFicheroPDF">
+                                            </i>
+                                        </label>
+                                        <input type="file" class="form-control-file"
+                                            style="display: none; visibility: none;" id="ficheroAdjuntoProcedimiento"
+                                            name="ficheroAdjuntoProcedimiento"
+                                            onchange="mostrarNombreArchivo(this.value)" />
+                                        <spam class="text-center"><strong id="mostrarNombreArchivo"><br></strong>
+                                            <spam id="file-name"></spam>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-auto" id="adjuntoEditable" style="display: block;">
+                                    <div class="form-group">
+                                        <label for="ficheroAdjuntoProcedimientoEditable"><i
+                                                class="fa-solid fa-file-signature fa-4x addFicheroEditable">
+                                            </i>
+                                        </label>
+
+                                        <input type="file" class="form-control-file"
+                                            style="display: none; visibility: none;"
+                                            id="ficheroAdjuntoProcedimientoEditable"
+                                            name="ficheroAdjuntoProcedimientoEditable"
+                                            onchange="mostrarNombreArchivoEditable(this.value)" />
+
+
+                                        <spam class="text-center"><strong
+                                                id="mostrarNombreArchivoEditable"><br></strong>
+                                            <spam id="file-name-editable"></spam>
+                                        </spam>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+                                Cerrar
+                            </button>
+                            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+                            </button>
+                            <button type="submit" value="submit" class="btn btn-primary">
+                                Guardar
+                            </button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+    $('#tabla_procedimientos').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/procedimientosDatos",
+        cache: false,
+        columns: [{
+            title: 'ID',
+            field: 'id_doc',
+            align: "center"
+        }, {
+            title: 'Código',
+            field: 'id_doc__nombre',
+            align: "center"
+        }, {
+            title: 'Título',
+            field: 'titulo',
+            align: "center"
+        }, {
+            title: 'Versión',
+            field: 'version',
+            align: "center"
+        }, {
+            title: 'Fecha',
+            field: 'fecha_verificacion',
+            align: 'center',
+            sortable: 'true',
+            formatter: function (value, row) {
+                var fecha = new Date(row.fecha_verificacion);
+                return $.datepicker.formatDate('dd-mm-yy', fecha);
+            }
+        }, {
+            title: 'Responsable / Revisor',
+            field: 'responsable__first_name',
+            align: "center"
+        }, {
+            title: 'Modificaciones',
+            field: 'modificaciones',
+            align: "center"
+        }, {
+            title: 'Habilitación',
+            field: 'id_doc__id_habilitacion__titulo',
+            align: "center"
+        }, {
+            title: "Estado",
+            field: "id_estado__nombre",
+            align: "center",
+            formatter: function (value, row) {          
+                var defecto ='<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+                switch(row.id_doc__id_estado__id) {  
+                    case 1: 
+                    estado = '<span class="badge badge-success" style="background-color: #21b563;">Operativo</span>';
+                    return estado;
+                    break;          
+                    case 2: 
+                    estado = '<span class="badge" style="background-color: #21b563;">En Vigor</span>';
+                    return estado;
+                    break;
+                            
+                    case 3: 
+                    estado = '<span class="badge" style="background-color: #EB8E34;">En Mantenimiento</span>';
+                    return estado;
+                    break;
+                    case 4: 
+                    estado = '<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+                    return estado;
+                    break;
+                    case 5: 
+                    estado = '<span class="badge" style="background-color: #524e4e;">Obsoleto</span>';
+                    return estado;
+                    break;
+                    case 6: 
+                    estado = '<span class="badge" style="background-color: #b52121;">No operativo</span>';
+                    return estado;
+                    break;
+                    case 7: 
+                    estado = '<span class="badge" style="background-color: #b52121;">Baja</span>';
+                    return estado;
+                    break;
+
+                    default:
+                    console.log("No se ha encontrado el estado", row.id_estado__id)
+                    return defecto;
+                    
+                }
+            },
+        },
+        {
+            title: "Acciones",
+            field: "action",
+            align: "center",
+            formatter: function (value, row) {
+                
+                var admin = '{{administrador}}';
+                var botonVerObjeto = '<a href="/private/docLaruex/verObjeto/' + row.id_doc + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+                var botonDescargarObjeto = '<a href="/private/docLaruex/consultarArchivo/' + row.id_doc + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-lg" style="color:#A11020"></i></a>';
+                var botonDescargarObjetoEditable = '<a href="/private/docLaruex/consultarArchivoEditable/' + row.id_doc + '/' + '" class="mx-1" title="Descargar" download><i class="fa-duotone fa-file-signature fa-lg" style="color:#266353"></i></a>';
+                var botonEditarProcedimiento = '<a href="/private/docLaruex/editarProcedimiento/' + row.id_doc + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#4F5775"></i></a>';
+
+                if (admin == 'True') {
+                    if (row.id_doc__ruta_editable) {
+                        return (botonVerObjeto +botonDescargarObjeto +botonDescargarObjetoEditable + botonEditarProcedimiento);
+                    }
+                    else {
+                        return (botonVerObjeto + botonDescargarObjeto + botonEditarProcedimiento);
+                    } 
+                }else{
+                    if (row.id_doc__ruta_editable) {
+                        return (botonVerObjeto +botonDescargarObjeto +botonDescargarObjetoEditable);
+                    }
+                    else {
+                        return (botonVerObjeto + botonDescargarObjeto);
+                    }
+
+                }
+            }
+        },
+        ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'fecha_verificacion',
+        sortOrder: 'desc',
+
+    });
+    // cambiamos la funcionalidad del boton submit del formulario
+    $("#formularioModal").submit(function (e) {
+        // cancelamos el funcionamiento por defecto del boton submit
+        e.preventDefault();
+        // capturamos la información del formulario 
+        var data = new FormData(this);
+        // ejecuta una url/action con la capacidad de gestionar la salida
+        $.ajax({
+            url: "/private/docLaruex/agregarArchivo/",
+            type: "POST",
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            // gestiono el return del view
+            success: function () {
+                crearAviso('objetoGuardar', 'Archivo guardado con éxito', 'alert-success', 2000)
+                $(".divFormularios").remove();
+                $("#reset").trigger("click");
+                $('#tabla_objetos').bootstrapTable('refresh');
+                $('#cerrar').trigger('click');
+                $("#modalFormulario").trigger('reset');
+                location.reload(true);
+            }
+        });
+    });
+
+    /*
+    $('#tabla_procedimientos').on('click-row.bs.table', function (e, row, $element) {
+        window.location.href = "/private/docLaruex/verObjeto/"+ row.id_doc + "/" ;
+    });
+    */
+
+
+    function mostrarAdjuntoEditable(value) {
+        if (value == "1") {
+            document.getElementById('adjuntoEditable').style.display = 'block';
+
+        } else {
+            document.getElementById('adjuntoEditable').style.display = 'none';
+        }
+    }
+    // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+    function mostrarNombreArchivoEditable(value) {
+
+        document.getElementById('file-name-editable').innerHTML = value;
+
+
+        document.getElementById('mostrarNombreArchivoEditable').style.display = 'none';
+
+    }
+    // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+    function mostrarNombreArchivo(value) {
+
+        document.getElementById('file-name').innerHTML = value;
+
+        document.getElementById('mostrarNombreArchivo').style.display = 'none';
+    }
+
+    function addZero(i) {
+        if (i < 10) { i = "0" + i }
+        return i;
+    }
+
+
+</script>
+{% endblock %}

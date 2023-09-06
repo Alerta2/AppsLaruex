@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+    <title>404</title>
+    <link href='https://fonts.googleapis.com/css?family=Cabin+Condensed:700' rel='stylesheet' type='text/css'>
+<style>
+*,*:before,*:after{
+  box-sizing:border-box;
+}
+html {
+    font-family: "Roboto", sans-serif;
+    background-color: #1B1C1C;
+    background: #1B1C1C;
+}
+  
+main {
+    display: flex;
+    height: 100%;  
+}
+
+body {
+    font-family: "Roboto", sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+    height: 100%;
+    width: 100%;
+}
+
+/**
+    SCROLLBAR STYLE FOR IE
+*/
+body {
+    scrollbar-base-color: #1B1C1C;/*#343a40;*/
+    scrollbar-3dlight-color: #fff;
+    scrollbar-highlight-color: #1B1C1C;/*#343a40;*/
+    scrollbar-track-color: #1B1C1C;/*#343a40;*/
+    scrollbar-arrow-color: #1B1C1C;/*#343a40;*/
+    scrollbar-shadow-color: #1B1C1C;/*#343a40;*/
+    scrollbar-darkshadow-color: #1B1C1C;/*#343a40;*/
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    background-color: #1B1C1C;
+}
+
+#content {
+    display         : flex;
+    position        : absolute;
+    font-family: "Roboto", sans-serif;
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.9);
+    letter-spacing: 1px;
+    margin: 0px ;
+    padding: 0px ;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-sizing: border-box;
+    left            : 0px;
+    top             : 0px;
+    bottom          : 0px;
+    right           : 0px;
+    margin          : 0px;
+  }
+
+.page-404{
+  margin: 0;
+  padding: 0;
+  background: url("{% static 'img/spd/logos/logo_alerta2_transparente.png' %}") no-repeat center;
+  background-size: 60vw;
+  position:absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.1;
+}
+.contenido{
+  position:absolute;
+}
+
+/*svg{
+  position:absolute;
+  left:50%;
+  top:50%;
+  margin:-60px 0 0 -400px;
+}*/
+
+
+/* B2 */
+
+  .button2 {
+    text-decoration: none;
+    background-color: #009CDD;
+    color: #1B1C1C;
+    padding: 10px 30px;
+    margin: 5px;
+    font-size: 15px;
+    font-family: Arial;  
+    border-radius: 25px;
+    transition: 0.5s;  
+    z-index: 100000;
+  }
+  
+  .button2:hover {
+    transition: 0.3s;
+    color: #009CDD;
+    font-weight: bold;
+    background-color: #1B1C1C;
+    padding: 12px 45px;
+    z-index: 100000;
+    box-shadow: 0px 10px 10px rgba(0, 156, 221, 0.8);
+  }
+
+
+</style>
+
+</head>
+<body>
+<!-- Contenido -->
+<div id="content">
+  <div class="page-404"></div>
+  <!-- https://codepen.io/joshkirk/pen/aNRxMK -->
+  <div class="contenido">
+    <svg viewBox="0 0 800 120" width="800" height="120">
+      <defs>
+          <pattern id="water" width=".25" height="1.1" patternContentUnits="objectBoundingBox">
+              <path fill="white" d="M0.25,1H0c0,0,0-0.659,0-0.916c0.083-0.303,0.158,0.334,0.25,0C0.25,0.327,0.25,1,0.25,1z" />
+          </pattern>
+          <text id="text" font-size="150">500</text>
+          <mask id="mask-text">
+              <use x="50%" y="95%" text-anchor="middle" xlink:href="#text" fill="white" />
+          </mask>
+      </defs>
+      <use xlink:href="#text" x="50%" y="95%" text-anchor="middle" fill="#333" />
+      <rect id="water-fall" mask="url(#mask-text)" fill="url(#water)" x="-400" y="0" width="1600" height="120" />
+  </svg>
+  <h1 style="color: white;">Error del Servidor</h1>
+  <a class="button2" href="{% url 'spd:HomeSpida' %}">Volver al Inicio</a>
+  <a class="button2" href="mailto:redalertaspida@gmail.com?Subject=Error%20de%20acceso%20en%20la%20web%20Spida">Contáctanos</a>
+  
+</div>
+</div>
+
+
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/1.17.0/TweenMax.min.js"></script>
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded",function(){
+    var fall = document.querySelector("#water-fall");
+    TweenMax.fromTo(fall,1.5,
+        {attr:{x:-400}},
+        {
+            attr:{x:0},
+            ease:Linear.easeNone,
+            repeat:-1,
+        }
+        );
+    TweenMax.fromTo(fall,10,
+        {attr:{y:130,height:0}},
+        {
+            attr:{y:-30,height:160},
+             repeat: 1,
+            yoyo:true,//alternate-reverse
+            ease:Linear.easeNone
+        }
+        )
+})
+</script>
+</body>
+</html>

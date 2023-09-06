@@ -1,0 +1,140 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Editar Contacto {{contacto.nombre}}</h5>
+    
+              <!-- Edit Form -->
+              <form id="formularioEditarContacto"  action="/private/docLaruex/editarContacto/{{contacto.id}}/" method="POST"
+              enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row mb-3">
+                  <label for="nuevoNombreContacto" class="col-md-4 col-lg-3 col-form-label">Nombre</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevoNombreContacto" type="text" class="form-control" id="nuevoNombreContacto" value="{{contacto.nombre}}">
+                  </div>
+                </div>
+
+
+
+                <div class="row mb-3">
+                  <label for="nuevoPuestoContacto" class="col-md-4 col-lg-3 col-form-label">Puesto</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevoPuestoContacto" type="text" class="form-control" id="nuevoPuestoContacto" value="{{contacto.puesto}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaEmpresaContacto" class="col-md-4 col-lg-3 col-form-label">Empresa</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevaEmpresaContacto" type="text" class="form-control" id="nuevaEmpresaContacto" value="{{contacto.empresa}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaDireccionContacto" class="col-md-4 col-lg-3 col-form-label">Dirección</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevaDireccionContacto" type="text" class="form-control" id="nuevaDireccionContacto" value="{{contacto.direccion}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoTelefono" class="col-md-4 col-lg-3 col-form-label">Teléfono</label>
+                  {% if contacto.telefono == null%}
+                    <div class="col-md-2 col-lg-2">
+                      <input name="nuevoPrefijoTelefono" type="text" class="form-control" id="nuevoPrefijoTelefono" value="" >
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                      <input name="nuevoTelefono" type="text" class="form-control" id="nuevoTelefono" value="">
+                    </div>
+                  {% else %}
+                  <div class="col-md-2 col-lg-2">
+                    <input name="nuevoPrefijoTelefono" type="text" class="form-control" id="nuevoPrefijoTelefono" value="{{contacto.telefono|slice:'0:3'}}" >
+                  </div>
+                  <div class="col-md-6 col-lg-7">
+                    <input name="nuevoTelefono" type="text" class="form-control" id="nuevoTelefono" value="{{contacto.telefono|slice:'3:18'}}">
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoTelefonoFijo" class="col-md-4 col-lg-3 col-form-label">Teléfono 2</label>
+                  {% if contacto.telefono_fijo == null%}
+                    <div class="col-md-2 col-lg-2">
+                      <input name="nuevoPrefijoTelefonoFijo" type="text" class="form-control" id="nuevoPrefijoTelefonoFijo">
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                      <input name="nuevoTelefonoFijo" type="text" class="form-control" id="nuevoTelefonoFijo">
+                    </div>
+                  {% else %}
+                    <div class="col-md-2 col-lg-2">
+                      <input name="nuevoPrefijoTelefonoFijo" type="text" class="form-control" id="nuevoPrefijoTelefonoFijo" value="{{contacto.telefono_fijo|slice:'0:3'}}" >
+                    </div>
+                    <div class="col-md-6 col-lg-7">
+                      <input name="nuevoTelefonoFijo" type="text" class="form-control" id="nuevoTelefonoFijo" value="{{contacto.telefono_fijo|slice:'3:18'}}">
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaExtension" class="col-md-4 col-lg-3 col-form-label">Extension</label>
+                  <div class="col-md-6 col-lg-7">
+                    <input name="nuevaExtension" type="text" class="form-control" id="nuevaExtension" value="{{contacto.extension}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevoEmailContacto" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                  <div class="col-md-8 col-lg-9">
+                    <input name="nuevoEmailContacto" type="nuevoEmailContacto" class="form-control" id="Email" value="{{contacto.email}}">
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <label for="nuevaInfoAdicionalContacto" class="col-md-4 col-lg-3 col-form-label">Información Adicional</label>
+                  <div class="col-md-8 col-lg-9">
+                    <textarea name="nuevaInfoAdicionalContacto" class="form-control" id="nuevaInfoAdicionalContacto" style="height: 100px">{{contacto.info_adicional}}</textarea>
+                  </div>
+                </div>
+
+
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+              </form><!-- End Profile Edit Form -->
+
+
+  </div>
+</div>
+
+<script>
+// cambiamos la funcionalidad del boton submit del formulario
+$("#formularioEditarContacto").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/editarContacto/{{contacto.id}}/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Contacto editado con éxito', 'alert-success', 2000);
+        setTimeout(function () {
+          window.location.href = "/private/docLaruex/contacto/{{contacto.id}}/";
+        }, 1000);
+      }
+    });
+  });
+
+</script>
+
+{% endblock %}

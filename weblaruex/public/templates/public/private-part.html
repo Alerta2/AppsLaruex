@@ -1,0 +1,247 @@
+{% extends "public/template.html" %}
+
+{% block meta %}
+  <title>Área Privada - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+<style>
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: #1d8896;
+  }
+  
+  .addImagen:hover {
+    color: rgba(29, 136, 150, 10);
+    filter: brightness(80%);
+  }
+  
+  .imagenCargada{
+    color: #1d9649;
+  }
+  
+  .close:focus {
+    outline: none;
+  }
+  .course-content img{
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+  }
+
+</style>
+
+  <main id="main" data-aos="fade-in">
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+    {% if alerta %}
+      {% if alerta.tipo == "success" %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <i class="fa-solid fa-circle-check"></i> {{ alerta.mensaje }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      {% else %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fa-sharp fa-solid fa-circle-exclamation"></i> {{ alerta.mensaje }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% endif %}
+    {% endif %}
+          
+    {% if user.is_superuser %}
+    <div class="row mx-0">
+      <div class="col d-flex justify-content-center">
+        <button class="btn btn-outline-info my-2 my-sm-0" title="agregar nuevo servicio" data-toggle="modal" data-target="#modalAgregarNuevoServicio">Agregar nuevo Servicio</button>
+      </div>
+    </div>
+    {% endif %}
+    </div><!-- End Breadcrumbs -->
+
+    {% include "public/parts/internal-service-section.html" %}
+
+    {% include "public/parts/external-service-section.html" %}
+
+    {% include "public/parts/maintenance-webPublic-service-section.html" %}
+  
+
+
+
+  </main><!-- End #main -->
+
+  
+  <div id="modalAgregarNuevoServicio" class="modal fade contact mt-5" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="TituloModal">Añadir Servicio</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formularioAgregarServicio" action="/agregarServicio/" method="POST" enctype="multipart/form-data"
+            class="php-email-form" role="form">
+            {% csrf_token %}
+  
+            <div class="row">
+              <div class="col-6 form-group">
+                <label for="categoriaServicio"><strong>Categoría del servicio</strong></label>
+                <select type="form-select" class="form-control" data-rule="required" id="categoriaServicio"
+                  name="categoriaServicio" style="border-color: #1d8896;" required>
+                  <option hidden></option>
+                  <option value="interna">Interna</option>
+                  <option value="externa">Externa</option>
+                  <option value="mantenimientoWeb">Mantenimiento Web</option>
+                </select>
+              </div>
+              <div class="col-6 form-group">
+                <label for="grupoServicio"><strong>Grupo</strong></label>
+                <select type="form-select" class="form-control" data-rule="required" id="grupoServicio"
+                  name="grupoServicio" style="border-color: #1d8896;" required>
+                  <option hidden></option>
+                  <option value="Administracion">Administracion</option>
+                  <option value="Alerta2">Alerta2</option>
+                  <option value="RAREx">RAREx</option>
+                  <option value="VRAEx">VRAEx</option>
+                  <option value="JUNTA">JUNTA</option>
+                  <option value="Laboratorios">Laboratorios</option>
+                  <option value="SPIDA">SPIDA</option>
+                  <option value="UNEX">UNEX</option>
+                  <option value="Web pública">Web Pública</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col form-group">
+                <label for="nombreServicio"><strong>Nombre servicio</strong></label>
+                <input type="text" class="form-control" id="nombreServicio" name="nombreServicio" data-rule="required"
+                  placeholder="GOOGLE" required />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col form-group">
+                <label for="urlServicio"><strong>Enlace del servicio</strong></label>
+                <input type="text" class="form-control" id="urlServicio" name="urlServicio"
+                  placeholder="https://google.es/" required />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col form-group">
+                <label for="descripcionServicio"><strong>Descripción del servicio</strong></label>
+                <textarea type="text" class="form-control" name="descripcionServicio" id="descripcionServicio" rows="3"
+                  placeholder="Máximo 200 caracteres" style="white-space: pre-line; border-color: #1d8896;"
+                  maxlength="200" required></textarea>
+              </div>
+            </div>
+            <div class="row my-2">
+              <div class="col-sm-12 d-flex justify-content-center">
+                <div class="form-group">
+                  <label for="imagenServicio">
+                    <i class="fa-duotone fa-image fa-6x addImagen" id="iconoImagen"></i>
+                  </label>
+                  <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                    id="imagenServicio" name="imagenServicio" onchange="mostrarNombreImagen(this.value)" required />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+                  <spam id="imagen-name"></spam>
+                </div>
+              </div>
+            </div>
+  
+            <div class="modal-footer d-flex justify-content-center">
+              <button type="submit" value="submit" class="btn btn-primary">
+                Guardar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalEliminarServicio" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="TituloModalEliminarServicio">Eliminar Servicio</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formularioEliminarServicio" action="\eliminarServicio/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" class="form-control" id="idServicio" name="idServicio" data-rule="required" hidden />
+            <div class="text-center">
+              <input type="text" class="form-control" id="inputNombreServicioEliminar" name="inputNombreServicioEliminar"
+                data-rule="required" hidden />
+              <div class="text-center">
+                <label for="seguroEliminarServicio"><strong>¿Está seguro que desea eliminar el servicio <span
+                      id="nombreServicioEliminar" class="text-danger"></span> ?</strong></label>
+
+              </div>
+              <div class="modal-footer d-flex justify-content-center">
+                <div>
+                  <button id="cerrarModalEliminarServicio" type="button" class="btn btn-secondary mx-1"
+                    data-dismiss="modal">
+                    Cerrar
+                  </button>
+                  <button type="submit" value="submit" class="btn btn-danger">
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+<script>
+
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+    document.getElementById('imagen-name').innerHTML = value;
+    document.getElementById('mostrarNombreImagen').style.display = 'none';
+    document.getElementById('iconoImagen').className = 'fa-duotone fa-circle-check fa-6x imagenCargada';
+  }
+
+
+  function agregarInfoServicio(id, nombre) {
+    document.getElementById('idServicio').value = id;
+    document.getElementById('nombreServicioEliminar').innerText = nombre;
+    document.getElementById('inputNombreServicioEliminar').value = nombre;
+    // eliminar salto de linea al final del nombre del servicio
+    // mostrar modal modalEliminarServicio
+    $('#modalEliminarServicio').modal('show');
+  }
+
+  function editarServicio(id, url) {
+    console.log("Hey")
+    var idServicio = parseInt(id)
+    console.log(idServicio, typeof(idServicio))
+    var url = "{% url 'public:publicEditarServicio' id='id' %}".replace('id', idServicio);
+    window.location.href = url;
+  }
+
+</script>
+
+
+{% endblock %}

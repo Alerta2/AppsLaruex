@@ -1,0 +1,381 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+#map {
+    height: 100%;
+    z-index: 1;
+    width: 101%;
+
+}
+
+#map img {
+    max-width: none !important;
+}
+
+#flotante
+{
+  position:absolute;
+  bottom:5%;  
+  right: 15%;  /* adjust value accordingly */
+  height: 30%;
+  z-index: 2;
+  border-radius: 25px;
+  border: 2px solid #000000;
+  padding: 20px;
+  width: 300px;
+  height: 150px;
+}
+#info_flotante
+{
+  position:absolute;
+  top:10%;  
+  right: 15%;  /* adjust value accordingly */
+  height: 30%;
+  z-index: 2;
+  background: #ffffff;    
+  border-radius: 25px;
+  border: 2px solid #000000;
+  padding: 20px;
+}
+
+#ocultaleyendas
+{
+  /*
+  background-image: url('img/binfo.png');
+  background-repeat: no-repeat;*/
+  position: absolute;
+  top: 50px;
+  left: 0px;
+  z-index: 2;
+  display: none;
+
+}
+
+#divleyendas
+{
+  
+  background: rgba(255,255,255,.8); 
+  z-index: 2;
+  position: absolute;
+  top: 100px;  
+  left: 0px;
+  max-width: 350px;
+  min-width: 100px;
+  border-bottom: 5px solid #3371b7;
+  border-top: 5px solid #3371b7;
+  border-right: 5px solid #334ab7;
+  border-left: 5px solid #334ab7;
+
+}
+
+
+#leyenda{
+
+display: inline-block;
+width: 100%;
+}
+
+
+#leyenda2
+{
+display: inline-block;
+width: 100%;
+max-width: 258px;
+}
+
+#leyenda3
+{
+ display: inline-block; 
+ width: 100%;
+}
+
+#leyenda4
+{
+  margin-top: 50px;
+  font-size: 90%;
+  line-height: 18px;
+  font-weight: 400;
+  position:absolute;
+  top:0%; 
+  left: 30%;  /* adjust value accordingly */
+  /*height: 30%;*/
+  z-index: 2;
+  /*border-radius: 25px;*/
+  border: 2px solid #337AB7;
+  background: #ffffff;    
+  padding: 1%;
+  width: 35%;
+  height: 20%;
+  max-width: 350px;
+  min-width: 100px;
+  min-height: 150px;
+}
+#info_flotante{
+  min-width: 250px;
+}
+
+
+h2{
+  background: #0088dd;
+  color: #ffffff;
+  font: normal normal normal 20px/1 Helvetica, arial, sans-serif;
+  border-bottom: 2px solid #0000ff;
+}
+
+#header {
+  background-color:gray;
+  color:white;
+  text-align:left;
+  padding:5px;
+}
+
+/* Para quitar los margenes */
+/*
+.gm-style-iw {
+   width: 350px !important;
+   top: 15 !important;
+   left: 0 !important;
+   background-color: #fff;
+   box-shadow: 0 1px 6px rgba(178, 178, 178, 0.6);
+   
+   border: 3px solid #00994c;
+   border-radius: 2px 2px 10px 10px;
+}*/
+#iw-container {
+  margin-bottom: 10px;
+} 
+.iw-title {
+   font-family: 'Open Sans Condensed', sans-serif;
+   font-size: 22px;
+   font-weight: 400;
+   padding: 10px;
+   background-color: #00994c; /*48b5e9 */
+   color: white;
+   margin: 0;
+   border-radius: 2px 2px 0 0; /* In accordance with the rounding of the default infowindow corners. */
+}
+.iw-content {
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  margin-right: 1px;
+  padding: 15px 5px 20px 15px;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.iw-content img {
+  float: right;
+  margin: 0 5px 5px 10px; 
+}
+.iw-subTitle {
+  font-size: 16px;
+  font-weight: 700;
+  padding: 5px 0;
+}
+.iw-bottom-gradient {
+  position: absolute;
+  width: 326px;
+  height: 25px;
+  bottom: 10px;
+  right: 18px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+  background: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+  background: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+  background: -ms-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+}
+#floating-panel {
+  position: absolute;
+  top: 50px;
+  /* left: 90%; */
+  z-index: 5;
+  background-color: #fff;
+  padding: 5px;
+  border: 1px solid #999;
+  text-align: center;
+  font-family: 'Roboto','sans-serif';
+  line-height: 30px;
+  padding-left: 10px;
+}
+
+@media only screen and (min-width : 601px) {
+#divleyendas
+  {
+    display: block;
+    
+  }
+}
+@media only screen and (max-width : 800px) {
+  #divleyendas
+  {
+    display: none;
+    top: 170px;
+  }
+  #ocultaleyendas{
+    display: block;
+    top:120px;
+  }
+  
+  h3{
+    font: normal normal normal 20px/1 Helvetica, arial, sans-serif;
+  }
+  #leyenda4{
+    top: 170px;
+  }
+  #h1_estaciones_alerta{
+    font-size: 0.9em;
+   
+  }
+   #info_flotante{
+    top: 400px;
+    left: 30%;
+  }
+  }
+
+@media only screen and (max-width : 600px) {
+  #divleyendas
+  {
+    display: none;
+    top: 170px;
+  }
+  #ocultaleyendas{
+    display: block;
+    top:120px;
+  }
+  
+  h3{
+    font: normal normal normal 20px/1 Helvetica, arial, sans-serif;
+  }
+  #leyenda4{
+    top: 170px;
+  }
+  #h1_estaciones_alerta{
+    font-size: 0.9em;
+   
+  }
+   #info_flotante{
+    top: 400px;
+    left: 30%;
+  }
+  }
+
+@media only screen and (max-width : 480px) {
+  #divleyendas
+  {
+    display: none;
+    top: 100px;
+  }
+  #ocultaleyendas{
+    top: 50px;
+    display: block;
+    
+  }
+  h3{
+    font: normal normal normal 20px/1 Helvetica, arial, sans-serif;
+  }
+  #info_flotante{
+    display: none;
+  }
+
+#leyenda4{
+    top: 100px;
+  }
+  #h1_estaciones_alerta{
+    font-size: 0.9em;
+   
+  }
+  #leyenda4 option h3{
+    font-size: 0.9em;
+  }
+   #info_flotante{
+    top: 400px;
+    left: 30%;
+  }
+}
+
+@media only screen and (max-width : 320px) {
+  #divleyendas
+  {
+    display: none;
+    top: 100px;
+  }
+  #ocultaleyendas{
+    top: 50px;
+    display: block;
+    
+  }
+  h3{
+    font: normal normal normal 20px/1 Helvetica, arial, sans-serif;
+  }
+  #info_flotante{
+    display: none;
+  }
+
+  #leyenda4{
+    top: 100px;
+  }
+  #h1_estaciones_alerta{
+    font-size: 0.9em;
+   
+  }
+  #info_flotante{
+    top: 400px;
+    left: 30%;
+
+  }
+}
+
+
+#tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    position: relative;
+    float: top;
+}
+
+/* Style the buttons that are used to open the tab content */
+#tab button {
+    background-color: #008CBA;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: 0.3s;
+    color: white;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 0.7em;
+}
+
+#tablinks{
+ color: white;
+}
+/* Change background color of buttons on hover */
+#tab button:hover {
+    background-color: #00CCBA;
+}
+
+/* Create an active/current tablink class */
+#tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+#tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+    animation: fadeEffect 1s; /* Fading effect takes 1 second */
+}
+
+/* Go from zero to full opacity */
+@keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}

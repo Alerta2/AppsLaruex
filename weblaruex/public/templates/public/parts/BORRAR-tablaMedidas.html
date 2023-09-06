@@ -1,0 +1,469 @@
+{% load static %}
+
+<style>
+	body {
+	font-family: "Poppins", sans-serif;
+}
+
+/* h1 {
+	margin: 2em auto 0;
+	font: 700 3em "Poppins", sans-serif;
+	color: #021a20;
+	text-align: center;
+}
+
+h5 {
+	margin: 0 auto 2em;
+	font: 400 1.3em "Poppins", sans-serif;
+	color: #052b34;
+	text-align: center;
+} */
+
+a {
+	text-decoration: none;
+}
+
+aside.context {
+	text-align: center;
+	color: #fff;
+	line-height: 1.7;
+}
+
+aside.context a {
+	text-decoration: none;
+	color: #fff;
+	padding: 3px 0;
+	border-bottom: 1px dashed;
+}
+
+.explanation {
+	max-width: 700px;
+	margin: 4em auto 0;
+}
+
+
+.periodic-table {
+	display: grid;
+	grid-template-columns: repeat(9, 100px);
+	grid-template-rows: repeat(4, 100px);
+	grid-gap: 10px;
+	margin: auto;
+	max-width: 1200px;
+	justify-content: center;
+}
+
+.periodic-element {
+
+/* padding: 4px; */
+  position: relative;
+  border-radius: 10px;
+  z-index: 1;
+  cursor: default;
+  transition: all 0.3s ease;
+}
+
+.periodic-element-inner {
+	padding: 10px 15px;
+	width: calc(100% - 10px);
+	height: calc(100% - 20px);
+	transition: inherit;
+}
+
+.periodic-element .title {
+	font: 700 34px/1.3 "Poppins", sans-serif;
+	margin: 0.3em 0 0;
+	transition: 0.8s ease 600ms;
+}
+
+.periodic-element .description {
+	font: 500 12px "Poppins", sans-serif;
+	margin-top: -0.2em;
+}
+
+.periodic-element:after {
+	z-index: 10;
+	content: attr(data-description);
+	background: #f9f8f7;
+	color: #333;
+	width: 180px;
+	position: absolute;
+	top: 80%;
+	opacity: 0;
+	transition: opacity 0.3s ease 0.3s, top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s;
+	height: auto;
+	font-size: 12px;
+	line-height: 1.4;
+	padding: 10px;
+	margin: 0 0 0 -50px;
+	border-radius: 6px;
+	text-align: center;
+}
+
+.periodic-element:hover {
+	transform: scale(1.12);
+	z-index: 10;
+}
+
+.periodic-element:hover .periodic-element-inner {
+	background: transparent;
+}
+
+.periodic-element:hover .title,
+.periodic-element:hover .description {
+	-webkit-text-fill-color: #222;
+}
+
+.periodic-element:hover:after {
+	top: 105%;
+	opacity: 1;
+}
+
+a.periodic-element {
+	cursor: pointer;
+}
+
+.social-media{
+	border: 3px solid;
+	border-radius: 10px;
+	border-image: linear-gradient(to bottom right, #f3f9a6, #cbc634) 1;
+	
+}
+
+.social-media .title, .social-media .description {
+    background: -webkit-linear-gradient(#f3f9a6, #cbc634);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.social-media:hover {
+    background: linear-gradient(to bottom right, #f3f9a6 0%, #cbc634 100%);
+}
+
+
+
+.just-trying{
+	
+	border: 3px solid;
+	border-radius: 10px;
+	border-image: linear-gradient(to bottom right, #37cfdc, #5a88e5) 1;
+}
+.just-trying .title, .just-trying .description {
+    background: -webkit-linear-gradient(#37cfdc, #5a88e5);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.just-trying:hover {
+    background: linear-gradient(to bottom right, #37cfdc 0%, #5a88e5 100%);
+}
+
+
+.intense-work {
+	border: 3px solid;
+	border-radius: 10px;
+	border-image: linear-gradient(to bottom right, #58ac30, #a7df62) 1;
+} 
+
+.intense-work .title,
+.intense-work .description {
+	
+    background: -webkit-linear-gradient(#58ac30, #a7df62);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+
+.intense-work:hover {
+    background: linear-gradient(to bottom right, #58ac30 0%, #a7df62 100%);
+} 
+
+.fun-stuff{
+	border: 3px solid;
+	border-radius: 10px;
+	border-image: linear-gradient(to bottom right, #ff616d, #ffc171) 1;
+
+}
+
+.fun-stuff .title,
+.fun-stuff .description {
+    background: -webkit-linear-gradient(#ff616d, #ffc171);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.fun-stuff:hover {
+    background: linear-gradient(to bottom right, #ff616d 0%, #ffc171 100%);
+}
+
+.legend-table {
+	padding: 15px;
+	text-align: center;
+	font-size: 15px;
+	margin: 2em auto 0;
+}
+
+.legend-table__marker {
+	width: 25px;
+	height: 25px;
+	margin: 5px 5px 10px;
+	display: inline-block;
+	vertical-align: middle;
+	box-shadow: 0.5px 1px rgba(0, 0, 0, 0.15);
+}
+
+.legend-table__text {
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0 25px 5px 5px;
+	/* @include text-gradient(#ccc, #eee); */
+}
+
+.legend-table__direction {
+	
+    background: -webkit-linear-gradient(#ccc, #eee);
+	background-clip: text;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	display: inline-block;
+	margin: 10px 15px 10px 10px;
+} 
+
+.empty-spacer-1 {
+	grid-column: 3 / span 4;
+	grid-row: 1;
+}
+
+.empty-spacer-2 {
+	grid-column: 1;
+	grid-row: 4;
+}
+
+</style>
+
+<div class="periodic-table">
+	<div class="empty-spacer-1"></div>
+	<div class="empty-spacer-2"></div>
+	<div class="periodic-element social-media" data-description="I'm only on here to reject invitations 😂">
+		<div class="periodic-element-inner" >
+			<div class="title">Li</div>
+			<div class="description">LinkedIn</div>
+		</div>
+	</div>
+	<div class="periodic-element social-media" data-description="Only so I don't miss out on my friends' milestones 🤷">
+		<div class="periodic-element-inner">
+			<div class="title">Fb</div>
+			<div class="description">Facebook</div>
+		</div>
+	</div>
+	<div class="periodic-element just-trying" 
+		data-description="Looking at amazing Dribbble 🏀 shots and internally die from the amount of talent/skill out there">
+		<div class="periodic-element-inner">
+			<div class="title">Db</div>
+			<div class="description">Dribbble</div>
+		</div>
+	</div>
+	<div class="periodic-element intense-work" data-description="Coming up with sassy commit messages 🔥">
+		<div class="periodic-element-inner">
+			<div class="title">Ct</div>
+			<div class="description">Commits</div>
+		</div>
+	</div>
+	<div class="periodic-element intense-work" data-description="Making custom emojis for Slack 💪🏻">
+		<div class="periodic-element-inner">
+			<div class="title">Sl</div>
+			<div class="description">Slack</div>
+		</div>
+	</div>
+	<div class="periodic-element fun-stuff" data-description="'Wikipedia Wormhole' is a thing. And it is dangerous 🐛">
+		<div class="periodic-element-inner">
+			<div class="title">Wk</div>
+			<div class="description">Wikipedia</div>
+		</div>
+	</div>
+	<div class="periodic-element fun-stuff"
+		data-description="Choosing the right playlist. (If my Spotify is working... it's always not working)">
+		<div class="periodic-element-inner">
+			<div class="title">Sp</div>
+			<div class="description">Spotify</div>
+		</div>
+	</div>
+	<a class="periodic-element social-media" data-description="If you say something witty, it's going on my Twitter 🐦"
+		href="https://twitter.com/meowlivia_" target="_blank">
+		<div class="periodic-element-inner">
+			<div class="title">Tw</div>
+			<div class="description">Twitter</div>
+		</div>
+	</a>
+	<div class="periodic-element social-media" data-description="Professional Dota 2 Watcher right here ✌️">
+		<div class="periodic-element-inner">
+			<div class="title">Tc</div>
+			<div class="description">Twitch</div>
+		</div>
+	</div>
+	<div class="periodic-element intense-work"
+		data-description="Creating GitHub issues, a.k.a. tossing problems which I can solve to the frontend team">
+		<div class="periodic-element-inner">
+			<div class="title">Gt</div>
+			<div class="description">GitHub</div>
+		</div>
+	</div>
+	<div class="periodic-element intense-work"
+		data-description="Trying to get yarn working after an update. The main reason I toss issues to the frontend team.">
+		<div class="periodic-element-inner">
+			<div class="title">Yn</div>
+			<div class="description">Yarn</div>
+		</div>
+	</div>
+	<div class="periodic-element just-trying "
+		data-description="A skill I'm trying to learn 🎨... and failing to learn 😛">
+		<div class="periodic-element-inner">
+			<div class="title">Il</div>
+			<div class="description">Illustration</div>
+		</div>
+	</div>
+	<a class="periodic-element just-trying "
+		data-description="Resident Designer. Keeping the diminishing flame of web design in me alive 🕯️"
+		href="https://tellystats.com" target="_blank">
+		<div class="periodic-element-inner">
+			<div class="title">Te</div>
+			<div class="description">TellyStats</div>
+		</div>
+	</a>
+	<div class="periodic-element just-trying "
+		data-description="I just need to stop adding items and actually start doing things. Am I the only one who is still using Wunderlist? 😂">
+		<div class="periodic-element-inner">
+			<div class="title">Wu</div>
+			<div class="description">Wunderlist</div>
+		</div>
+	</div>
+	<div class="periodic-element fun-stuff "
+		data-description="I have zero cooking skills, so I watch cooking videos and never try cooking for real 🍳">
+		<div class="periodic-element-inner">
+			<div class="title">Cv</div>
+			<div class="description">Cooking</div>
+		</div>
+	</div>
+	<div class="periodic-element fun-stuff " data-description="Or any animal gifs, basically. 🐈🐕🦊🦔🦉🐍🐬🦄">
+		<div class="periodic-element-inner">
+			<div class="title">Dg</div>
+			<div class="description">Dog Gifs</div>
+		</div>
+	</div>
+	<a class="periodic-element fun-stuff " data-description="Getting distracted by Toggl comics 🙃"
+		href="https://blog.toggl.com" target="_blank">
+		<div class="periodic-element-inner">
+			<div class="title">Tg</div>
+			<div class="description">Toggl Blog</div>
+		</div>
+	</a>
+	<div class="periodic-element just-trying "
+		data-description="I google every damn thing. Including movie spoilers. While watching the movie. Yes.">
+		<div class="periodic-element-inner">
+			<div class="title">Gg</div>
+			<div class="description">Google</div>
+		</div>
+	</div>
+	<a class="periodic-element just-trying "
+		data-description="I like spreadsheets so I create them for the smallest reasons 🧐"
+		href="https://docs.google.com/spreadsheets/d/1Dim2nKRjgpkjA4miqTzcLPT68L0B5LU2aWZWF5hHYAc/edit#gid=0"
+		target="_blank">
+		<div class="periodic-element-inner">
+			<div class="title">Ex</div>
+			<div class="description">Excel</div>
+		</div>
+	</a>
+	<div class="periodic-element intense-work"
+		data-description="I still StackOverflow the simplest shit 'just to be sure'. Where will we be without it ❤️">
+		<div class="periodic-element-inner">
+			<div class="title">So</div>
+			<div class="description">StackOv.</div>
+		</div>
+	</div>
+	<div class="periodic-element intense-work"
+		data-description="It's very much not my job, but sometimes I stick my hand into the Coding Projects jar 🍪 anyway">
+		<div class="periodic-element-inner">
+			<div class="title">Cd</div>
+			<div class="description">Coding</div>
+		</div>
+	</div>
+	<div class="periodic-element just-trying"
+		data-description="I spend so much time on Codepen, I decided to go Pro because I felt bad 💸">
+		<div class="periodic-element-inner">
+			<div class="title">Cp</div>
+			<div class="description">Codepen</div>
+		</div>
+	</div>
+	<div class="periodic-element just-trying" data-description="We all have that one thing that keeps us alive 🛫🗺️">
+		<div class="periodic-element-inner">
+			<div class="title">Tr</div>
+			<div class="description">Travel</div>
+		</div>
+	</div>
+	<a class="periodic-element social-media" data-description="Fuck this app. It's a terrible love-hate relationship."
+		href="https://www.instagram.com/meowliviaaa/" target="_blank">
+		<div class="periodic-element-inner">
+			<div class="title">In</div>
+			<div class="description">Instagram</div>
+		</div>
+	</a>
+	<a class="periodic-element fun-stuff"
+		data-description="Obsessing over musicals and stalking broadway stars is 👏🏻 not 👏🏻 a 👏🏻 crime!"
+		href="https://codepen.io/collection/XPWkdW/" target="_blank">
+		<div class="periodic-element-inner">
+			<div class="title">Mu</div>
+			<div class="description">Musicals</div>
+		</div>
+	</a>
+	<div class="periodic-element fun-stuff" data-description="I learn memes, I make memes, I breathe memes.">
+		<div class="periodic-element-inner">
+			<div class="title">Me</div>
+			<div class="description">Memes</div>
+		</div>
+	</div>
+	<div class="periodic-element intense-work" data-description="Battling double columns in Notion">
+		<div class="periodic-element-inner">
+			<div class="title">No</div>
+			<div class="description">Notion</div>
+		</div>
+	</div>
+	<div class="periodic-element intense-work"
+		data-description="Updating my website to make it look like I'm not stuck in the 90s. Not succeeding 😂">
+		<div class="periodic-element-inner">
+			<div class="title">Ht</div>
+			<div class="description">HTML</div>
+		</div>
+	</div>
+	<div class="periodic-element just-trying"
+		data-description="Reading and losing faith in the comments section of any website 🙈">
+		<div class="periodic-element-inner">
+			<div class="title">Rd</div>
+			<div class="description">Reading</div>
+		</div>
+	</div>
+	<a class="periodic-element fun-stuff"
+		data-description="Procrastinating by watching cute animal videos on YouTube 🐾">
+		<div class="periodic-element-inner">
+			<div class="title">Yu</div>
+			<div class="description">YouTube</div>
+		</div>
+	</a>
+	<div class="periodic-element fun-stuff"
+		data-description="Fantasizing about being a rockstar, while barely being able to play three chords 🎸">
+		<div class="periodic-element-inner">
+			<div class="title">Gt</div>
+			<div class="description">Guitar</div>
+		</div>
+	</div>
+	<a class="periodic-element just-trying"
+		data-description="My newest hobby. Going broke one stationery at a time 🖊️">
+		<div class="periodic-element-inner">
+			<div class="title">Pl</div>
+			<div class="description">Planner</div>
+		</div>
+	</a>
+</div>
+

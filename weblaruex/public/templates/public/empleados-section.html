@@ -1,0 +1,206 @@
+
+{% extends "public/template.html" %}
+
+{% load static %}
+
+{% block meta %}
+  <title>Empleados - LARUEX</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+<style>  .addImagen {
+  color: #1d8896;
+}
+
+.addImagen:hover {
+  color: rgba(29, 136, 150, 10);
+  filter: brightness(80%);
+}
+
+.imagenCargada{
+  color: #1d9678;
+}
+
+.close:focus {
+  outline: none;
+}
+
+.checkboxDiv input[type="checkbox"]:checked{
+  
+  background-color: #1d8896 !important;
+  border: 2px solid #1d8896 !important;
+  color: #fff;
+  accent-color: #1d8896;
+}
+</style>
+  <main id="main" data-aos="fade-in">
+
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs">
+    </div>
+
+    {% if alerta %}
+    {% if alerta.tipo == "success" %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fa-solid fa-circle-check"></i> {{ alerta.mensaje }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% else %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="fa-sharp fa-solid fa-circle-exclamation"></i> {{ alerta.mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endif %}
+  {% endif %}
+
+    {% include "public/parts/empleados-list.html" %}
+
+  </main><!-- End #main -->
+
+  <div id="modalEliminarEmpleado" class="modal fade my-5" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="TituloModalEliminarEmpleado">Eliminar Empleado</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formularioEliminarEmpleado" action="\eliminarEmpleado/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" class="form-control" id="idEmpleado" name="idEmpleado" data-rule="required" hidden/>
+            <input type="text" class="form-control" id="inputNombreEmpleadoEliminar" name="inputNombreEmpleadoEliminar" data-rule="required" hidden/>
+            <label for="seguroEliminarEmpleado"><strong>¿Está seguro que desea eliminar la información del empleado <span class="text-danger" id="nombreEmpleadoEliminar"></span> ?</strong></label>
+            <div class="modal-footer d-flex justify-content-center">
+              <div>
+                <button id="cerrarModalEliminarEmpleado" type="button" class="btn btn-secondary mx-1" data-dismiss="modal">
+                  Cerrar
+                </button>
+                <button type="submit" value="submit" class="btn btn-danger">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+<div id="modalAgregarEmpleado" class="modal fade pt-5" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalAgregarEmpleado">Agregar empleado</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioAgregarEmpleado" action="\agregarEmpleado/" method="POST" enctype="multipart/form-data" class="php-email-form"  role="form">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col form-group">
+              <label for="nombreEmpleado" class="text-secondary"><strong>Nombre del empleado</strong></label>
+              <input type="text" class="form-control" id="nombreEmpleado" name="nombreEmpleado" data-rule="required"required/>
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col form-group">
+              <label for="puestoEmpleado" class="text-secondary"><strong>Puesto del empleado</strong></label>
+              <input type="text" class="form-control" id="puestoEmpleado" name="puestoEmpleado" data-rule="required" required/>
+            </div>
+          </div>
+          <div class="row my-3">
+            <div class="col form-group">
+              <div>
+                <label for="grupoEmpleadosAgregar" class="text-secondary"><strong>Grupos</strong></label>
+              </div>
+              <div>
+                
+                <div class="checkboxDiv form-check-inline">
+                  <div class="mx-2 ">
+                    <input class="form-check-input" type="checkbox" id="grupoSeleccionadoLaboratorio" name="checkbox"  value="laboratorios">
+                    <label class="form-check-label" for="grupoSeleccionadoLaboratorio">Laboratorios</label></div>
+                  <div class="mx-2">
+                    <input class="form-check-input" type="checkbox" id="grupoSeleccionadoRedes" name="checkbox"  value="redes">
+                    <label class="form-check-label" for="grupoSeleccionadoRedes">Redes</label></div>
+                  <div class="mx-2">
+                    <input class="form-check-input" type="checkbox" id="grupoSeleccionadoInformatica" name="checkbox" value="informatica">
+                    <label class="form-check-label" for="grupoSeleccionadoInformatica">Informática</label></div>
+                  <div class="mx-2">
+                    <input class="form-check-input" type="checkbox" id="grupoSeleccionadoDireccion" name="checkbox"  value="direccion">
+                    <label class="form-check-label" for="grupoSeleccionadoDireccion">Dirección</label></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <div class="row my-2">
+          <div class="col-sm-12 d-flex justify-content-center">
+            <div class="form-group">
+              <label for="imagenEmpleadoAgregar">
+                <i class="fa-duotone fa-image fa-6x addImagen" id="iconoImagen"></i>
+              </label>
+              <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                id="imagenEmpleadoAgregar" name="imagenEmpleadoAgregar"
+                onchange="mostrarNombreImagen(this.value)"/>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+              <spam id="imagen-name"></spam>
+            </div>
+          </div>
+        </div>
+          
+
+
+        <div class="modal-footer d-flex justify-content-center">
+          <button type="submit" value="submit" class="btn btn-info">
+            Guardar
+          </button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+<script>
+
+function agregarInfoEmpleado (id, nombre) {
+    document.getElementById('idEmpleado').value = id;
+    document.getElementById('nombreEmpleadoEliminar').innerHTML = nombre;
+    document.getElementById('inputNombreEmpleadoEliminar').value = nombre;
+    // mostrar modal modalEliminarServicio
+    $('#modalEliminarEmpleado').modal('show');
+  }
+
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+    document.getElementById('imagen-name').innerHTML = value;
+    document.getElementById('mostrarNombreImagen').style.display = 'none';
+    var iconoImagen = document.getElementById('iconoImagen');
+    iconoImagen.classList.remove("fa-image", "fa-6x", "addImagen");
+    iconoImagen.classList.add("fa-circle-check", "fa-6x", "imagenCargada");
+  }
+
+
+
+</script>
+  
+{% endblock %}
+

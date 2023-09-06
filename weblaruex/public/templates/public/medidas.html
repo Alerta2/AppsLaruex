@@ -1,0 +1,128 @@
+{% extends "public/template.html" %}
+
+{% block meta %}
+  <title>Medidas de radiactividad - LARUEX</title>
+  <meta name="description" content="Laboratorio de radiactividad especializado en análisis de radón, aguas de consumo y alimentos. Monitoreo de radiactividad, mediciones precisas y servicios de dosimetría. Garantizamos resultados confiables y seguridad radiológica.">
+  <meta name="keywords" content="Laboratorio de radiactividad, Análisis de radón, Medición de radón, Laboratorio de aguas de consumo, Análisis de agua potable, Laboratorio de alimentos radiactivos, Análisis de alimentos contaminados, Monitoreo de radiactividad, Laboratorio de dosimetría, Análisis de muestras radiactivas, Laboratorio de radiación ambiental, Análisis de radiación en el medio ambiente, Laboratorio de radioquímica, Análisis de isótopos radiactivos, Laboratorio de seguridad radiológica, Análisis de radiactividad en materiales, Laboratorio de protección radiológica, Análisis de riesgos radiológicos, Laboratorio de radioisótopos, Análisis de productos radiactivos, Extremadura, Cáceres">
+  {% endblock %}
+
+{% block content %}
+
+
+<style>  
+  .addImagen {
+    color: #1d8896;
+  }
+  
+  .addImagen:hover {
+    color: rgba(29, 136, 150, 10);
+    filter: brightness(80%);
+  }
+  
+  .imagenCargada{
+    color: #1d9678;
+  }
+  
+  .close:focus {
+    outline: none;
+  }
+  
+  .checkboxDiv input[type="checkbox"]:checked{
+    
+    background-color: #1d8896 !important;
+    border: 2px solid #1d8896 !important;
+    color: #fff;
+    accent-color: #1d8896;
+  }
+  </style>
+
+  <main id="main">
+    <!-- ======= Breadcrumbs ======= -->
+    <div class="breadcrumbs" data-aos="fade-in">
+
+      {% if alerta %}
+      {% if alerta.tipo == "success" %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <i class="fa-solid fa-circle-check"></i> {{ alerta.mensaje }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      {% else %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fa-sharp fa-solid fa-circle-exclamation"></i> {{ alerta.mensaje }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% endif %}
+    {% endif %}
+      <div class="container">
+      </div>
+    </div><!-- End Breadcrumbs -->
+
+    {% if user.is_superuser %}
+    <div class="row mb-5">
+
+      <div class="col d-flex justify-content-center">
+        <a href="{% url 'public:publicAgregarMedida' %}" class="btn btn-outline-info my-2 my-sm-0" title="Agregar nueva medida" target="_blank">Agregar nueva medida</a>
+
+      </div>
+    </div>
+    {% endif %}
+    
+    <div class="container" data-aos="fade-up">
+      <div class="section-title">
+        <h2>Medidas más destacadas</h2>
+        <p>LARUEX</p>
+      </div>
+     {% include "public/parts/medidas-list.html" %}
+
+
+    </div>
+
+  </main><!-- End #main -->
+
+
+  <div id="modalEliminarMedida" class="modal fade my-5" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="TituloModalEliminarMedida">Eliminar Medida</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="formularioEliminarMedida" action="\eliminarMedida/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" class="form-control" id="idMedida" name="idMedida" data-rule="required" hidden/>
+            <input type="text" class="form-control" id="inputNombreMedidaEliminar" name="inputNombreMedidaEliminar" data-rule="required" hidden />
+            <label for="seguroEliminarMedida"><strong>¿Está seguro que desea eliminar de la lista la medida de <span class="text-danger" id="nombreMedidaEliminar"></span> ?</strong></label>
+            <div class="modal-footer d-flex justify-content-center">
+              <div>
+                <button id="cerrarModalEliminarMedida" type="button" class="btn btn-secondary mx-1" data-dismiss="modal">
+                  Cerrar
+                </button>
+                <button type="submit" value="submit" class="btn btn-danger">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function agregarInfoMedida(id, nombre) {
+        document.getElementById('idMedida').value = id;
+        document.getElementById('nombreMedidaEliminar').innerHTML = nombre;      
+        document.getElementById('inputNombreMedidaEliminar').value = nombre;
+        // mostrar modal modalEliminarServicio
+        $('#modalEliminarMedida').modal('show');
+      }
+  </script>
+
+{% endblock %}

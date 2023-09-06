@@ -1,0 +1,59 @@
+{% load static %}
+
+<section id="spida" class="map">
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+      <h2>Red de alerta y predicción de inundaciones</h2>
+      <p>Spida</p>
+    </div>
+    <div class="text-center">
+      <p>
+        <strong>SPIDA</strong>, recopila entre otras informaciones, para todas las estaciones fijas de la red SPIDA los niveles de los ríos en las últimas 24 horas en cada una de las poblaciones sometidas a vigilancia, hasta el último valor registrado por los sensores radar y una foto de la altura del citado último nivel registrado. 
+      </p>
+    </div>
+
+    <div id="accordion" class="my-4">
+      <div class="card cardAcordion">
+        <div class="card-header cardAcordion" id="headingSpida">
+
+          
+          
+            <button class="btnColapseAcordion" data-toggle="collapse" data-target="#collapseSpida" aria-expanded="false" aria-controls="collapseSpida" onclick="modificarIcono('iconSpida')">
+              <div class="ml-2 my-2 d-flex justify-content-start "><i id="iconSpida" class="fa-solid fa-square-plus fa-lg fa-beat my-auto" style="color:#1d8896"></i><h4><strong>&nbsp; ¿Qué es SPIDA?</strong></h4>
+              </div>
+              
+            </button>
+
+
+        </div>
+    
+        <div id="collapseSpida" class="collapse show cardAcordionShow my-2" aria-labelledby="headingSpida" data-parent="#accordion">
+          <div class="card-body">
+            <p>
+              La red de inundaciones, SPIDA, inició su funcionamiento en 2018, siendo diseñada y gestionada por el Laboratorio de Radiactividad Ambiental de la Universidad de Extremadura, LARUEX y costeada su funcionamiento por la Junta de Extremadura, Protección Civil. 
+            </p>
+            <p>  
+              Su objetivo es detectar e informar de forma automática y en tiempo cuasi-real, de cualquier alteración en los niveles de los ríos de Extremaduratanto la Junta de Extremadura pudiendo superarse los límites definidos como zonas inundables y poniendo en riesgo a la población. Por ello, la red SPIDA está integrada de 20 estaciones que informan en tiempo real del caudal en puntos conflictivos y envían imágenes del estado del río. 
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="row">
+      <div class="col-md-6 col-sm-12 col-xs-12 d-md-flex justify-content-md-end  d-sm-flex justify-content-sm-center d-xs-flex justify-content-xs-center">
+        <button class="btnVerTodo mb-2"><a href="https://spida.laruex.com/" target="_blank" style="font-size: 22px;">Ir a la página</a></button>
+      </div>
+      <div class="col-md-6 col-sm-12 col-xs-12 d-md-flex justify-content-md-start d-sm-flex justify-content-sm-center d-xs-flex justify-content-xs-center">
+        <button class="btnVerTodo mb-2"><a onclick="scrollSeccion('redes','nuestras-redes');" target="_blank" style="font-size: 22px; color: #fff;">Ver mapa de estaciones</a></button>
+      </div>
+    </div>
+    
+
+  </div>
+</section><!-- End Trainers Section -->
+<script type="text/javascript">
+ $('.collapse').collapse()
+
+</script>

@@ -1,0 +1,259 @@
+{% extends "public/template.html" %}
+{% load static %}
+
+
+{% block meta %}
+  <title{{ curso.titulo }}></title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+{% endblock %}
+
+{% block content %}
+
+<style>
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: #1d8896;
+  }
+  
+  .addImagen:hover {
+    color: rgba(29, 136, 150, 10);
+    filter: brightness(80%);
+  }
+  
+  .imagenCargada{
+    color: #1d9678;
+  }
+  
+  .close:focus {
+    outline: none;
+  }
+
+  .checkboxDiv input[type="checkbox"]:checked{
+    
+    background-color: #1d8896 !important;
+    border: 2px solid #1d8896 !important;
+    color: #fff;
+    accent-color: #1d8896;
+  }
+
+
+
+  </style>
+
+<div class="my-5"></div>
+<!-- ======= noticia completa ======= -->
+<section id="about" class="about">
+  
+
+
+
+  {% if alerta %}
+  {% if alerta.tipo == "success" %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fa-solid fa-circle-check"></i> {{ alerta.mensaje }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% else %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fa-sharp fa-solid fa-circle-exclamation"></i> {{ alerta.mensaje }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endif %}
+{% endif %}
+
+  <div class="container" data-aos="fade-up">
+    <nav aria-label="breadcrumb" class="my-3 mx-auto" >
+      <ol class="breadcrumb" style="background-color: transparent;">
+        <li class="breadcrumb-item"><a href="\">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="\responsables">Responsables</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{responsable.nombre}}</li>
+      </ol>
+    </nav>
+    <div class="section-title">
+      <div class="row">
+        <div class="col col-sm-12 col-md-12 col-lg-7">
+          
+        <h2>{{ responsable.nombre }}</h2>
+        <p>{{ responsable.cargo }}</p>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-5 d-flex justify-content-sm-center justify-content-lg-start">
+          
+        {% if user.is_superuser %}
+            <a href="" class="btn btn-outline-info my-auto" title="Editar Responsable" data-toggle="modal"
+              data-target="#modalEditarResponsable"><span>Editar</span></a>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="row d-flex justify-content-sm-center ">
+      <div class="col-lg-6 col-xs-12 col-sm-12 pb-sm-3 order-1 d-flex justify-content-sm-center justify-content-lg-end pt-4" data-aos="fade-left" data-aos-delay="100">
+        <img src="{% static 'img/personal/responsables/' %}{{ responsable.imagen }}" class="img-fluid rounded" alt="" style="max-width: auto; max-height: 300px;" >
+      </div>
+      <div class="col-lg-6 col-xs-12 col-sm-12 order-2 pt-4 content get d-flex justify-content-sm-center justify-content-lg-start" id="contenidoNoticiaDiv">
+        <div>
+          <h3>{{ responsable.nombre }}</h3>
+          <p>
+            {{ responsable.cargo }}
+          </p>
+          <p class="font-italic"><strong>Información de contacto</strong></p>
+          {% if responsable.telefono|slice:':3' == "+34" %}
+          <p class="font-italic"><i class="fa-duotone fa-phone mx-2" style="color: #1d8896"></i>{{ responsable.telefono|slice:'0:3'}} {{responsable.telefono|slice:'3:6'}} {{responsable.telefono|slice:'6:9'}} {{responsable.telefono|slice:'9:12'}}</p>
+          {% else %}
+          <p class="font-italic"><i class="fa-duotone fa-phone mx-2" style="color: #1d8896"></i>+34 {{responsable.telefono|slice:'3:6'}} {{responsable.telefono|slice:'6:9'}} {{responsable.telefono|slice:'9:12'}}</p>
+          {% endif %}
+
+          <p class="font-italic"><i class="fa-duotone fa-at mx-2" style="color: #1d8896"></i>{{ responsable.email }}</p>
+
+          <p class="font-italic"><strong>Secciones</strong></p>
+            {% for g in responsable.secciones %}
+            {% if not g.strip  == "" %}
+              <p class="font-italic"><i class="fa-duotone fa-circle-check mx-2" style="color: #1d8896"></i>{{ g }}</p>
+             {% endif %}
+            {% endfor %}
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</section><!-- noticia completa -->
+
+<div id="modalEditarResponsable" class="modal fade  pt-5" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModalEditarResponsable">Editar datos de {{responsable.nombre}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioEditarResponsable" action="\editarResponsable/" method="POST" enctype="multipart/form-data" class="php-email-form"  role="form">
+          {% csrf_token %}
+
+          {% for g in responsable.secciones %}
+            <input type="text" class="form-control" id="idSeccion{{g}}" data-rule="required" value="{{g}}" hidden/>            
+          {% endfor %}
+          <input type="text" class="form-control" id="idResponsableEditar" name="idResponsableEditar" data-rule="required" value="{{responsable.id}}" hidden />
+          <div class="row">
+            <div class="col form-group">
+              <label for="nuevoNombreResponsable" class="text-secondary"><strong>Nombre del responsable</strong></label>
+              <input type="text" class="form-control" id="nuevoNombreResponsable" name="nuevoNombreResponsable" data-rule="required" value="{{responsable.nombre}}" required/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col form-group">
+              <label for="nuevoPuestoResponsable" class="text-secondary"><strong>Puesto del responsable</strong></label>
+              <input type="text" class="form-control" id="nuevoPuestoResponsable" name="nuevoPuestoResponsable" data-rule="required" value="{{responsable.cargo}}" required/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col form-group">
+              <label for="nuevoCorreoResponsable" class="text-secondary"><strong>Correo del responsable</strong></label>
+              <input type="email" class="form-control" id="nuevoCorreoResponsable" name="nuevoCorreoResponsable" data-rule="required" value="{{responsable.email}}" required/>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col form-group">
+              <label for="nuevoTelefonoResponsable" class="text-secondary"><strong>Teléfono del responsable</strong></label>
+              <input type="text" class="form-control" id="nuevoTelefonoResponsable" name="nuevoTelefonoResponsable" data-rule="required" value="{{responsable.telefono}}" required/>
+            </div>
+          </div>
+        <div class="row">
+          <div class="col form-group">
+            <label for="nuevaFraseResponsable" class="text-secondary"><strong>Frase del responsable</strong></label>
+            <textarea name="nuevaFraseResponsable" class="form-control" id="nuevaFraseResponsable" rows="3" style="white-space: pre-line; border-color: #1d8896;" maxlength="150" >{{responsable.frase}}</textarea>
+          </div>
+        </div>
+          <div class="row my-3">
+            <div class="col form-group">
+              <div>
+                <label for="seccionesResponsableEditar" class="text-secondary"><strong>Secciones</strong></label>
+              </div>
+              <div>
+                <div class="checkboxDiv form-check form-check-inline">
+                  <div class="mx-2">
+                    <input class="form-check-input" type="checkbox" id="nuevaSeccionSeleccionadaLaboratorio" name="checkbox"  value="laboratorios">
+                    <label class="form-check-label" for="nuevaSeccionSeleccionadaLaboratorio">Laboratorios</label></div>
+                  <div class="mx-2">
+                    <input class="form-check-input" type="checkbox" id="nuevaSeccionSeleccionadaRedes" name="checkbox"  value="redes">
+                    <label class="form-check-label" for="nuevaSeccionSeleccionadaRedes">Redes</label>
+                  </div>
+                  <div class="mx-2">
+                    <input class="form-check-input" type="checkbox" id="nuevaSeccionSeleccionadaHome" name="checkbox" value="home">
+                    <label class="form-check-label" for="nuevaSeccionSeleccionadaHome">Home</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <div class="row my-2">
+          <div class="col-sm-12 d-flex justify-content-center">
+            <div class="form-group">
+              <label for="nuevaImagenResponsable">
+                <i class="fa-duotone fa-image fa-6x addImagen" id="iconoImagen"></i>
+              </label>
+              <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                id="nuevaImagenResponsable" name="nuevaImagenResponsable"
+                onchange="mostrarNombreImagen(this.value)"/>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+              <spam id="imagen-name"></spam>
+            </div>
+          </div>
+        </div>
+          
+          <div class="modal-footer d-flex justify-content-center">
+            <button type="submit" value="submit" class="btn btn-info">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // obtener el valor de los input con id="idSeccion*" y marcar los checkbox correspondientes
+  var secciones = document.querySelectorAll('[id^="idSeccion"]');
+  
+  for (var i = 0; i < secciones.length; i++) {
+    var seccion = secciones[i].value;
+    if (seccion == "laboratorios"){
+      document.getElementById("nuevaSeccionSeleccionadaLaboratorio").checked = true;
+    }
+    if (seccion == "redes"){
+      document.getElementById("nuevaSeccionSeleccionadaRedes").checked = true;
+    }
+    if (seccion == "home"){
+      document.getElementById("nuevaSeccionSeleccionadaHome").checked = true;
+    }
+  }
+
+  
+  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagen(value) {
+    document.getElementById('imagen-name').innerHTML = value;
+    document.getElementById('mostrarNombreImagen').style.display = 'none';
+    var iconoImagen = document.getElementById('iconoImagen');
+
+    iconoImagen.classList.remove("fa-image", "fa-6x", "addImagen");
+    iconoImagen.classList.add("fa-circle-check", "fa-6x", "imagenCargada");
+  }
+
+</script>
+
+{% endblock %}

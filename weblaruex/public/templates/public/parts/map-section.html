@@ -1,0 +1,62 @@
+{% load static %}
+
+<section id="nuestras-redes" class="map">
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+        <h2>Redes de Alerta operativas</h2>
+        <p>SPIDA y RAREx</p>
+    </div>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+    <div id="open_map" class="open_map"></div>
+  </div>
+    <script type="text/javascript">
+      var data = {{ estaciones|safe }};
+      var rarexIcon =  L.divIcon({
+          html: '<i class="fas fa-radiation fa-2x" style="color: #286e28"></i>',
+          iconSize: [20, 20],
+          className: 'myDivIcon'
+        });
+      var spidaIcon =  L.divIcon({
+          html: '<i class="fas fa-tint fa-2x" style="color: #0e73b7"></i>',
+          iconSize: [20, 20],
+          className: 'myDivIcon'
+        });
+      var map = L.map('open_map').setView([39.4034522,-7.7628017], 7);
+      var Stamen_Terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
+          attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          subdomains: 'abcd',
+          minZoom: 0,
+          maxZoom: 20,
+          ext: 'png'
+      });
+      map.addLayer(Stamen_Terrain);
+      for (var i = 0; i< data.length; i++){
+        console.log(data[i].nombre);
+        var icon = rarexIcon;
+        if (data[i].red == 'SPIDA')
+          icon = spidaIcon;
+        var marker = L.marker([data[i].lat, data[i].lon], {icon: icon}).addTo(map);
+        marker.bindPopup(data[i].red + ":" + data[i].nombre);
+      }
+      /*Legend specific*/
+      var legend = L.control({ position: "bottomleft" });
+
+      legend.onAdd = function(map) {
+      var div = L.DomUtil.create("div", "legend");
+      div.innerHTML += '<i class="fas fa-radiation fa-2x" style="color: #286e28"></i><span>  Estación RAREx</span><br>';
+      div.innerHTML += '<i class="fas fa-tint fa-2x" style="color: #0e73b7"></i><span>   Estación SPIDA</span><br>';           
+   
+        
+
+        return div;
+      };
+
+      legend.addTo(map);
+    </script>
+</section><!-- End Trainers Section -->

@@ -1,0 +1,226 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+    ul.pagination li .page-link {
+        background-color: rgb(255, 255, 255) !important;
+        color: rgb(41, 68, 87);
+
+    }
+
+    ul.pagination li.active .page-link {
+        background-color: rgb(41, 68, 87) !important;
+        border-color: rgb(41, 68, 87) !important;
+    }
+
+    ul.pagination li .page-link:hover {
+        filter: brightness(85%);
+
+    }
+
+    ul.pagination li.active .page-link:hover {
+        filter: brightness(120%);
+
+    }
+
+    .btn-light {
+        color: rgb(41, 68, 87);
+    }
+
+    th {
+        color: rgb(41, 68, 87);
+    }
+
+    .addFicheroEditable {
+        color: rgb(9, 58, 65);
+    }
+
+    .addFicheroEditable:hover {
+        color: rgb(133, 198, 228);
+    }
+
+    /* estilo añadirFichero PDF*/
+    .addFicheroPDF {
+        color: rgb(161, 16, 32);
+    }
+
+    .addFicheroPDF:hover {
+        color: rgb(99, 10, 20);
+    }
+
+    .file-upload {
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+    }
+
+    .add:hover {
+        color: #ce8312;
+    }
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+    <h5 class="card-title">Procedimientos</h5>
+    <nav>
+        <ol class="breadcrumb" style="background-color:#fff !important">
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+                        class="bi bi-house-door"></i></a></li>
+            <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/objetos">Listado de
+            Archivos</a></li>
+            <li class="breadcrumb-item active" style="font-size: large;">Procedimientos por Tipo</li>
+        </ol>
+    </nav>
+</div>
+
+
+
+<div class="select col-4" >
+    <label for="tipoProcedimiento"><strong>Seleccione el tipo del procedimiento</strong></label>
+    <select class="form-control form-select" id="tipoProcedimiento" name="tipoProcedimiento" onchange="getSelecionados()">
+      {% for tipo in TipoProcedimientos %}
+          <option value="{{tipo}}">{{tipo}}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+<table id="tabla_procedimientos_tipo" data-toggle="table" data-search="true" data-show-columns="true"
+    data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+    data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+    data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+</table>
+
+
+
+<script type="text/javascript">
+
+function getSelecionados (){
+    // get value of selected  element in select box
+    var tipoProcedimiento = document.getElementById("tipoProcedimiento").value;
+    
+
+    // actualizar la tabla con los seleccionados
+    $("#tabla_procedimientos_tipo").bootstrapTable('refresh', {url: "/private/docLaruex/procedimientosDatosTipo/" + tipoProcedimiento +"/" });
+  }
+
+
+    $('#tabla_procedimientos_tipo').bootstrapTable({
+        method: 'get',
+        url: "/private/docLaruex/procedimientosDatosTipo/" + tipoProcedimiento +"/",
+        cache: false,
+        columns: [{
+            title: 'ID',
+            field: 'id_doc',
+            align: "center"
+        }, {
+            title: 'Código',
+            field: 'id_doc__nombre',
+            align: "center"
+        }, {
+            title: 'Título',
+            field: 'titulo',
+            align: "center"
+        }, {
+            title: 'Versión',
+            field: 'version',
+            align: "center"
+        }, {
+            title: 'Fecha',
+            field: 'fecha_verificacion',
+            align: 'center',
+            sortable: 'true',
+            formatter: function (value, row) {
+                var fecha = new Date(row.fecha_verificacion);
+                return $.datepicker.formatDate('dd-mm-yy', fecha);
+            }
+        }, {
+            title: 'Responsable / Revisor',
+            field: 'responsable__first_name',
+            align: "center"
+        }, {
+            title: 'Modificaciones',
+            field: 'modificaciones',
+            align: "center"
+        }, {
+            title: 'Habilitación',
+            field: 'id_doc__id_habilitacion__titulo',
+            align: "center"
+        }, {
+            title: "Estado",
+            field: "id_estado__nombre",
+            align: "center",
+            formatter: function (value, row) {          
+                var defecto ='<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+                switch(row.id_estado__id) {  
+                    case 1: 
+                    estado = '<span class="badge badge-success" style="background-color: #21b563;">Operativo</span>';
+                    return estado;
+                    break;          
+                    case 2: 
+                    estado = '<span class="badge" style="background-color: #21b563;">En Vigor</span>';
+                    return estado;
+                    break;
+                            
+                    case 3: 
+                    estado = '<span class="badge" style="background-color: #EB8E34;">En Mantenimiento</span>';
+                    return estado;
+                    break;
+                    case 4: 
+                    estado = '<span class="badge" style="background-color: #EB8E34;">En Revisión</span>';
+                    return estado;
+                    break;
+                    case 5: 
+                    estado = '<span class="badge" style="background-color: #524e4e;">Obsoleto</span>';
+                    return estado;
+                    break;
+                    case 6: 
+                    estado = '<span class="badge" style="background-color: #b52121;">No operativo</span>';
+                    return estado;
+                    break;
+                    case 7: 
+                    estado = '<span class="badge" style="background-color: #b52121;">Baja</span>';
+                    return estado;
+                    break;
+
+                    default:
+                    console.log("No se ha encontrado el estado", row.id_estado__id)
+                    return defecto;
+                    
+                }
+            },
+        },
+        {
+            title: "Acciones",
+            field: "action",
+            align: "center",
+            formatter: function (value, row) {
+                if (row.id_doc__ruta_editable) {
+                    return (
+                        '<a href="/private/docLaruex/verObjeto/' + row.id_doc + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>' +
+                        '<a href="/private/docLaruex/consultarArchivo/' + row.id_doc + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-lg" style="color:#A11020"></i></a>' +
+                        '<a href="/private/docLaruex/consultarArchivoEditable/' + row.id_doc + '/' + '" class="mx-1" title="Descargar" download><i class="fa-duotone fa-file-signature fa-lg" style="color:#266353"></i></a>'
+                    );
+                }
+                else {
+                    return (
+                        '<a href="/private/docLaruex/verObjeto/' + row.id_doc + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>' +
+                        '<a href="/private/docLaruex/consultarArchivo/' + row.id_doc + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-lg" style="color:#A11020"></i></a>'
+                    );
+                }
+            }
+        },
+        ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'fecha_verificacion',
+        sortOrder: 'desc',
+
+    });
+
+
+</script>
+{% endblock %}

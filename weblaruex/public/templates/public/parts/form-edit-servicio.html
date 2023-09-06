@@ -1,0 +1,181 @@
+{% load static %}{% load widget_tweaks %}
+
+<style>
+
+.card {
+ width: 70rem;
+ height: auto;
+ background: white;
+ border-radius: 10px;
+ transition: border-radius 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.shadow {
+ box-shadow: inset 0 -3em 3em rgba(0,0,0,0.1),
+             0 0  0 2px rgb(190, 190, 190),
+             0.3em 0.3em 1em rgba(0,0,0,0.3);
+}
+
+
+  /*--------------------------------------------------------------
+  # Añadir Imagen
+  --------------------------------------------------------------*/
+  .addImagen {
+    color: #1d8896;
+  }
+  
+  .addImagen:hover {
+    color: rgba(29, 136, 150, 10);
+    filter: brightness(80%);
+  }
+
+  .imagenCargada{
+    color: #1d9649;
+  }
+
+  .sinBorde:focus {
+    outline: none;
+  }
+
+  .ImagenServicio{
+    max-width: 350px;
+    background-color: rgb(7, 41, 45);
+    background: linear-gradient(to top right, rgb(7, 41, 45), rgb(89, 126, 123));
+    background: -webkit-linear-gradient(to top right, rgb(7 16 45), rgb(58 60 84));
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    border-radius: 20px;
+    border: 1px solid rgb(84, 104, 106);
+
+    
+  }
+  .ImagenServicio img{
+    width: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+    border: 1px solid rgb(84, 104, 106);
+  }
+
+</style>
+
+<!-- ======= Contact Section ======= -->
+<section id="contact" class="contact"  >
+  <div class="container d-flex justify-content-center" data-aos="fade-up" >
+    <div class="card shadow">
+      <div class="card-body">
+        <div class="row d-flex justify-content-center">
+          <div class="col-10">            
+              <form id="formularioEditarServicio" action="{% url 'public:publicEditarServicio' id=servicio.id %}" method="POST" enctype="multipart/form-data"
+              class="php-email-form" role="form">
+              {% csrf_token %}
+              
+              <div class="row my-3 form-group">
+                <div class="col-12">
+                  <div class="ImagenServicio mx-auto">
+                    <img src="{% static 'img/servicios/' %}{{ servicio.imagen }}" class="img-fluid" alt="..."  >
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                    <label for="categoriaServicioEditar"><strong>Categoría del servicio</strong></label>
+                    <select type="form-select"  class="form-control" data-rule="required" id="categoriaServicioEditar" name="categoriaServicioEditar" style="border-color: #1d8896;" required>
+                      <option hidden>{{servicio.categoria}}</option>
+                      <option value="interna">Interna</option>
+                      <option value="externa">Externa</option>
+                      <option value="mantenimientoWeb">Mantenimiento Web</option>
+                    </select>
+                </div>
+                <div class="col-md-6 col-sm-12 col-xs-12 form-group">
+                    <label for="grupoServicioEditar"><strong>Grupo</strong></label>
+                    <select type="form-select"  class="form-control" data-rule="required" id="grupoServicioEditar" name="grupoServicioEditar" style="border-color: #1d8896;" required>
+                      <option hidden>{{servicio.grupo}}</option>
+                      <option value="Administracion">Administracion</option>
+                      <option value="Alerta2">Alerta2</option>
+                      <option value="RAREx">RAREx</option>
+                      <option value="VRAEx">VRAEx</option>
+                      <option value="JUNTA">JUNTA</option>
+                      <option value="Laboratorios">Laboratorios</option>
+                      <option value="SPIDA">SPIDA</option>
+                      <option value="UNEX">UNEX</option>
+                      <option value="Web pública">Web Pública</option>
+                    </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col form-group">
+                  <label for="nombreServicioEditar"><strong>Nombre servicio</strong></label>
+                  <input type="text" class="form-control" id="nombreServicioEditar" name="nombreServicioEditar" data-rule="required" placeholder="GOOGLE" value="{{servicio.nombre}}" required/>
+                </div>
+              </div>
+              <div class="row">
+                  <div class="col form-group">
+                    <label for="urlServicioEditar"><strong>Enlace del servicio</strong></label>
+                    <input type="text" class="form-control" id="urlServicioEditar" name="urlServicioEditar" value="{{servicio.enlace}}" placeholder="https://google.es/" required/>
+                  </div>
+              </div>
+              <div class="row">
+                <div class="col form-group">
+                  <label for="descripcionServicioEditar"><strong>Descripción del servicio</strong></label>
+                    <textarea type="text" class="form-control" name="descripcionServicioEditar" id="descripcionServicioEditar" rows="3" 
+                    placeholder="Máximo 200 caracteres" style="white-space: pre-line; border-color: #1d8896;" maxlength="200" required>{{servicio.descripcion}}</textarea>
+                </div>
+              </div>
+
+
+              <div class="row my-2">
+                <div class="col-sm-12 d-flex justify-content-center">
+                  <div class="form-group">
+                    <label for="nuevaImagenServicioEditar">
+                      <i class="fa-duotone fa-image fa-6x addImagen" id="nuevoIconoImagenServicioEditar"></i>
+                    </label>
+                    <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                      id="nuevaImagenServicioEditar" name="nuevaImagenServicioEditar"
+                      onchange="mostrarNombreImagenServicioEditar(this.value)"/>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="text-center"><strong id="mostrarNombreImagenServicioEditar"><br></strong>
+                    <span id="imagen-name-servicio-edit"></span>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col d-flex justify-content-center">
+
+                  <button type="submit" value="submit" class="btn btn-primary" >
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section><!-- End Contact Section -->
+
+
+<script>
+  // mostramos el titulo de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
+  function mostrarNombreImagenServicioEditar(value) {
+    document.getElementById('imagen-name-servicio-edit').innerHTML = value;
+    // document.getElementById('imagen-name-servicio-edit').style.display = 'none';   
+    document.getElementById('mostrarNombreImagenServicioEditar').style.display = 'none';   
+
+    var iconoImagenServicioEditar = document.getElementById('nuevoIconoImagenServicioEditar');
+    iconoImagenServicioEditar.classList.remove("fa-image", "fa-6x", "addImagen");
+    iconoImagenServicioEditar.classList.add("fa-circle-check", "fa-6x", "imagenCargada");
+  }
+</script>
+
+
+
+

@@ -1,0 +1,442 @@
+{% extends "base/base2.html" %}
+{% load static %}
+{% block title %}
+    RARE
+{% endblock %}
+{% block imports %}
+    <link href="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.css" rel="stylesheet">
+
+    <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.js"></script>
+
+    <!-- scripts de grafica -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- aos -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+{% endblock %}
+
+{% block css %}
+        /* Zoom In #1 */
+        .hoverZoomIn figure img {
+            -webkit-transform: scale(1);
+            transform: scale(1);
+            -webkit-transition: .3s ease-in-out;
+            transition: .3s ease-in-out;
+        }
+        .hoverZoomIn figure:hover img {
+            -webkit-transform: scale(1.3);
+            transform: scale(1.3);
+        }
+        .select,
+        #locale {
+            width: 100%;
+        }
+        .like {
+            margin-right: 10px;
+        }
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-center m-5">
+            <h1>Invalidar datos</h1>
+            <h3>{{ estacion }}</h3>
+        </div>
+        <div class="col-12 mt-2 mb-5">
+            <div class="w-100">
+                <div id="chart"></div>
+            </div>
+            <div id="toolbarFinish" class="row text-center m-3 w-100">
+                {% if tabla == "Espec" %}
+                    <div class="custom-control custom-switch pt-2 pr-3 rounded border">
+                        <input id="checkbox_todos" type="checkbox" class="custom-control-input">
+                        <label class="custom-control-label" for="checkbox_todos">Todos isótopos</label>
+                    </div>
+                {% endif %}
+                <div id="progress_div" class="w-25 p-2">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                    <div class="alert alert-success" role="alert">
+                        Datos invalidados correctamente.
+                    </div>
+                    <div class="alert alert-danger" role="alert">
+                    </div>
+                </div>
+                <button id="button" class="btn btn-secondary" style="max-height:38px">Invalidar marcados</button>
+            </div>
+            <div id="toolbar">
+                <div class="input-group mb-3">
+                    {% if tabla == "Espec" %}
+                        <div class="custom-control custom-switch pt-2 pr-3 rounded border">
+                            <input id="checkbox_amd" type="checkbox" class="custom-control-input">
+                            <label class="custom-control-label" for="checkbox_amd">Actividad > AMD</label>
+                        </div>
+                        <input id="input_limite_inferior_amd" type="number" class="form-control" placeholder="amd inf">
+                        <input id="input_limite_superior_amd" type="number" class="form-control" placeholder="amd sup" aria-label="Limite superior_amd" aria-describedby="basic-addon3">
+                        <input id="input_limite_inferior" type="number" class="form-control" placeholder="act inf">
+                        <input id="input_limite_superior" type="number" class="form-control" placeholder="act sup" aria-label="Limite superior" aria-describedby="basic-addon2">
+                    {% elif tabla == "EspecAcum" %}
+                        <div class="custom-control custom-switch pt-2 pr-3 rounded border">
+                            <input id="checkbox_amd" type="checkbox" class="custom-control-input">
+                            <label class="custom-control-label" for="checkbox_amd">Actividad > AMD</label>
+                        </div>
+                        <input id="input_limite_inferior_amd" type="number" class="form-control" placeholder="amd inf">
+                        <input id="input_limite_superior_amd" type="number" class="form-control" placeholder="amd sup" aria-label="Limite superior_amd" aria-describedby="basic-addon3">
+                        <input id="input_limite_inferior" type="number" class="form-control" placeholder="act inf">
+                        <input id="input_limite_superior" type="number" class="form-control" placeholder="act sup" aria-label="Limite superior" aria-describedby="basic-addon2">
+                    {% elif tabla == "Gamma" %}
+                        <input id="input_limite_inferior" type="number" class="form-control" placeholder="valor inf">
+                        <input id="input_limite_superior" type="number" class="form-control" placeholder="valor sup" aria-label="Limite superior" aria-describedby="basic-addon2">
+                    {% endif %}
+                    <div class="input-group-append">
+                        <button id="button_limite" class="btn btn-outline-secondary" type="button">Aplicar filtros</button>
+                    </div>
+                </div>
+            </div>
+            <table id="tabla_valores"
+                   class="table table-bordered"
+                   data-toolbar=".toolbar"
+                   data-height="600"
+                   data-virtual-scroll="true"
+                   data-search="true"
+                   data-click-to-select="true"
+                   data-show-columns="true">
+                <thead id="tabla_valores_thead">
+                    <tr>
+                        <th data-field="state" data-checkbox="true"></th>
+                        {% if tabla == "Gamma" %}
+                            <th data-field="fecha" data-sortable="true" data-sort-name="fecha" data-sort-order="desc">Fecha</th>
+                            <th data-field="estacion">Estación</th>
+                            <th data-field="canal">Canal</th>
+                            <th data-field="valor" data-sortable="true" data-sort-order="desc">Valor</th>
+                            <th data-field="valido">Valido</th>
+                        {% elif tabla == "Espec" %}
+                            <th data-field="fecha" data-sortable="true" data-sort-name="fecha" data-sort-order="desc">Fecha</th>
+                            <th data-field="detector">Detector</th>
+                            <th data-field="isotopo">Isotopo</th>
+                            <th data-field="actividad" data-sortable="true" data-sort-order="desc">Actividad</th>
+                            <th data-field="error">Error</th>
+                            <th data-field="amd">AMD</th>
+                            <th data-field="valido">Valido</th>
+                        {% elif tabla == "EspecAcum" %}
+                            <th data-field="fecha" data-sortable="true" data-sort-name="fecha" data-sort-order="desc">Fecha</th>
+                            <th data-field="detector">Detector</th>
+                            <th data-field="isotopo">Isotopo</th>
+                            <th data-field="actividad" data-sortable="true" data-sort-order="desc">Actividad</th>
+                            <th data-field="error">Error</th>
+                            <th data-field="amd">AMD</th>
+                            <th data-field="valido">Valido</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody id="tabla_valores_tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $('.btnright').hide();
+    $('.btnleft').hide();
+    $('.alert-success').hide();
+    $('.alert-danger').hide();
+
+    var tabla = "{{ tabla }}";
+    var valores = {{ valores|safe }};
+
+    var $table = $('#tabla_valores');
+
+    var $checkboxAMD = $('#checkbox_amd');
+    var $inputLimiteInferiorAmd = $('#input_limite_inferior_amd');
+    var $inputLimiteInferior = $('#input_limite_inferior');
+    var $buttonLimite = $('#button_limite');
+    var $inputLimiteSuperiorAmd = $('#input_limite_superior_amd');
+    var $inputLimiteSuperior = $('#input_limite_superior');
+
+    var limiteInferiorAmd = 0;
+    var limiteSuperiorAmd = 1000000;
+    var limiteInferior = 0;
+    var limiteSuperior = 1000000;
+
+    var $button = $('#button');
+
+    var $fechas = [];
+    var $selected = [];
+    var $correcto = true;
+    var $fechasMal = "";
+
+    $(function() {
+        $table.bootstrapTable({
+            data: valores
+        })
+        $buttonLimite.click(function() {
+
+            $('.alert-success').hide();
+            $('.alert-danger').hide();
+            $('.alert-danger').text("");
+            $('.progress-bar').css('width', '0%').attr('aria-valuenow', 0);
+            $('.progress-bar').text('');
+            fechas = [];
+            if ($inputLimiteInferiorAmd.val() == ""){
+                limiteInferiorAmd = 0;
+            }
+            else{
+                limiteInferiorAmd = $inputLimiteInferiorAmd.val();
+            }
+            if ($inputLimiteSuperiorAmd.val() == ""){
+                limiteSuperiorAmd = 1000000;
+            }
+            else{
+                limiteSuperiorAmd = $inputLimiteSuperiorAmd.val();
+            }
+
+            if ($inputLimiteInferior.val() == ""){
+                limiteInferior = 0;
+            }
+            else{
+                limiteInferior = $inputLimiteInferior.val();
+            }
+            if ($inputLimiteSuperior.val() == ""){
+                limiteSuperior = 1000000;
+            }
+            else{
+                limiteSuperior = $inputLimiteSuperior.val();
+            }
+
+            for (var i = 0; i < valores.length; i++){
+                if (tabla == "Espec"){
+                    console.log("Actividad: " + limiteInferior + " --- " + valores[i].actividad + " --- " + limiteSuperior);
+                    console.log("AMD: " + limiteInferiorAmd + " --- " + valores[i].amd + " --- " + limiteSuperiorAmd);
+                    if ((valores[i].actividad >= limiteInferior)&&(valores[i].actividad <= limiteSuperior)&&(valores[i].amd >= limiteInferiorAmd)&&(valores[i].amd <= limiteSuperiorAmd)){
+                        console.log("Intento introducir");
+                        if ($('#checkbox_amd').is(":checked")){
+                            if(valores[i].actividad > valores[i].amd){
+                                fechas.push(valores[i].fecha);
+                            }
+                        }
+                        else{
+                            fechas.push(valores[i].fecha);
+                        }
+                    }
+                }
+                else if (tabla == "EspecAcum"){
+                    console.log("Actividad: " + limiteInferior + " --- " + valores[i].actividad + " --- " + limiteSuperior);
+                    console.log("AMD: " + limiteInferiorAmd + " --- " + valores[i].amd + " --- " + limiteSuperiorAmd);
+                    if ((valores[i].actividad >= limiteInferior)&&(valores[i].actividad <= limiteSuperior)&&(valores[i].amd >= limiteInferiorAmd)&&(valores[i].amd <= limiteSuperiorAmd)){
+                        console.log("Intento introducir");
+                        if ($('#checkbox_amd').is(":checked")){
+                            if(valores[i].actividad > valores[i].amd){
+                                fechas.push(valores[i].fecha);
+                            }
+                        }
+                        else{
+                            fechas.push(valores[i].fecha);
+                        }
+                    }
+                }
+                else if (tabla == "Gamma"){
+                    if ((valores[i].valor >= limiteInferior)&&(valores[i].valor <= limiteSuperior)){
+                        fechas.push(valores[i].fecha);
+                    }
+                }
+            }
+            $table.bootstrapTable('filterBy', {
+                fecha: fechas
+            })
+        })
+        $button.click(function () {
+            console.log('getSelections: ' + JSON.stringify($table.bootstrapTable('getSelections')))
+            $selected = $table.bootstrapTable('getSelections');
+            console.log(tabla);
+            $correcto = true;
+            $fechasMal = "Los siguientes valores han fallado: ";
+            $fechas = [];
+            for (var i = 0; i < $selected.length; i++){
+                var porcentaje = (i*100)/$selected.length;
+                $('.progress-bar').css('width', porcentaje+'%').attr('aria-valuenow', porcentaje);
+                $('.progress-bar').text(porcentaje+'%');
+                var historico = "0";
+                {% if historico %}
+                    historico = "1";
+                {% endif %}
+                if (tabla == "Gamma"){
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        url:"/private/rare/invalidarDatoGamma/" + $selected[i].estacion + "/"+ $selected[i].canal + "/"+ $selected[i].fecha.split(" ")[0] + "/"+ $selected[i].fecha.split(" ")[1].replace("+00:00","").replaceAll(":","-") + "/"+historico+"/",
+                        success: function(data)
+                        {
+                            if (data.valor != 1){
+                                $correcto = false;
+                                $fechasMal = $fechasMal + ", " + $selected[i].fecha;
+                            }
+                        },
+                    })
+                }
+                else if (tabla == "Espec"){
+                    var todos = 0;
+                    if ($('#checkbox_todos').is(":checked")){
+                        todos = 1;
+                    }
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        url:"/private/rare/invalidarDatoEspec/" + $selected[i].detector + "/"+ $selected[i].isotopo + "/"+ $selected[i].fecha.split(" ")[0] + "/"+ $selected[i].fecha.split(" ")[1].replace("+00:00","").replaceAll(":","-") + "/" + todos + "/"+historico+"/",
+                        success: function(data)
+                        {
+                            if (data.valor != 1){
+                                $correcto = false;
+                                $fechasMal = $fechasMal + ", " + $selected[i].fecha;
+                            }
+                        },
+                    })
+                }
+                else if (tabla == "EspecAcum"){
+                    var todos = 0;
+                    if ($('#checkbox_todos').is(":checked")){
+                        todos = 1;
+                    }
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        url:"/private/rare/invalidarDatoEspecAcum/" + $selected[i].detector + "/"+ $selected[i].isotopo + "/"+ $selected[i].fecha.split(" ")[0] + "/"+ $selected[i].fecha.split(" ")[1].replace("+00:00","").replaceAll(":","-") + "/" + todos + "/"+historico+"/",
+                        success: function(data)
+                        {
+                            if (data.valor != 1){
+                                $correcto = false;
+                                $fechasMal = $fechasMal + ", " + $selected[i].fecha;
+                            }
+                        },
+                    })
+                }
+                if ($correcto)
+                    $fechas.push($selected[i].fecha);
+            }
+            $table.bootstrapTable('remove', {
+                field: 'fecha',
+                values: $fechas
+            })
+            $('.progress-bar').css('width', '100%').attr('aria-valuenow', 100);
+            $('.progress-bar').text('100%');
+            if($correcto){
+                $('.alert-success').show();
+            }
+            else{
+                $('.alert-danger').text(fechasMal);
+                $('.alert-danger').show();
+            }
+            /***
+            var todos = $table.bootstrapTable('getData');
+            console.log(todos);
+            var selected = $table.bootstrapTable('getSelections');
+            console.log(selected);
+            var hidden = $table.bootstrapTable('getHiddenRows', true);
+            console.log(hidden);
+            var difference = todos.filter(x => selected.indexOf(x) === -1);
+            console.log(difference);
+            var fechas = [];
+
+            for (var i = 0; i <script difference.length; i++){
+                console.log(difference[i]);
+            }
+            ***/
+        })
+    })
+
+    function drawChartPopup(datos) {
+        var fechas = [];
+        var valores = [];
+        var valoresAMD = [];
+        var series = [];
+        var title = "";
+
+        if ("{{tabla}}" == "Gamma"){
+            for (var i = 0; i < datos.length; i++){
+                fechas.push(new Date(datos[i].fecha).toISOString().replace(/T/, ' ').replace(/\..+/, ''));
+                valores.push(datos[i].valor);
+            };
+            series = [{
+                    name: "Valor",
+                    data: valores
+                }];
+            title = "Fecha. Media valor: " + Math.round(parseFloat("{{media.valor.valor__avg}}".replace(",",".")) * 100) / 100;
+        }
+        else{
+            for (var i = 0; i < datos.length; i++){
+                fechas.push(new Date(datos[i].fecha).toISOString().replace(/T/, ' ').replace(/\..+/, ''));
+                valores.push(datos[i].actividad);
+                valoresAMD.push(datos[i].amd);
+
+            };
+            series = [{
+                    name: "Valor",
+                    data: valores
+                },{
+                    name: "AMD",
+                    data: valoresAMD
+                }];
+            title = "Fecha. Media actividad: " + Math.round(parseFloat("{{media.actividad.actividad__avg}}".replace(",",".")) * 100) / 100 + ". Media AMD: " + Math.round(parseFloat("{{media.amd.amd__avg}}".replace(",",".")) * 100) / 100;
+        }
+
+        /**** grafica de valores de dosis ****/
+        var options = {
+            series: series,
+            colors: ['#08AC00', '#FCB400'],
+            chart: {
+                id: 'chart',
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: true
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight'
+            },
+            title: {
+                text: datos.Medida,
+                align: 'left'
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                    opacity: 0.5
+                },
+            },
+            xaxis: {
+                title: {
+                    text: title,
+                },
+                categories: fechas,
+                labels: {
+                    datetimeFormatter: {
+                        year: 'yyyy',
+                        month: 'MMM \'yy',
+                        day: 'dd MMM',
+                        hour: 'HH:mm'
+                    }
+                },
+                type: 'datetime',
+            },
+            yaxis: {
+                title: {
+                    text: datos.Unidades,
+                },
+            }
+        };
+
+        chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
+    }
+    drawChartPopup(valores);
+
+</script>
+{% endblock %}

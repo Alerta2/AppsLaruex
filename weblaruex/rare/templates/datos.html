@@ -1,0 +1,1242 @@
+{% extends 'base_rvra.html' %}
+{% load staticfiles %}
+
+
+{% block css %}
+  <link rel="stylesheet" type="text/css" href="{% static 'startbootstrap/css/bootstrap.min.css' %}" />
+   <link rel="stylesheet" type="text/css" href="{% static 'css/datos.css' %}" />
+
+   <link rel="stylesheet" type="text/css" href="{% static 'js/ol530/ol.css' %}" />
+   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+   <script type="text/javascript" src="{% static 'js/ol530/ol.js'%}"></script>
+
+
+<style type="text/css">
+      html, body, .map {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+
+   <style type="text/css">
+ .ol-zoom {
+      right: 8px;
+      left: auto;
+    }
+   </style>
+{% endblock css %}
+
+{% block content %}
+<div id="map" style="position:absolute;height: 100%;width: 100%;align:right;"></div>
+
+
+<div id="rosa_viento">
+<IMG SRC="{% static 'img/rosa_viento.png' %}" style="z-index:2; position:absolute; margin-left:80%;margin-top:1%;width:15%;height: 20%;" />
+</div>
+
+<div class="container" id="container_leyenda">
+<div id="leyenda" class="col-md-12" style="z-index:3;margin-left:70%;margin-top:26%;width:25%;height: 35%; position:absolute;border-radius: 25px;border: 2px solid #433003;background-image:url({% static "img/cielo.jpg" %});">
+
+      <div id="estimacion" class="col-md-12" style="width:100%;height: 10%;display:none;">
+         <h4 style="text-align: center;"><b>*{{estimacion_direccion_viento|escape}}</b></h4>
+      </div>
+      <div id="titulo_velocidad" class="col-md-12" style="width:100%;height: 15%;margin-bottom:4%;">
+        <h3 style="text-align: center;"><b>Vel. Viento (Km/h) </b></h3>
+      </div>
+
+      <div class="col-md-12" style="width:100%;height: 15%;">
+        <div class="col-md-6" style="width:50%;height: 50%;">
+        <h6 style="text-align: center;">Vel&lt;70</h6>
+        </div>
+        <div class="col-md-6" style="width:50%;height: 50%;">
+        <IMG SRC="{% static 'img/flechas/viento_a.png' %}" style="width:100%;height: 100%;z-index:3; position:absolute;" />
+        </div>
+      </div>
+
+
+   <div class="col-md-12" style="width:100%;height: 15%;">
+
+      <div class="col-md-6" style="width:50%;height: 50%;">
+        <h6 style="text-align: center;">70 &lt;Vel&lt;90</h6>
+        </div>
+        <div class="col-md-6" style="width:50%;height: 50%;">
+        <IMG SRC="{% static 'img/flechas/viento_n.png' %}" style="width:100%;height: 100%;z-index:3;  position:absolute;" />
+
+      </div>
+  </div>
+
+
+<div class="col-md-12" style="width:100%;height: 15%;">
+    <div class="col-md-6" style="width:50%;height: 50%;">
+      <h6 style="text-align: center;"> 90&lt;Vel</h6>
+      </div>
+      <div class="col-md-6" style="width:50%;height: 50%;">
+
+      <IMG SRC="{% static 'img/flechas/viento_r.png' %}" style="width:100%;height: 100%;z-index:3;  position:absolute;" />
+    </div>
+</div>
+
+<div class="col-md-12" style="width:100%;height: 15%;margin-bottom:4%;">
+        <h3 style="text-align: center;"><b>Dirección</b></h3>
+      </div>
+
+<div class="col-md-12" style="width:100%;height: 15%;">
+      <div class="col-md-6" style="width:50%;height: 50%;">
+        {% if estacion.id == 4 or estacion.id == 53 %}
+          <h6 style="text-align: center;"> Cabril - Estación</h6>
+        {% else %}
+          <h6 style="text-align: center;"> CNA - Estación</h6>
+        {% endif %}
+      </div>
+        <div class="col-md-6" style="width:50%;height: 50%;">
+           <IMG SRC="{% static 'img/flechas/direccionCentral.png' %}" style="width:100%;height: 100%;z-index:3; position:absolute;data-rotate:90;" />
+        </div>
+
+
+</div>
+
+
+</div>
+</div>
+
+
+<div class="container" id="container_principal" style="z-index:2; position:absolute;height: 90%;">
+
+
+  <div class="row" style="margin-top:4%; height: 10%;width: 100%;margin-bottom:4%;">
+    <div class="col-md-6 col-md-offset-4" >
+
+    <select id="menu_estaciones" class="form-control input-lg " style="border-radius: 25px;border: 2px solid #433003;background-image:url({% static 'img/cielo.jpg' %}); height: 10%;" onchange="this.options[this.selectedIndex].click();">
+      {% if estacion.id == 40 or estacion.id == 59 or estacion.id == 61 %}
+      {% if estacion.id == 40 %}
+        <option    value="{{estacion.id|escape}} "><h3 ><b>SAUCEDILLA </b></h3></option>
+      {% endif %}
+
+      {% if estacion.id == 59 %}
+        <option    value="{{estacion.id|escape}} "><h3 ><b>CACERES EXP. 1 </b></h3></option>
+      {% endif %}
+
+      {% if estacion.id == 61 %}
+        <option    value="{{estacion.id|escape}} "><h3 ><b>CACERES EXP. 2 </b></h3></option>
+      {% endif %}
+
+      {% else %}
+      <option    value="{{estacion.id|escape}} "><h3 ><b>{{estacion.nombre|escape}} </b></h3></option>
+      {% endif %}
+
+      {% for est in estaciones %}
+       {% if est.id != 9 and est.id != 40 and est.id != 59 and est.id != 61 and est.id != 92 %}
+      <option    value="{{est.id|escape}}" onclick="document.location.href='{% url 'Datos' est.id %}';" ><h3 ><b>{{est.nombre|escape}}  </b></h3></option>
+      {% endif %}
+      <!-- Aqui tengo que cambiar los nombres de las estaciones, por lo menos de Saucedilla-->
+      {% if est.id == 40 %}
+      <option    value="{{est.id|escape}}" onclick="document.location.href='{% url 'Datos' est.id %}';" ><h3 ><b>SAUCEDILLA  </b></h3></option>
+      {% endif %}
+
+      {% if est.id == 59 %}
+      <option    value="{{est.id|escape}}" onclick="document.location.href='{% url 'Datos' est.id %}';" ><h3 ><b>CACERES EXP. 1  </b></h3></option>
+      {% endif %}
+
+      {% if est.id == 61 %}
+      <option    value="{{est.id|escape}}" onclick="document.location.href='{% url 'Datos' est.id %}';" ><h3 ><b>CACERES EXP. 2  </b></h3></option>
+      {% endif %}
+
+
+      {% endfor %}
+
+
+    </select>
+
+    </div>
+  </div>
+
+  <!--Fila superior con grafica e isotopos -->
+    {% if ultimo_valor %}
+    <div class="row" style="height: 40%;">
+      <div id="dosis" class="col-md-12 col-xs-12" style="height: 100%;" >
+        <div class="apartado effect9" style="height: 100%;width: 100%;margin-right:5%; border-radius: 25px;border: 4px solid #433003;opacity:1;background-image:url({% static 'img/cielo.jpg' %});background-size:100% 100%;">
+        <div style=" height: 10%;width: 100%;margin-left:1%;">
+         <div class="col-md-4 col-xs-6" style="z-index:1;">
+              <h3><b>Tasa de dosis</b></h3>
+          </div>
+        <div class="col-md-8 col-xs-6">
+
+              {% if estacion.id < 4000 %}
+              {% if antiguo %}
+              <h3 id="tasa_dosis_mensaje_h3"><b> {{ultimo_valor.valor|floatformat:3}} &micro;Sv/h </b> ( {{ultimo_valor.fecha_hora|date:"H:i"}} {{ultimo_valor.fecha_hora|date:"d/m/y"}}) </h3>
+              {% else %}
+              <h1 id="tasa_dosis_mensaje_h1"><b> {{ultimo_valor.valor|floatformat:3}} &micro;Sv/h </b> ( {{ultimo_valor.fecha_hora|date:"H:i"}} ) </h1>
+              {% endif %}
+              {% else %}
+
+              {% if antiguo %}
+              <h3 id="tasa_dosis_mensaje_h3"><b> {{ultimo_valor.valor|floatformat:3}} &micro;Sv/h </b> ( {{ultimo_valor.fecha|date:"d/m/y"}}) </h3>
+              {% else %}
+              <h1 id="tasa_dosis_mensaje_h1"><b> {{ultimo_valor.valor|floatformat:3}} &micro;Sv/h </b> ( {{ultimo_valor.fecha|date:"d/m/y"}} ) </h1>
+              {% endif %}
+
+              {% endif %}
+
+        </div>
+      </div>
+
+
+        <div id="tasa_dosis" style="height: 65%;width: 100%;margin-top:4%;"></div>
+
+       <div class="col-md-12 col-xs-12" style="z-index:1;">
+              <input type="checkbox" name="limite2" value="limite1" style="z-index:2;" onchange="SelectCheckbox(this)" checked >Alerta</input>
+              <input type="checkbox" name="limite3" value="limite2" style="z-index:2;" onchange="SelectCheckbox(this)" checked>Emergencia</input>
+        </div>
+
+        </div>
+
+      </div>
+    </div>
+      {% endif %}
+
+
+      {% if meteorologia_maximas %}
+      {% if estacion.id == 1 or estacion.id == 3 or estacion.id == 7 or estacion.id == 8 or estacion.id == 11 %}
+      <div id="meteo" class="col-md-12 col-xs-12" style="height: 50%;margin-top:4%;postion:absolute; border-radius: 25px;border: 4px solid #433003;background-image:url({% static 'img/cielo.jpg' %});background-size:100% 100%;">
+          <h3 style=" height: 10%;width: 100%;margin-left:1%" ><b>*Meteorología estimada</b></h3>
+      {% else %}
+     <div id="meteo" class="col-md-12 col-xs-12" style="height: 50%;margin-top:4%;postion:absolute; border-radius: 25px;border: 4px solid #433003;background-image:url({% static 'img/cielo.jpg' %});background-size:100% 100%;">
+          <h3 style=" height: 10%;width: 100%;margin-left:1%" ><b>Meteorología</b></h3>
+      {% endif %}
+          {% for meteorologia in meteorologia_maximas %}
+              <div id="col_meteo" class="col-md-2 col-xs-2" style="margin-bottom:5%;margin-top:1%;width:16%;height: 100%">
+                  <div class="col-md-12 col-xs-12" style="margin-bottom:1%;height: 10%"><b> {{meteorologia.hora}}:00</b></div>
+                  <!-- Modificado David para mostrar Meteo bien aumento width de img de 50 a 100 y cambio de icono-->
+                  <!-- <div class="col-md-12 col-xs-12" style="margin-bottom:1%;height: 10%"><img src="{% static "img/13_g.png" %}" width="100%"/></div> -->
+                  <div class="col-md-12 col-xs-12" style="margin-bottom:1%;height: 10%"><img src="{% static 'img/iconomet' %}/{{meteorologia.icometeo|safe}}.png" width="100%"/></div>
+                  <div class="col-md-12 col-xs-12" style="margin-bottom:1%;height: 10%"><b>{{meteorologia.maximo_tem}}&deg;C</b></div>
+                   <div class="col-md-12 col-xs-12" style="margin-bottom:1%;height: 10%"><b>{{meteorologia.maximo_pre}}mm</b></div>
+
+                    <!-- Modificado David para que ponga otro icono-->
+                   {% if estacion.id == 4 or estacion.id == 53 %}
+                    <div class="col-md-12 col-xs-12" style="margin-bottom:1%;height: 10%"><IMG SRC="{% static 'img/flechas' %}/direccionCabril_{{icono_central|safe}}.png" style="width:100%;height: 100%;"/></div>
+                    {% else %}
+                    <div class="col-md-12 col-xs-12" style="margin-bottom:1%;height: 10%"><IMG SRC="{% static 'img/flechas' %}/direccionCentral_{{icono_central|safe}}.png" style="width:100%;height: 100%;"/></div>
+                    {% endif %}
+
+                   <div class="col-md-12 col-xs-12" style="margin-bottom:1%;height: 10%"><IMG SRC="{% static 'img/flechas' %}/direccion_{{meteorologia.angulo|safe}}.png" style="width:100%;height: 100%;"/></div>
+
+                    <div class="col-md-12 col-xs-12" style="margin-bottom:1%;height: 10%"><b>{{meteorologia.velocidad_viento}}m/s</b></div>
+
+              </div>
+          {% endfor %}
+
+
+     </div>
+     {% endif %}
+
+     {% if lista_detectores_isotopos %}
+
+
+     {% if estacion.id == 12 or estacion.id == 57 %}
+
+       <div id="detectores_isotopos" class="col-md-12 col-xs-12" style="height: 30%;margin-top:4%;">
+          <div style="border-radius: 25px;border: 4px solid #433003;background-image:url({% static 'img/agua.jpg' %});background-size:100% 100%;height: 100%;width: 100%;">
+
+      {% else %}
+
+      <div id="detectores_isotopos" class="col-md-12 col-xs-12" style="height: 30%;margin-top:4%;">
+          <div style="border-radius: 25px;border: 4px solid #433003;background-image:url({% static 'img/cielo.jpg' %});background-size:100% 100%;height: 100%;width: 100%;">
+
+      {% endif %}
+
+              <!-- Cargo un css diferente para el tipo de etiqueta h3-->
+              {% if estacion.id == 12 or estacion.id == 13 or estacion.id == 57 %}
+               <style>
+               .iso{
+                  color: white;
+               }
+               </style>
+              {% endif %}
+-*
+              <div style=" height: 10%;width: 100%;margin-left:1%; ">
+                    <div class="col-md-6 col-xs-6">
+                        <h3 class="iso" ><b>Isótopos</b></h3>
+                    </div>
+                    <div class="col-md-6 col-xs-6">
+                          <h4 class="iso"><b>{{lista_detectores_isotopos.0.fecha|escape}}</b></h3>
+                    </div>
+              </div>
+
+              <!--Isotopos artificiales-->
+              <div class="col-md-6 col-xs-6" style="height: auto; ">
+                  <div class="col-md-12 col-xs-12">
+                          <h4  class="iso" style="{{estilo}}"><b>Artificiales</b></h4>
+                    </div>
+                  {% for detec in lista_detectores_isotopos %}
+                  {% if detec.artificial == '1' %}
+                  <div class="col-lg-3 col-xs-3" style="z-index:1;margin-bottom:1%;">
+
+                        <button onclick="obtener_datos_isotopo({{detec.id_detector|escape}},{{detec.id|escape}},'{{detec.abreviado|safe}}')" style="margin-bottom:1%; cursor: pointer; cursor: hand;border-radius: 25px;"class="btn {{detec.icono}}" ><h7>{{detec.abreviado|safe}}</h7></button>
+
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+             </div>
+             <!--Isotopos naturales-->
+              <div class="col-md-6 col-xs-6">
+                  <div class="col-md-12 col-xs-12">
+                          <h4 class="iso" style="{{estilo}}"><b>Naturales</b></h4>
+                    </div>
+                  {% for detec in lista_detectores_isotopos %}
+                  {% if detec.artificial == '0' %}
+                  <div class="col-lg-3 col-xs-3" style="z-index:1;margin-bottom:1%;">
+
+                        <button onclick="obtener_datos_isotopo({{detec.id_detector|escape}},{{detec.id|escape}},'{{detec.abreviado|safe}}')" style="margin-bottom:1%; cursor: pointer; cursor: hand;border-radius: 25px;"class="btn {{detec.icono}}" ><h7 >{{detec.abreviado|safe}}</h7></button>
+
+                      </div>
+                      {% endif %}
+                  {% endfor %}
+
+
+
+             </div>
+            <!--Gamma Total-->
+            <div class="col-md-6 col-xs-6">
+                  <div class="col-md-12 col-xs-12">
+                          <h4 class="iso" style="{{estilo}}"><b>Gamma Total</b></h4>
+                    </div>
+                  {% for detec in lista_detectores_isotopos %}
+                  {% if detec.artificial == '2' %}
+              <div class="col-lg-6 col-xs-6" style="z-index:1;margin-bottom:1%;">
+                    <button onclick="obtener_datos_isotopo({{detec.id_detector|escape}},{{detec.id|escape}},'{{detec.abreviado|safe}}')" style="margin-bottom:1%; cursor: pointer; cursor: hand;border-radius: 25px;"class="btn {{detec.icono}}" ><h7 >{{detec.abreviado|safe}}</h7></button>
+
+            </div>
+                {% endif %}
+              {% endfor %}
+
+          </div>
+
+            <h1 style="opacity: 0;">a</h1>
+          </div>
+
+     </div>
+
+     {% if estacion.id == 12 or estacion.id == 57 %}
+
+     <div id="grafica_isotopos" class="col-md-8 col-xs-8" style="height: 40%;margin-top:4%;display:none;" >
+        <div class="apartado effect9" style="height: 100%;width: 100%;margin-right:5%; border-radius: 25px;border: 4px solid #433003;background-image:url({% static "img/agua.jpg" %});background-size:100% 100%;">
+              <div class="col-md-6 col-xs-6">
+               <h3 class="iso" style=" height: 10%;width: 100%;margin-left:1%;" ><b id="id_isotopo_select">Isótopos</b></h3>
+             </div>
+
+     {% else %}
+     <div id="grafica_isotopos" class="col-md-8 col-xs-8" style="height: 40%;margin-top:4%;display:none;" >
+        <div class="apartado effect9" style="height: 100%;width: 100%;margin-right:5%; border-radius: 25px;border: 4px solid #433003;background-image:url({% static "img/cielo.jpg" %});background-size:100% 100%;">
+              <div class="col-md-6 col-xs-6">
+               <h3 style=" height: 10%;width: 100%;margin-left:1%;" ><b id="id_isotopo_select">Isótopos</b></h3>
+             </div>
+      {% endif %}
+
+            {% if estacion.id == 12 or estacion.id == 57 %}
+              <div class="col-md-6 col-xs-6">
+                      <div class="col-md-9 col-xs-9">
+                    <h4 class="iso"><b>{{lista_detectores_isotopos.0.fecha|escape}}</b></h4> <!-- Modificado David -->
+                  </div>
+            {% else %}
+               <div class="col-md-6 col-xs-6">
+                      <div class="col-md-9 col-xs-9">
+                    <h4><b>{{lista_detectores_isotopos.0.fecha|escape}}</b></h4> <!-- Modificado David -->
+                  </div>
+            {% endif %}
+
+                  <div class="col-md-3 col-xs-3">
+                    <button onclick="document.getElementById('grafica_isotopos').style.display='none';document.getElementById('detectores_isotopos').style.display='block';" style="z-index:2;align:right;margin-bottom:1%; cursor: pointer; cursor: hand;border-radius: 25px;"class="btn btn-info" >Cerrar</button>
+                    </div>
+                </div>
+              <div id="valores_isotopos" style="height: 70%;width: 100%;margin-top:4%;"></div>
+
+        </div>
+      </div>
+
+     {% endif %}
+
+    {% if lista_radon_yodo %}
+    {% if estacion.id != 40 and estacion.id != 56 %}
+       <div id="detectores_particulas" class="col-md-12 col-xs-12" style="height: 30%;margin-top:4%;">
+          <div style="border-radius: 25px;border: 4px solid #433003;background-image:url({% static "img/cielo.jpg" %});background-size:100% 100%;">
+
+              <div style=" height: 10%;width: 100%;margin-left:1%;">
+                    <div class="col-md-6 col-xs-6">
+                          <h4><b>Monitor de Partículas</b></h4>
+                    </div>
+                    <div class="col-md-6 col-xs-6">
+                          <h3><b>{{lista_radon_yodo.0.fecha|escape}}</b></h3>
+                    </div>
+              </div>
+
+              <br>
+
+
+ <div class="col-md-12 col-xs-12">
+              {% for detec in lista_radon_yodo %}
+              <div class="col-lg-3 col-xs-3" style="z-index:1;">
+
+                    <button onclick="obtener_datos_particula({{detec.id_estacion|escape}},{{detec.id_canal|escape}},'{{detec.nombre}}')" style="margin-bottom:1%; cursor: pointer; cursor: hand;border-radius: 25px;"class="btn {{detec.icono}}"><h7>{{detec.nombre}}</h7></button>
+
+
+
+                  </div>
+
+              {% endfor %}
+            </div>
+             <br>
+           <div class="col-md-12 col-xs-12">
+              <!-- Hay que poner aqui los valores de Alfa, beta, etc-->
+              {% for detec in lista_radon_yodo %}
+              <div class="col-lg-3 col-xs-3" style="z-index:1;">
+                    {% if "-" in detec.valor %}
+                    <h4>0.0Bq/m3</h4>
+                    {% else %}
+                    <h4>{{detec.valor}}Bq/m3</h4>
+                    <!-- Hay que poner aqui los valores de Alfa, beta, etc-->
+                    {% endif %}
+                  </div>
+              {% endfor %}
+            </div>
+            <h1 style="opacity: 0;">a</h1>
+         </div>
+     </div>
+
+
+     <div id="grafica_particulas" class="col-md-12 col-xs-12" style="height: 40%;margin-top:4%;display:none;" >
+        <div class="apartado effect9" style="height: 100%;width: 100%;margin-right:5%; border-radius: 25px;border: 4px solid #433003;background-image:url({% static "img/cielo.jpg" %});background-size:100% 100%;">
+        <div class="col-md-6 col-xs-6">
+         <h3 style=" height: 10%;width: 100%;margin-left:1%;" ><b id="id_particula_select">Isótopos</b> </h3>
+        </div>
+        <div class="col-md-6 col-xs-6">
+          <div class="col-md-9 col-xs-9">
+                    <h4><b>{{lista_radon_yodo.0.fecha|escape}}</b></h4>
+                  </div>
+            <div class="col-md-3 col-xs-3">
+                  <button onclick="document.getElementById('grafica_particulas').style.display='none';document.getElementById('detectores_particulas').style.display='block';" style="z-index:2;margin-bottom:1%; cursor: pointer; cursor: hand;border-radius: 25px;"class="btn btn-info" >cerrar</button>
+            </div>
+        </div>
+         <div id="valores_particulas" style="height: 70%;width: 100%;margin-top:5%"></div>
+        </div>
+      </div>
+
+      {% endif %}
+
+     {% endif %}
+
+     {% if lista_yodo_cesio %}
+
+
+      {% if estacion.id == 12 or estacion.id == 13 or estacion.id == 57 %}
+               <style>
+               .iso{
+                  color: white;
+               }
+               </style>
+      {% endif %}
+
+      {% if estacion.id == 13 %}
+       <div id="detectores_monocanal" class="col-md-12 col-xs-12" style="height: 25%;margin-top:4%;">
+          <div style="border-radius: 25px;border: 4px solid #433003;background-image:url({% static "img/agua.jpg" %});background-size:100% 100%;">
+
+
+              <div style=" height: 10%;width: 100%;margin-left:1%;">
+                    <div class="col-md-6 col-xs-6">
+                          <h4 class="iso"><b>Monocanales en Agua</b></h4>
+                    </div>
+                    <div class="col-md-6 col-xs-6">
+                          <h3 class="iso"><b>{{lista_yodo_cesio.0.fecha|escape}}</b></h3>
+                    </div>
+              </div>
+
+              <!--
+              <h3 style=" height: 10%;width: 100%;margin-left:1%;color:gray;" ><b>Monocanales en Agua</b></h3>
+              -->
+             <div class="col-md-12 col-xs-12">
+              {% for detec in lista_yodo_cesio %}
+              <div class="col-md-3 col-xs-3" style="z-index:1;">
+
+                    <button onclick="obtener_datos_monocanal({{detec.id_estacion|escape}},{{detec.id_canal|escape}},'{{detec.nombre}}')"  style="margin-bottom:1%; cursor: pointer; cursor: hand;border-radius: 25px;"class="btn {{detec.icono}}" ><h7 >{{detec.nombre}}</h7></button>
+
+                  </div>
+              {% endfor %}
+            </div>
+              <!-- Aqui se muestra el ultimo valor registrado para cada -->
+              <div class="col-md-12 col-xs-12">
+              </br>
+              {% for detec in lista_yodo_cesio %}
+              <div class="col-md-3 col-xs-3" style="z-index:1;">
+                    {% if "-" in detec.valor %}
+                    <h4 style="color: white;">0.0 Bq/L</h4>
+                    {% else %}
+                    <h4 style="color: white;">{{detec.valor}} Bq/L</h4>
+                    {% endif %}
+
+                  </div>
+              {% endfor %}
+            </div>
+
+           <h1 style="opacity: 0;">a</h1>
+         </div>
+     </div>
+
+
+
+     <div id="grafica_monocanal" class="col-md-12 col-xs-12" style="height: 40%;margin-top:4%;display:none;" >
+        <div class="apartado effect9" style="height: 100%;width: 100%;margin-right:5%; border-radius: 25px;border: 4px solid #433003;background-image:url({% static "img/agua.jpg" %});background-size:100% 100%;">
+        <div class="col-md-6 col-xs-6">
+         <h3 class="iso" style=" height: 10%;width: 100%;margin-left:1%;" ><b id="id_monocanal_select">Monocanales en Agua</b> </h3>
+        </div>
+        <div class="col-md-6 col-xs-6">
+          <div class="col-md-9 col-xs-9">
+                    <h4 class="iso"><b>{{lista_yodo_cesio.0.fecha|escape}}</b></h3>
+                  </div>
+            <div class="col-md-3 col-xs-3">
+                  <button onclick="document.getElementById('grafica_monocanal').style.display='none';document.getElementById('detectores_monocanal').style.display='block';" style="z-index:2;margin-bottom:1%; cursor: pointer; cursor: hand;border-radius: 25px;"class="btn btn-info" >cerrar</button>
+            </div>
+        </div>
+         <div id="valores_monocanal" style="height: 70%;width: 95%;margin-top:2%"></div>
+        </div>
+      </div>
+      {% endif %}
+
+     {% endif %}
+
+  <!--Fin Fila superior con grafica e isotopos -->
+
+
+
+
+
+</div>
+
+{% endblock content %}
+
+
+{% block js %}
+<script>
+//alert(window.innerWidth);
+
+
+var dispositivo = navigator.userAgent.toLowerCase();
+var markers=[]
+var center;
+var myLatLng;
+var LatCen;
+var LonCen;
+
+var vectorSource = new ol.source.Vector({});
+
+function initMap() {
+  myLatLng = {lat: {{estacion.map_lat|escape}},lng: {{estacion.map_lon|escape}}};
+  LatCen = {{estacion.map_lat|escape}};
+  LonCen = {{estacion.map_lon|escape}};
+  var viento = {lat: {{estacion.map_lat|escape}},lng: {{estacion.map_lon|escape}}};
+
+
+  center = {lat: {{estacion.map_lat|escape}}-0.002,lng: {{estacion.map_lon|escape}}-0.004};
+  var lati = {{estacion.map_lat|escape}}-0.002;
+  var loni = {{estacion.map_lon|escape}}-0.004;
+
+  map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          }),
+          new ol.layer.Vector({
+          source: vectorSource
+      })
+        ],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([loni,lati]),
+          zoom: 12
+        })
+      });
+
+
+  /*
+
+  var marker = new google.maps.Marker({
+    position: myLatLng,
+    map: map
+  });*/
+  if( dispositivo.search(/iphone|ipod|ipad|android/) == -1 ){
+            if ({{direccion_viento}}!=-1){
+
+                  var ruta_img = "{% static img %}"+"img/flechas/viento_"+{{direccion_viento}}+".gif";
+
+                  var iconStyle = new ol.style.Style({
+                    image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                    opacity: 1.0,
+                    src: ruta_img
+                    }))
+                    });
+
+
+
+
+      var marker = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([loni, lati]))
+
+      });
+
+
+      marker.set('name','marcador');
+
+      marker.setStyle(iconStyle);
+
+
+
+      vectorSource.addFeature(marker);
+
+
+          }
+}
+
+    setTimeout(pintar_central(),100);
+
+}
+
+var pintar_limite=false;
+var data_dosis;
+var options_dosis;
+var chart_dosis;
+google.charts.load('current', {packages: ['corechart', 'line']});
+google.charts.setOnLoadCallback(pintargraficaDosis);
+
+function pintargraficaDosis(){
+  var dosis=[{{lista_dosis|safe}}];
+
+  var identificadorEstacion = {{estacion.id|safe}}
+
+
+  var dateFormatter;
+
+
+  if (identificadorEstacion < 4000){
+    dateFormatter = new google.visualization.DateFormat({pattern: 'dd/MM/yyyy HH:mm'});
+  }else{
+    dateFormatter = new google.visualization.DateFormat({pattern: 'dd/MM/yy'});
+  }
+
+  var valorFormatter = new google.visualization.NumberFormat({pattern:'#.###'});
+
+
+  data_dosis = new google.visualization.DataTable();
+
+      data_dosis.addColumn('datetime', 'Date');
+      data_dosis.addColumn('number', 'H\u2081\u2080');
+      data_dosis.addColumn('number', 'Alerta');
+      data_dosis.addColumn('number', 'Emergencia');
+
+      data_dosis.addRows([{{lista_dosis|safe}}]);
+      dateFormatter.format(data_dosis, 0);
+      valorFormatter.format(data_dosis, 1);
+
+if (identificadorEstacion < 4000){
+    options_dosis = {
+        lineWidth: 3,
+        vAxis: {
+          textStyle: {color: 'black', fontName: 'arial', fontSize: 13},
+          title: 'H\u2081\u2080 (\u00B5Sv/h)',
+          format: '0.000',
+          gridlines: {
+                      color: '#8D7D7D'
+                    }
+
+        },
+        hAxis: {
+          textStyle: {color: 'black', fontName: 'arial', fontSize: 16},
+          textPosition: 'bottom',
+          title: 'Hora',
+           format: 'HH:mm',
+           gridlines: {
+                      color: '#8D7D7D'
+                    }
+
+        },
+         //backgroundColor: '#F5F0E4',
+         backgroundColor: 'none',
+         legend: { position: 'top' },
+         chartArea: {width: 'auto', height: 'auto'},
+         series: {
+            0: { color: '#0000FF' },
+            1: { color: '#FF9100' },
+            2: { color: '#FF0000' }
+          }
+
+      };
+    }else{
+      options_dosis = {
+        lineWidth: 3,
+        vAxis: {
+          textStyle: {color: 'black', fontName: 'arial', fontSize: 13},
+          title: 'H\u2081\u2080 (\u00B5Sv/h)',
+          format: '0.000',
+          gridlines: {
+                      color: '#8D7D7D'
+                    }
+
+        },
+        hAxis: {
+          textStyle: {color: 'black', fontName: 'arial', fontSize: 16},
+          textPosition: 'bottom',
+          title: 'Dia',
+           format: 'dd/MM',
+           gridlines: {
+                      color: '#8D7D7D'
+                    }
+
+        },
+         //backgroundColor: '#F5F0E4',
+         backgroundColor: 'none',
+         legend: { position: 'top' },
+         chartArea: {width: 'auto', height: 'auto'},
+         series: {
+            0: { color: '#0000FF' },
+            1: { color: '#FF9100' },
+            2: { color: '#FF0000' }
+          }
+
+      };
+    }
+
+       chart_dosis = new google.visualization.LineChart(document.getElementById('tasa_dosis'));
+
+      chart_dosis.draw(data_dosis, options_dosis);
+
+}
+
+
+//{% if lista_dosis %}
+  //pintargrafica();
+//{% endif %}
+
+
+function pintarGrafica(datos,div){
+
+var dateFormatter = new google.visualization.DateFormat({pattern: 'dd/MM/yyyy HH:mm'});
+  var data = new google.visualization.DataTable();
+
+      data.addColumn('datetime', 'Date');
+      data.addColumn('number', 'Ae');
+      if(div=='valores_isotopos'){
+        data.addColumn('number', 'Amd');
+      }
+      datos='['+datos+']'
+
+      data.addRows(eval(datos));
+      dateFormatter.format(data, 0);
+
+      var options = {
+        lineWidth: 4,
+        vAxis: {
+          textStyle: {color: 'black', fontName: 'arial', fontSize: 13},
+          title: 'Ae (Bq/m\u00B3)',
+          gridlines: {
+                      color: '#8D7D7D'
+                    }
+
+        },
+        hAxis: {
+          textStyle: {color: 'black', fontName: 'arial', fontSize: 16},
+          title: 'Hora',
+           format: 'HH:mm',
+           gridlines: {
+                      color: '#8D7D7D'
+                    },
+        },
+         backgroundColor: 'none',
+         legend: { position: 'top' },
+         chartArea: {width: 'auto', height: 'auto'},
+         series: {
+            0: { color: '#276C0C' },
+            1: { color: '#e7711b' }
+          }
+
+
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById(div));
+
+      chart.draw(data, options);
+
+}
+
+
+
+function pintarGraficaIsoAgua(datos,div){
+
+var dateFormatter = new google.visualization.DateFormat({pattern: 'dd/MM/yyyy HH:mm'});
+  var data = new google.visualization.DataTable();
+
+      data.addColumn('datetime', 'Date');
+      data.addColumn('number', 'Ae');
+      if(div=='valores_isotopos'){
+        data.addColumn('number', 'Amd');
+      }
+      datos='['+datos+']'
+
+      data.addRows(eval(datos));
+      dateFormatter.format(data, 0);
+
+      var options_agua = {
+        lineWidth: 4,
+        vAxis: {
+          textStyle: {color: 'white', fontName: 'arial', fontSize: 13},
+          title: 'Ae (Bq/L)',
+          titleTextStyle: {color: 'white'},
+          gridlines: {
+                      color: 'white'
+                    }
+
+        },
+        hAxis: {
+          textStyle: {color: 'white', fontName: 'arial', fontSize: 16},
+          title: 'Hora',
+          titleTextStyle: {color: 'white'},
+           format: 'HH:mm',
+           gridlines: {
+                      color: 'white'
+                    },
+        },
+         backgroundColor: 'none',
+         legend: { position: 'top' },
+         legendTextStyle: {color: 'white'},
+         chartArea: {width: 'auto', height: 'auto'},
+         series: {
+            0: { color: 'LawnGreen' },
+            1: { color: 'orange' }
+          }
+
+
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById(div));
+
+      chart.draw(data, options_agua);
+
+}
+
+
+
+function pintarGraficaAgua(datos,div){
+
+var dateFormatter = new google.visualization.DateFormat({pattern: 'dd/MM/yyyy HH:mm'});
+  var data = new google.visualization.DataTable();
+
+      data.addColumn('datetime', 'Date');
+      data.addColumn('number', 'Ae');
+      // if(div=='valores_isotopos'){
+      //   data.addColumn('number', 'Amd');
+      // }
+      datos='['+datos+']';
+
+      data.addRows(eval(datos));
+      dateFormatter.format(data, 0);
+
+      // if (div=='valores_isotopos'){
+
+      //   var options_agua2 = {
+      //     lineWidth: 4,
+      //     vAxis: {
+      //       textStyle: {color: 'white', fontName: 'arial', fontSize: 14},
+      //       //title: 'Ae (Bq/m\u00B3)',
+      //       title: 'Ae (Bq/L)',
+      //       titleTextStyle: {color: 'white'},
+      //       gridlines: {
+      //                   color: 'white'
+      //                 }
+
+      //     },
+      //     hAxis: {
+      //       textStyle: {color: 'white', fontName: 'arial', fontSize: 10},
+      //       title: 'Hora',
+      //       titleTextStyle: {color: 'white'},
+      //        format: 'HH:mm',
+      //        gridlines: {
+      //                   //color: '#8D7D7D'
+      //                   color: '#white'
+      //                 }
+      //     },
+      //      backgroundColor: 'none',
+      //      legend: { position: 'top' },
+      //      legendTextStyle: {color: 'white'},
+      //      chartArea: {width: 'auto', height: 'auto'},
+      //      series: {
+      //         //0: { color: '#276C0C' },
+      //         0: { color: 'LawnGreen' },
+      //         1: { color: 'orange' }
+
+      //       }
+
+
+      //   };
+      // }else{
+
+        var options_agua2 = {
+          lineWidth: 4,
+          vAxis: {
+            textStyle: {color: 'white', fontName: 'arial', fontSize: 14},
+            //title: 'Ae (Bq/m\u00B3)',
+            title: 'Ae (Bq/L)',
+            titleTextStyle: {color: 'white'},
+            gridlines: {
+                        color: 'white'
+                      }
+
+          },
+          hAxis: {
+            textStyle: {color: 'white', fontName: 'arial', fontSize: 14},
+            title: 'Hora',
+            titleTextStyle: {color: 'white'},
+             format: 'HH:mm',
+             gridlines: {
+                        //color: '#8D7D7D'
+                        color: '#white'
+                      }
+          },
+           backgroundColor: 'none',
+           legend: { position: 'top' },
+           legendTextStyle: {color: 'white'},
+           chartArea: {width: 'auto', height: 'auto'},
+           series: {
+              //0: { color: '#276C0C' },
+              0: { color: 'LawnGreen' }
+
+            }
+
+
+        };
+      //}
+
+      var chart = new google.visualization.LineChart(document.getElementById(div));
+
+      chart.draw(data, options_agua2);
+
+}
+
+
+
+function obtener_datos_isotopo(id_estacion,id_canal,nombre){
+  tasa_dosis=document.getElementById("valores_isotopos");
+  tasa_dosis.innerHTML="";
+  document.getElementById("grafica_isotopos").style.display="block";
+  document.getElementById("detectores_isotopos").style.display="none";
+  //alert(document.getElementById("id_isotopo_select").innerHTML);
+  document.getElementById("id_isotopo_select").innerHTML=nombre;
+ $.ajax({
+        url: '/dosisEstacion/'+id_estacion+"/"+id_canal,
+        dataType: 'text',
+        success: function(data) {
+          datos_tasa_dosis=data;
+          //pintarGraficaIsotopo(datos_tasa_dosis);
+          if (id_estacion==1000 || id_estacion==1010){
+            google.charts.setOnLoadCallback(pintarGraficaIsoAgua(datos_tasa_dosis,'valores_isotopos'));
+          }else{
+            google.charts.setOnLoadCallback(pintarGrafica(datos_tasa_dosis,'valores_isotopos'));
+          }
+        }
+    });
+}
+function obtener_datos_particula(id_estacion,id_canal,nombre){
+  tasa_dosis=document.getElementById("valores_particulas");
+  tasa_dosis.innerHTML="";
+  document.getElementById("grafica_particulas").style.display="block";
+  document.getElementById("detectores_particulas").style.display="none";
+  //alert(document.getElementById("id_isotopo_select").innerHTML);
+  document.getElementById("id_particula_select").innerHTML=nombre;
+ $.ajax({
+        url: '/gammaEstacion/'+id_estacion+"/"+id_canal,
+        dataType: 'text',
+        success: function(data) {
+          datos_tasa_dosis=data;
+          //pintarGraficaIsotopo(datos_tasa_dosis);
+          google.charts.setOnLoadCallback(pintarGrafica(datos_tasa_dosis,'valores_particulas'));
+        }
+    });
+}
+
+function obtener_datos_monocanal(id_estacion,id_canal,nombre){
+  tasa_dosis=document.getElementById("valores_monocanal");
+  tasa_dosis.innerHTML="";
+  document.getElementById("grafica_monocanal").style.display="block";
+  document.getElementById("detectores_monocanal").style.display="none";
+  //alert(document.getElementById("id_isotopo_select").innerHTML);
+  document.getElementById("id_monocanal_select").innerHTML=nombre;
+ $.ajax({
+        url: '/monocanalEstacion/'+id_estacion+"/"+id_canal,
+        dataType: 'text',
+        success: function(data) {
+          datos_tasa_dosis=data;
+          //pintarGraficaIsotopo(datos_tasa_dosis);
+          google.charts.setOnLoadCallback(pintarGraficaAgua(datos_tasa_dosis,'valores_monocanal'));
+        }
+    });
+}
+
+
+
+
+
+
+
+var limite2=true;
+var limite3=true;
+function SelectCheckbox(element){
+  if(element.name=="limite2"){
+    if(element.checked){
+      limite2=true;
+    }else{
+       limite2=false;
+    }
+  }else{
+    if(element.checked){
+      limite3=true;
+    }else{
+       limite3=false;
+    }
+  }
+var view = new google.visualization.DataView(data_dosis);
+if(limite3==false)view.hideColumns([3]);
+if(limite2==true){
+  options_dosis.series={
+              0: { color: '#0000FF' },
+              1: { color: '#FF9100' },
+              2: { color: '#FF0000' }
+            }
+
+}else{
+  options_dosis.series={
+              0: { color: '#0000FF' },
+              1: { color: '#FF0000' }
+            }
+  view.hideColumns([2]);
+}
+
+chart_dosis.draw(view, options_dosis);
+}
+
+var polyline;
+
+
+function pintar_central(){
+  /*
+  var latNuc=[39.8066939,41.1833,39.2303,42.7751,40.7034,40.9958];
+  var lngNuc=[-5.6992407,0.5639,-1.0532,-3.2069,-2.5988,0.8900];
+  var nuc = {
+    url: "http://www.wiki.sc4devotion.com/images/4/46/Nuclear_Power_Plant.png",
+    scaledSize: new google.maps.Size(50, 50),
+    origin: new google.maps.Point(0,0),
+    anchor: new google.maps.Point(0,0)
+
+ };
+ for (var k = 0; k < latNuc.length ; k++){
+      var Posi = {lat: latNuc[k],lng: lngNuc[k]};
+      var markerNuci = new google.maps.Marker({
+        position: Posi,
+        map: map,
+        icon: nuc
+  });
+    }
+  var routes = [myLatLng,
+        new google.maps.LatLng(39.8066939, -5.6992407)
+    ];
+*/
+  angulo={{angulo}};
+  var mang = Math.floor(angulo/45);
+  var iconang = '0';
+  if (mang == 1){
+    iconang = '45';
+  }
+  if (mang == 2){
+    iconang = '90';
+  }
+  if (mang == 3){
+    iconang = '135';
+  }
+  if (mang == 4){
+    iconang = '180';
+  }
+  if (mang == 5){
+    iconang = '225';
+  }
+  if (mang == 6){
+    iconang = '270';
+  }
+  if (mang == 7){
+    iconang = '315';
+  }
+
+  var ruta_img = "{% static img %}"+"img/flechas/direccionCentral_"+iconang+".png";
+
+
+
+
+
+
+if( dispositivo.search(/iphone|ipod|ipad|android/) == -1 ){
+
+var iconStyle = new ol.style.Style({
+                    image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+                    opacity: 1.0,
+                    src: ruta_img
+                    }))
+                    });
+
+
+
+
+      var marker = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([LonCen, LatCen]))
+
+      });
+
+
+      marker.set('name','marcador');
+
+      marker.setStyle(iconStyle);
+
+
+
+      vectorSource.addFeature(marker);
+      }
+}
+
+if('{{estimacion_direccion_viento}}'!=""){
+  document.getElementById("estimacion").style.display="block";
+document.getElementById("leyenda").style.height="50%";
+}
+
+</script>
+
+
+
+<script type="text/javascript">
+            var xInic, yInic;
+            var estaPulsado = false;
+
+            function ratonPulsado(evt) {
+                //Obtener la posición de inicio
+                xInic = evt.clientX;
+                yInic = evt.clientY;
+                estaPulsado = true;
+                //Para Internet Explorer: Contenido no seleccionable
+                document.getElementById("leyenda").unselectable = true;
+            }
+
+            function ratonMovido1(evt) {
+                if(estaPulsado) {
+                    //Calcular la diferencia de posición
+                    var xActual = evt.clientX;
+                    var yActual = evt.clientY;
+                    var xInc = xActual-xInic;
+                    var yInc = yActual-yInic;
+                    xInic = xActual;
+                    yInic = yActual;
+
+                    //Establecer la nueva posición
+                    var elemento = document.getElementById("leyenda");
+                    var position = getPosicion(elemento);
+                    elemento.style.top = (position[0] + yInc) + "px";
+                    elemento.style.left = (position[1] + xInc) + "px";
+                }
+            }
+
+             function ratonMovido(evt) {
+                if(estaPulsado) {
+                    //Calcular la diferencia de posición
+                    var xActual = evt.clientX;
+                    var yActual = evt.clientY;
+                    var xInc = xActual-xInic;
+                    var yInc = yActual-yInic;
+
+
+                    //Establecer la nueva posición
+                    var elemento = document.getElementById("leyenda");
+                    var position = getPosicion(elemento);
+                    console.log((position[0] + yInc+elemento.offsetHeight));
+                    if((window.innerHeight-elemento.offsetHeight)>(position[0] + yInc) && (window.innerWidth-elemento.offsetWidth)*-1<(position[1] + xInc) &&
+                     (position[1] + xInc)<0 &&(position[0] + yInc+elemento.offsetHeight)>0){
+                        elemento.style.top = (position[0] + yInc) + "px";
+                        elemento.style.left = (position[1] + xInc) + "px";
+                        xInic = xActual;
+                        yInic = yActual;
+                    }
+
+                }
+            }
+
+            function ratonSoltado(evt) {
+                estaPulsado = false;
+            }
+            function scrolldiv(evt) {
+                if(estaPulsado) {
+                    estaPulsado=false;
+                }
+            }
+
+
+
+
+            function ratonSoltado(evt) {
+                estaPulsado = false;
+            }
+            function scrolldiv(evt) {
+                if(estaPulsado) {
+                    estaPulsado=false;
+                }
+            }
+
+            /*
+             * Función para obtener la posición en la que se encuentra el
+             * elemento indicado como parámetro.
+             * Retorna un array con las coordenadas x e y de la posición
+             */
+            function getPosicion(elemento) {
+                var posicion = new Array(2);
+                if(document.defaultView && document.defaultView.getComputedStyle) {
+                    posicion[0] = parseInt(document.defaultView.getComputedStyle(elemento, null).getPropertyValue("top"))
+                    posicion[1] = parseInt(document.defaultView.getComputedStyle(elemento, null).getPropertyValue("left"));
+                } else {
+                    //Para Internet Explorer
+                    posicion[0] = parseInt(elemento.currentStyle.top);
+                    posicion[1] = parseInt(elemento.currentStyle.left);
+                }
+                return posicion;
+            }
+
+        </script>
+
+        <script type="text/javascript">
+            var el = document.getElementById("leyenda");
+            if (el.addEventListener){
+
+                el.addEventListener("mousedown", ratonPulsado, false);
+                el.addEventListener("mouseup", ratonSoltado, false);
+                el.addEventListener("DOMMouseScroll", scrolldiv, false);
+                el.addEventListener("mousewheel", scrolldiv, false);
+                document.addEventListener("mousemove", ratonMovido, false);
+            } else { //Para IE
+                el.attachEvent('onmousedown', ratonPulsado);
+                el.attachEvent('onmouseup', ratonSoltado);
+                el.attachEvent("mousewheel", scrolldiv);
+                document.attachEvent('onmousemove', ratonMovido);
+            }
+        </script>
+
+<script src="{% static 'js/mobilefullscreen.js' %}"></script>
+<script>
+window.onload=initMap();
+</script>
+
+
+
+{% endblock js %}

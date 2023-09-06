@@ -1,0 +1,17 @@
+{% load static %}
+<section id="triptico" class="triptico">
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+        <h2>Organismos financiadores del curso</h2>
+        <p>Patrocinadores</p>
+    </div>
+
+    <div class="container" data-aos="fade-up">
+        <div class="d-flex align-items-center">
+            {% for patrocinador in patrocinadores %}
+                <div class="col-sm align-middle"><img src="{% static 'img/cursos/' %}{{ curso.id }}/organizadores/{{ patrocinador.imagen }}" class="img-fluid" title="{{ patrocinador.alt }}"></div>
+            {% endfor %}
+        </div>
+    </div>
+  </div>
+</section><!-- End certification Section -->

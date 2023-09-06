@@ -1,0 +1,249 @@
+{% extends "base/base_spida.html" %}
+
+{% load static %}
+
+{% block imports %}
+
+  <!-- Estilo portadaSpida.html -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/spida/portadaSpida.css' %}"/>
+
+{% endblock %}
+
+{% block content %}
+
+{% include "popups/loader.html" %}
+
+ <!-- Carrousel Imagenes Portada y Titulos -->
+ <div id="demo" class="carousel slide" data-ride="carousel" style="width:100%; height:100%">
+    <!-- Indicators -->
+    <ul class="carousel-indicators">
+      <li data-target="#demo" data-slide-to="0" class="active"></li>
+      <li data-target="#demo" data-slide-to="1"></li>
+      <li data-target="#demo" data-slide-to="2"></li>
+      <li data-target="#demo" data-slide-to="3"></li>
+      <li data-target="#demo" data-slide-to="4"></li>
+      <li data-target="#demo" data-slide-to="5"></li>
+      <li data-target="#demo" data-slide-to="6"></li>
+    </ul>
+
+    <!-- The slideshow -->
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="{% static 'img/spida/portada/p1.jpg' %}">
+      </div>
+      <div class="carousel-item">
+        <img  src="{% static 'img/spida/portada/p2.jpg' %}">
+      </div>
+      <div class="carousel-item">
+        <img  src="{% static 'img/spida/portada/p3.jpg' %}">
+      </div>
+      <div class="carousel-item">
+        <img  src="{% static 'img/spida/portada/p4.jpg' %}">
+      </div>
+      <div class="carousel-item">
+        <img  src="{% static 'img/spida/portada/p5.jpg' %}">
+      </div>
+      <div class="carousel-item">
+        <img  src="{% static 'img/spida/portada/p6.jpg' %}">
+      </div>
+    </div>
+
+    <!-- Left and right controls -->
+    <a class="carousel-control-prev" href="#demo" data-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </a>
+    <a class="carousel-control-next" href="#demo" data-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </a>
+
+    <!-- Titulo Portada -->
+    <div class="section-title-portada">
+        <h1 style="color:Khaki">Spida</h1>
+        <h2> Sistema de Predicción Inteligente de Inundaciones</h2>
+        <p><span style="color:lightgreen">Comunidad</span><span style="color:white"> Autónoma de </span><span style="color:darkgray">Extremadura</span></p>
+        <a class="btn btn-primary btn-xl text-uppercase js-scroll-trigger" href="{% url 'spida:MapaSpida' %}">Datos en Tiempo Real</a>
+    </div>
+</div> <!-- End Carrousel Imagenes Portada y Titulos -->
+
+<!-- Seccion ¿QUE ES SPIDA?-->
+<section id="defspida" class="about" style="background-color: #343a40;">
+      <div class="container">
+        <!-- Titulo seccion -->
+        <div class="section-title">
+          <h2>¿Qué es Spida?</h2>
+        </div>
+
+        <!-- Contenido Info-->
+        <div class="row content">
+          <div class="col-lg-6">
+            <p>
+              SPIDA es el Sistema de Predicción Inteligente de Inundaciones de la Comunidad Autónoma de Extremadura.
+            </p>
+            <p>Su objetivo de aplicación consiste en la monitorización y análisis en tiempo real y diferido de datos
+              procedentes de diversos instrumentos de medida pertenecientes a Sistemas Automáticos de Información Hidrológica.
+            </p>
+            <p>
+              Se trata, por tanto, de un Sistema de Alerta Temprana a través del cual se monitorizan eventos adversos de
+              carácter previsible que pueden suponer riesgo de inundación en su entorno.
+            </p>
+          </div>
+          <div class="col-lg-6 pt-4 pt-lg-0">
+            <p>
+              Se enmarca dentro del desarrollo del Proyecto INTERREG / RAT_VA_PC, cuyo beneficiario principal
+              es la Dirección General de Emergencias y Protección Civil de la Comunidad Autónoma de Extremadura,
+              integrante del Plan Especial de Protección Civil del Riesgo de Inundaciones de la Comunidad Autónoma
+              de Extremadura (INUNCAEX).
+            </p>
+            <p>
+              SPIDA se ha desarrollado en el Centro Hispano-Luso de Redes de Alerta Temprana, por parte del grupo de
+              investigación LARUEX, que a su vez es responsable del diseñado, la gestión y el mantenimiento de la Red 
+              de Alerta Radiológica de la Comunidad Autónoma de Extremadura (RAREX) desde hace 30 años.
+            </p>
+          </div>
+        </div>
+
+      </div>
+</section><!-- End Section ¿QUE ES SPIDA? -->
+
+
+<!-- ======= Section LOGOS ======= -->
+<section id="logos" class="logos">
+      <div class="row" data-aos="zoom-in" style="width:100%; height:100%;padding:0; margin:0">
+          <div class=" col-3 d-flex align-items-center justify-content-center" style="width:100%; height:100%;padding:0; margin:0">
+              <img src="{% static 'img/spida/logos/logo_laruex.png' %}" class="img-fluid" alt="">
+          </div>
+          <div class=" col-3 d-flex align-items-center justify-content-center" style="width:100%; height:100%;padding:0; margin:0">
+              <img src="{% static 'img/spida/logos/logo_junta_extremadura.png' %}" class="img-fluid" alt="">
+          </div>
+          <div class="col-3 d-flex align-items-center justify-content-center" style="width:100%; height:100%;padding:0; margin:0">
+              <img src="{% static 'img/spida/logos/logo_interreg.png' %}" class="img-fluid" alt="">
+          </div>
+          <div class="col-3 d-flex align-items-center justify-content-center" style="width:100%; height:100%;padding:0; margin:0">
+              <img src="{% static 'img/spida/logos/logo_rat_va_pc.png' %}" class="img-fluid" alt="">
+          </div>
+      </div>
+</section><!-- End Section LOGOS -->
+
+<!-- Seccion Estaciones SPIDA-->
+<section id="defestaciones" class="about" style="background-color: #343a40;">
+      <div class="container">
+        <div class="section-title">
+          <h2>Estaciones Spida</h2>
+        </div>
+
+        <div class="row content">
+          <p style="padding-right: 15px;padding-left: 15px">
+              En la actualidad, la Red SPIDA se compone de un total de veintiún estaciones de monitoreo de nivel de agua
+              repartidas entre las provincias de Cáceres y Badajoz.
+          </p>
+          <div class="col-lg-6">
+            <p>
+              Veinte de ellas consideradas como estaciones fijas, es decir, estaciones que se encuentran instaladas
+              en un lugar determinado de forma permanente.
+            </p>
+            <img src="{% static 'img/spida/portada/estacion_fija.jpg' %}" class="img-fluid" style="width:100%; border-radius: 10px 10px 10px; box-shadow:0 10px 16px 0 rgba(0,0,0,0.6),0 6px 20px 0 rgba(0,0,0,0.4) !important; ">
+          </div>
+          <div class="col-lg-6 pt-4 pt-lg-0" data-aos="zoom-in">
+            <p>
+              Se cuenta además con una estación portátil y que, por tanto,  puede ser trasportada e instalada 
+              en cualquier punto de interés.
+            </p>
+            <img src="{% static 'img/spida/portada/estacion_movil.jpg' %}" class="img-fluid" style="width:100%; border-radius: 10px 10px 10px; box-shadow:0 10px 16px 0 rgba(0,0,0,0.6),0 6px 20px 0 rgba(0,0,0,0.4) !important; ">
+          </div>
+        </div>
+
+      </div>
+</section><!-- End Section Estaciones SPIDA -->
+
+
+<!-- Section REDES DE INFORMACION -->
+    <section id="defredesinfo" class="about" style="background-color:#fff">
+        <div class="container">
+          <div class="section-title">
+            <h2 style="color: #343a40;">Redes de información</h2>
+          </div>
+
+          <div class="row content">
+              <p style="color: #343a40; padding-right: 15px;padding-left: 15px">
+              La activación del plan de emergencia ante inundaciones de la Comunidad Autónoma de Extremadura (INUNCAEX),
+              está basado en los sistemas de previsión, meteorológica e hidrológica, así como en los avisos que de
+              sus escenarios de emergencia hagan las entidades que gestionan las presas. 
+              Para ello, integra los datos reportados por cuatro redes de información como son:
+
+            </p>
+            <div class="col-xl-3 col-md-6 col-sm-12 d-flex align-items-stretch mt-4 mt-md-0" data-aos="zoom-in" data-aos-delay="100">
+              <div class="icon-box">
+                <p><a href="http://www.aemet.es/es/portada" target ="_blank">Aemet</a></p>
+                <p style="color: #343a40; padding-top: 15px; padding-bottom:15px;">Agencia Estatal de Meteorología</p>
+                <img src="{% static 'img/spida/portada/red_aemet.PNG' %}" class="img-fluid">
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 d-flex align-items-stretch mt-4 mt-md-0" data-aos="zoom-in" data-aos-delay="200">
+              <div class="icon-box">
+                <p><a href="https://saihtajo.chtajo.es/" target ="_blank">Saih del Tajo</a></p>
+                <p style="color: #343a40; padding-top: 15px; padding-bottom:15px;">Sistema de Información Hidrográfica de la Confederación del Río Tajo</p>
+                <img src="{% static 'img/spida/portada/red_saih_tajo.PNG' %}" class="img-fluid">
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 d-flex align-items-stretch mt-4 mt-xl-0" data-aos="zoom-in" data-aos-delay="300">
+              <div class="icon-box">
+                <p><a href="http://www.saihguadiana.com:7080/visorTR/index.php" target ="_blank">Saih del Guadiana</a></p>
+                <p style="color: #343a40; padding-top: 15px; padding-bottom:15px;">Sistema de Información Hidrográfica de la Confederación del Río Guadiana</p>
+                <img src="{% static 'img/spida/portada/red_saih_guadiana.PNG' %}" class="img-fluid">
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 d-flex align-items-stretch mt-4 mt-xl-0" data-aos="zoom-in" data-aos-delay="300">
+              <div class="icon-box">
+                <p><a href="{% url 'spida:MapaSpida' %}">Spida</a></p>
+                <p style="color: #343a40; padding-top: 15px; padding-bottom:15px;">Sistema de Predicción Inteligente de Inundaciones de la Junta de Extremadura</p>
+                <img src="{% static 'img/spida/portada/red_spida.PNG' %}" class="img-fluid">
+              </div>
+            </div>
+          </div>
+        </div>
+    </section><!-- End Section REDES DE INFORMACION -->
+
+<!-- Seccion Grupos implicados -->
+<!--   <section id="defestaciones" class="about" style="background-color: #343a40;">
+    <div class="container">
+      <div class="section-title">
+        <h2>Grupos implicados</h2>
+      </div>
+
+      <div class="row content">
+        <p style="padding-right: 15px;padding-left: 15px">
+          Toda la información registrada por las estaciones de SPIDA se gestiona desde el Centro de
+          Operaciones de ALERTA2 y se encuentra permanentemente disponible para los servicios de
+          emergencia de Protección Civil y Emergencias 112 de la Junta de Extremadura.
+        </p>
+        <p style="padding-right: 15px;padding-left: 15px">
+          El uso de los datos en el transcurso de una emergencia se circunscribe a las comunicaciones
+          existentes entre ambas partes, con la salvedad de que pudieran efectuarse alguna otra
+          comunicación ante otras administraciones afectadas (municipales…etc.) siempre con la petición
+          o el permiso de la Dirección del Plan.
+        </p>
+        <div class="col-lg-6">
+          <p>
+            Veinte de ellas consideradas como estaciones fijas, es decir, aquellas estaciones que se encuentran instaladas
+            en un lugar determinado de forma permanente.
+          </p>
+          <img src="{% static 'img/spida/portada/estacion_fija.jpg' %}" class="img-fluid" style="width:100%; border-radius: 10px 10px 10px; box-shadow:0 10px 16px 0 rgba(0,0,0,0.6),0 6px 20px 0 rgba(0,0,0,0.4) !important; ">
+        </div>
+        <div class="col-lg-6 pt-4 pt-lg-0" data-aos="zoom-in">
+          <p>
+            La unidad restante se corresponde con una estación del tipo móvil. Se trata por tanto de
+            una estación portatil, la cual puede ser transportada para operar desde cualquier lugar de interés.
+          </p>
+          <img src="{% static 'img/spida/portada/estacion_movil.jpg' %}" class="img-fluid" style="width:100%; border-radius: 10px 10px 10px; box-shadow:0 10px 16px 0 rgba(0,0,0,0.6),0 6px 20px 0 rgba(0,0,0,0.4) !important; ">
+        </div>
+      </div>
+
+    </div>
+  </section> --><!-- End Seccion Grupos Implicados -->
+
+
+
+{% endblock %}

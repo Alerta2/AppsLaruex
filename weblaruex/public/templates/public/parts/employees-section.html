@@ -1,0 +1,66 @@
+{% load static %}
+
+<style>
+
+</style>
+<section id="section-works" class="section appear clearfix">
+  <div class="container" data-aos="fade-up">
+
+    <div class="row mar-bot40">
+      <div class="col-md-offset-3 col-md-6">
+        <div class="section-title">
+          <h2 class="section-heading animated" data-animation="bounceInUp">Personal del Laruex</h2>
+          <p>Nuestro equipo</p>
+        </div>
+      </div>
+    </div>
+<!-- Javascript filter divs -->
+    <div class="row" data-aos="zoom-in" data-aos-delay="100">
+      <nav id="options" class="col-md-12 text-center clearfix">
+        <ul id="filters" class="option-set clearfix" data-option-key="filter">
+          <li><a href="#nomove" class="current btn-theme btn-small" data-categoria="isotope-item">Todos</a></li>
+          <li><a href="#nomove" class="btn-theme btn-small" data-categoria="laboratorios">Laboratorios</a></li>
+          <li><a href="#nomove" class="btn-theme btn-small" data-categoria="redes">Redes</a></li>
+          <li><a href="#nomove" class="btn-theme btn-small" data-categoria="direccion">Dirección</a></li>
+          <li><a href="#nomove" class="btn-theme btn-small" data-categoria="informatica">Informática</a></li>
+        </ul>
+      </nav>
+      <div id="empleados" class="row portfolio-items w-100 pl-3" >
+          {% for empleado in empleados %}
+           <article class="col-xl-3 col-lg-4 col-md-6 col-6 element {{ empleado.grupo }} isotope-item mt-3 ">
+              <div class="portfolio-item m-2">
+                <img src="{% static 'img/personal/trabajadores/' %}{{ empleado.imagen }}" alt="" />
+                <div class="portfolio-desc">
+                  <div class="folio-info">
+                    <div class="texto">
+                      <h5>{{ empleado.nombre }}</h5>
+                      <p>{{ empleado.puesto }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </article>
+          {% endfor %}
+      </div>
+
+
+    </div>
+
+  </div>
+
+</section>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('.option-set a').click(function(e) {
+      e.preventDefault(); // Evitar el comportamiento predeterminado del enlace
+      
+      var categoria = $(this).attr('data-categoria'); // Obtener la categoría desde el atributo 'data-categoria' del enlace
+      
+      $(".isotope-item").hide(); // Ocultar todos los elementos isotope-item
+      $("."+categoria).show(); // Mostrar elementos con la clase de categoría seleccionada
+      
+      $('.option-set a').removeClass('current'); // Remover clase "current" de todos los enlaces
+      $(this).addClass('current'); // Agregar clase "current" al enlace seleccionado
+    });
+  });
+</script>

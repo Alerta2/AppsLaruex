@@ -1,0 +1,103 @@
+{% load static %}
+<style>
+.card {
+  height: 254px;
+  transition: all 0.4s;
+  border-radius: 10px;
+  box-shadow: 0px 0px 6px 4px  rgba(11, 66, 76, 0.251);   
+  background-color: rgba(255, 255, 255, 0.074);
+  border: 1px solid rgba(255, 255, 255, 0.222);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-radius: .7rem;
+}
+
+.card:hover {
+  border-radius: 15px;
+  cursor: pointer;
+  transform: scale(1.1);
+  box-shadow: 0px 0px 10px 5px  rgba(11, 66, 76, 0.251);
+    
+
+}
+
+.first-content {
+  height: 100%;
+  transition: all 0.4s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  border-radius: 15px;
+}
+
+.card:hover .first-content {
+  height: 0px;
+  opacity: 0;
+}
+
+.second-content {
+  height: 0%;
+  width: 100%;
+  opacity: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  transition: all 0.4s;
+  font-size: 0px;
+  transform: rotate(90deg) scale(-1);
+}
+
+.card:hover .second-content {
+  opacity: 1;
+  height: 100%;
+  font-size: 1.8rem;
+  transform: rotate(0deg);
+}
+
+.learn-more-btn{
+  background-color: #fff;
+  color: #17695d;
+  border-radius: 5px;
+  padding: 5px 10px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: all 0.4s;
+}
+
+.visualizador{
+  height: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  padding: 0px 0px;
+
+}
+.card__image {
+  z-index: 1;
+  position: absolute;
+  top: -50px;
+  width: 55%;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.content-container {
+  margin-top: auto; /* Ajusta el valor del margen según tus necesidades */
+}
+
+</style>
+
+<div class="container" data-aos="fade-up">
+  <div class="section-title">
+    <h2>Medidas más destacadas</h2>
+    <p>LARUEX</p>
+  </div>
+  {% include "public/parts/slider-medidas-section.html" %}
+</div>

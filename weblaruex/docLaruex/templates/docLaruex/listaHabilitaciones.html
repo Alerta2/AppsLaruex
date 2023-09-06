@@ -1,0 +1,625 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block content %}
+
+
+<style>
+  ul.pagination li .page-link {
+    background-color: rgb(255, 255, 255) !important;
+    color: rgb(41, 68, 87);
+
+  }
+
+  ul.pagination li.active .page-link {
+    background-color: rgb(41, 68, 87) !important;
+    border-color: rgb(41, 68, 87) !important;
+  }
+
+  ul.pagination li .page-link:hover {
+    filter: brightness(85%);
+
+  }
+
+  ul.pagination li.active .page-link:hover {
+    filter: brightness(120%);
+
+  }
+
+  .btn-light {
+    color: rgb(41, 68, 87);
+  }
+
+  th {
+    color: rgb(41, 68, 87);
+  }
+  .enlace:hover {
+    color: #095657;
+  }
+  
+  .add:hover {
+    color: #cb8501;
+  }
+
+</style>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Habilitaciones</li>
+    </ol>
+  </nav>
+</div>
+
+{% if administrador %}
+<div class="my-3 d-flex justify-content-end">
+  <!-- boton que permite añadir una nueva habilitación -->
+  <a href="" class="mx-1" title="upload" data-toggle="modal" data-target="#modalFormulario" style="color: #ee9b00"><i
+      class="fa-solid fa-square-plus fa-2x add"></i></a>
+
+  <!-- boton que permite asociar elementos al formato actual-->
+  <a href="" title="Asociar Habilitación" class="mx-" data-toggle="modal" data-toggle="tooltip"
+    data-target="#modalAsociarHabilitacion" style="color: #0A9396; " download><i class="fa-duotone fa-link fa-2x mx-2 enlace"></i></a>
+
+  <!-- boton que permite asociar elementos al formato actual-->
+  <a href="" title="Asociar Habilitación" class="mx-" data-toggle="modal" data-toggle="tooltip" data-target="#modalAsociarHabilitacionTodosUsuarios" style="color: #0A9396; " download><i class="fa-duotone fa-network-wired fa-2x enlace"></i><a>               
+</div>
+{% endif %}
+
+<!--- modalFormulario que agrega las habilitaciones-->
+<div id="modalFormulario" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Habilitación</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioHabilitaciones" action="/private/docLaruex/agregarHabilitacion/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="titulo">Nombre de Habilitacion</label>
+                <input type="text" class="form-control" id="titulo" name="titulo" data-rule="required" />
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary">
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== Modal para asociar habilitaciones a usuarios ========== -->
+<div id="modalAsociarHabilitacion" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+  aria-labelledby="modalAsociarHabilitacion" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">
+          <strong>
+            Seleccione los usuarios que desea asociar.
+          </strong>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+      </div>
+      <!-- END Cabecera del modalAsociarHabilitacion -->
+
+      <!-- Body del modalAsociarHabilitacion -->
+      <div class="modal-body">
+        <form id="formularioAsociarHabilitacion" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row justify-content-center">
+            <div class="col-11 ">
+              <div class="card card p-4 ">
+                <h5 class="card-title text-center">Habilitación</h5>
+                <div class="form-group">
+                  <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                    {% for habilitacion in habilitaciones %}
+                    <option value="{{habilitacion.id}}">
+                      {{habilitacion.titulo}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row justify-content-center">
+            <div class="col-lg-5">
+              <div class="card card p-4 ">
+                <h5 class="card-title text-center">Lista de Empleados</h5>
+                <table class="table-sm table-hover" id="tabla_usuarios_para_asociar" data-search="true"
+                  data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10]"
+                  data-toolbar="#toolbar"></table>
+              </div>
+            </div>
+
+            <div class="col-lg-1 col-12 my-auto text-center">
+              <i id="flechas" class="fa-solid fa-arrow-right-arrow-left fa-3x" style="color: rgb(41,68,87)"></i>
+            </div>
+
+            <div class="col-lg-5">
+              <div class="card p-4">
+                <h5 class="card-title text-center">Empleados seleccionados</h5>
+                <table id="tabla_usuarios_para_asociar_seleccionados" class="table-sm table-hover" data-search="true"
+                  data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10]"
+                  data-toolbar="#toolbar"></table>
+              </div>
+            </div>
+          </div>
+      </div>
+      <input type="text" id="idUsuarioActual" value="{{ id }}" hidden name="idUsuarioActual" data-rule="required" />
+      <input type="text" id="idUsuariosSeleccionados" value="{{ id }}" hidden name="idUsuariosSeleccionados"
+        data-rule="required" />
+
+      <!-- Footer del ModalAsociarHabilitacion -->
+      <div class="modal-footer d-flex">
+
+        <button id="cerrarAsociar" type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cerrar
+        </button>
+        <button type="submit" value="submit" class="btn btn-primary">
+          Guardar
+        </button>
+      </div>
+      <!-- END Footer del ModalAsociarHabilitacion -->
+    </div>
+  </div>
+</div><!-- END Body del ModalAsociarHabilitacion -->
+</form>
+</div> <!-- END ModalAsociarHabilitacion -->
+
+<!-- ========== Modal para asociar habilitaciones a usuarios ========== -->
+<div id="modalAsociarHabilitacionTodosUsuarios" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+  aria-labelledby="modalAsociarHabilitacionTodosUsuarios" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">
+          <strong>
+            Seleccione la habilitación que desea asociar a todos los usuarios.
+          </strong>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+            aria-hidden="true">&times;</span></button>
+      </div>
+      <!-- END Cabecera del modalAsociarHabilitacion -->
+
+      <!-- Body del modalAsociarHabilitacion -->
+      <div class="modal-body">
+        <form id="formularioAsociarHabilitacionTodosUsuarios" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row justify-content-center">
+            <div class="col-11 ">
+              <div class="card card p-4 ">
+                <h5 class="card-title text-center">Habilitación</h5>
+                <div class="form-group">
+                  <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                    {% for habilitacion in habilitaciones %}
+                    <option value="{{habilitacion.id}}">
+                      {{habilitacion.titulo}}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+      <!-- Footer del ModalAsociarHabilitacion -->
+      <div class="modal-footer d-flex">
+
+        <button id="cerrarAsociarTodos" type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cerrar
+        </button>
+        <button type="submit" value="submit" class="btn btn-primary">
+          Guardar
+        </button>
+      </div>
+      <!-- END Footer del ModalAsociarHabilitacion -->
+    </div>
+  </div>
+</div><!-- END Body del ModalAsociarHabilitacion -->
+</form>
+</div> <!-- END ModalAsociarHabilitacion -->
+
+
+
+<!-- =************************ COLLAPSE ************************= -->
+
+<!-- =================== Listado de Habilitaciones ==========================-->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Habilitaciones</h6>
+      <!-- Accordion without outline borders -->
+      <div class="accordion accordion-flush" id="accordionFlushHabilitaciones">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingListaHabilitaciones">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseListaHabilitaciones" aria-expanded="false"
+              aria-controls="flush-collapseListaHabilitaciones">Lista de Habilitaciones
+            </button>
+          </h2>
+          <div id="flush-collapseListaHabilitaciones" class="accordion-collapse collapse"
+            aria-labelledby="flush-headingListaHabilitaciones" data-bs-parent="#accordionFlushHabilitaciones">
+            <div class="accordion-body">
+              <table id="tabla_habilitaciones" data-toggle="table" data-search="true" data-show-columns="true"
+                data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+                data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+                data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+              </table>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Accordion without outline borders -->
+    </div>
+  </div>
+</section>
+
+
+<!-- =================== Listado que relaciona los usuarios con las habilitaciones ==========================-->
+<section class="section">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Habilitaciones por Usuario</h6>
+      <!-- Accordion without outline borders -->
+      <div class="accordion accordion-flush" id="accordionFlushRelacionHabilitacionesUsuarios">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="flush-headingRelacionHabilitacionesUsuarios">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#flush-collapseRelacionHabilitacionesUsuarios" aria-expanded="false"
+              aria-controls="flush-collapseRelacionHabilitacionesUsuarios">Relacion de usuarios con las habilitaciones
+          </h2>
+          <div id="flush-collapseRelacionHabilitacionesUsuarios" class="accordion-collapse collapse"
+            aria-labelledby="flush-headingRelacionHabilitacionesUsuarios" data-bs-parent="#accordionFlushRelacionHabilitacionesUsuarios">
+            <div class="accordion-body">
+              <div class="select col-4" >
+                <label for="usuarioSeleccionado"><strong>Seleccione el usuario</strong></label>
+                <select class="form-control form-select" id="usuarioSeleccionado" name="usuarioSeleccionado" onchange="getSelecionados()">
+                  {% for user in usuarios %}
+                      <option value="{{user.id}}">{{user.first_name}} {{user.last_name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <table id="tabla_relacion_habilitaciones" data-toggle="table" data-search="true" data-show-columns="true"
+                data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+                data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+                data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+              </table>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Accordion without outline borders -->
+    </div>
+  </div>
+</section>
+
+
+
+<script type="text/javascript">
+  $('#tabla_habilitaciones').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/habilitacionesDatos",
+    cache: false,
+    columns: [{
+      title: 'ID',
+      field: 'id',
+      align: "center"
+    }, {
+      title: 'Nombre',
+      field: 'titulo',
+      align: "center"
+    },{
+      title: "Acciones",
+      field: "action",
+      align: "center",
+      formatter: function (value, row) {
+        var habilitacion = row.id;
+        
+        var botonEliminarHabilitacion = '<a href="/private/docLaruex/eliminarHabilitacion/' + habilitacion +'/" class="mx-1" title="Eliminar Habilitacion" ><i class="fa-solid fa-xmark fa-lg" style="color:#ae2012"></i></a>';
+
+        var admin = '{{administrador}}';
+        if (admin == 'True') { 
+            return (botonEliminarHabilitacion);
+        }
+      },
+    },
+    ],
+    locale: "es-ES",
+    search: true,
+    sortName: 'id_habilitacion',
+    sortOrder: 'desc',
+
+  });
+  $('#tabla_relacion_habilitaciones').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/habilitacionesDatosRelacionados",
+    cache: false,
+    columns: [{
+      title: 'Empleado',
+      field: 'id_usuario',
+      align: "center",
+      formatter: function (value, row) {
+        return (
+          row.id_usuario__first_name + " " + row.id_usuario__last_name
+        );
+      },
+    },{
+      title: 'Habilitación',
+      field: 'id_habilitacion__titulo',
+      align: "center"
+    }, {
+      title: 'Cargo',
+      field: 'tipo',
+      align: "center"
+    },  {
+      title: 'Fecha de Inicio',
+      field: 'fecha',
+      align: "center",
+      sortable: "true",
+      formatter: function (value, row) {
+        var fecha = new Date(row.fecha);
+        return (
+          $.datepicker.formatDate("dd-mm-yy", fecha)
+        );
+      },
+    },{
+      title: "Acciones",
+      field: "action",
+      align: "center",
+      formatter: function (value, row) {
+        var habilitacion = row.id_habilitacion__id;
+        var usuario = row.id_usuario__id;
+        
+        var botonEliminarHabilitacion = '<a href="/private/docLaruex/eliminarHabilitacionUsuario/' + habilitacion + '/' + usuario +'/" class="mx-1" title="Eliminar Habilitacion" ><i class="fa-solid fa-xmark fa-lg" style="color:#ae2012"></i></a>';
+
+        var admin = '{{administrador}}';
+        if (admin == 'True') { 
+            return (botonEliminarHabilitacion);
+        }
+      },
+    },
+    ],
+    locale: "es-ES",
+    search: true,
+    sortName: 'id_habilitacion',
+    sortOrder: 'desc',
+
+  });
+
+  $(".accordion").collapse();
+
+
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
+  function addZero(i) {
+    if (i < 10) { i = "0" + i }
+    return i;
+  }
+
+
+  /*
+    ------------ TABLAS Y FUNCIONES DEL MODAL ASOCIAR USUARIOS ------------
+  */
+
+  //tabla del modal asociar objetos
+  $("#tabla_usuarios_para_asociar").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/docLaruex/habilitacionesDatosAsociar",
+    cache: false,
+    columns: [
+      {
+        title: "ID",
+        field: "id",
+        align: "center",
+      }, {
+        title: 'Empleado',
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            row.first_name + " " + row.last_name
+          );
+        },
+      }, {
+        title: "",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            '<div onclick="addValueTable(' + row.id + ', &apos;' + row.first_name + '&apos;, &apos;' + row.last_name + '&apos;)" class="mx-1" title="select"><i class="fa-solid fa-angles-right fa-lg" style="color:#68B29E"></i></div>'
+          );
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+  function addZero(i) {
+    if (i < 10) {
+      i = "0" + i;
+    }
+    return i;
+  }
+
+
+  function addValueTable(id, first_name, last_name) {
+    $("#tabla_usuarios_para_asociar_seleccionados").bootstrapTable('insertRow', {
+      index: 0,
+      row: {
+        id: id,
+        nombre: first_name + " " + last_name,
+      }
+    });
+  }
+
+  // tatbla de elementos seleccionados
+  $("#tabla_usuarios_para_asociar_seleccionados").bootstrapTable({
+    locale: navigator.language,
+    cache: false,
+    columns: [
+      {
+        title: "ID",
+        field: 'id',
+        align: "center",
+      }, {
+        title: "Empleado",
+        field: 'nombre',
+        align: "center"
+      }, {
+        title: "Cargo",
+        field: 'tipo',
+        align: "center",
+        formatter: function (value, row) {
+          return ( 
+            '<select class="form-select" data-rule="required" id="cargoHabilitacion'+row.id.toString()+'" name="cargoHabilitacion"><option value="Responsable">Responsable</option><option value="Técnico" selected="selected">Técnico</option><option value="Supervisor">Supervisor</option><option value="Sustituto">Sustituto</option></select>'
+
+          );
+        },
+      }, {
+        title: "",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            '<div onclick="deleteValue(' + row.id + ')" class="mx-1" ><i class="fa-solid fa-xmark fa-lg" style="color:#F52220"></i></div>'
+
+          );
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+  function deleteValue(id) {
+    $("#tabla_usuarios_para_asociar_seleccionados").bootstrapTable('remove', {
+      field: 'id',
+      values: [id]
+    })
+  }
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioAsociarHabilitacion").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    $table = $("#tabla_usuarios_para_asociar_seleccionados");
+    var idSeleccionado = "";
+    var cargoIDSeleccionado = "";
+    for (let value of $table.bootstrapTable('getData')) {
+      console.log("info file");
+      console.log(value);
+      idSeleccionado = idSeleccionado + value["id"] +"@" + document.getElementById('cargoHabilitacion'+value["id"].toString()).value + "#";
+      
+      console.log(idSeleccionado);
+    }
+    
+    $("#idUsuariosSeleccionados").val(idSeleccionado);
+    console.log($("#idUsuariosSeleccionados").val());
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    
+    $.ajax({
+      url: "/private/docLaruex/asociarHabilitacion/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        $table.bootstrapTable('removeAll');
+        $("#idUsuariosSeleccionados").val("");
+        $('#tabla_relacion_habilitaciones').bootstrapTable('refresh');
+        $('#cerrarAsociar').trigger('click');
+      }
+    });
+  });
+
+    // cambiamos la funcionalidad del boton submit del formulario
+    $("#formularioAsociarHabilitacionTodosUsuarios").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    
+    $.ajax({
+      url: "/private/docLaruex/asociarHabilitacionTodosUsuarios/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        $('#tabla_relacion_habilitaciones').bootstrapTable('refresh');
+        $('#cerrarAsociarTodos').trigger('click');
+      }
+    });
+  });
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioHabilitaciones").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarHabilitacion/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        document.location.reload();
+      }
+    });
+  });
+
+  function getSelecionados (){
+    // get value of selected  element in select box
+    var usuarioSeleccionado = document.getElementById("usuarioSeleccionado").value;
+
+    // actualizar la tabla con los seleccionados
+    $("#tabla_relacion_habilitaciones").bootstrapTable('refresh', {url: "/private/docLaruex/habilitacionesDatosRelacionados/" + usuarioSeleccionado + "/"});
+  }
+
+
+
+
+</script>
+{% endblock %}

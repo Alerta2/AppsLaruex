@@ -1,0 +1,1373 @@
+/*--------------------------------------------------------------
+# MAPA (Visor de mapa)
+--------------------------------------------------------------*/
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/*Estilo de los bindtooltip/POPUPS en los marcadores del mapa*/
+.leaflet-tooltip {
+  border-radius: 15px;
+  padding: 20px 15px 0px 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  text-align: left;
+}
+
+/* Color de fondo de los botones/controles de la parte superior izquierda del mapa*/
+.leaflet-left .leaflet-control {
+  background-color: #fff;
+}
+
+a.leaflet-control-zoom-in,
+a.leaflet-control-zoom-out {
+  font: none !important;
+  text-indent: none !important;
+}
+
+
+
+/*--------------------------------------------------------------
+# Seccion logos (Parte inferior de la pantalla)
+--------------------------------------------------------------*/
+.logos {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 86px;
+  background-color: rgba(255, 255, 255, 0); /*0.6 opacity*/
+  /* #1B1C1C;*/
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.logos img:hover {
+  filter: none;
+  transform: scale(1.1);
+}
+
+.logos img {
+  max-width: 90%;
+  max-height: 70%;
+  transition: all 0.4s ease-in-out;
+  /*filter: grayscale(100);*/
+}
+
+.row-logos {
+  text-align: left;
+  align-items: center;
+  justify-content: center;
+  /*height: 100%;*/
+  height: 58px;
+  margin: 0 50px 0 58px;
+}
+
+@media only screen and (max-width: 768px) {
+  .row-logos {
+    margin: 0 40px 0 58px;
+  }
+}
+
+@media (max-width: 650px) {
+  .row-logos {
+    margin: 0 40px 0 0px;
+  }
+}
+
+
+/*-----------------------------------------------------------------------------------
+    # Leyenda de colores para el CONTROL DE CAPAS situado en el sidebar 
+    (Precipitacion Acum 1 hora (Imagenes Aemet))
+-------------------------------------------------------------------------------------*/
+
+.info.legend {
+  width: auto;
+  height: auto;
+  padding: 8px;
+  background: white;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0px 6px 20px 0px rgba(18, 28, 28, 0.8);
+  border-radius: 5px;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.info.legend.especial {
+  margin: 10px;
+}
+
+.info.legend span {
+  display: inline-block;
+  width: 50px;
+  height: 16px;
+  /*float: left;*/
+  /*Si quiero que los bloques de la leyenda se alinen a la izquierda*/
+  opacity: 0.7;
+  font-size: 80%;
+  font-weight: bold;
+}
+
+
+/******************************************************************
+    SIDEBAR - CUADRO LOCALIZACIÓN/UBICACIÓN ESTACIÓN
+******************************************************************/
+.sidebar-location {
+  height: 50px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 10px;
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  /*justify-content: center;*/
+}
+
+.sidebar-location::before {
+  content: "";
+  background-image: url('../../../static/img/spd/sidebar/maps.jpg');
+  background-size: cover;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  opacity: 0.5;
+}
+
+.sidebar-location p {
+  position: relative;
+  color: #000000;
+  text-align: left;
+  margin: 0px;
+}
+
+
+/*-------------------------------------------------------
+  # Margenes del mapa
+---------------------------------------------------------*/
+
+.leaflet-left .leaflet-control {
+  margin: 0;
+}
+
+.leaflet-top.leaflet-left {
+  padding: 10px 0 0 5px;
+  z-index: 1001;
+}
+
+.leaflet-fullscreen-on .leaflet-top.leaflet-left {
+  padding: 10px 0 0 15px;
+}
+
+.leaflet-bottom.leaflet-left {
+  width: calc(100% - 50px);
+  padding: 10px;
+  /*padding-bottom: 60px;*/
+  /*padding-bottom: 88px;*/
+  /*padding-bottom: 30px;*/
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.leaflet-fullscreen-on .leaflet-bottom.leaflet-left {
+  width: calc(100% - 50px);
+  padding-bottom: 8px;
+}
+
+@media only screen and (max-width: 768px) {
+  .leaflet-bottom.leaflet-left {
+    width: calc(100% - 40px);
+  }
+
+  .leaflet-fullscreen-on .leaflet-bottom.leaflet-left {
+    width: calc(100% - 40px);
+  }
+
+  .leaflet-top.leaflet-left {
+    padding: 10px 0 0 10px;
+  }
+
+  .leaflet-fullscreen-on .leaflet-top.leaflet-left {
+    padding: 10px 0 0 15px;
+  }
+}
+
+/*.leaflet-fullscreen-on img.leaflet-control{
+    top: 0;
+}*/
+.leaflet-fullscreen-on .watermark {
+  top: 0;
+}
+
+.leaflet-touch .leaflet-bar a:last-child,
+.leaflet-touch .leaflet-bar a:first-child {
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+/*-------------------------------------------------------
+  # Marca de agua (watermark leaflet)
+---------------------------------------------------------*/
+
+/*img.leaflet-control {
+    position: fixed;
+    margin: 0;
+    top: 47px;
+    right: 40px;
+    width: 150px;
+}*/
+.my-control {
+  /*background: #fff;*/
+  right: 38px;
+  justify-content: right;
+  text-align: right;
+  padding-right: 5px;
+  border: none !important;
+  margin: 0;
+}
+
+.watermark {
+  top: 58px;
+  right: 50px;
+  width: 150px;
+}
+
+.my-control p {
+  margin: 0px;
+}
+
+#avisos {
+  padding-right: 5px;
+}
+
+#icon-aviso {
+  border-radius: 50%;
+  padding: 3px 5px 5px 5px;
+  width: 15px;
+  height: 15px;
+  background-color: rgba(27, 28, 28, 0.4);
+}
+
+/*-------------------------------------------------------
+  # Estilo del marcador que representa los embalses
+---------------------------------------------------------*/
+.marker-embalses {
+  position: absolute;
+  color: rgba(0, 0, 0, 0.9);
+  letter-spacing: 1px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  padding: 0;
+  width: 60px;
+  height: 45px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Icono situado en el marcador de embalses*/
+.custom-div-icon i {
+  font-size: 15px;
+}
+
+/*-------------------------------------------------------
+  # Estilo del marcador que representa la temperatura de las estaciones de Aemet
+---------------------------------------------------------*/
+.marker-temperature {
+  position: absolute;
+  color: rgba(0, 0, 0, 0.9);
+  letter-spacing: 1px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  padding: 0;
+  width: 60px;
+  height: 45px;
+  border-radius: 10px;
+  margin-left: -20px;
+  margin-top: -20px;
+}
+
+
+/*-----------------------------------------------------------------
+# SEARCH CON OPCIONES (BUSCADOR DE ESTACIONES)
+------------------------------------------------------------------*/
+/*Buscador Search with options*/
+select {
+  display: none !important;
+}
+
+.dropdown-select {
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 100%);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#40FFFFFF', endColorstr='#00FFFFFF', GradientType=0);
+  background-color: #fff;
+  border-radius: 6px;
+  border: solid 1px #eee;
+  box-shadow: 0px 2px 5px 0px rgba(155, 155, 155, 0.5);
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  float: left;
+  font-size: 14px;
+  font-weight: normal;
+  height: 42px;
+  line-height: 40px;
+  outline: none;
+  margin-top: 20px;
+  padding-left: 18px;
+  padding-right: 30px;
+  position: relative;
+  text-align: left !important;
+  transition: all 0.2s ease-in-out;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  white-space: nowrap;
+  width: auto;
+
+}
+
+.dropdown-select:focus {
+  background-color: #fff;
+}
+
+.dropdown-select:hover {
+  background-color: #fff;
+}
+
+.dropdown-select:active,
+.dropdown-select.open {
+  background-color: #fff !important;
+  border-color: #bbb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) inset;
+}
+
+.dropdown-select:after {
+  height: 0;
+  width: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #777;
+  -webkit-transform: origin(50% 20%);
+  transform: origin(50% 20%);
+  transition: all 0.125s ease-in-out;
+  content: '';
+  display: block;
+  margin-top: -2px;
+  pointer-events: none;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+}
+
+.dropdown-select.open:after {
+  -webkit-transform: rotate(-180deg);
+  transform: rotate(-180deg);
+}
+
+.dropdown-select.open .list {
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.dropdown-select.open .option {
+  cursor: pointer;
+}
+
+.dropdown-select.wide {
+  width: 100%;
+}
+
+.dropdown-select.wide .list {
+  left: 0 !important;
+  right: 0 !important;
+}
+
+.dropdown-select .list {
+  box-sizing: border-box;
+  transition: all 0.15s cubic-bezier(0.25, 0, 0.25, 1.75), opacity 0.1s linear;
+  -webkit-transform: scale(0.75);
+  transform: scale(0.75);
+  -webkit-transform-origin: 50% 0;
+  transform-origin: 50% 0;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.09);
+  background-color: #fff;
+  border-radius: 6px;
+  margin-top: 4px;
+  padding: 3px 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000000;
+  max-height: 250px;
+  margin-bottom: 20px;
+  overflow: auto;
+  border: 1px solid #ddd;
+}
+
+.dropdown-select .list:hover .option:not(:hover) {
+  background-color: transparent !important;
+}
+
+.dropdown-select .dd-search {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem;
+}
+
+.dropdown-select .dd-searchbox {
+  width: 100%;
+  height: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding: 0.5rem;
+  border: 1px solid #999;
+  border-color: #999;
+  border-radius: 4px;
+  outline: none;
+}
+
+.dropdown-select .dd-searchbox:focus {
+  border-color: #12CBC4;
+}
+
+.dropdown-select .list ul {
+  padding: 0;
+}
+
+.dropdown-select .option {
+  cursor: default;
+  font-weight: 400;
+  line-height: 40px;
+  outline: none;
+  padding-left: 18px;
+  padding-right: 29px;
+  text-align: left;
+  transition: all 0.2s;
+  list-style: none;
+}
+
+.dropdown-select .option:hover,
+.dropdown-select .option:focus {
+  background-color: #f6f6f6 !important;
+}
+
+.dropdown-select .option.selected {
+  font-weight: 600;
+  color: #12cbc4;
+}
+
+.dropdown-select .option.selected:focus {
+  background: #f6f6f6;
+}
+
+.dropdown-select a {
+  color: #aaa;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.dropdown-select a:hover {
+  color: #666;
+}
+
+/*------------------------------------------------------------
+# SIDEBAR SECCION INFO ESTACION
+------------------------------------------------------------*/
+
+.title-estacion {
+  font-family: 'Brush Script MT';
+  font-size: 40px;
+  font-style: normal;
+  font-weight: bold;
+  font-variant: normal;
+  color: #1B1C1C;
+  padding-top: 80px;
+  padding-bottom: 15px;
+}
+
+.linea-divisoria {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.linea-divisoria::before {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 200px;
+  height: 2px;
+  background: #1B1C1C;
+  bottom: 1px;
+  left: calc(50% - 100px);
+}
+
+.linea-divisoria::after {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 60px;
+  height: 5px;
+  background: #48CCCD;
+  bottom: 0;
+  left: calc(50% - 30px);
+}
+
+/*Pagina Preload html */
+.loader-info-estacion {
+  overflow: hidden !important;
+  position: absolute;
+  /*top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;*/
+  width: 100% !important;
+  height: 100% !important;
+  left: 0 !important;
+  margin: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 1);
+  z-index: 2;
+}
+
+
+/*-------------------------------------------------------------------------
+  # POPUP (Centrar las imagenes situadas en el popup. Ej: Zonas Aemet)
+--------------------------------------------------------------------------*/
+.leaflet-popup-content img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/*-------------------------------------------------------------------------
+  # POPUP Capa de Imagenes Spida
+--------------------------------------------------------------------------*/
+.leaflet-popup-photo a.leaflet-popup-close-button {
+  top: -13px;
+  right: -13px;
+  background-color: #343a40;
+  padding: 5px;
+  border-radius: 0px;
+  width: 15px;
+  height: 15px;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
+  color: #555;
+  display: none;
+}
+
+.leaflet-popup-photo a.leaflet-popup-close-button:hover {
+  color: #333;
+  background-color: #1B1C1C;
+}
+
+.leaflet-popup-photo .leaflet-popup-content-wrapper {
+  padding: 6px;
+  border-radius: 4px;
+  background-color: #1B1C1C;
+}
+
+.leaflet-popup-photo .leaflet-popup-content {
+  margin: 0;
+  background-color: #1B1C1C;
+}
+
+.leaflet-popup-photo .leaflet-popup-tip {
+  background: white;
+}
+
+.leaflet-popup-photo img,
+.leaflet-popup-photo video {
+  display: block;
+  width: 100%;
+}
+
+.leaflet-popup-photo p {
+  margin: 5px 0 0 0;
+}
+
+#titleBindPopUp {
+  color: #12CBC4;
+  font-family: 'Brush Script MT', cursive;
+  font-size: 35px;
+  text-align: center;
+}
+
+#contentBindPopUp {
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+  font-size: 15px;
+}
+
+/*---------------------------------------------------------------
+# MODAL ULTIMA IMAGEN 
+------------------------------------------------------------------*/
+#UltimaFoto {
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#UltimaFoto:hover {
+  opacity: 0.7;
+}
+
+#modalUltimaImagen {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+  width: 80%;
+  height: 70%;
+}
+
+#UltimaImagen-modal {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+
+/* Caption of Modal Image */
+/*#caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    height: 150px;
+  }*/
+
+/* The Close Button */
+.closeUltimaImagen {
+  position: absolute;
+  top: 15px;
+  right: 35px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.closeUltimaImagen:hover,
+.closeUltimaImagen:focus {
+  color: #48CCCD;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px) {
+  .modal-content-img {
+    width: 100%;
+    height: 80%;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+/*------------------------------------------------------------------------------------
+# Carrousel (Galería) de las imagenes de una estacion 
+-------------------------------------------------------------------------------------*/
+
+/* Contenedor de imagenes de una estacion */
+.slideshow-container {
+  max-width: 1000px;
+  position: relative;
+  margin-bottom: 20px !important;
+}
+
+.mySlides img {
+  border-radius: 20px;
+  cursor: zoom-in;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  width: 100% !important;
+  height: 250px !important;
+}
+
+/* Number text (1/3 etc) */
+.numbertext {
+  color: #ffffff;
+  font-size: 14px;
+  padding: 8px 12px;
+  position: absolute;
+  bottom: 2px;
+  right: 0;
+}
+
+.btn {
+  background-color: transparent;
+  /* Blue background */
+  border: none;
+  /* Remove borders */
+  color: white;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: transparent;
+  color: yellow;
+}
+
+.img-capture {
+  color: white;
+  font-size: 14px;
+  padding: 8px 12px;
+  position: absolute;
+  bottom: 2px;
+  left: 0px;
+}
+
+.img-capture:active,
+.img-capture:focus {
+  outline: 0 !important;
+  border: none;
+  box-shadow: none;
+}
+
+.img-streaming {
+  color: white;
+  font-size: 14px;
+  padding: 8px 12px;
+  position: absolute;
+  bottom: 2px;
+  left: 35px;
+}
+
+.img-streaming:active,
+.img-streaming:focus {
+  outline: 0 !important;
+  border: none;
+  box-shadow: none;
+}
+
+
+/* Next & previous buttons */
+.prev,
+.next {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  /*margin-top: -22px;*/
+  padding: 16px;
+  color: white !important;
+  font-weight: bold;
+  font-size: 18px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  user-select: none;
+}
+
+/* Position the "next button" to the right */
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+.prev {
+  left: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover,
+.next:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+
+/*------------------------------------------------------------------------------------
+#Barra de progreso para volver a cargar datos
+-------------------------------------------------------------------------------------*/
+.progress.leaflet-control {
+  width: 100%;
+  /*height: 8px;*/
+  background-color: rgba(27, 28, 29, 1);
+  height: 20px;
+}
+.leaflet-fullscreen-on .leaflet-control-container .leaflet-bottom.leaflet-left .progress.leaflet-control {
+  background: transparent;
+}
+/*#bar{
+  background-color: #1B1C1C;
+}*/
+
+
+/*-------------------------------------------------------------------------------------------
+# Estilo icono marcadores estaciones SPIDA monitorizadas con LEDS
+https://codepen.io/fskirschbaum/pen/MYJNaj
+--------------------------------------------------------------------------------------*/
+.led-box {
+  height: 15px;
+  width: 100%;
+  margin: 10px 0;
+  /*float: left;*/
+  display: flex;
+  justify-content: center;
+}
+
+.led-box p {
+  font-size: 12px;
+  text-align: center;
+  margin: 1em;
+}
+
+.led-red {
+  margin: 0 10px;
+  width: 15px;
+  height: 15px;
+  background-color: #FF0000;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #441313 0 0px 3px,
+    rgba(255, 0, 0, 0.5) 0 0px 12px;
+  -webkit-animation: blinkRed 0.5s infinite;
+  -moz-animation: blinkRed 0.5s infinite;
+  -ms-animation: blinkRed 0.5s infinite;
+  -o-animation: blinkRed 0.5s infinite;
+  animation: blinkRed 0.5s infinite;
+}
+
+@-webkit-keyframes blinkRed {
+  from {
+    background-color: #FF0000;
+  }
+
+  50% {
+    background-color: #a00;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #441313 0 0px 9px,
+      rgba(255, 0, 0, 0.5) 0 0px 0;
+  }
+
+  to {
+    background-color: #FF0000;
+  }
+}
+
+@-moz-keyframes blinkRed {
+  from {
+    background-color: #FF0000;
+  }
+
+  50% {
+    background-color: #a00;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #441313 0 0px 9px,
+      rgba(255, 0, 0, 0.5) 0 0px 0;
+  }
+
+  to {
+    background-color: #FF0000;
+  }
+}
+
+@-ms-keyframes blinkRed {
+  from {
+    background-color: #FF0000;
+  }
+
+  50% {
+    background-color: #a00;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #441313 0 0px 9px,
+      rgba(255, 0, 0, 0.5) 0 0px 0;
+  }
+
+  to {
+    background-color: #FF0000;
+  }
+}
+
+@-o-keyframes blinkRed {
+  from {
+    background-color: #FF0000;
+  }
+
+  50% {
+    background-color: #a00;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #441313 0 0px 9px,
+      rgba(255, 0, 0, 0.5) 0 0px 0;
+  }
+
+  to {
+    background-color: #FF0000;
+  }
+}
+
+@keyframes blinkRed {
+  from {
+    background-color: #FF0000;
+  }
+
+  50% {
+    background-color: #a00;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #441313 0 0px 9px,
+      rgba(255, 0, 0, 0.5) 0 0px 0;
+  }
+
+  to {
+    background-color: #FF0000;
+  }
+}
+
+.led-orange {
+  margin: 0 10px;
+  width: 15px;
+  height: 15px;
+  background-color: #FFA500;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #875400 0 0px 3px,
+    rgba(255, 165, 0, 0.5) 0 0px 12px;
+  -webkit-animation: blinkOrange 1s infinite;
+  -moz-animation: blinkOrange 1s infinite;
+  -ms-animation: blinkOrange 1s infinite;
+  -o-animation: blinkOrange 1s infinite;
+  animation: blinkOrange 1s infinite;
+}
+
+@-webkit-keyframes blinkOrange {
+  from {
+    background-color: #FFA500;
+  }
+
+  50% {
+    background-color: #BD7E17;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #875400 0 0px 9px,
+      rgba(255, 165, 165, 0.5) 0 0px 0;
+  }
+
+  to {
+    background-color: #FFA500;
+  }
+}
+
+@-moz-keyframes blinkOrange {
+  from {
+    background-color: #FFA500;
+  }
+
+  50% {
+    background-color: #BD7E17;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #875400 0 0px 9px,
+      rgba(255, 165, 165, 0.5) 0 0px 0;
+  }
+
+  to {
+    background-color: #FFA500;
+  }
+}
+
+@-ms-keyframes blinkOrange {
+  from {
+    background-color: #FFA500;
+  }
+
+  50% {
+    background-color: #BD7E17;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #875400 0 0px 9px,
+      rgba(255, 165, 165, 0.5) 0 0px 0;
+  }
+
+  to {
+    background-color: #FFA500;
+  }
+}
+
+@-o-keyframes blinkOrange {
+  from {
+    background-color: #FFA500;
+  }
+
+  50% {
+    background-color: #BD7E17;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #875400 0 0px 9px,
+      rgba(255, 165, 165, 0.5) 0 0px 0;
+  }
+
+  to {
+    background-color: #FFA500;
+  }
+}
+
+@keyframes blinkOrange {
+  from {
+    background-color: #FFA500;
+  }
+
+  50% {
+    background-color: #BD7E17;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #875400 0 0px 9px,
+      rgba(255, 165, 165, 0.5) 0 0px 0;
+  }
+
+  to {
+    background-color: #FFA500;
+  }
+}
+
+.led-yellow {
+  margin: 0 10px;
+  width: 15px;
+  height: 15px;
+  background-color: #ff0;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #808002 0 0px 3px,
+    #ff0 0 2px 12px;
+  -webkit-animation: blinkYellow 2s infinite;
+  -moz-animation: blinkYellow 2s infinite;
+  -ms-animation: blinkYellow 2s infinite;
+  -o-animation: blinkYellow 2s infinite;
+  animation: blinkYellow 2s infinite;
+}
+
+@-webkit-keyframes blinkYellow {
+  from {
+    background-color: #ff0;
+  }
+
+  50% {
+    background-color: #aa0;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #808002 0 0px 9px,
+      #ff0 0 0px 0;
+  }
+
+  to {
+    background-color: #ff0;
+  }
+}
+
+@-moz-keyframes blinkYellow {
+  from {
+    background-color: #ff0;
+  }
+
+  50% {
+    background-color: #aa0;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #808002 0 0px 9px,
+      #ff0 0 0px 0;
+  }
+
+  to {
+    background-color: #ff0;
+  }
+}
+
+@-ms-keyframes blinkYellow {
+  from {
+    background-color: #ff0;
+  }
+
+  50% {
+    background-color: #aa0;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #808002 0 0px 9px,
+      #ff0 0 0px 0;
+  }
+
+  to {
+    background-color: #ff0;
+  }
+}
+
+@-o-keyframes blinkYellow {
+  from {
+    background-color: #ff0;
+  }
+
+  50% {
+    background-color: #aa0;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #808002 0 0px 9px,
+      #ff0 0 0px 0;
+  }
+
+  to {
+    background-color: #ff0;
+  }
+}
+
+@keyframes blinkYellow {
+  from {
+    background-color: #ff0;
+  }
+
+  50% {
+    background-color: #aa0;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #808002 0 0px 9px,
+      #ff0 0 0px 0;
+  }
+
+  to {
+    background-color: #ff0;
+  }
+}
+
+.led-green {
+  margin: 0 10px;
+  width: 15px;
+  height: 15px;
+  background-color: #abff00;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 0px 7px 1px, inset #304701 0 0px 3px,
+    #89ff00 0 0px 12px;
+}
+
+.led-black {
+  margin: 0 10px;
+  width: 15px;
+  height: 15px;
+  background-color: #767676;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #000000 0 -1px 9px,
+    #474747 0 2px 12px;
+}
+
+.led-blue {
+  margin: 0 10px;
+  width: 15px;
+  height: 15px;
+  background-color: #24e0ff;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #006 0 -1px 9px,
+    #3f8cff 0 2px 14px;
+}
+
+
+
+
+/*-----------------------------------------------------------------------------------
+  CUADRO INFORMACION AVISOS METEOROLOGICOS AEMET (Menu Capas)
+  https://codepen.io/chalharb/pen/KyYQbJ
+  ----------------------------------------------------------------------------------*/
+.current {
+  z-index: 50;
+}
+
+.emergency-alerts.collapsed .emergency-alert {
+  height: auto;
+}
+
+.emergency-alerts.collapsed {
+  height: 50px;
+  margin-bottom: 10px;
+}
+
+.emergency-alerts.collapsed .emergency-alert__zona {
+  display: none;
+}
+
+.emergency-alerts.collapsed .emergency-alert__link {
+  display: none;
+}
+
+.emergency-alerts.collapsed .emergency-alert_probabilidad {
+  display: none;
+}
+
+.emergency-alerts.collapsed .emergency-alert__link {
+  display: none;
+}
+
+.emergency-alerts.collapsed .emergency-alert__duracion {
+  display: none;
+}
+
+.emergency-alerts.collapsed .emergency-alerts__cycle {
+  display: none;
+}
+
+.emergency-alerts__collapse {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 9999;
+}
+
+.emergency-alert {
+  color: white;
+}
+
+.emergency-alert a {
+  color: white;
+  text-decoration: underline;
+}
+
+.emergency-alert a:hover {
+  color: black;
+}
+
+.emergency-alert--nivelrojo {
+  background-color: #a70016;
+  color: white;
+}
+
+.emergency-alert--nivelnaranja {
+  background-color: #FF5733;
+  color: white;
+}
+
+.emergency-alert--nivelamarillo {
+  background-color: #FFC300;
+  color: white;
+}
+
+.emergency-alert--sinavisos {
+  background-color: #82E0AA;
+  color: white;
+}
+
+
+/***************
+* Mobile Styles
+*/
+.emergency-alert {
+  padding: 15px 40px 15px 15px;
+  position: absolute;
+  width: 100%;
+  height: 200px;
+  text-align: left;
+}
+
+.emergency-alert__icon,
+.emergency-alert__title,
+.emergency-alert__description,
+.emergency-alert__date,
+.emergency-alert__link {
+  padding-bottom: 5px;
+}
+
+.emergency-alert__icon {
+  font-size: 16px;
+  padding-right: 15px;
+  float: left;
+}
+
+.emergency-alert__title {
+  font-size: 16px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.emergency-alert__description {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.emergency-alerts {
+  position: relative;
+  height: 200px;
+  margin-top: 20px;
+}
+
+.emergency-alerts__cycle {
+  z-index: 99999;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}
+
+.emergency-alerts__cycle--prev,
+.emergency-alerts__cycle--next {
+  width: 50%;
+  display: inline-block;
+  float: left;
+  background: rgba(0, 0, 0, 0.15);
+  color: white;
+  border: none;
+  padding: 10px;
+}
+
+.emergency-alerts__cycle--prev {
+  border-right: 1px solid rgba(255, 253, 253, 0.15);
+}
+
+
+/*---------------------------------------------------------------------
+    SPIN/SPINNER LOADING MAP
+    ---------------------------------------------------------------------*/
+.spinner {
+  left: 0px !important;
+  top: 0px !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(27, 28, 28, 0.9);
+  color: white !important;
+}
+
+.spinner div {
+  top: 50% !important;
+  left: 50% !important;
+  scale: 1.2 !important;
+  background-color: white;
+  color: #ffffff !important;
+  z-index: 9999;
+  position: 'absolute',
+}
+
+/*--------------------------------------------------------------------------------
+    SWEETALERT TIPO DE AVISOS (+INFORMACION)
+    ---------------------------------------------------------------------------------*/
+
+.buttonClose-swal {
+  color: white;
+}
+
+.swal2-close {
+  box-shadow: none !important;
+}
+
+.buttonClose-swal:focus {
+  box-shadow: none !important;
+}
