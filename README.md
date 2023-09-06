@@ -14,7 +14,7 @@ Sigue estos pasos para instalar Weblaruex en tu entorno local:
 git clone https://github.com/Alerta2/AppsLaruex.git
 2. **Acceder al directorio:**
 cd weblaruex
-3. **Crear un entorno virtual:**
+3. **Crear un entorno virtual**
 python -m venv venv o equivalente en conda
 4. **Instalar las dependencias:**
 pip install -r requirements.txt o importar el entorno en conda
