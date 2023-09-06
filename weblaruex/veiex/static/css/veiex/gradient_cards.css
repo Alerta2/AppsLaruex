@@ -1,0 +1,72 @@
+/*Iconos ICA*/
+.icon-description-ICA {
+    text-align: left;
+    font-size: 14px;
+}
+
+.icon-description-ICA b{
+    padding: 5px;
+    border-radius: 15px;
+    color: white;
+    box-shadow: none !important;
+}
+
+/*Calidad buena (azul)*/
+.card-blue {
+    background: linear-gradient(45deg, #6d80fe 0%, #23d2fd 100%);
+    box-shadow: 0 5px 20px rgba(35, 210, 253, 0.3);
+}
+
+/*Calidad Razonablemente buena (verde)*/
+.card-green {
+    background: linear-gradient(45deg, #00ACC1 0%, #29f499 100%);
+    box-shadow: 0 5px 20px rgba(41, 244, 153, 0.3);
+}
+
+/*Calidad Regular (amarillo)*/
+.card-yellow {
+    background: linear-gradient(45deg, #CDDC39 0%, #FDD835 100%);
+    box-shadow: 0 5px 20px rgba(253, 216, 53, 0.3);
+}
+
+/*Calidad Desfavorable (rojo)*/
+.card-red {
+    background: linear-gradient(45deg, #C62828 0%, #E57373 100%);
+    box-shadow: 0 5px 20px rgba(229, 115, 115, 0.3);
+}
+
+/*Calidad Muy desfavorable (granate)*/
+.card-darkred {
+    background: linear-gradient(45deg, #7B241C 0%, #CB4335 100%);
+    box-shadow: 0 5px 20px rgba(203, 67, 53, 0.3);
+}
+
+/*Calidad Extremadamente desfavorable (violeta)*/
+.card-purple {
+    background: linear-gradient(45deg, #707cff 0%, #fa81e8 100%);
+    box-shadow: 0 5px 20px rgba(250, 129, 232, 0.3);
+}
+
+/*No aplica, sin datos (gris)*/
+.card-grey {
+    background: linear-gradient(45deg, #455A64 0%, #CFD8DC 100%);
+    box-shadow: 0 5px 20px rgba(207, 216, 220, 0.3);
+}
+
+.card {
+    border: 0;
+    border-radius: 10px;
+}
+
+.card-body {
+    padding: 15px 20px 5px 20px;
+}
+
+.card-number {
+    text-align: left;
+}
+
+.card-charts {
+    display: none;
+    margin: 20px;
+}

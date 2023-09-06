@@ -1,0 +1,258 @@
+{% extends "base/base_veiex.html" %}
+
+{% load static %}
+
+
+{% block imports %}
+<!-- Mapa Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+
+<!-- Leaflet Spin -->
+<!-- https://github.com/makinacorpus/Leaflet.Spin -->
+<script src="{% static 'js/veiex/spin.min.js' %}" charset="utf-8"></script>
+<script src="{% static 'js/veiex/leaflet.spin.min.js' %}" charset="utf-8"></script>
+
+<!-- Leaflet Sidebar -->
+<!-- https://github.com/noerw/leaflet-sidebar-v2 -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/leaflet-sidebar.css' %}">
+<script type="text/javascript" src="{% static 'js/spd/leaflet-sidebar.js' %}"></script>
+
+<!-- Custom css mapa -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/mapa_spd.css' %}" />
+
+{% endblock %}
+
+
+{% block content %}
+<!-- Mapa Leaflet-->
+<div id="map"></div>
+<!-- END Mapa Leaflet-->
+
+
+<!-- Panel Menu Lateral Sidebar -->
+<div id="sidebar" class="leaflet-sidebar collapsed">
+
+    <!-- Nav tabs (Pestañas) -->
+    <div class="leaflet-sidebar-tabs">
+        <ul role="tablist">
+            <li>
+                <a href="#aviso_provisionalidad" role="tab" style=" color: yellow;"><i class="fa-solid fa-info fa-beat"
+                        style="--fa-beat-scale: 2.0;"></i><span class="tooltip-sidebar">AVISO DE
+                        PROVISIONALIDAD</span></a>
+            </li>
+            <li>
+                <a href="#capas" role="tab"><i class="fas fa-layer-group"></i><span class="tooltip-sidebar">CONTROL DE
+                        CAPAS</span></a>
+            </li>
+            <li>
+                <a href="#estaciones" role="tab"><i class="fas fa-broadcast-tower"></i><span
+                        class="tooltip-sidebar">INFORMACIÓN DE UNA ESTACIÓN</span></a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tab panes -->
+    <div class="leaflet-sidebar-content" id="sidebar-contenido">
+        <div class="loader-info-estacion">
+            <span class="loader">
+                <button class="btn btn-primary" type="button" disabled>
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Cargando datos...
+                </button>
+            </span>
+        </div>
+        <div class="leaflet-sidebar-pane" id="aviso_provisionalidad">
+            <!--<h1 class="leaflet-sidebar-header">
+          sidebar-v2
+          <span class="leaflet-sidebar-close"
+            ><i class="fa fa-caret-right"></i
+          ></span>
+        </h1>-->
+            <div>
+                <h2 style="padding-top: 20px; font-family: 'Bradley Hand ITC'; font-weight: bold;">Aviso sobre la
+                    provisionalidad de los
+                    datos en tiempo real</h2>
+                <div class="linea-divisoria"></div>
+                <p style="text-align: left; line-height: 20px;">
+                    <span class="text-spida">SPIDA </span>
+                    es un Sistema de Alerta Temprana con telecontrol en tiempo real a través de la cual se monitorean
+                    amenazas o
+                    eventos adversos de carácter previsible que puedan desembocar en episodios de inundación.
+                    <br><br>
+                    Los datos recopilados por los sensores de los diversos puntos de control existentes, son
+                    transmitidos
+                    de forma automática sin ningún tipo de aprobación final al Centro Hispano-Luso de Redes de Alerta
+                    Temprana
+                    <span class="text-alerta2" style="font-size: 22px;">alerta<span
+                            style="font-size: 25px; top: 0px;">2</span></span>
+                    , con una periodicidad decimominutal mediante comunicaciones LTE y/o IPSAT.
+                    <br><br>
+                    La alta frecuencia de transmision de los datos, aporta a éstos un caracter de provisionalidad hasta
+                    su
+                    posterior revisión, validacion y consolidacion por parte del personal técnico del Centro
+                    <span class="text-alerta2" style="font-size: 22px;">alerta<span
+                            style="font-size: 25px; top: 0px;">2</span></span>.
+                    <br><br>
+                    Consecuencia de ello, los datos no pueden ser legalmente utilizados ya que pueden estar afectados
+                    por
+                    diversos factores como:
+                </p>
+                <ul class="list-causas" style="text-align: left; line-height: 20px;">
+                    <li> Embalsamiento natural del agua debido a troncos y follaje.</li>
+                    <li> Crecimiento de la Vegetación próxima a los sensores. </li>
+                    <li> Funcionamiento incorrecto de los equipos de medición, registro y comunicación. </li>
+                    <li> Desembalses decontrolados. </li>
+                    <li> Transporte de sedimentos puntuales. </li>
+                </ul>
+                <p style="text-align: left; line-height: 20px;">
+                    <br>
+                    En cuanto a los datos meteorológicos (pluviometría), destacar que en ningún caso tendrán validez
+                    oficial los recopilados por las diversas estaciones que conforman
+                    <span class="text-spida"> SPIDA</span>
+                    , siendo los únicos datos meteorológicos válidos los proporcionados por la Agencia Estatal de
+                    Meteorología
+                    (Aemet), referente
+                    a la previsión de precipitación.
+                    <br><br>
+                    Motivos por los cuales se les advierte a los usuarios sobre la naturaleza provisional de la
+                    información
+                    contenida,
+                    antes de usarla para la toma de decisiones que conciernen a la seguridad personal o pública o
+                    aplicada a un
+                    negocio que suponga
+                    consecuencias económicas u operacionales substanciales.
+                    <br><br>
+                    Cualquier comentario debe realizarse al buzón de
+                    <span class="text-alerta2" style="font-size: 22px;">alerta<span
+                            style="font-size: 25px; top: 0px;">2</span></span>:
+                    <a style="color:'blue';" href="mailto:redalertaspida@gmail.com">redalertaspida@gmail.com</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="leaflet-sidebar-pane" id="capas">
+            <!--<h1 class="leaflet-sidebar-header">
+          Control de Capas<span class="leaflet-sidebar-close"
+            ><i class="fa fa-caret-right"></i
+          ></span>
+        </h1>-->
+            <div id="loader-control-layers">
+                <!-- Aqui voy a añadir el control de capas -->
+            </div>
+        </div>
+
+        <div class="leaflet-sidebar-pane" id="estaciones">
+
+            <h1 class="leaflet-sidebar-header">
+                Información de la Estación<span class="leaflet-sidebar-close"><i class="fa fa-caret-right"></i></span>
+            </h1>
+            <!--<div class="loader-info-estacion">
+          <span class="loader">
+            <button class="btn btn-primary" type="button" disabled>
+              <i class="fas fa-spinner fa-spin"></i>
+              Cargando datos...
+            </button>
+          </span>
+        </div>-->
+            <select name="">
+                {% for estacion in listaEstaciones %}
+                <option value="{{estacion.Id}}">{{estacion.Red}}{{estacion.Tipo}} - {{estacion.Nombre}}</option>
+                {% endfor %}
+            </select>
+            <div id="info-estacion">
+            </div>
+        </div>
+
+        <!--<div class="leaflet-sidebar-pane" id="messages">
+        <h1 class="leaflet-sidebar-header">
+          Messages<span class="leaflet-sidebar-close"
+            ><i class="fa fa-caret-right"></i
+          ></span>
+        </h1>
+      </div>-->
+
+        <div class="leaflet-sidebar-pane" id="settings">
+            <h1 class="leaflet-sidebar-header">
+                Settings<span class="leaflet-sidebar-close"><i class="fa fa-caret-right"></i></span>
+            </h1>
+        </div>
+    </div>
+</div>
+<!-- END Panel Menu Lateral Sidebar -->
+
+
+
+
+<script>
+
+    /******************************************************************
+        DEFINO EL MAPA LEAFLET 
+    *******************************************************************/
+    var map = L.map('map', {
+        attributionControl: false,
+        zoomControl: false,
+        minZoom: 5,
+        maxZoom: 18
+    });
+
+    /*******************************************************************
+        MAP SPINNER LOADING... (http://spin.js.org/)
+    *******************************************************************/
+    var spinner_options = {
+        color: '#ffffff',
+        fadeColor: 'transparent',
+        zIndex: 1999,
+        top: '50%',
+        left: '50%',
+        position: 'absolute',
+        animation: 'spinner-line-fade-more',
+    }
+
+    /*******************************************************************
+        WATERMARK (Marca de agua en el mapa)
+    ******************************************************************/
+
+    L.Control.Watermark = L.Control.extend({
+        onAdd: function (map) {
+            var el = L.DomUtil.create('div', 'leaflet-bar my-control');
+            var img = L.DomUtil.create('img');
+            img.src = "{% static 'img/veiex/logos/logo_alerta2_transparente.png' %}";
+            el.innerHTML = '<img class="watermark" src="{% static "img/veiex/logos/logo_alerta2_transparente.png" %}">'
+            return el;
+        },
+        onRemove: function (map) {
+            // Nothing to do here
+        }
+    });
+
+
+    L.control.watermark = function (opts) {
+        return new L.Control.Watermark(opts);
+    }
+
+    L.control.watermark().addTo(map);
+
+    /*******************************************************************
+        PANEL SIDEBAR (PANEL MENU LATERAL)
+    ******************************************************************/
+
+    var sidebar = L.control.sidebar({ container: "sidebar", position: "right" }).addTo(map);
+
+    // Si no hay un usuario loguado muestro el avisos de provisionalidad de datos 
+    if ('{{request.user.is_authenticated}}' == 'False') {
+        sidebar.open('aviso_provisionalidad')
+    }
+
+</script>
+
+
+
+
+
+
+{% endblock %}

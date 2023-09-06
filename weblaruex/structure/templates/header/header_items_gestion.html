@@ -1,0 +1,15 @@
+{% load static %}
+{% if perms.auth.muestras_vraex %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'structure:servicios' %}">HOME</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'gestionmuestras:gestmuesOpciones' %}">Gestion Muestras</a>
+    </li>
+
+<script>
+    $('.btnright').hide();
+    $('.btnleft').hide();
+</script>
+
+{% endif %}

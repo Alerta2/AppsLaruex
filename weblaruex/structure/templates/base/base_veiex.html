@@ -1,0 +1,317 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+    <title>VEIEX</title>
+
+
+    <!-- Graficos HighCharts -->
+    <script src="http://code.highcharts.com/adapters/prototype-adapter.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/maps/modules/map.js"></script>
+    <script src="https://code.highcharts.com/gantt/modules/gantt.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/modules/full-screen.js"></script>
+    <script src="https://blacklabel.github.io/multicolor_series/js/multicolor_series.js"></script>
+
+
+    <!--HighMaps-->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/marker-clusters.js"></script>
+    <script src="https://code.highcharts.com/modules/coloraxis.js"></script>
+    <script src="https://code.highcharts.com/maps/modules/accessibility.js"></script>-->
+
+
+    <!-- Bootstrap 4-->
+    <!-- Css Bootstrap para los modal File Input (Kraje)-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+        crossorigin="anonymous">
+    <!-- Css Bootstrap para el resto -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+
+    <!-- Iconos Menu Fontawesome-->
+    <!-- Fontawesome v6 -->
+    <link href="{% static 'fontawesome/v6/css/all.css' %}" rel="stylesheet">
+    <script src="{% static 'fontawesome/v6/js/all.js' %}" crossorigin="anonymous"></script>
+
+    <!--Fuente Roboto-->
+    <!--<link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">-->
+
+    <!-- Sweet Alert -->
+    <!-- https://sweetalert.js.org/guides/ -->
+    <!-- https://sweetalert2.github.io/ -->
+    <!--<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>-->
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+    <!-- Rolldate -->
+    <!-- https://www.cssscript.com/mobile-ios-date-picker-rolldate/ -->
+    <!--<script type="text/javascript" src="{% static 'js/spd/rolldate-spd.js' %}"></script>-->
+
+
+
+    <!--Animaciones de los div data-aos-->
+    <!--https://michalsnik.github.io/aos/-->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <!-- Custom css base -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/veiex/base.css' %}">
+
+    <!-- Custom css header -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/veiex/header.css' %}">
+
+    <!-- Custom css styles (Estilos generales de tamaños, etc...) -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/veiex/util.css' %}">
+
+    <!-- Custom css preloadings -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/veiex/preload.css' %}">
+
+    <!-- Bloque para poder importar referencias en otros html -->
+    {% block imports %}{% endblock %}
+
+</head>
+
+<body>
+    <div>
+        <!--Water Preload alerta2-->
+        <div id="box">
+            <div class="smoke">
+                <canvas id="canvas"></canvas>
+            </div>
+            <div id="tile01">
+                <div class="mask"
+                    style="background-image: -webkit-radial-gradient(center 10px, 80px 100px, #111111 50%, #ADADB1 51%); left:18px;">
+                    alerta</div>
+                <div class="mask" style="writing-mode: vertical-rl; top: -3px; font-size: 62px;">
+                    2</div>
+            </div>
+        </div>
+
+        <!--Loading Alerta2 (circular)-->
+        <div class="preloaderBg" id="preloader">
+            <div class="preloader">
+            </div>
+            <div class="preloader2"></div>
+        </div>
+
+
+        <!--Show Loading Alerta2-->
+        <script>
+            function LoadingAlerta2() {
+                var x = document.getElementById("preloader");
+                if (x.style.display == "none") {
+                    x.style.display = "flex";
+                } else {
+                    x.style.display = "none";
+                }
+            };
+            LoadingAlerta2();
+
+            function ShowPreload() {
+                $("#box").fadeIn();
+            }
+        </script>
+
+        <!--Animation efects to Smoke preload-->
+        <script>
+            (function () {
+                var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+                window.requestAnimationFrame = requestAnimationFrame;
+            })();
+
+            var canvas = document.getElementById("canvas"),
+                ctx = canvas.getContext("2d");
+
+            canvas.height = document.body.offsetHeight;
+            canvas.width = 300;
+
+            var parts = [],
+                minSpawnTime = 40,
+                lastTime = new Date().getTime(),
+                maxLifeTime = Math.min(5000, (canvas.height / (1.5 * 60) * 1000)),
+                emitterX = canvas.width / 2,
+                emitterY = canvas.height - 10,
+                smokeImage = new Image();
+
+            function spawn() {
+                if (new Date().getTime() > lastTime + minSpawnTime) {
+                    lastTime = new Date().getTime();
+                    parts.push(new smoke(emitterX, emitterY));
+                }
+            }
+
+            function render() {
+                var len = parts.length;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                while (len--) {
+                    if (parts[len].y < 0 || parts[len].lifeTime > maxLifeTime) {
+                        parts.splice(len, 1);
+                    } else {
+                        parts[len].update();
+
+                        ctx.save();
+                        var offsetX = -parts[len].size / 2,
+                            offsetY = -parts[len].size / 2;
+
+                        ctx.translate(parts[len].x - offsetX, parts[len].y - offsetY);
+                        ctx.rotate(parts[len].angle / 180 * Math.PI);
+                        ctx.globalAlpha = parts[len].alpha;
+                        ctx.drawImage(smokeImage, offsetX, offsetY, parts[len].size, parts[len].size);
+                        ctx.restore();
+                    }
+                }
+                spawn();
+                requestAnimationFrame(render);
+            }
+
+            function smoke(x, y, index) {
+                this.x = x;
+                this.y = y;
+
+                this.size = 1;
+                this.startSize = 32;
+                this.endSize = 40;
+
+                this.angle = Math.random() * 359;
+
+                this.startLife = new Date().getTime();
+                this.lifeTime = 0;
+
+                this.velY = -1 - (Math.random() * 0.5);
+                this.velX = Math.floor(Math.random() * (-6) + 3) / 10;
+            }
+
+            smoke.prototype.update = function () {
+                this.lifeTime = new Date().getTime() - this.startLife;
+                this.angle += 0.2;
+
+                var lifePerc = ((this.lifeTime / maxLifeTime) * 100);
+
+                this.size = this.startSize + ((this.endSize - this.startSize) * lifePerc * .1);
+
+                this.alpha = 1 - (lifePerc * .01);
+                this.alpha = Math.max(this.alpha, 0);
+
+                this.x += this.velX;
+                this.y += this.velY;
+            }
+
+            smokeImage.src = "http://somethinghitme.com/projects/particle%20test/images/smoke.png";
+            smokeImage.onload = function () {
+                render();
+            }
+
+
+            //window.onresize = resizeMe;
+            window.onload = resizeMe;
+            function resizeMe() {
+                canvas.height = document.body.offsetHeight;
+            }
+        </script>
+
+        <!-- Back to top-->
+        <a href="#" id="scroll" style="display: none;"><i class="fas fa-arrow-up"></i></a>
+
+        <!-- Cabecera -->
+        <div id="header" style="font-family: 'Roboto', sans-serif;">{% include "header/header_veiex.html" %}</div>
+
+        <!-- Content page-->
+        <div id="content">{% block content %}{% endblock %}</div>
+
+        <!-- Footer page-->
+        <div id="footer">{% block footer %}{% endblock %}</div>
+
+        <!-- Scripts-->
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+
+        <!-- ✅ load jQuery Para el animate de scroll  ✅ -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+        <script type="text/javascript">
+
+
+            /* Close preloading Smoke Alerta2*/
+            $(window).on("load", function () {
+                $("#box").fadeOut("slow");
+            });
+
+
+
+
+            /*Mostrar Back to top */
+            function onScrollContent() {
+                if ($(this).scrollTop() > 100) {
+                    $('#scroll').fadeIn();
+
+                } else {
+                    $('#scroll').fadeOut();
+                }
+            }
+            window.onscroll = function () { onScrollContent() };
+
+            $('#scroll').click(function () {
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 600);
+                return false;
+            });
+
+            /*Para no volver a enviar formulario cuando recargo la pagina*/
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+
+            /*No permitir hacer click derecho para guardar las imagenes*/
+            $(document).ready(function () {
+                $("img").on("contextmenu", function () {
+                    return false;
+                });
+                $("video").on("contextmenu", function () {
+                    return false;
+                });
+            });
+        </script>
+
+
+        <!--Animaciones de los div data-aos-->
+        <!--https://michalsnik.github.io/aos/-->
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script>
+            $(function () {
+                AOS.init({
+                    duration: 2000,
+                    keyboardScrolling: true,
+                    //offset: 20,
+                })
+
+                $(window).on('load', function () {
+                    AOS.refresh();
+                });
+            });
+        </script>
+
+    </div>
+</body>
+
+</html>

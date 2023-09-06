@@ -1,0 +1,114 @@
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+
+html, body{
+    height: 100%;
+    font-family: 'Numans', sans-serif;
+}
+
+p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1em;
+    font-weight: 300;
+    line-height: 1.7em;
+}
+
+a,
+a:hover,
+a:focus {
+    color: inherit;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+#content {
+    width: 90%;
+    min-height: 100vh;
+    transition: all 0.3s;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+/* Zoom In #1 */
+.hoverZoomIn figure img {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    -webkit-transition: .3s ease-in-out;
+    transition: .3s ease-in-out;
+}
+.hoverZoomIn figure:hover img {
+    -webkit-transform: scale(1.3);
+    transform: scale(1.3);
+}
+
+.container-texto-centrado{
+    height: 70%;
+    background-color: rgba(248, 249, 250, 0.8) !important;
+    font-size: 0.7em;
+}
+
+.texto-centrado{
+    overflow-y: auto;
+}
+
+/* ---------------------------------------------------
+    WRAPPER
+----------------------------------------------------- */
+.wrapper{
+    position: absolute;
+    top: 100px;
+    height: 88%;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.bg-lighter{
+    background-color: rgba(248, 249, 250, 0.8) !important;
+}
+
+.loader-wrapper {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #fff;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+/* Tablet portrait */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .navbarfooter{
+            font-size: 0.6em;
+            max-height: 40px;
+            padding-top: 10;
+    }
+}
+
+/* Tablet landscape */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    .navbarfooter{
+            font-size: 0.6em;
+            max-height: 40px;
+            padding-top: 10;
+    }
+}
+
+/* Smartphone landscape */
+@media (min-width: 481px) and (max-width: 767px) {
+    .navbarfooter{
+            font-size: 0.6em;
+            max-height: 40px;
+            padding-top: 10;
+    }
+}
+
+/* Smartphone portrait */
+@media (min-width: 320px) and (max-width: 480px) {
+    .navbarfooter{
+            font-size: 0.6em;
+            max-height: 40px;
+            padding-top: 10;
+    }
+}

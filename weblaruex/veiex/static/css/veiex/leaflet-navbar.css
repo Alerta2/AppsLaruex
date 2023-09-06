@@ -1,0 +1,138 @@
+/* Icons from Font-Awesome  | Font Awesome by Dave Gandy - http://fontawesome.io*/
+/* Thanks to http://fa2png.io/ for icon png generation */
+
+/*.leaflet-control-navbar-fwd {
+    background-image: url("../../../static/img/spd/iconos/right_negro.png");
+}*/
+
+/*.leaflet-control-navbar-back {
+    background-image: url("../../../static/img/spd/iconos/left_negro.png");
+}*/
+
+
+/*.leaflet-control-navbar-home {
+    background-image: url("../../../static/img/spd/iconos/home.png");
+}*/
+
+/*.leaflet-control-navbar-fwd-disabled {
+    background-image: url("../../../static/img/spd/iconos/right_gris.png");
+}
+
+.leaflet-control-navbar-back-disabled {
+    background-image: url("../../../static/img/spd/iconos/left_gris.png");
+}
+
+.leaflet-control-navbar-home-disabled {
+    background-image: url("../../../static/img/spd/iconos/home.png");
+}*/
+
+.leaflet-control-navbar-fwd::after {
+    font-weight: 900;
+    content: "\f061";
+    font-family: 'Font Awesome 6 Pro';
+    font-size: 15px;
+    color: #fff;
+}
+
+.leaflet-control-navbar-back::after {
+    font-weight: 900;
+    content: "\f060";
+    font-family: 'Font Awesome 6 Pro';
+    font-size: 15px;
+    color: #fff;
+}
+
+.leaflet-control-navbar-home::after {
+    font-weight: 900;
+    content: "\f015";
+    font-family: 'Font Awesome 6 Pro';
+    font-size: 15px;
+    color: #fff;
+}
+
+.leaflet-control-navbar-zoom-in::after {
+    font-weight: 900;
+    content: "\2b";
+    font-family: 'Font Awesome 6 Pro';
+    font-size: 15px;
+    color: #fff;
+}
+
+.leaflet-control-navbar-zoom-out::after {
+    font-weight: 900;
+    content: "\f068";
+    font-family: 'Font Awesome 6 Pro';
+    font-size: 15px;
+    color: #fff;
+}
+
+.leaflet-control-fullscreen a::after {
+    font-weight: 900;
+    content: "\f065";
+    font-family: 'Font Awesome 6 Pro';
+    font-size: 15px;
+    color: #fff;
+}
+.leaflet-fullscreen-on .leaflet-control-fullscreen a::after {
+    font-weight: 900;
+    content: "\f066";
+    font-family: 'Font Awesome 6 Pro';
+    font-size: 15px;
+    color: #fff;
+}
+
+.leaflet-control-fullscreen a {
+    background: #1B1C1C;
+    background-color: #1B1C1C;
+}
+
+.leaflet-control-zoom-in::after{
+    font-weight: 900;
+    content: "\2b";
+    font-family: 'Font Awesome 6 Pro';
+    font-size: 15px;
+    color: #fff;
+}
+
+.leaflet-control-zoom-out::after{
+    font-weight: 900;
+    content: "\f068";
+    font-family: 'Font Awesome 6 Pro';
+    font-size: 15px;
+    color: #fff;
+}
+
+/*Color de fondo de los botones del margen superior izquierdo del navbar*/
+.leaflet-control-navbar a{
+    background-color: #1B1C1C;
+}
+/*Color de fondo cuando paso el raton por encima del navbar de botones del margen superior izquierdo*/
+.leaflet-control-navbar a:hover{
+    background-color: #12CBC4;
+}
+
+/*Color de fondo del control fullscreen*/
+.leaflet-bar a.leaflet-disabled{
+    background-color: rgba(27, 28, 28, 0.7);
+}
+
+.leaflet-bar a.leaflet-disabled:hover{
+    background-color: rgba(27, 28, 28, 0.7);
+}
+
+.leaflet-control-fullscreen a:hover{
+    background-color: #12CBC4;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

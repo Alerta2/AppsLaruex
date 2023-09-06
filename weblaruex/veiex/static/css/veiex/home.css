@@ -1,0 +1,482 @@
+#content {
+    font-family: "Bradley Hand ITC";
+    font-weight: bold;
+    font-size: 21px;
+    /*background-image: url("https://media.npr.org/assets/img/2020/05/15/gettyimages-866344282_wide-4dfa47ab01ff730d1751a7aa14080277cbb334c3.jpg"), linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+    background-size: cover;
+    background-position: left;*/
+}
+
+@media only screen and (max-width: 800px) {
+
+    #content {
+        background-position: left -120px center;
+    }
+}
+
+
+
+/******************************************************************
+    SECCION TITULO DE LA PORTADA
+******************************************************************/
+
+.section-title-portada {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.button-portada {
+    margin-top: 2%;
+    margin-bottom: 50px;
+    background: #23d5ab;
+    color: black;
+    border-color: #23d5ab;
+    font-weight: bold;
+    box-shadow: 5px 5px 5px 0px rgba(255, 255, 255, 0.5);
+}
+
+.button-portada:hover {
+    background: #23a6d5;
+    border-color: #23a6d5;
+}
+
+.bandera {
+    width: 50px;
+    height: 30px;
+    opacity: 70%;
+    margin-bottom: 20px;
+}
+
+
+/*************************************************************************
+    ANIMACION HUMO PORTADA (https://codepen.io/wikyware-net/pen/MWmQOGa)
+*************************************************************************/
+
+.ag-smoke-block {
+    height: 100%;
+    width: 100%;
+    background-color: transparent;
+    overflow: hidden;
+    position: relative;
+}
+
+.ag-smoke_img {
+    width: auto;
+    height: 100%;
+
+    z-index: 10;
+    position: absolute;
+    bottom: 0;
+}
+
+.ag-smoke_img__left {
+    left: 0;
+
+    -webkit-animation: an-smoke-left 40s linear infinite;
+    -moz-animation: an-smoke-left 40s linear infinite;
+    -o-animation: an-smoke-left 40s linear infinite;
+    animation: an-smoke-left 40s linear infinite;
+}
+
+.ag-smoke_img__right {
+    right: 0;
+
+    -webkit-animation: an-smoke-right 40s linear infinite;
+    -moz-animation: an-smoke-right 40s linear infinite;
+    -o-animation: an-smoke-right 40s linear infinite;
+    animation: an-smoke-right 40s linear infinite;
+}
+
+@-webkit-keyframes an-smoke-left {
+
+    0%,
+    100% {
+        -webkit-transform: translate(0%, 0%);
+        transform: translate(0%, 0%);
+    }
+
+    25% {
+        -webkit-transform: translate(-10%, 0%);
+        transform: translate(-10%, 0%);
+    }
+
+    50% {
+        -webkit-transform: translate(-20%, 0%);
+        transform: translate(-20%, 0%);
+    }
+
+    75% {
+        -webkit-transform: translate(-10%, 0%);
+        transform: translate(-10%, 0%);
+    }
+}
+
+@-moz-keyframes an-smoke-left {
+
+    0%,
+    100% {
+        -moz-transform: translate(0%, 0%);
+        transform: translate(0%, 0%);
+    }
+
+    25% {
+        -moz-transform: translate(-10%, 0%);
+        transform: translate(-10%, 0%);
+    }
+
+    50% {
+        -moz-transform: translate(-20%, 0%);
+        transform: translate(-20%, 0%);
+    }
+
+    75% {
+        -moz-transform: translate(-10%, 0%);
+        transform: translate(-10%, 0%);
+    }
+}
+
+@-o-keyframes an-smoke-left {
+
+    0%,
+    100% {
+        -o-transform: translate(0%, 0%);
+        transform: translate(0%, 0%);
+    }
+
+    25% {
+        -o-transform: translate(-10%, 0%);
+        transform: translate(-10%, 0%);
+    }
+
+    50% {
+        -o-transform: translate(-20%, 0%);
+        transform: translate(-20%, 0%);
+    }
+
+    75% {
+        -o-transform: translate(-10%, 0%);
+        transform: translate(-10%, 0%);
+    }
+}
+
+@keyframes an-smoke-left {
+
+    0%,
+    100% {
+        -webkit-transform: translate(0%, 0%);
+        -moz-transform: translate(0%, 0%);
+        -o-transform: translate(0%, 0%);
+        transform: translate(0%, 0%);
+    }
+
+    25% {
+        -webkit-transform: translate(-10%, 0%);
+        -moz-transform: translate(-10%, 0%);
+        -o-transform: translate(-10%, 0%);
+        transform: translate(-10%, 0%);
+    }
+
+    50% {
+        -webkit-transform: translate(-20%, 0%);
+        -moz-transform: translate(-20%, 0%);
+        -o-transform: translate(-20%, 0%);
+        transform: translate(-20%, 0%);
+    }
+
+    75% {
+        -webkit-transform: translate(-10%, 0%);
+        -moz-transform: translate(-10%, 0%);
+        -o-transform: translate(-10%, 0%);
+        transform: translate(-10%, 0%);
+    }
+}
+
+@-webkit-keyframes an-smoke-right {
+
+    0%,
+    100% {
+        -webkit-transform: translate(0%, 0%);
+        transform: translate(0%, 0%);
+    }
+
+    25% {
+        -webkit-transform: translate(10%, 0%);
+        transform: translate(10%, 0%);
+    }
+
+    50% {
+        -webkit-transform: translate(20%, 0%);
+        transform: translate(20%, 0%);
+    }
+
+    75% {
+        -webkit-transform: translate(10%, 0%);
+        transform: translate(10%, 0%);
+    }
+}
+
+@-moz-keyframes an-smoke-right {
+
+    0%,
+    100% {
+        -moz-transform: translate(0%, 0%);
+        transform: translate(0%, 0%);
+    }
+
+    25% {
+        -moz-transform: translate(10%, 0%);
+        transform: translate(10%, 0%);
+    }
+
+    50% {
+        -moz-transform: translate(20%, 0%);
+        transform: translate(20%, 0%);
+    }
+
+    75% {
+        -moz-transform: translate(10%, 0%);
+        transform: translate(10%, 0%);
+    }
+}
+
+@-o-keyframes an-smoke-right {
+
+    0%,
+    100% {
+        -o-transform: translate(0%, 0%);
+        transform: translate(0%, 0%);
+    }
+
+    25% {
+        -o-transform: translate(10%, 0%);
+        transform: translate(10%, 0%);
+    }
+
+    50% {
+        -o-transform: translate(20%, 0%);
+        transform: translate(20%, 0%);
+    }
+
+    75% {
+        -o-transform: translate(10%, 0%);
+        transform: translate(10%, 0%);
+    }
+}
+
+@keyframes an-smoke-right {
+
+    0%,
+    100% {
+        -webkit-transform: translate(0%, 0%);
+        -moz-transform: translate(0%, 0%);
+        -o-transform: translate(0%, 0%);
+        transform: translate(0%, 0%);
+    }
+
+    25% {
+        -webkit-transform: translate(10%, 0%);
+        -moz-transform: translate(10%, 0%);
+        -o-transform: translate(10%, 0%);
+        transform: translate(10%, 0%);
+    }
+
+    50% {
+        -webkit-transform: translate(20%, 0%);
+        -moz-transform: translate(20%, 0%);
+        -o-transform: translate(20%, 0%);
+        transform: translate(20%, 0%);
+    }
+
+    75% {
+        -webkit-transform: translate(10%, 0%);
+        -moz-transform: translate(10%, 0%);
+        -o-transform: translate(10%, 0%);
+        transform: translate(10%, 0%);
+    }
+}
+
+/******************************************************************
+    ESTILOS SECCIONES (CLARAS, OSCURAS)
+******************************************************************/
+section {
+    overflow: hidden;
+}
+
+.section-dark {
+    background-color: #1B1C1C;
+    color: white;
+}
+
+.section-light {
+    background-color: #fff;
+    color: #343a40;
+}
+
+
+/******************************************************************
+    ESTILOS CONTENIDO DE UNA SECCION
+******************************************************************/
+
+/*Texto justificado*/
+.row {
+    text-align: left;
+    align-items: center;
+    justify-content: center;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/*Separacion por arriba y por abajo de una seccion*/
+.container {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/*Estilo titulo de una seccion*/
+.section-title {
+    text-align: center;
+    padding: 60px 30px 30px 30px;
+}
+
+.section-title h2 {
+    font-family: "Brush Script MT";
+    font-size: 50px;
+    font-style: normal;
+    font-weight: bold;
+    font-variant: normal;
+    position: relative;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+}
+
+/*linea de debajo del titulo*/
+.section-title h2::before {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 200px;
+    height: 1px;
+    background: #ddd;
+    bottom: 1px;
+    left: calc(50% - 100px);
+}
+
+.section-title h2::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 60px;
+    height: 5px;
+    background: aquamarine;
+    bottom: 0;
+    left: calc(50% - 30px);
+}
+
+/******************************************************************
+    SECCION LOGOS
+******************************************************************/
+.logos {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 150px;
+    background-color: #FFFFFF;
+    align-items: center;
+    justify-content: center;
+}
+
+.logos img:hover {
+    filter: none;
+    transform: scale(1.1);
+}
+
+.logos img {
+    max-width: 90%;
+    max-height: 70%;
+    transition: all 0.4s ease-in-out;
+    filter: grayscale(100);
+}
+
+/******************************************************************
+    SECCION INFORMACION DE CONTACTO -> https://codepen.io/fadzrinmadu/pen/rNxGOyE 
+******************************************************************/
+.contact-info {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-top: 20px;
+}
+
+.card {
+    position: relative;
+    flex: 1;
+    max-width: 600px;
+    height: 140px;
+    background-color: #444;
+    margin: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-contact {
+    font-size: 32px;
+    color: aquamarine;
+    /* #ea8685;*/
+    transition: .3s linear;
+}
+
+.card:hover .icon-contact {
+    transform: scale(4);
+    opacity: 0;
+}
+
+.card-content h3,
+.card-content span {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
+    opacity: 0;
+}
+
+.card-content h3 {
+    top: 20px;
+    text-transform: uppercase;
+    color: aquamarine;
+    font-weight: bold;
+    /* #ea8685;*/
+}
+
+.card-content span {
+    bottom: 20px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.card:hover h3 {
+    opacity: 1;
+    top: 46px;
+    transition: .3s linear .3s;
+}
+
+.card:hover span {
+    opacity: 1;
+    bottom: 46px;
+    transition: .3s linear .3s;
+}
+
+
+@media screen and (max-width:900px) {
+    .card {
+        flex: 100%;
+        max-width: 500px;
+    }
+}

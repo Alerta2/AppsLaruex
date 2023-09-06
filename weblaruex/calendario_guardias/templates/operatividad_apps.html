@@ -1,0 +1,156 @@
+{% extends "base/base_calendario_guardias.html" %}
+{% load static %}
+{% block imports %}
+<!-- FullCalendar 5.10.1 -->
+<!-- https://fullcalendar.io/docs/initialize-globals -->
+<link rel="stylesheet" href="{% static 'css/calendario_guardias/fullcalendar.css' %}" />
+<script src="{% static 'js/calendario_guardias/fullcalendar.js' %}"></script>
+<script src="{% static 'js/calendario_guardias/fullcalendar_es.js' %}"></script>
+
+<!-- Bootstrap Table -->
+<!-- https://bootstrap-table.com/ -->
+<link href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css" rel="stylesheet">
+<script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table-locale-all.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.18.3/dist/extensions/export/bootstrap-table-export.min.js"></script>
+
+<!-- Custom css notificaciones -->
+<link rel="stylesheet" href="{% static 'css/calendario_guardias/supervision.css' %}" />
+
+<style>
+    td {
+        text-align: left;
+    }
+
+    td p {
+        padding-left: 40px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="cursive-brush" style="font-size: 7vh;">Operatividad aplicaciones</h2>
+
+    <!--Linea divisoria-->
+    <hr class="linea-hr" />
+    <!-- Tabla con las solicitudes de cambios temporales pendientes de aceptar -->
+    <div class="table-responsive" style="padding-bottom: 20px;">
+        <table class="table" id="tablaOperatividadApps" name="tablaOperatividadApps" data-toggle="table"
+            data-show-toggle="false" data-locale="es-ES" data-show-columns="false" data-show-fullscreen="true"
+            data-search="true" data-show-pagination-switch="true" data-pagination="true"
+            data-page-list="[4, 8, 12, All]" data-page-size="8" data-show-footer="true" data-footer-style="footerStyle"
+            data-show-refresh="true" data-loading-template="loadingTemplate" data-detail-view="true"
+            data-detail-formatter="detailFormatter">
+        </table>
+    </div>
+    <!-- END Tabla con las solicitudes de cambios temporales pendientes de aceptar -->
+</div>
+
+
+<!-- Configuracion comun a todas las tablas bootstrap table -->
+<script src="{% static 'js/spd/bootstrap_table_spd.js' %}"></script>
+
+
+<!-- Tabla Bootstrap Table de los Informes -->
+<script type="text/javascript">
+
+    $('#tablaOperatividadApps').bootstrapTable({
+        method: 'get',
+        url: "{% url 'calendario_guardias:getEstadoApps' %}",
+        cache: false,
+        columns: [{
+            title: 'Aplicación',
+            field: 'nombre',
+            align: 'center',
+            //sortable: 'true',
+            footerFormatter: LogoFooter
+        }, {
+            title: 'Proceso',
+            field: 'nombre_proceso',
+            align: 'center',
+            //sortable: 'true'
+        }, {
+            title: 'Ultima ejecución',
+            field: 'ultima_ejecucion',
+            align: 'center',
+            //sortable: 'true',
+        }, /*{
+            title: 'Próxima ejecución',
+            field: 'proxima_ejecucion',
+            align: 'center',
+            sortable: 'true',
+        },*/ {
+            title: 'Estado',
+            field: 'estado',
+            align: 'center',
+            formatter: function (value, row) {
+                switch (String(value)) {
+
+                    case '1'://En ejecucion pero con fallos
+                        return '<i class="fa-solid fa-hexagon-exclamation fa-lg" style="color:#FFD700"></i>'
+                    case '2'://Detenida
+                        return '<i class="fa-sharp fa-solid fa-circle-stop fa-lg" style="color:#A52A2A"></i>'
+                    case '3'://En ejecucion
+                        return '<i class="fa-solid fa-thumbs-up fa-lg" style="color:#90EE90"></i>'
+                    default://Error
+                        return '<i class="fa-solid fa-triangle-exclamation fa-lg" style="color:#FF0000"></i>'
+                }
+            }
+        }],
+        locale: "es-ES",
+        search: true,
+
+    });
+
+    var classes = ["table", "table-bordered", "table-dark", "table-striped"];
+    $('#tablaOperatividadApps').bootstrapTable('refreshOptions', {
+        classes: classes.join(' ')
+    });
+
+
+
+    function detailFormatter(index, row) {
+        var html = []
+        $.each(row, function (key, value) {
+            switch (key) {
+                case 'descripcion':
+                    if (value != null) {
+                        html.push('<p><b>Descripción:</b> ' + value + '</p>')
+                    }
+                    break;
+                /*case 'ultima_ejecucion':
+                    if (value != null && value != '-') {
+                        html.push('<p><b>Última ejecución:</b> ' + value + '</p>')
+                    }
+                    break;*/
+                case 'proxima_ejecucion':
+                    if (value != null && value != '-') {
+                        html.push('<p><b>Próxima ejecución:</b> ' + value + '</p>')
+                    }
+                    break;
+                case 'segundos_ejecucion':
+                    console.log("SEGUNDOS", value);
+                    if (value != null && value != '-') {
+                        if (value > 3600) {
+                            html.push('<p><b>Frecuencia de ejecución:</b> ' + value / 3600 + ' horas</p>');
+                        }
+                        else if (value > 60) {
+                            html.push('<p><b>Frecuencia de ejecución:</b> ' + value / 60 + ' minutos</p>');
+                        }
+                        else {
+                            html.push('<p><b>Frecuencia de ejecución:</b> ' + value + ' segundos</p>');
+                        }
+                    }
+                    break;
+                default:
+                    break;
+
+            }
+        })
+        return html.join('')
+    }
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,352 @@
+{% extends "base/base_calendario_guardias.html" %}
+{% load static %}
+{% block imports %}
+
+<!-- Custom css Buscador -->
+<link rel="stylesheet" href="{% static 'css/calendario_guardias/personal.css' %}">
+
+<!-- Custom css Buscador -->
+<link rel="stylesheet" href="{% static 'css/calendario_guardias/buscador_guardias.css' %}">
+
+<!-- flatpickr -->
+<!-- https://flatpickr.js.org/ -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+
+{% endblock %}
+{% block content %}
+
+<!-- Titulo -->
+<h2 class="cursive-brush" style="font-size: 9vh;">Personal</h2>
+<!--Linea divisoria-->
+<hr class="linea-hr" />
+
+<!-- Buscador de Personal-->
+<div class="row justify-content-center" style="padding:20px;">
+    <div class="search-box">
+        <input type="search" placeholder="Buscar..." name="search" class="searchbox-input" onkeyup="buttonUp();"
+            style="padding-left: 10px;" required>
+        <button class="btn" onclick="infoSearch()"><i class="fas fa-info-circle"
+                style="font-size: 30px; color: #9E7BFF;"></i></button>
+    </div>
+</div>
+<!-- END Buscador de Personal -->
+
+{% if user.is_authenticated %}
+<!-- Si el usuario esta logeado ... -->
+{% if perms.auth.calendario_guardias_nuevo %}
+<!-- Si el usuario tiene permisos de acceso para creacion/modificacion de calendarios ... -->
+<!--Boton añadir un nuevo analista-->
+<div class="btn-add">
+    <button class="icon-btn add-btn">
+        <div class="add-icon"></div>
+        <div class="btn-txt" onclick="addUser()">Añadir un nuevo analista</div>
+    </button>
+</div>
+<!--END Boton añadir un nuevo analista-->
+{% endif %}
+{% endif %}
+
+
+
+<div class="row" style="padding:40px;">
+    {% for personal in Personal %}
+    <div class="col-xl-3 col-lg-4 col-md-6 colum_card">
+        <div class="card">
+            <img src="{{personal.avatar}}" alt="">
+            <h2>{{personal.nombre}}</h2>
+            <i class="{{personal.icono}} fa-3x fa-fade"></i>
+            <p style="margin-bottom: 0;">{{personal.area}}</p>
+            {% if user.is_authenticated %}
+            <!-- Si el usuario esta logeado ... -->
+            {% if perms.auth.calendario_guardias_nuevo %}
+            <!-- Si el usuario tiene permisos de acceso para creacion/modificacion de calendarios ... -->
+            <div class="cont">
+                <button type="button" class="btn btn-danger"
+                    onclick="deleteUser('{{personal.nombre}}','{{personal.apellidos}}','{{personal.id}}', '{{personal.area}}','{{personal.id_area}}')"><i
+                        class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    {% endfor%}
+</div>
+
+
+<script type="text/javascript">
+    //Boton añadir analista y por tanto modificar el calendario respectivo
+    var idArea, idUser, fechaAltaBaja, estadoAltaBaja, nameArea, supervisorUser
+
+    const values = []
+
+    async function addUser() {
+        const steps = ['1', '2', '3']
+        const Queue = Swal.mixin({
+            showCancelButton: true,
+            confirmButtonText: 'Siguiente <i class="fa-solid fa-circle-arrow-right"></i>',
+            cancelButtonText: '<i class="fa-solid fa-circle-left"></i> Atrás',
+            reverseButtons: true,
+            progressSteps: steps,
+            inputAttributes: {
+                required: true
+            },
+            validationMessage: 'Este campo es requerido!'
+        })
+
+        let currentStep
+        let flatpickrInstance
+
+        for (currentStep = 0; currentStep < steps.length;) {
+            var result = null
+
+            if (currentStep == 0) { //Selecciono el area de trabajo
+                result = await Queue.fire({
+                    title: 'Selecciona el Área de trabajo',
+                    input: 'select',
+                    inputOptions: new Promise(function (resolve) {
+                        $.getJSON("{% url 'calendario_guardias:getAreas' %}", function (data) {
+                            resolve(JSON.parse(data))
+                        });
+                    }),
+                    inputPlaceholder: 'Selecciona el área',
+                    showCancelButton: currentStep > 0,
+                    currentProgressStep: 0,
+                    inputValue: values[currentStep],
+                })
+            } else if (currentStep == 1) { //Selecciono al usuario en funcion del area
+                result = await Queue.fire({
+                    title: 'Selecciona el usuario',
+                    input: 'select',
+                    html: '<div class="custom-control custom-switch">' +
+                        '<input type="checkbox" class="custom-control-input" id="SupervisorCheck">' +
+                        '<label class="custom-control-label" for="SupervisorCheck">Supervisor</label><span style ="font-size:12px;"> (Este analista solo realiza las semanas de vacaciones)</span>' +
+                        '</div>',
+                    inputOptions: new Promise(function (resolve) {
+                        $.getJSON("{% url 'calendario_guardias:getUsers' %}?area=" + values[0], function (data) {
+                            resolve(JSON.parse(data))
+                        });
+                    }),
+                    inputPlaceholder: 'Selecciona el usuario',
+                    showCancelButton: currentStep > 0,
+                    currentProgressStep: 1,
+                    inputValue: values[currentStep],
+                    preConfirm: () => {
+                        if ($('#SupervisorCheck').is(':checked')) {
+                            supervisorUser = "1"
+                        }
+                        else {
+                            supervisorUser = "0"
+                        }
+                        //console.log("SUPERVISOR USER: ", supervisorUser)
+                    }
+                })
+            } else { //Selecciono la fecha en la que quiero darle de alta
+                result = await Queue.fire({
+                    title: 'Selecciona la fecha de alta',
+                    html: '<input class="swal2-input" id="expiry-date" style="display:none">',
+                    stopKeydownPropagation: false,
+                    showCancelButton: currentStep > 0,
+                    currentProgressStep: 2,
+                    inputValue: values[currentStep],
+                    preConfirm: () => {
+                        if (flatpickrInstance.selectedDates[0] < new Date()) {
+                            Swal.showValidationMessage(`La fecha de alta no puede estar en el pasado`)
+                        }
+                        if (flatpickrInstance.selectedDates[0] == undefined) {
+                            Swal.showValidationMessage(`Es obligatorio fijar una fecha de alta`)
+                        }
+                    },
+                    willOpen: () => {
+                        flatpickrInstance = flatpickr(
+                            Swal.getPopup().querySelector('#expiry-date'), {
+                            minDate: "today",
+                            inline: true,
+                            "locale": "es",
+                        }
+                        )
+                    }
+                })
+            }
+
+            if (result.value) {
+                if (currentStep == 2) {
+                    values[currentStep] = moment(flatpickrInstance.selectedDates[0]).format('YYYY-MM-DD')
+                } else {
+                    values[currentStep] = result.value
+                }
+                currentStep++
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                currentStep--
+            } else {
+                break
+            }
+        }
+
+        if (currentStep === steps.length) {
+            showPreloaderAlerta2();
+            //Swal.fire(JSON.stringify(values))
+
+            idArea = values[0];
+            idUser = values[1];
+            fechaAltaBaja = values[2];
+            estadoAltaBaja = 1; //quiero dar de alta (Alta=1, Baja=0)
+
+            await $.getJSON("{% url 'calendario_guardias:getPersonalArea' %}?a=" + idArea, function (data) {
+                area = data['area']
+            });
+
+            Swal.fire({
+                title: '¿Estás seguro?',
+                html: ' A continuación será actualizado el calendario de guardias <b>' + moment(fechaAltaBaja, 'YYYY-MM-DD').format('YYYY') + '</b>' +
+                    ' perteneciemte al área de <b>' + area[0].nombre + '</b> en el cual se dará de alta a un nuevo analista.<br><br> ' +
+                    '<p style="font-size:15px"><i class="fa-solid fa-info fa-beat" style="--fa-beat-scale: 1.4;"></i>' +
+                    ' Esta acción puede llevar unos minutos. Por favor espere hasta que haya terminado.</p>',
+                icon: 'question',
+                allowOutsideClick: false,
+                showCancelButton: true,
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Continuar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    //console.log("SUPERVISOR USER 1:", supervisorUser)
+                    $.getScript('../../../../static/js/calendario_guardias/' + area[0].js_refresh_calendar); //Agrego el js en funcion del area seleccionada
+
+                    //createAlert(' Mensaje informativo', '', data.text, 'info', true, true, 'pageMessages');
+                    //createAlert(' Opps! ...', 'Se ha producido un error', data.text, 'danger', true, false, 'pageMessages')
+                }
+                else {
+                    showPreloaderAlerta2();
+                }
+            })
+        }
+    }
+
+</script>
+
+
+<script type="text/javascript">
+    //Boton eliminar analista y por tanto modificar el calendario respectivo
+
+    let flatpickrInstance = null;
+
+    async function deleteUser(nombreUser, apellidosUser, id_user, areaUser, id_area) {
+        Swal.fire({
+            title: 'Eliminar analista',
+            html: '¿Desea eliminar a <b>' + nombreUser + ' ' + apellidosUser + '</b> del calendario de guardias perteneciente al área de <b>' + areaUser + '</b>?',
+            icon: 'question',
+            showCancelButton: true,
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                Swal.fire({
+                    title: 'Fecha de Baja',
+                    html: '<p style="font-size:15px"><i class="fa-solid fa-info fa-beat" style="--fa-beat-scale: 1.4;"></i> ' +
+                        'Por favor selecciona la fecha en la que se dará de baja a ' + nombreUser + ' ' + apellidosUser + ' del calendario de guardias ' +
+                        'perteneciente al área de ' + areaUser + '.' +
+                        '<br><br>' +
+                        '<input class="swal2-input" id="expiry-date" style="display:none">',
+                    stopKeydownPropagation: false,
+                    confirmButtonText: 'Continuar',
+                    preConfirm: () => {
+                        if (flatpickrInstance.selectedDates[0] < new Date()) {
+                            Swal.showValidationMessage(`La fecha de baja no puede estar en el pasado`)
+                        }
+                        if (flatpickrInstance.selectedDates[0] == undefined) {
+                            Swal.showValidationMessage(`Es obligatorio fijar una fecha de baja`)
+                        }
+                    },
+                    willOpen: () => {
+                        flatpickrInstance = flatpickr(
+                            Swal.getPopup().querySelector('#expiry-date'), {
+                            minDate: "today",
+                            inline: true,
+                            "locale": "es",
+                        })
+                    }
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        showPreloaderAlerta2();
+
+                        idArea = id_area;
+                        idUser = id_user;
+                        fechaAltaBaja = moment(flatpickrInstance.selectedDates[0]).format('YYYY-MM-DD');
+                        estadoAltaBaja = 0; //quiero dar de baja (Alta=1, Baja=0)
+
+                        await $.getJSON("{% url 'calendario_guardias:getPersonalArea' %}?a=" + idArea, function (data) {
+                            area = data['area']
+                        });
+
+                        Swal.fire({
+                            title: '¿Estás seguro?',
+                            html: '<p>El <b>' + moment(fechaAltaBaja, 'YYYY-MM-DD').format('LL') + '</b> será dado de baja a <b>' + nombreUser + ' ' + apellidosUser + '</b> en el área de <b>' + areaUser + '</b>.' +
+                                '<p style="font-size:15px"><i class="fa-solid fa-info fa-beat" style="--fa-beat-scale: 1.4;"></i>' +
+                                ' Si deseas continuar, se actualizará el calendario de guardias respectivo, no pudiendo revertir los cambios.' +
+                                ' Si así lo desea es importante que espere hasta que el proceso haya terminado.</p>',
+                            icon: 'question',
+                            showCancelButton: true,
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Continuar',
+                            cancelButtonText: 'Cancelar',
+                            reverseButtons: true,
+                            didOpen: () => {
+                                $.getJSON("{% url 'calendario_guardias:getPersonalArea' %}?a=" + idArea, function (data) {
+                                    area = data['area']
+                                });
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.getScript('../../../../static/js/calendario_guardias/' + area[0].js_refresh_calendar); //Agrego el js en funcion del area seleccionada
+                            }
+                        })
+                    }
+                })
+            }
+        })
+    }
+</script>
+
+
+
+
+<script>
+    //BUSCADOR PERSONAL
+    function infoSearch() {
+        Swal.fire({
+            title: "Personal del Laruex incluido en el calendario de guardias",
+            html: "En esta sección podreis consultar los analistas, así como el resto de personal perteneciente a otras áreas en las que se requiere permanencia continua.",
+            timer: 20000,
+            timerProgressBar: true,
+        });
+    }
+
+    var buttonUp = () => {
+        const input = document.querySelector(".searchbox-input");
+        const cards = document.getElementsByClassName("colum_card");
+        let filter = (input.value).normalize('NFD').replace(/[\u0300-\u036f]/g, "").toUpperCase();
+        for (let i = 0; i < cards.length; i++) {
+            let title = cards[i].querySelector(".card");
+            if (title.innerText.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toUpperCase().indexOf(filter) > -1) {
+                cards[i].classList.remove("d-none")
+            } else {
+                cards[i].classList.add("d-none")
+            }
+        }
+    }
+    $('input[type=search]').on('search', function () {
+        const cards = document.getElementsByClassName("colum_card");
+        for (let i = 0; i < cards.length; i++) {
+            cards[i].classList.remove("d-none");
+        }
+    });
+</script>
+
+{% endblock %}

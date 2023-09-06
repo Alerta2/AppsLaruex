@@ -1,0 +1,477 @@
+/*--------------------------------------------------------------
+# MAPA (Visor de mapa)
+--------------------------------------------------------------*/
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/*Estilo de los bindtooltip/POPUPS en los marcadores del mapa*/
+.leaflet-tooltip {
+  border-radius: 15px;
+  padding: 20px 15px 0px 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  text-align: left;
+}
+
+/* Color de fondo de los botones/controles de la parte superior izquierda del mapa*/
+.leaflet-left .leaflet-control {
+  background-color: #fff;
+}
+
+a.leaflet-control-zoom-in,
+a.leaflet-control-zoom-out {
+  font: none !important;
+  text-indent: none !important;
+}
+
+
+/******************************************************************
+    SECCION LOGOS MAPA (MARGEN INFERIOR)
+******************************************************************/
+
+.logos {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 86px;
+  background-color: rgba(255, 255, 255, 0);
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.logos img:hover {
+  filter: none;
+  transform: scale(1.1);
+}
+
+.logos img {
+  max-width: 90%;
+  max-height: 70%;
+  transition: all 0.4s ease-in-out;
+}
+
+.row-logos {
+  text-align: left;
+  align-items: center;
+  justify-content: center;
+  height: 58px;
+  margin: 0 50px 0 58px;
+}
+
+@media only screen and (max-width: 768px) {
+  .row-logos {
+    margin: 0 40px 0 58px;
+  }
+}
+
+@media (max-width: 650px) {
+  .row-logos {
+    margin: 0 40px 0 0px;
+  }
+}
+
+
+/******************************************************************
+    MARGENES DEL MAPA
+******************************************************************/
+
+.leaflet-left .leaflet-control {
+  margin: 0;
+}
+
+.leaflet-top.leaflet-left {
+  padding: 10px 0 0 5px;
+  z-index: 1001;
+}
+
+.leaflet-fullscreen-on .leaflet-top.leaflet-left {
+  padding: 10px 0 0 15px;
+}
+
+.leaflet-bottom.leaflet-left {
+  width: calc(100% - 50px);
+  padding: 10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.leaflet-fullscreen-on .leaflet-bottom.leaflet-left {
+  width: calc(100% - 50px);
+  padding-bottom: 8px;
+}
+
+@media only screen and (max-width: 768px) {
+  .leaflet-bottom.leaflet-left {
+    width: calc(100% - 40px);
+  }
+
+  .leaflet-fullscreen-on .leaflet-bottom.leaflet-left {
+    width: calc(100% - 40px);
+  }
+
+  .leaflet-top.leaflet-left {
+    padding: 10px 0 0 10px;
+  }
+
+  .leaflet-fullscreen-on .leaflet-top.leaflet-left {
+    padding: 10px 0 0 15px;
+  }
+}
+
+.leaflet-fullscreen-on .watermark {
+  top: 0;
+}
+
+.leaflet-touch .leaflet-bar a:last-child,
+.leaflet-touch .leaflet-bar a:first-child {
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+/******************************************************************
+    WATERMARK (MARCA DE AGUA MAPA)
+******************************************************************/
+
+.my-control {
+  right: 38px;
+  justify-content: right;
+  text-align: right;
+  padding-right: 5px;
+  border: none !important;
+  margin: 0;
+}
+
+.watermark {
+  top: 58px;
+  right: 50px;
+  width: 150px;
+}
+
+.my-control p {
+  margin: 0px;
+}
+
+/******************************************************************
+    SPIN/SPINNER LOADING MAP
+******************************************************************/
+.spinner {
+  left: 0px !important;
+  top: 0px !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(27, 28, 28, 0.9);
+  color: white !important;
+}
+
+.spinner div {
+  top: 50% !important;
+  left: 50% !important;
+  scale: 1.2 !important;
+  background-color: white;
+  color: #ffffff !important;
+  z-index: 9999;
+  position: 'absolute',
+}
+
+
+/******************************************************************
+    SIDEBAR PRELOADING
+******************************************************************/
+
+
+.loader-info-estacion {
+  overflow: hidden !important;
+  position: absolute;
+  width: 100% !important;
+  height: 100% !important;
+  /*left: 0 !important;
+  margin: 0 !important;*/
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 1);
+  z-index: 2;
+}
+
+/******************************************************************
+    TITULO INFO-ESTACION (SIDEBAR)
+******************************************************************/
+
+.title-estacion {
+  font-family: 'Bradley Hand ITC';
+  font-size: 40px;
+  font-style: normal;
+  font-weight: bold;
+  font-variant: normal;
+  color: #1B1C1C;
+  padding-top: 80px;
+}
+
+.title-estacion span {
+  font-size: 20px;
+}
+
+.linea-divisoria {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.linea-divisoria::before {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 200px;
+  height: 2px;
+  background: #1B1C1C;
+  bottom: 1px;
+  left: calc(50% - 100px);
+}
+
+.linea-divisoria::after {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 60px;
+  height: 5px;
+  background: #48CCCD;
+  bottom: 0;
+  left: calc(50% - 30px);
+}
+
+/******************************************************************
+    BUSCADOR INFO-ESTACION (SIDEBAR)
+******************************************************************/
+/*Buscador Search with options*/
+select {
+  display: none !important;
+}
+
+.dropdown-select {
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 100%);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#40FFFFFF', endColorstr='#00FFFFFF', GradientType=0);
+  background-color: #fff;
+  border-radius: 6px;
+  border: solid 1px #eee;
+  box-shadow: 0px 2px 5px 0px rgba(155, 155, 155, 0.5);
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  float: left;
+  font-size: 14px;
+  font-weight: normal;
+  height: 42px;
+  line-height: 40px;
+  outline: none;
+  margin-top: 20px;
+  padding-left: 18px;
+  padding-right: 30px;
+  position: relative;
+  text-align: left !important;
+  transition: all 0.2s ease-in-out;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  white-space: nowrap;
+  width: auto;
+
+}
+
+.dropdown-select:focus {
+  background-color: #fff;
+}
+
+.dropdown-select:hover {
+  background-color: #fff;
+}
+
+.dropdown-select:active,
+.dropdown-select.open {
+  background-color: #fff !important;
+  border-color: #bbb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) inset;
+}
+
+.dropdown-select:after {
+  height: 0;
+  width: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #777;
+  -webkit-transform: origin(50% 20%);
+  transform: origin(50% 20%);
+  transition: all 0.125s ease-in-out;
+  content: '';
+  display: block;
+  margin-top: -2px;
+  pointer-events: none;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+}
+
+.dropdown-select.open:after {
+  -webkit-transform: rotate(-180deg);
+  transform: rotate(-180deg);
+}
+
+.dropdown-select.open .list {
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.dropdown-select.open .option {
+  cursor: pointer;
+}
+
+.dropdown-select.wide {
+  width: 100%;
+}
+
+.dropdown-select.wide .list {
+  left: 0 !important;
+  right: 0 !important;
+}
+
+.dropdown-select .list {
+  box-sizing: border-box;
+  transition: all 0.15s cubic-bezier(0.25, 0, 0.25, 1.75), opacity 0.1s linear;
+  -webkit-transform: scale(0.75);
+  transform: scale(0.75);
+  -webkit-transform-origin: 50% 0;
+  transform-origin: 50% 0;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.09);
+  background-color: #fff;
+  border-radius: 6px;
+  margin-top: 4px;
+  padding: 3px 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000000;
+  max-height: 250px;
+  margin-bottom: 20px;
+  overflow: auto;
+  border: 1px solid #ddd;
+}
+
+.dropdown-select .list:hover .option:not(:hover) {
+  background-color: transparent !important;
+}
+
+.dropdown-select .dd-search {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem;
+}
+
+.dropdown-select .dd-searchbox {
+  width: 100%;
+  height: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding: 0.5rem;
+  border: 1px solid #999;
+  border-color: #999;
+  border-radius: 4px;
+  outline: none;
+}
+
+.dropdown-select .dd-searchbox:focus {
+  border-color: #12CBC4;
+}
+
+.dropdown-select .list ul {
+  padding: 0;
+}
+
+.dropdown-select .option {
+  cursor: default;
+  font-weight: 400;
+  line-height: 40px;
+  outline: none;
+  padding-left: 18px;
+  padding-right: 29px;
+  text-align: left;
+  transition: all 0.2s;
+  list-style: none;
+}
+
+.dropdown-select .option:hover,
+.dropdown-select .option:focus {
+  background-color: #f6f6f6 !important;
+}
+
+.dropdown-select .option.selected {
+  font-weight: 600;
+  color: #12cbc4;
+}
+
+.dropdown-select .option.selected:focus {
+  background: #f6f6f6;
+}
+
+.dropdown-select a {
+  color: #aaa;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.dropdown-select a:hover {
+  color: #666;
+}
+
+/******************************************************************
+    BARRA PROGRESO (REFRESCAR LA PAGINA)
+******************************************************************/
+.progress.leaflet-control {
+  width: 100%;
+  background-color: rgba(27, 28, 29, 1);
+  height: 20px;
+}
+
+.leaflet-fullscreen-on .leaflet-control-container .leaflet-bottom.leaflet-left .progress.leaflet-control {
+  background: transparent;
+}
+
+/******************************************************************
+    SPIN/SPINNER (CARGANDO MAPA)
+******************************************************************/
+.spinner {
+  left: 0px !important;
+  top: 0px !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(27, 28, 28, 0.9);
+  color: white !important;
+}
+
+.spinner div {
+  top: 50% !important;
+  left: 50% !important;
+  scale: 1.2 !important;
+  background-color: white;
+  color: #ffffff !important;
+  z-index: 9999;
+  position: 'absolute',
+}

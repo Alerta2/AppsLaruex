@@ -1,0 +1,41 @@
+{% load static %}
+
+<nav class="navbar navbar-expand-lg navbar-mainbg fixed-top" style="max-height: 55px;  z-index:5000;">
+    <a id="rotulo" class="navbar-brand navbar-logo" href="#">
+      SPIDA
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-bars text-white"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+            <!--<div class="hori-selector"><div
+             class="left"></div><div class="right"></div></div>-->
+            <li class="nav-item">
+                <a class="nav-link hoverable" href="/spida/inicio/"><i class="fas fa-home"></i>Inicio</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link hoverable" href="/spida/mapa/"><i class="fas fa-map-marked-alt"></i>Datos en Tiempo Real</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link hoverable" href="/spida/sucesos/"><i class="fas fa-tint"></i>Sucesos</a>
+            </li>
+            {% if user.is_authenticated %}
+                {% if perms.auth.spida_documentacion %}
+                    <li class="nav-item">
+                        <a class="nav-link hoverable" href="/spida/documents/"><i class="fas fa-folder-open"></i>Documentacion</a>
+                    </li>
+                {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link hoverable" href="{% url 'structure:logout' %}?next=/spida/mapa/"><i class="fas fa-sign-in-alt"></i>Log out</a>
+                    </li>
+            {% else %}
+                <li class="nav-item">
+                    <!-- <a class="nav-link hoverable" href="/spida/acceso/"><i class="fas fa-sign-in-alt"></i>Acceso</a>-->
+                    <a class="nav-link hoverable" href="/spida/login/?next=/spida/mapa/"><i class="fas fa-sign-in-alt"></i>Acceso</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+

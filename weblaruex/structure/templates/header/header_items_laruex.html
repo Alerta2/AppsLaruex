@@ -1,0 +1,16 @@
+{% load static %}
+{% if perms.auth.red_live %}
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'structure:servicios' %}">HOME</a>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="" id="dropdownConexRemotas" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >Con.Remotas</a>
+        <div class="dropdown-menu" aria-labelledby="dropdownConexRemotas">
+            <a class="dropdown-item" href="{% url 'rare:consultarConexionesRemotas' %}">Mis conexiones</a>
+            {% if user.is_superuser %}
+            <a class="dropdown-item" href="{% url 'rare:conexionesPorUsuario' %}">Con. por Usuario</a>
+            <a class="dropdown-item" href="{% url 'rare:conexionesPorEquipo' %}">Con. por Equipo</a>
+            {% endif %}
+        </div>
+    </li>
+{% endif %}

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+    <title>GUARDIAS ALERTA2</title>
+
+
+
+
+    <!-- Bootstrap 4-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+
+    <!-- Fontawesome v6 -->
+    <link href="{% static 'fontawesome/v6/css/all.css' %}" rel="stylesheet">
+    <script src="{% static 'fontawesome/v6/js/all.js' %}" crossorigin="anonymous"></script>
+
+    <!--Fuente Roboto-->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
+
+    <!-- Sweet Alert -->
+    <!-- https://sweetalert.js.org/guides/ -->
+    <!-- https://sweetalert2.github.io/ -->
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Moment JS -->
+    <!-- https://momentjs.com/ -->
+    <script src="{% static 'js/calendario_guardias/moment.min.js' %}"></script>
+    <script src="{% static 'js/calendario_guardias/moment_locales.min.js' %}"></script>
+
+    <!-- Animate css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.2.3/animate.min.css">
+
+
+    <!-- Custom css base -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/calendario_guardias/base_calendario_guardias.css' %}">
+
+    <!-- Custom css header -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/calendario_guardias/header_calendario_guardias.css' %}">
+
+    <!-- Custom css styles (Estilos generales de tamaños, etc...) -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/calendario_guardias/util.css' %}">
+
+    {% block imports %} {% endblock %}
+
+</head>
+
+<body>
+
+    <!-- Preload Alerta 2-->
+    <div class="preloaderBg" id="preloader">
+        <div class="preloader"></div>
+        <div class="preloader2"></div>
+    </div>
+
+    <script type="text/javascript">
+        /* ----------- Preload Alerta2 ---------------*/
+        function showPreloaderAlerta2() {
+            var x = document.getElementById("preloader");
+            if (x.style.display == "none") {
+                x.style.display = "flex";
+            } else {
+                x.style.display = "none";
+            }
+        };
+        showPreloaderAlerta2();
+    </script>
+
+    <!-- Preload New Page -->
+    <div class="loader-wrapper">
+        <div class="logo-preloader"></div>
+        <div class="line line-1"></div>
+        <div class="line line-2"></div>
+        <div class="line line-3"></div>
+        <div class="line line-4"></div>
+        <div class="line line-5"></div>
+    </div>
+
+    <script>
+        /* ------------- Preload New Page --------------*/
+        $(window).on("load", function () {
+            $(".loader-wrapper").fadeOut("slow");
+        });
+    </script>
+
+    <script type="text/javascript">
+        moment.locale('es');
+    </script>
+
+
+    <!-- MENSAJES DE ALERTA -->
+    <div id="pageMessages"></div>
+
+    <!-- Cabecera -->
+    <div id="header">{% include "header/header_calendario_guardias.html" %}</div>
+
+    <!-- Contenido -->
+    <div id="content">{% block content %}{% endblock %}</div>
+
+    <!-- Pie de página-->
+    <div id="footer">{% block footer %}{% endblock %}</div>
+
+    <!-- Scripts-->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <!--Funcion para crear alertas-->
+    <!-- https://codepen.io/codysechelski/pen/dYVwjb -->
+    <script type="text/javascript">
+        function createAlert(title, summary, details, severity, dismissible, autoDismiss, appendToId) {
+            var iconMap = {
+                info: "fa fa-info-circle",
+                success: "fa fa-thumbs-up",
+                warning: "fa fa-exclamation-triangle",
+                danger: "fa ffa fa-exclamation-circle"
+            };
+
+            var iconAdded = false;
+
+            var alertClasses = ["alert", "animated", "flipInX"];
+            alertClasses.push("alert-" + severity.toLowerCase());
+
+            if (dismissible) {
+                alertClasses.push("alert-dismissible");
+            }
+
+            var msgIcon = $("<i />", {
+                "class": iconMap[severity] // you need to quote "class" since it's a reserved keyword
+            });
+
+            var msg = $("<div />", {
+                "class": alertClasses.join(" ") // you need to quote "class" since it's a reserved keyword
+            });
+
+            if (title) {
+                var msgTitle = $("<h4 />", {
+                    html: title
+                }).appendTo(msg);
+
+                if (!iconAdded) {
+                    msgTitle.prepend(msgIcon);
+                    iconAdded = true;
+                }
+            }
+
+            if (summary) {
+                var msgSummary = $("<strong />", {
+                    html: summary
+                }).appendTo(msg);
+
+                if (!iconAdded) {
+                    msgSummary.prepend(msgIcon);
+                    iconAdded = true;
+                }
+            }
+
+            if (details) {
+                var msgDetails = $("<p />", {
+                    html: details
+                }).appendTo(msg);
+
+                if (!iconAdded) {
+                    msgDetails.prepend(msgIcon);
+                    iconAdded = true;
+                }
+            }
+
+
+            if (dismissible) {
+                var msgClose = $("<span />", {
+                    "class": "close closeAlert", // you need to quote "class" since it's a reserved keyword
+                    "data-dismiss": "alert",
+                    html: '<i class="fa-solid fa-circle-xmark"></i>'
+                }).appendTo(msg);
+            }
+
+            $('#' + appendToId).prepend(msg);
+
+            $(".closeAlert").on('click', function (event) {
+                msg.addClass("flipOutX");
+                setTimeout(function () {
+                    msg.remove();
+                }, 1000);
+            });
+
+            if (autoDismiss) {
+                setTimeout(function () {
+                    msg.addClass("flipOutX");
+                    setTimeout(function () {
+                        msg.remove();
+                    }, 1000);
+                }, 5000);
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>

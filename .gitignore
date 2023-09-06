@@ -6,7 +6,7 @@
 
 
 # Ignorar archivos específicos
-weblaruex/weblaruex/setting.py
+weblaruex/weblaruex/settings.py
 weblaruex/weblaruex/*.save*
 weblaruex/config.ini
 
@@ -14,7 +14,9 @@ weblaruex/config.ini
 weblaruex/media/
 weblaruex/static/
 */__pycache__/
+*__pycache__*
 
 # Ignorar una extensión específica en todas las carpetas
 *.tmp
 *.MP4
+*.pyc

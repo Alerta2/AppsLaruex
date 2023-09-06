@@ -1,0 +1,957 @@
+{% extends "base/base_veiex.html" %}
+
+{% load static %}
+
+{% block imports %}
+
+
+
+<!-- Moment JS -->
+<!-- https://momentjs.com/ -->
+<script src="{% static 'js/veiex/moment.min.js' %}"></script>
+<script src="{% static 'js/veiex/moment_locales.min.js' %}"></script>
+
+<script type="text/javascript">
+  moment.locale('es');
+</script>
+
+
+<!-- Sparkline -->
+<!-- https://codepen.io/ekrembk/pen/NWdWzY -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/sparkline.css' %}" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<scrip src="https://d3js.org/d3.v3.min.js"></scrip>
+<script src="{% static 'js/veiex/sparkline.js' %}"></script>
+
+<!-- Mapa Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+
+
+<!-- ContextMenu (Click voton derecho sobre el mapa) -->
+<!-- https://github.com/aratcliffe/Leaflet.contextmenu -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/leaflet-contextmenu.css' %}">
+<script type="text/javascript" src="{% static 'js/spd/leaflet-contextmenu.js' %}"></script>
+
+<!-- Leaflet Sidebar (Panel lateral) -->
+<!-- https://github.com/noerw/leaflet-sidebar-v2 -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/leaflet-sidebar.css' %}">
+<script type="text/javascript" src="{% static 'js/veiex/leaflet-sidebar.js' %}"></script>
+
+<!-- Extra Markers -->
+<!-- https://github.com/coryasilva/Leaflet.ExtraMarkers -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/leaflet-extra-markers.min.css' %}">
+<script type="text/javascript" src="{% static 'js/veiex/leaflet-extra-markers.min.js' %}"></script>
+
+<!-- Fluid water animation -->
+<!--https://www.cssscript.com/liquid-progress-indicator/-->
+<script src="{% static 'js/spida/js-fluid-meter.js' %}"></script>
+
+<!-- Control search (buscador de markers)-->
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/leaflet-search.css' %}" />
+<script src="{% static 'js/veiex/leaflet-search.js' %}"></script>
+
+<!-- Control Full Screen -->
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css'
+  rel='stylesheet' />
+<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+
+<!-- Control Navbar (Boton Home y avanzar o retroceder movimientos historicos) -->
+<!--https://github.com/davidchouse/Leaflet.NavBar-->
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/leaflet-navbar.css' %}">
+
+<!-- Pulse icon (Alarmas animadas)-->
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/leaflet-icon-pulse.css' %}" />
+<script src="{% static 'js/veiex/leaflet-icon-pulse.js' %}"></script>
+
+<!-- Time Dimension (Imagenes Prediccion Precipitacion 1 h Aemet)-->
+<!-- https://github.com/socib/Leaflet.TimeDimension -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/leaflet-timedimension-control.css' %}" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/iso8601-js-period@0.2.1/iso8601.min.js"></script>
+<script src="{% static 'js/spd/leaflet-timedimension.js' %}"></script>
+<script src="{% static 'js/spd/leaflet-timedimension-util.js' %}"></script>
+<script src="{% static 'js/spd/leaflet-timedimension-layer.js' %}"></script>
+<script src="{% static 'js/spd/leaflet-timedimension-layer-wms.js' %}"></script>
+<script src="{% static 'js/spd/leaflet-timedimension-layer-geojson.js' %}"></script>
+<script src="{% static 'js/spd/leaflet-timedimension-player.js' %}"></script>
+<script src="{% static 'js/spd/leaflet-timedimension-control.js' %}"></script>
+<script src="{% static 'js/spd/leaflet-timedimension-control-map.js' %}"></script>
+
+<!-- Control Panel Layers -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/leaflet-panel-layers.css' %}" />
+<script src="{% static 'js/spd/leaflet-panel-layers.js' %}"></script>
+
+<!--Plugin CSS file with desired skin Para opacidad de capas wms-->
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/css/ion.rangeSlider.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
+
+<!-- Control Info Avisos -->
+<script src="{% static 'js/spida/L.Control.Info.js' %}"></script>
+
+<!-- Control Leyenda -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/spd/leaflet-legend.css' %}" />
+<script src="{% static 'js/spd/leaflet-legend.js' %}"></script>
+
+<!-- MarkersCluster -->
+<link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
+<script src="http://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
+
+<!-- Leaflet Spin -->
+<!-- https://github.com/makinacorpus/Leaflet.Spin -->
+<script src="{% static 'js/veiex/spin.min.js' %}" charset="utf-8"></script>
+<script src="{% static 'js/veiex/leaflet.spin.min.js' %}" charset="utf-8"></script>
+
+<!-- Para invertir el area de relleno de un poligono o capa json del mapa-->
+<!--https://github.com/ebrelsford/Leaflet.snogylop-->
+<script type="text/javascript" src="{% static 'js/spd/leaflet-snogylop.js' %}"></script>
+
+<!-- Custom css mapa -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/mapa.css' %}" />
+
+<!-- Custom css Graficos Highcharts  -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/highcharts.css' %}" />
+
+<!-- Gradient cards contaminantes -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/gradient_cards.css' %}" />
+
+
+<!-- Capas Shapefiles -->
+<script type="text/javascript" src="{% static 'js/spd/shapefiles/aemet.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/spd/shapefiles/extremadura.js' %}"></script>
+
+
+
+<style>
+  /*-----------------------------------------------------------------------
+#Cuadro de Info Avisos
+------------------------------------------------------------------------*/
+  .leaflet-control-layers.leaflet-control.contentStyle {
+    max-height: 500px;
+    margin-left: 10px;
+  }
+
+  #title-aviso {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    color: #fff;
+    margin: 0px;
+  }
+
+  #cabecera-aviso {
+    color: #00CED1;
+    font-family: 'Brush Script MT', cursive;
+    font-size: 30px;
+  }
+
+  .titleStyle {
+    background-color: rgba(52, 58, 64, 0.6);
+    right: 45px;
+    top: 35px;
+  }
+
+  .contentStyle {
+    /*background-color: rgba(245, 245, 245, 0.8);*/
+    background-color: rgba(52, 58, 64, 0.6);
+    font-size: 13px;
+    color: #fff;
+    text-align: justify;
+  }
+
+  .leaflet-popup-content-wraper {
+    max-height: 500px;
+    overflow: auto;
+    right: 45px;
+  }
+
+
+  #recaptcha>div {
+    margin: 0 auto .5em;
+  }
+
+
+  [contentEditable=true]:empty:not(:focus):before {
+    content: attr(data-text)
+  }
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<!-- Mapa Leaflet-->
+<div id="map"></div>
+<!-- END Mapa Leaflet-->
+
+<!-- Logos -->
+<div id="logos" class="logos">
+  <div class="row row-logos">
+    <div class=" col-6 d-flex align-items-center justify-content-center"
+      style="width:100%; height:100%;padding:0; margin:0">
+      <img src="{% static 'img/veiex/logos/logo_laruex.png' %}" alt="">
+    </div>
+    <div class=" col-6 d-flex align-items-center justify-content-center"
+      style="width:100%; height:100%;padding:0; margin:0">
+      <img src="{% static 'img/veiex/logos/logo_junta_extremadura.png' %}" alt="">
+    </div>
+  </div>
+  <div>
+    <p style="line-height : 15px; font-size: 12px; font-family:'Roboto', sans-serif; text-align: center; color: white;">
+      © Copyright 2021
+      <span class="text-alerta2" style="font-size: 18px;">alerta<span style="font-size: 21px;">2</span></span>
+
+    </p>
+  </div>
+</div>
+<!-- End Logos -->
+
+
+<!-- Panel Menu Lateral Sidebar -->
+<div id="sidebar" class="leaflet-sidebar collapsed">
+
+  <!-- Pestañas tabs -->
+  <div class="leaflet-sidebar-tabs">
+    <ul role="tablist">
+      <li>
+        <a href="#aviso_provisionalidad" role="tab" style=" color: yellow;"><i class="fa-solid fa-info fa-beat"
+            style="--fa-beat-scale: 2.0;"></i><span class="tooltip-sidebar">AVISO DE
+            PROVISIONALIDAD</span></a>
+      </li>
+      <li>
+        <a href="#capas" role="tab"><i class="fas fa-layer-group"></i><span class="tooltip-sidebar">CONTROL DE
+            CAPAS</span></a>
+      </li>
+      <li>
+        <a href="#estaciones" role="tab"><i class="fas fa-broadcast-tower"></i><span class="tooltip-sidebar">INFORMACIÓN
+            DE UNA ESTACIÓN</span></a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Tab panes -->
+  <div class="leaflet-sidebar-content" id="sidebar-contenido">
+    <!-- Loading Panel Menu Lateral Sidebar -->
+    <div class="loader-info-estacion">
+      <button class="btn btn-primary" type="button" disabled>
+        <i class="fas fa-spinner fa-spin"></i>
+        Cargando datos...
+      </button>
+    </div>
+    <div class="leaflet-sidebar-pane" id="aviso_provisionalidad">
+      <div>
+        <h2 style="padding-top: 20px; font-family: 'Bradley Hand ITC'; font-weight: bold;">Aviso sobre la
+          provisionalidad de los
+          datos en tiempo real</h2>
+        <div class="linea-divisoria"></div>
+        <p style="text-align: left; line-height: 20px;">
+          <span class="text-spida">VEIEX </span>
+          es un Sistema de Alerta Temprana con telecontrol en tiempo real que tiene como objetivo detectar y reportar
+          rápidamente cualquier evento de emisión industrial que pueda representar un riesgo para la salud humana y el
+          medio ambiente.
+          <br><br>
+          Dicha red está compuesta por una serie de estaciones de monitoreo distribuidas estratégicamente en áreas
+          cercanas a industrias con alta emisión de contaminantes atmosféricos. Los datos recopilados por los sensores
+          de los diversos puntos de control existentes, son transmitidos de forma automática sin ningún tipo de
+          aprobación final al Centro Hispano-Luso de Redes de Alerta Temprana
+          <span class="text-alerta2" style="font-size: 22px;">alerta<span
+              style="font-size: 25px; top: 0px;">2</span></span>
+          , con una periodicidad dosminutal mediante comunicaciones LTE.
+          <br><br>
+          La alta frecuencia de transmision de los datos, aporta a éstos un caracter de provisionalidad hasta su
+          posterior revisión, validacion y consolidacion por parte del personal técnico del Centro
+          <span class="text-alerta2" style="font-size: 22px;">alerta<span
+              style="font-size: 25px; top: 0px;">2</span></span>.
+          <br><br>
+          La finalidad de estos datos provisionales es proporcionar información rápida y preliminar para fines de
+          monitoreo y alerta temprana. Sin embargo, es posible que los datos sufran ajustes y modificaciones durante el
+          proceso de validación y verificación posterior.
+          <br><br>
+          Consecuencia de ello, los datos no pueden ser legalmente utilizados ya que pueden no reflejar con precisión
+          las condiciones reales del monitoreo de emisiones industriales por diversos factores como:
+        </p>
+        <ul class="list-causas" style="text-align: left; line-height: 20px;">
+          <li> Funcionamiento incorrecto de los equipos de medición, registro y comunicación. </li>
+          <li> Labores de reparación, puesta a punto y mantenimiento del SAM.</li>
+          <li> Dispersión de las emisiones en la atmósfera por condiciones meteorológicas adversas.</li>
+          <li> Variación en las actividades de la industria.</li>
+          <li> Cambios en la regulación gubernamental.</li>
+        </ul>
+        <p style="text-align: left; line-height: 20px;">
+          <br>
+          Motivos por los cuales se les advierte a los usuarios sobre la naturaleza provisional de la información
+          contenida,
+          antes de usarla para la toma de decisiones que conciernen a la seguridad personal o pública o aplicada a un
+          negocio que suponga
+          consecuencias económicas u operacionales substanciales.
+          <br><br>
+          Cualquier comentario debe realizarse al buzón de
+          <span class="text-alerta2" style="font-size: 22px;">alerta<span
+              style="font-size: 25px; top: 0px;">2</span></span>:
+          <a style="color:'blue';" href="mailto:redalertaspida@gmail.com">redalertaspida@gmail.com</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="leaflet-sidebar-pane" id="capas">
+      <div id="loader-control-layers">
+        <!-- Aqui voy a añadir el control de capas -->
+      </div>
+    </div>
+
+    <div class="leaflet-sidebar-pane" id="estaciones">
+      <h1 class="leaflet-sidebar-header">
+        Información de la Estación<span class="leaflet-sidebar-close"><i class="fa fa-caret-right"></i></span>
+      </h1>
+      <select name="">
+        {% for estacion in listaEstaciones %}
+        <option value="{{estacion.I}}">{{estacion.Nombre}} - {{estacion.Foco}}</option>
+        {% endfor %}
+      </select>
+      <div id="info-estacion">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- END Menu Lateral Sidebar -->
+
+
+
+<!-- ===========================================================
+      DECLARO VARIABLES
+    ===========================================================-->
+
+<script>
+  var url_getDatos = "{% url 'veiex:getDatos' %}";
+  var url_getHeatMap = "{% url 'veiex:getMaximosDiarios' %}";
+  var url_getPromedios = "{% url 'veiex:getPromediosValidados' %}";
+  var url_getDatosICA = "{% url 'veiex:getDatosICA' %}";
+  var url_getActividadAnual = "{% url 'veiex:getActividadIndustrial' %}";
+  var url_getJsonActividadAnual = "{% url 'veiex:getJSONActividadIndustrial' %}";
+
+  var icon_aviso = "{% static 'img/spd/iconos/aviso.png' %}";
+  var estaciones = null;
+  var embalses = null;
+  var avisos_met_aemet = null;
+  let url_cargar_estaciones = "{% url 'spd:getEstaciones' %}";
+  let url_cargar_embalses = "{% url 'spd:getEmbalses' %}";
+  let url_cargar_cieloAemet = "{% url 'spd:getEstadoCieloAemet'%}";
+  let url_cargar_temperaturaAemet = "{% url 'spd:getTemperaturaAemet'%}";
+  let url_cargar_radarAemet = "{% url 'spd:getImagenesRadar'%}"
+  let menuChart = ['viewFullscreen', 'downloadJPEG'];
+  let layer_alarmas_animadas_level = 1
+
+  if ('{{request.user.is_authenticated}}' == 'True') {
+    menuChart = ["viewFullscreen", "separator", "downloadPNG", "downloadJPEG", "downloadPDF", "separator", "downloadXLS", "downloadCSV", "viewData"];/*"printChart",   "downloadSVG"*/
+    layer_alarmas_animadas_level = 0
+  }
+</script>
+
+
+<script>
+
+  /******************************************************************
+      DEFINO EL MAPA LEAFLET 
+  *******************************************************************/
+  var map = L.map('map', {
+    attributionControl: false,
+    zoomControl: false,
+    minZoom: 5,
+    maxZoom: 18,
+    timeDimension: true,
+    timeDimensionOptions: {
+      period: "PT1H",
+    },
+    contextmenu: true,
+    contextmenuWidth: 200,
+    contextmenuItems: [ //Menu click derecho sobre el mapa
+      {
+        text: 'Aumentar zoom',
+        icon: '../../../static/img/spd/iconos/zoom_in.png',
+        callback: zoomIn
+      }, {
+        text: 'Disminuir zoom',
+        icon: '../../../static/img/spd/iconos/zoom_out.png',
+        callback: zoomOut
+      }]
+  });
+
+  /*----------------------------------------------------------------
+  # Funciones opciones menu click derecho sobre el mapa
+  ----------------------------------------------------------------*/
+  //Zoom in
+  function zoomIn(e) {
+    map.zoomIn();
+  }
+
+  //Zoom out
+  function zoomOut(e) {
+    map.zoomOut();
+  }
+
+  /*******************************************************************
+      MAP SPINNER LOADING... (http://spin.js.org/)
+  *******************************************************************/
+  var spinner_options_map = {
+    color: 'blue',
+    fadeColor: 'transparent',
+    zIndex: 1999,
+    top: '50%',
+    left: '50%',
+    position: 'absolute',
+    animation: 'spinner-line-fade-more',
+  }
+
+  var spinner_options_sidebar = {
+    position: 'absolute',
+    zIndex: 2001,
+    color: '#009CDD',
+    top: '50%',
+    left: '50%',
+    animation: 'spinner-line-fade-more',
+  }
+
+  /*******************************************************************
+      WATERMARK (Marca de agua en el mapa)
+  ******************************************************************/
+
+  L.Control.Watermark = L.Control.extend({
+    onAdd: function (map) {
+      var el = L.DomUtil.create('div', 'leaflet-bar my-control');
+      var img = L.DomUtil.create('img');
+      img.src = "{% static 'img/veiex/logos/logo_alerta2_transparente.png' %}";
+      el.innerHTML = '<img class="watermark" src="{% static "img/veiex/logos/logo_alerta2_transparente.png" %}">'
+      return el;
+    },
+    onRemove: function (map) {
+      // Nothing to do here
+    }
+  });
+
+
+  L.control.watermark = function (opts) {
+    return new L.Control.Watermark(opts);
+  }
+
+  L.control.watermark().addTo(map);
+
+  /*******************************************************************
+      PANEL SIDEBAR (PANEL MENU LATERAL)
+  ******************************************************************/
+
+  var sidebar = L.control.sidebar({ container: "sidebar", position: "right" }).addTo(map);
+
+  // Si no hay un usuario loguado muestro el avisos de provisionalidad de datos 
+  if ('{{request.user.is_authenticated}}' == 'False') {
+    sidebar.open('aviso_provisionalidad')
+  }
+
+</script>
+
+
+
+<!-- ===========================================================
+      AVISOS
+    ===========================================================-->
+<script>
+  L.Control.MyControl = L.Control.extend({
+    onAdd: function (map) {
+      var el = L.DomUtil.create('div', 'leaflet-bar my-control');
+
+      el.innerHTML = 'My Control';
+
+      return el;
+    },
+
+    onRemove: function (map) {
+      // Nothing to do here
+    }
+  });
+
+  L.control.myControl = function (opts) {
+    return new L.Control.MyControl(opts);
+  }
+</script>
+
+
+
+
+<!-- ===========================================================
+      CARGO LAS CAPAS DE MARCADORES (Estaciones Saih, Spida, Embalses, Cielo Aemet, etc...)
+    ===========================================================-->
+<script type="text/javascript" src="{% static 'js/veiex/map_marcadores_spd.js' %}"></script>
+<script src="{% static 'js/spd/reqwest.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/veiex/map_cargar_capas_spd.js' %}"></script>
+
+<!-- Control Navbar (Boton Home y avanzar o retroceder movimientos historicos) -->
+<!--https://github.com/davidchouse/Leaflet.NavBar-->
+<script type="text/javascript" src="{% static 'js/veiex/leaflet-navbar.js' %}"></script>
+
+<!-- Funciones/Opciones graficos Highcharts -->
+<script type="text/javascript" src="{% static 'js/veiex/graficos_highcharts.js' %}"></script>
+
+
+<!-- Funciones Buscador INFORMACIÓN DE UNA ESTACIÓN -->
+<script type="text/javascript">
+
+  function create_custom_dropdowns() {
+    $('select').each(function (i, select) {
+      if (!$(this).next().hasClass('dropdown-select')) {
+        $(this).after('<div class="dropdown-select wide ' + ($(this).attr('class') || '') + '" tabindex="0"><span class="current">Seleccione una estación...</span><div class="list"><ul></ul></div></div>');
+        var dropdown = $(this).next();
+        var options = $(select).find('option');
+        options.each(function (j, o) {
+          var display = $(o).data('display-text') || '';
+          dropdown.find('ul').append('<li class="option" data-value="' + $(o).val() + '" data-display-text="' + display + '"><span style ="font-size:11px;">' + ($(o).text()).split('-')[0] + '</span>' + ' - ' + ($(o).text()).split('-')[1] + '</li>');
+        });
+      }
+    });
+    $('.dropdown-select ul').before('<div class="dd-search"><input id="txtSearchValue" autocomplete="off" onkeyup="filter()" class="dd-searchbox" type="text" placeholder="Buscar..."></div>');
+  }
+
+  // Open/close
+  $(document).on('click', '.dropdown-select', function (event) {
+    if ($(event.target).hasClass('dd-searchbox')) {
+      return;
+    }
+    $('.dropdown-select').not($(this)).removeClass('open');
+    $(this).toggleClass('open');
+    if ($(this).hasClass('open')) {
+      $(this).find('.option').attr('tabindex', 0);
+      $(this).find('.selected').focus();
+    } else {
+      $(this).find('.option').removeAttr('tabindex');
+      $(this).focus();
+    }
+  });
+
+  // Close when clicking outside
+  $(document).on('click', function (event) {
+    if ($(event.target).closest('.dropdown-select').length === 0) {
+      $('.dropdown-select').removeClass('open');
+      $('.dropdown-select .option').removeAttr('tabindex');
+    }
+    event.stopPropagation();
+  });
+
+  // Search
+  function filter() {
+    var valThis = ($('#txtSearchValue').val()).normalize('NFD').replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    $('.dropdown-select ul > li').each(function () {
+      var text = $(this).text();
+      (text.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toUpperCase().indexOf(valThis) > -1) ? $(this).show() : $(this).hide();
+    });
+  };
+
+  // Option click
+  $(document).on('click', '.dropdown-select .option', function (event) {
+    //$(".loader-info-estacion").fadeIn('fast');
+    //$('#info-estacion').html('')
+    InfoEstacion($(this));
+  });
+
+  function InfoEstacion(estacion) {
+    HTMLInfoEstacion(estacion);
+
+    /*Para cargar el geojson de la subcuenca en el mapa*/
+    /*$.getJSON("{% static 'js/spd/shapefiles/subcuencas/subcuenca' %}" + estacion.data('value') + ".geojson", function (data) {
+      layer_subcuenca.clearLayers();
+      layer_subcuenca.addData(data);
+      map.fitBounds(layer_subcuenca.getBounds());
+
+    }).always(function () {
+
+      //Completo el contenido sidebar de la estacion
+      HTMLInfoEstacion(estacion);
+    });;*/
+
+  };
+
+  /* Propiedades del Indice de Calidad del Aire*/
+  function PropiedadesICA(FechaHoraUTC, valor) {
+
+    if (new Date(FechaHoraUTC).getTime() <= new Date().setHours(new Date().getHours() - 1)) {
+      return { icono: "fa-solid fa-xmark", clase: 'card-grey', descripcion: 'No aplica' };
+    }
+    if (valor >= 0 && valor <= 50) {
+      return { icono: 'fa-solid fa-face-laugh', clase: 'card-blue', descripcion: 'Buena' };
+    }
+    if (valor > 51 && valor <= 100) {
+      return { icono: 'fa-solid fa-face-smile', clase: 'card-green', descripcion: 'Razonablemente Buena' };
+    }
+    if (valor >= 101 && valor <= 150) {
+      return { icono: 'fa-solid fa-face-meh', clase: 'card-yellow', descripcion: 'Regular' };
+    }
+    if (valor >= 151 && valor <= 200) {
+      return { icono: 'fa-solid fa-face-frown-slight', clase: 'card-red', descripcion: 'Desfavorable' };
+    }
+    if (valor >= 201 && valor <= 300) {
+      return { icono: 'fa-solid fa-face-frown', clase: 'card-darkred', descripcion: 'Muy desfavorable' };
+    }
+    if (valor > 300) {
+      return { icono: 'fa-solid fa-face-mask', clase: 'card-purple', descripcion: 'Extremadamente desfavorable' };
+    }
+  }
+
+
+  function HTMLInfoEstacion(estacion) {
+
+    $('#info-estacion').html('')
+    $('.leaflet-sidebar-content').css('overflow-y', 'hidden');
+    $(".loader-info-estacion").fadeIn('fast');
+
+    $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "{% url 'veiex:getInfoEstacion' %}?i=" + estacion.data('value'),
+      success: function (data) {
+
+        // Selecciono la estacion consultada en el buscador
+        estacion.closest('.list').find('.selected').removeClass('selected');
+        estacion.addClass('selected');
+        var text = estacion.data('display-text') || estacion.text();
+        estacion.closest('.dropdown-select').find('.current').text(text);
+        estacion.closest('.dropdown-select').prev('select').val(estacion.data('value')).trigger('change');
+
+        // Genero el HTML del interior del Sidebar para la estacion seleccionada
+        var html = ''
+
+        // Información detallada de la estacion
+        if (data.info_estacion != undefined) {
+
+          if (data.info_estacion.Foco == null || data.info_estacion.Foco == "") {
+            html += '<h2 class="title-estacion">' + data.info_estacion.Nombre + '</h2>'
+              + '<div class="linea-divisoria"></div>'
+              + '<p style="text-align:left"><span style="font-weight: bold">Localización: </span><span style="font-weight: normal">' + data.info_estacion.Lat + ' ' + data.info_estacion.Lon
+              + '. </span><a href="https://www.google.com/maps/place/' + data.info_estacion.Lat + ',' + data.info_estacion.Lon + '" target="_blank">Ir al sitio <i class="fas fa-location-arrow"></i></a></p>'
+
+          }
+          else {
+            html += '<h2 class="title-estacion">' + data.info_estacion.Nombre + '<br><span>' + data.info_estacion.Foco + '</span></h2>'
+              + '<div class="linea-divisoria"></div>'
+              + '<p style="text-align:left"><span style="font-weight: bold">Localización: </span><span style="font-weight: normal">' + data.info_estacion.Lat + ' ' + data.info_estacion.Lon
+              + '. </span><a href="https://www.google.com/maps/place/' + data.info_estacion.Lat + ',' + data.info_estacion.Lon + '" target="_blank">Ir al sitio <i class="fas fa-location-arrow"></i></a></p>'
+              + '<p style="text-align:left"><span style="font-weight: bold">Denominación: </span><span style="font-weight: normal">' + data.info_estacion.Denominacion + '.</p>'
+              + '<p style="text-align:left"><span style="font-weight: bold">Proceso asociado: </span><span style="font-weight: normal">' + data.info_estacion.Proceso + '.</p>'
+          }
+        }
+
+        // Ultimos valores contaminantes https://codepen.io/gijsbotje/pen/XeJpaQ
+        if (data.contaminantes != undefined) {
+
+          html += '<div class="row mb-3">'
+          data.contaminantes.forEach(async (contaminante) => {
+
+            const ICA = PropiedadesICA(contaminante.UTC, contaminante.Valor);
+
+            html += '<div class="col-12 m-b-10">'
+              + '<div id="card-' + contaminante.Acronimo + '" class="card ' + ICA.clase + ' text-white mb-3 mb-md-0 card-toggle" >'
+              + '<div class="card-body d-flex justify-content-between align-items-end">'
+              + '<div class="card-number">'
+              + '<div class="h3 m-0" style="display: inline-block;">' + contaminante.Valor
+              + '<span style="font-size:15px"> ' + contaminante.Unidades + '</span>'
+              + '</div><br><small><strong>' + contaminante.Acronimo + '</strong></small>'
+              + '</div>'
+              + '<div class="card-info text-right"><small>' + moment(contaminante.UTC).locale('es').format("D, MMM hh:mm") + ' h</small><br /><small>' + ICA.descripcion + '</small></div>'
+              + '</div>'
+              + '<div id="sparkline-' + contaminante.Acronimo + '" class="spark-cont"></div>'
+              + '<div class="card-charts">'
+              + '<div id="chart-ICA-' + contaminante.Acronimo + '" class="grafico-linear-gauge"></div>'
+              + '<div id="chart-contaminante-' + contaminante.Acronimo + '" class="grafico-highcharts"></div>'
+              + '<div id="chart-heatmap-' + contaminante.Acronimo + '" class="grafico-highcharts"></div>'
+              + '<figure>'
+              + '<div id="chart-gauge-' + contaminante.Acronimo + '"></div>'
+              + '<div id="description-chart-gauge-' + contaminante.Acronimo + '"></div>'
+              + '</figure>'
+              + '<div id = "buttonrow" ><button id="export-pdf-' + contaminante.Acronimo + '">Export to PDF</button></div>'
+              + '</div>'
+              + '</div>'
+              + '</div>'
+          });
+          html += '</div>'
+        }
+
+        // Grafico ICA global
+        html += '<div id="chart-ICA" class="grafico-highcharts"></div>';
+
+        // Grafico Gant Actividad/Inactividad global
+        html += '<div id="chart-gant-actividad"></div>';//' class="grafico-highcharts"></div>';
+
+        // Añado el contenido html al sidebar
+        document.getElementById('info-estacion').innerHTML = html;
+
+        // Evento para mostrar los gráficos
+        $('.spark-cont').click(function () {
+          $(this).next('.card-charts').toggle();
+        });
+
+        // Cargo el grafico que muestra la actividad industrial anual de la estacion/foco
+        LoadData_ActividadAnual(
+          data.info_estacion, // Informacion de la estación
+          "chart-gant-actividad" // Id del grafico de Actividad Industrial global
+        );
+
+        // Cargo el grafico que muestra el ICA para todos los contaminantes monitorizados
+        LoadChart_ICA(
+          data.info_estacion, // Informacion de la estación
+          data.contaminantes, // Informacion de los contaminantes
+          data.flags, // Flags
+          data.ica, // Indices de Calidad del Aire
+          "chart-ICA", // Id del grafico del ICA global
+        );
+
+        //(async function () {
+        if (data.contaminantes != undefined) {
+
+          // Cargo la información referente a cada contaminante
+          data.contaminantes.forEach(async (contaminante) => {
+
+            $(`#export-pdf-${contaminante.Acronimo}`).click(function () {
+              Highcharts.exportCharts([`chart-contaminante-${contaminante.Acronimo}`, `chart-heatmap-${contaminante.Acronimo}`, `chart-gauge-${contaminante.Acronimo}`]);
+            });
+
+            LoadData_MaximosDiarios(
+              data.info_estacion,  // Informacion de la estación
+              contaminante, // Informacion de los contaminantes
+              "chart-heatmap-" + contaminante.Acronimo // Id del grafico de Maximos diarios
+            );
+
+            LoadData_Promedios(
+              data.info_estacion,  // Informacion de la estación
+              contaminante, // Informacion de los contaminantes
+              "chart-gauge-" + contaminante.Acronimo // Id del grafico de Promedios semihorarios
+            )
+
+          })
+        }
+        //})();
+      },
+      error: function () {
+        console.log("getJSON Info Estacion request failed!");
+      },
+      complete: function () {
+        $(".loader-info-estacion").css('display', 'none');
+        $('.leaflet-sidebar-content').css('overflow-y', 'auto');
+      }
+
+    });
+  }
+
+  async function MostrarPanelInfoAvisos() {
+    Swal.fire({
+      html:
+        "<h3 class='text-bradley' style='font-size:30px'><b>Tipos de aviso por riesgo de inundación</b></h3>" +
+        "<div class='linea-divisoria'></div>" +
+        "<br>" +
+        '<p style="text-align:left; font-size:14px"><i class="fas fa-circle" style="color:#7B68EE;stroke: #1B1C1C;stroke-width: 20;padding-left:2px"></i>' +
+        ' <b>SIN DATOS:</b> Caracterizado por la falta de datos de nivel de río y/o caudal.</p>' +
+        '<p style="text-align:left; font-size:14px"><i class="fas fa-circle" style="color:#abff00;stroke: #1B1C1C;stroke-width: 20;padding-left:2px"></i>' +
+        ' <b>NIVEL 0 o SIN AVISOS:</b> Caracterizado por niveles de caudal muy bajos o casi inexistentes con ninguna significancia.</p>' +
+        '<p style="text-align:left; font-size:14px"><i class="fas fa-circle" style="color:#ff0;stroke: #1B1C1C;stroke-width: 20;padding-left:2px"></i>' +
+        ' <b>NIVEL 1:</b> Caracterizado por la existencia de información sobre un aumento del nivel de caudal a priori sin importancia.</p>' +
+        '<p style="text-align:left; font-size:14px"><i class="fas fa-circle" style="color:#FFA500;stroke: #1B1C1C;stroke-width: 20;padding-left:2px"></i>' +
+        ' <b>NIVEL 2:</b> Caracterizado por la posibilidad de ocurrencia de sucesos y/o situaciones capaces de dar lugar a un estado ' +
+        'de riesgo de inundación en funcion de la evolución de los fenómenos causantes del aumento de nivel de caudal.</p>' +
+        '<p style="text-align:left; font-size:14px"><i class="fas fa-circle" style="color:#FF0000;stroke: #1B1C1C;stroke-width: 20;padding-left:2px"></i>' +
+        ' <b>NIVEL 3:</b> Caracterizado por la posibilidad de ocurrencia de sucesos y/o situaciones capaces de ' +
+        'dar lugar a un estado de peligro, por inundación inminente o bien porque ésta ya ha comenzado.</p>',
+      //fas fa-exclamation-triangle: #000000,#90EE90,#90EE90,#FFFF00,#FFA500,#FFA500,#CD5C5C
+      showConfirmButton: false,
+      timer: 100000,
+      timerProgressBar: true,
+      focusConfirm: false,
+      showCloseButton: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    })
+  }
+
+
+  // Keyboard events
+  $(document).on('keydown', '.dropdown-select', function (event) {
+    var focused_option = $($(this).find('.list .option:focus')[0] || $(this).find('.list .option.selected')[0]);
+    // Space or Enter
+    if (event.keyCode == 13) {
+      if ($(this).hasClass('open')) {
+        focused_option.trigger('click');
+      } else {
+        $(this).trigger('click');
+      }
+      return false;
+      // Down
+    } else if (event.keyCode == 40) {
+      if (!$(this).hasClass('open')) {
+        $(this).trigger('click');
+      } else {
+        focused_option.next().focus();
+      }
+      return false;
+      // Up
+    } else if (event.keyCode == 38) {
+      if (!$(this).hasClass('open')) {
+        $(this).trigger('click');
+      } else {
+        var focused_option = $($(this).find('.list .option:focus')[0] || $(this).find('.list .option.selected')[0]);
+        focused_option.prev().focus();
+      }
+      return false;
+      // Esc
+    } else if (event.keyCode == 27) {
+      if ($(this).hasClass('open')) {
+        $(this).trigger('click');
+      }
+      return false;
+    }
+  });
+
+  $(document).ready(function () {
+    create_custom_dropdowns();
+    $(".loader-info-estacion").fadeOut("slow");
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Funciones Cargar Graficos de una Estacion-->
+<script type="text/javascript">
+
+
+</script>
+
+
+
+
+<!-- ===========================================================
+      CONTROLES MAPA (Botones, zoom, control de capas, timelapse, etc...)
+    ===========================================================-->
+<script type="text/javascript" src="{% static 'js/veiex/map_controles_spd.js' %}"></script>
+
+
+
+
+
+
+
+
+
+<!-- TEMPORIZADOR PARA REGARGAR LOS DATOS TRANSCURRIDOS 5 MINUTOS-->
+<script>
+  var tiempo_actualizar = 900; //segundos (5 minutos)
+  var progreso = tiempo_actualizar;
+  var idIterval = setInterval(function () {
+    progreso += 1;
+    if (progreso >= tiempo_actualizar) {
+      progreso = 0;
+      $('#bar').css('width', progreso + '%');
+
+      /* Funciones para actualizar la información de la Página */
+
+      //Actualizo el sidebar de la estacion que esá seleccionada
+      $sidebarInfoEstacion = $('.dropdown-select .option.selected')
+      if ($sidebarInfoEstacion.length > 0) {
+        //$(".loader-info-estacion").fadeIn('fast');
+        //$('#info-estacion').html('')
+        InfoEstacion($sidebarInfoEstacion);
+      }
+
+      //Vista inicial mapa
+      map.fitBounds(layer_extremadura.getBounds());//Ajusto el mapa al contorno de extremadura*/
+    }
+    else {
+      var valorAncho = (progreso / tiempo_actualizar) * 100;
+      $('#bar').css('width', valorAncho + '%');
+    }
+
+  }, 1000);
+</script>
+
+
+
+<script>
+
+  /* Añado las capas al mapa */
+  /* map.addControl(layer_name) */
+
+  /* Elimino las capas que no quiero mostrar al cargar la pagina */
+  /*if ('{{request.user.is_authenticated}}' == 'False') {
+    myLayersControl.removeLayer(layer_estaciones_saih_tajo);
+    myLayersControl.removeLayer(layer_estaciones_saih_guadiana);
+    myLayersControl.removeLayer(layer_embalses);
+  }*/
+</script>
+
+
+<script>
+  $('.emergency-alerts__cycle--prev').on('click', function () {
+    var $prev = $('.emergency-alert.current').removeClass('current').prev('.emergency-alert');
+    if ($prev.length) {
+      $prev.addClass('current');
+    } else {
+      $(".emergency-alert:last").addClass('current');
+    }
+  });
+
+  $('.emergency-alerts__cycle--next').on('click', function () {
+    var $next = $('.emergency-alert.current').removeClass('current').next('.emergency-alert');
+    if ($next.length) {
+      $next.addClass('current');
+    } else {
+      $(".emergency-alert:first").addClass('current');
+    }
+  });
+</script>
+
+
+
+
+<script>
+  let slideIndex = 1;
+  // Next/previous controls
+  function plusSlides(n) {
+    showSlides(slideIndex += n);
+  }
+
+  // Thumbnail image controls
+  function currentSlide(n) {
+    showSlides(slideIndex = n);
+  }
+
+  function showSlides(n) {
+    let i;
+    let slides = document.getElementsByClassName("mySlides");
+    //let dots = document.getElementsByClassName("dot");
+    if (n > slides.length) { slideIndex = 1 }
+    if (n < 1) { slideIndex = slides.length }
+    for (i = 0; i < slides.length; i++) {
+      slides[i].style.display = "none";
+    }
+    /*for (i = 0; i < dots.length; i++) {
+      dots[i].className = dots[i].className.replace(" active", "");
+    }*/
+    slides[slideIndex - 1].style.display = "block";
+    //dots[slideIndex-1].className += " active";
+  }
+</script>
+
+
+
+
+{% endblock %}

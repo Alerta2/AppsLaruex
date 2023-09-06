@@ -1,0 +1,48 @@
+{% load static %}
+<div id="activador_model" data-toggle="modal" data-target="#modalinfo" hidden></div>
+<h3 style="text-decoration: underline;" id="titulo_grafica_h1" hidden> Estacion </h3>
+<h3 style="text-decoration: underline;" id="actividad_grafica" hidden></h3>
+<h3 style="text-decoration: underline;" id="actividad_maxima" hidden></h3>
+<h3 style="text-decoration: underline;" id="lid_grafica" hidden></h3>
+<h3 style="text-decoration: underline;" id="unidad_grafica" hidden></h3>
+<div class="modal fullscreen-modal h-100 bg-light fade" id="modalinfo" tabindex="-1" role="dialog" aria-labelledby="modalinfo" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 4000px;" style="max-width:100%">
+        <div class="modal-content h-100 w-100">
+            <div class="modal-header">
+                <div class="col-11">
+                    <div class="row">
+                        <div id="titulo_grafica" class="col-6 col-sm-6 col-md-6 col-lg-2 col-xl-2" >
+                            <img id="logo_enac" src="{% static 'img/logo_enac.jpg' %}" data-toggle="tooltip" data-placement="bottom" title="Medidas realizadas conforme a la acreditación en la Norma UNE-EN ISO/IEC 17025 del Laboratorio de Radiactividad Ambiental de la Universidad de Extremadura. Para más información consulte en http://www.laruex.com/" height="60" width="150">
+                        </div>
+                        <div id="check_csn" class="col-4 col-sm-4 col-md-4 col-lg-2 col-xl-2" >
+                            <input id="checkbox_comparar" type="checkbox" onchange="CargarGraficas();" data-toggle="toggle" data-size="sm"><div class="p-2 font-weight-old"><label id="label_comparar_csn" data-toggle="tooltip" data-placement="bottom" title="Comparación con los datos publicados por el Consejo de Seguridad Nuclear">CSN</label></div>
+                        </div>
+                        <div id="check_maximo" class="col-4 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+                            <input id="checkbox_maximo" type="checkbox" onchange="CargarGraficas();" data-toggle="toggle" data-size="sm"><div class="p-2 font-weight-old"><label id="label_maximo_legal" data-toggle="tooltip" data-placement="bottom" title="Valor extraído de la normativa española">Máximo Legal: <br>No Definido</label></div>
+                        </div>
+                        <div id="leyenda_isotopos" class="col-5 col-sm-5 col-md-5 col-lg-4 col-xl-4" >
+                            <div class="d-flex flex-column bg-warning">
+                                <div class="p-0 font-weight-bold text-black" data-toggle="tooltip" data-placement="bottom" title="Elementos producidos en la naturaleza. Estos elementos dependen de diversos factores como la composición de los suelos de la zona de medida.">Isotopos Naturales</div>
+                                <div class="p-0 font-weight-bold text-danger" data-toggle="tooltip" data-placement="bottom" title="Elementos producidos de forma artificial. Estos elementos son producidos por la acción del hombre y provienen de acciones como la producción industrial o los tratamientos médicos.">Isotopos Artificiales</div>
+                            </div>
+                        </div>
+                        <div id="contenedor_isotopos" class="col-5 col-sm-5 col-md-5 col-lg-2 col-xl-2" >
+                            <select id="menu_isotopos" class="form-control input-lg " style="border-radius: 25px;border: 2px solid #433003;" onchange="CargarGraficas(document.getElementById('checkbox_comparar'));"></select>
+                        </div>
+                        {% if perms.auth.verificacion_vraex %}
+                        <div id="verificar" class="col-1 col-sm-1 col-md-1 col-lg-1 col-xl-1">
+                            <i onclick="verificar();" class="far fa-thumbs-up fa-2x" data-toggle="tooltip" data-placement="bottom" title="Pulse para verificar los resultados mostrados"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <button id="cerrar" type="button" class="close col-1" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="datos_grafica" class="col-md-12 col-xs-12" ></div>
+            </div>
+        </div>
+    </div>
+</div>

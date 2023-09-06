@@ -1,0 +1,68 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+
+
+{% block modal %}
+{% include "modal/modal_grafica_verificacion.html" %}
+{% endblock %}
+
+{% block content %}
+
+<section class="section dashboard m-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card info-card sales-card">
+            <div class="card-body mt-4">
+                <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="fa-solid fa-sliders-up"></i>
+                </div>
+                <div class="ps-3">
+                    <h6 class="mb-3">Configuración del Django</h6>
+                    <p>IPs válidas: <b>{{ django.validips }}</b></p>
+                    <p>Ruta activa: <b>{{ django.rutaActiva }}</b></p>
+                    <p>Email user: <b>{{ emailConfig.hostUser }}</b></p>
+                    <p>Email password: <b>{{ emailConfig.hostPassword }}</b></p>
+                    <p>Gestor cursos: <b>{{ emailConfig.gestorCursos }}</b></p>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div><!-- End Card -->
+        {% for db in dbs %}
+            <div class="col-3">
+                <div class="card info-card sales-card">
+                <div class="card-body mt-4">
+                    <div class="d-flex align-items-center">
+                        <div class="ps-3">
+                            <div class="row">
+                                <div class="col-4 text-right pt-2"><label>Database: </label></div>
+                                <div class="col-8"><input type="text" class="form-control" value="{{ db.database }}" readonly></div>
+                                <div class="col-4 text-right pt-2""><label>User: </label></div>
+                                <div class="col-8"><input type="text" class="form-control" value="{{ db.user }}" readonly></div>
+                                <div class="col-4 text-right pt-2""><label>Password: </label></div>
+                                <div class="col-8"><input type="text" class="form-control" value="{{ db.password }}" readonly></div>
+                                <div class="col-4 text-right pt-2""><label>Host: </label></div>
+                                <div class="col-8"><input type="text" class="form-control" value="{{ db.host }}" readonly></div>
+                                <div class="col-4 text-right pt-2""><label>Port: </label></div>
+                                <div class="col-8"><input type="text" class="form-control" value="{{ db.port }}" readonly></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div><!-- End Card -->
+        {% endfor %}
+    </div>
+</section>
+<!-- End Info programa -->
+
+
+<script>
+
+</script>
+<!-- End Botones -->
+{% endblock %}

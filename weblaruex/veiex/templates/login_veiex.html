@@ -1,0 +1,129 @@
+{% extends "base/base_veiex.html" %}
+
+{% load static %}
+
+{% block imports %}
+<!-- Custom css login -->
+<link rel="stylesheet" type="text/css" href="{% static 'css/veiex/login.css' %}">
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-login100" >
+
+        <div class="div-form">
+            <form class="login100-form validate-form" method="post" style="font-family: 'Bradley Hand ITC'; color: #eee;">
+                <span class="login100-form-title p-b-15" style="color: #eee;">
+                    <i class="p fas fa-user-lock color-animate" style="font-size: 50px"></i>
+                </span>
+
+                <span class="login100-form-title p-b-37">
+                    Acceso privado
+                </span>
+
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+
+                <div class="wrap-input100 validate-input m-b-20" data-validate="Introduce el usuario">
+                    <input class="input100" type="username" name="username" placeholder="Usuario">
+                    <span class="focus-input100"></span>
+                </div>
+
+                <div class="wrap-input100 validate-input m-b-25" data-validate="Introduce la contraseña">
+                    <input class="input100" type="password" name="password" placeholder="Contraseña">
+                    <span class="focus-input100"></span>
+                </div>
+
+                <div class="container-login100-form-btn">
+                    <button class="login100-form-btn" type="submit">
+                        INICIAR SESIÓN
+                    </button>
+                </div>
+
+            </form>
+        </div>
+</div>
+
+<script>
+    (function ($) {
+        "use strict";
+
+        /*==================================================================
+        [ Validate after type ]*/
+        $('.validate-input .input100').each(function () {
+            $(this).on('blur', function () {
+                if (validate(this) == false) {
+                    showValidate(this);
+                }
+                else {
+                    $(this).parent().addClass('true-validate');
+                }
+            })
+        })
+
+
+        /*==================================================================
+        [ Validate ]*/
+        var input = $('.validate-input .input100');
+
+        $('.validate-form').on('submit', function () {
+            var check = true;
+
+            for (var i = 0; i < input.length; i++) {
+                if (validate(input[i]) == false) {
+                    showValidate(input[i]);
+                    check = false;
+                }
+            }
+
+            return check;
+        });
+
+
+        $('.validate-form .input100').each(function () {
+            $(this).focus(function () {
+                hideValidate(this);
+                $(this).parent().removeClass('true-validate');
+            });
+        });
+
+        function validate(input) {
+            if ($(input).attr('type') == 'email' || $(input).attr('name') == 'email') {
+                if ($(input).val().trim().match(/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{1,5}|[0-9]{1,3})(\]?)$/) == null) {
+                    return false;
+                }
+            }
+            else {
+                if ($(input).val().trim() == '') {
+                    return false;
+                }
+            }
+        }
+
+        function showValidate(input) {
+            var thisAlert = $(input).parent();
+
+            $(thisAlert).addClass('alert-validate');
+
+            $(thisAlert).append('<span class="btn-hide-validate"><i class="fas fa-exclamation"></i></span>')
+            $('.btn-hide-validate').each(function () {
+                $(this).on('click', function () {
+                    hideValidate(this);
+                });
+            });
+        }
+
+        function hideValidate(input) {
+            var thisAlert = $(input).parent();
+            $(thisAlert).removeClass('alert-validate');
+            $(thisAlert).find('.btn-hide-validate').remove();
+        }
+
+
+
+    })(jQuery);
+</script>
+
+{% endblock %}
