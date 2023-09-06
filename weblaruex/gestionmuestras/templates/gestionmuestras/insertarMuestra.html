@@ -99,11 +99,8 @@
                             <div class="col-12">
                                 <label for="inputFechaRecogidaInicio" class="form-label">Fecha Recogida Inicio</label>
                             </div>
-                            <div class="col-6">
-                                <input type="date" id="fechaRecogidaInicio" name="fechaRecogidaInicio" class="form-control" required>
-                            </div>
-                            <div class="col-6">
-                                <input type="time" id="horaRecogidaInicio" name="horaRecogidaInicio" class="form-control" required>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecogidaInicio" name="fechaRecogidaInicio" class="form-control" required>
                             </div>
                         </div>
                     </div>
@@ -112,11 +109,8 @@
                             <div class="col-12">
                                 <label for="inputFechaRecogidaFin" class="form-label">Fecha Recogida Fin</label>
                             </div>
-                            <div class="col-6">
-                                <input type="date" id="fechaRecogidaFin" name="fechaRecogidaFin" class="form-control" required>
-                            </div>
-                            <div class="col-6">
-                                <input type="time" id="horaRecogidaFin" name="horaRecogidaFin" class="form-control" required>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecogidaFin" name="fechaRecogidaFin" class="form-control" required>
                             </div>
                         </div>
                     </div>               
@@ -125,11 +119,8 @@
                             <div class="col-12">
                                 <label for="inputFechaRecogidaReferencia" class="form-label">Fecha Recogida Referencia</label>
                             </div>
-                            <div class="col-6">
-                                <input type="date" id="fechaRecogidaReferencia" name="fechaRecogidaReferencia" class="form-control" readonly>
-                            </div>
-                            <div class="col-6">
-                                <input type="time" id="horaRecogidaReferencia" name="horaRecogidaReferencia" class="form-control" readonly>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecogidaReferencia" name="fechaRecogidaReferencia" class="form-control" readonly>
                             </div>
                         </div>
                     </div>
@@ -138,11 +129,8 @@
                             <div class="col-12">
                                 <label for="inputFechaRecepcion" class="form-label">Fecha Recepcion <i onclick="cargarFechaActual()" class="fa-solid fa-arrows-rotate"></i></label>
                             </div>
-                            <div class="col-6">
-                                <input type="date" id="fechaRecepcion" name="fechaRecepcion" class="form-control" required>
-                            </div>
-                            <div class="col-6">
-                                <input type="time" id="horaRecepcion" name="horaRecepcion" class="form-control" required>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecepcion" name="fechaRecepcion" class="form-control" required>
                             </div>
                         </div>
                     </div>
@@ -232,22 +220,42 @@
 <!-- End Info programa -->
 
 <script>
-    $( "#horaRecogidaFin" ).bind("change paste keyup", function() {
-        var dateInicio = new Date($("#fechaRecogidaInicio").val() + " " + $("#horaRecogidaInicio").val());
-        var dateFin = new Date($("#fechaRecogidaFin").val() + " " + $("#horaRecogidaFin").val());
-        var dif = (((dateFin.getTime() - dateInicio.getTime())  / 1000) / 2)+3600;
-        dateInicio.setSeconds(dateInicio.getSeconds() + dif);
-        var isoString =  dateInicio.toISOString();
-        $("#fechaRecogidaReferencia").val(isoString.split("T")[0]);
-        $("#horaRecogidaReferencia").val(isoString.split("T")[1].split(":")[0]+":"+isoString.split("T")[1].split(":")[1]);
+    $( "#fechaRecogidaFin" ).bind("change paste keyup", function() {
+        const fecha1 = new Date($("#fechaRecogidaInicio").val());
+        const fecha2 = new Date($("#fechaRecogidaFin").val());
+
+        // Calcular la fecha media
+        const fechaMedia = new Date((fecha1.getTime() + fecha2.getTime()) / 2);
+        const formatoFechaHora = fechaMedia.toLocaleString('es-ES', opcionesFormato);
+        const formatoFecha = formatoFechaHora.split('.').shift().replace(',','');
+        var formatoCorrecto = formatoFecha.replace(/[/]/g, '-').replace(/[\s]/g, 'T').slice(0, 16);
+        const fechaCorrecta = formatoCorrecto.slice(6,10)+"-"+formatoCorrecto.slice(3,5)+"-"+formatoCorrecto.slice(0,2)+"T"+formatoCorrecto.slice(11,13)+":"+formatoCorrecto.slice(14,16)
+        $("#fechaRecogidaReferencia").val(fechaCorrecta);
     });
     function cargarFechaActual(){
-        var fecha = new Date();
-        $("#fechaRecepcion").val(fecha.toISOString().split("T")[0]);
-        $("#horaRecepcion").val(fecha.toISOString().split("T")[1].split(":")[0]+":"+fecha.toISOString().split("T")[1].split(":")[1]);
+        const fechaActual = new Date();
+
+        // Definir las opciones de formato
+        const opcionesFormato = {
+            timeZone: 'Europe/Madrid',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        };
+
+        // Formatear la fecha y hora actual con las opciones de formato
+        const formatoFechaHora = fechaActual.toLocaleString('es-ES', opcionesFormato);
+        const formatoFecha = formatoFechaHora.split('.').shift().replace(',','');
+        var formatoCorrecto = formatoFecha.replace(/[/]/g, '-').replace(/[\s]/g, 'T').slice(0, 16);
+        const fechaCorrecta = formatoCorrecto.slice(6,10)+"-"+formatoCorrecto.slice(3,5)+"-"+formatoCorrecto.slice(0,2)+"T"+formatoCorrecto.slice(11,13)+":"+formatoCorrecto.slice(14,16)
+
+        $("#fechaRecepcion").val(fechaCorrecta);
     }
     function cargarParametros(){
-        $.ajax({
+        $.ajax({  
             type: "GET",
             dataType: "json",
             url:"/private/gestionmuestras/insertarMuestra/consultarParametrosTipo/"+$("#inputCodigoCSN option:selected").val().split("_")[0]+"/",

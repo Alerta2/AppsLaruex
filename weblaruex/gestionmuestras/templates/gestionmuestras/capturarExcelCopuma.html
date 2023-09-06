@@ -1,0 +1,68 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+    button, input[type="submit"], input[type="reset"] {
+        background: none;
+        color: inherit;
+        border: none;
+        padding: 0;
+        font: inherit;
+        cursor: pointer;
+        outline: inherit;
+    }
+    .param-adicional div:hover{
+        background-color: #D7E9FC;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <div class="card">
+        <div class="card-body">
+        
+            <h5 class="card-title">Capturar excel copuma</h5>
+            <!-- Multi Columns Form -->
+            <form class="g-3" action="{% url 'gestionmuestras:gestmuesCapturarExcelCopuma' %}" method="POST" enctype="multipart/form-data"> 
+                {% csrf_token %}
+                <!-- captura de fichero -->
+                <div class="row">
+                    <div class="col-12">
+                        <label for="inputFile" class="form-label">Fichero de medidas copuma:</label>
+                        <input type="file" class="form-control" id="inputFile" name="inputFile" required>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="card-header my-4"></div>
+                    <button type="submit" class="btn btn-primary">Insertar</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </div>
+            </form><!-- End Multi Columns Form -->
+        </div>
+    </div>
+</section>
+<!-- End Info programa -->
+
+<script>
+    // obtengo la fecha de recogida en formato dd/mm/yyyy almacenada en {{datos.fecha_recogida}} y la convierto a formato yyyy/mm/dd y la pongo en el input con id fecha_recogida  
+    var fecha_recogida = "{{datos.fecha_recogida}}";
+    document.getElementById("fecha_recogida").value = fecha_recogida.split("/")[2] + "-" + fecha_recogida.split("/")[1] + "-" + fecha_recogida.split("/")[0];
+    // the same with fecha_medida
+    var fecha_medida = "{{datos.fecha_medida}}";
+    document.getElementById("fecha_medida").value = fecha_medida.split("/")[2] + "-" + fecha_medida.split("/")[1] + "-" + fecha_medida.split("/")[0];
+</script>
+{% endblock %}

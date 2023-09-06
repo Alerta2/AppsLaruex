@@ -281,7 +281,6 @@ def capturarExcelCopuma(request):
 @permission_required('auth.visualizacion_muestras')
 def infoAlicuota(request, id_alicuota):
     tratamientos = RelacionAnaliticasTratamiento.objects.using('gestion_muestras').filter(id_muestra_analitica=id_alicuota).values('identificador','cod_reducido','tratamiento__descripcion','fecha_inicio','fecha_fin','analista__nombre','paso_actual')
-    print(tratamientos)
     return JsonResponse(list(tratamientos), safe=False)
 
 
@@ -397,12 +396,6 @@ def verificarResultado(resultado, mayor, errorAbajoMayor, menor, errorArribaMeno
         resultado["factor2"] = "OK"
     else:
         resultado["factor2"] = "ERROR"
-    '''
-    if mayor - errorAbajoMayor > menor + errorArribaMenor:
-        resultado["factor2"] = "ERROR"
-    else:
-        resultado["factor2"] = "OK"
-    '''
     return resultado
 
 def obtenerFactor(procedimiento, medida):

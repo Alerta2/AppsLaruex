@@ -9,6 +9,13 @@
 {% endblock %}
 
 {% block content %}
+
+
+
+<!-- import scripts gestion de muestras -->
+<script src="{% static 'js/scriptsGestion/gestionMuestras.js' %}"></script>
+
+
 <div class="pagetitle">
   <nav>
       <ol class="breadcrumb">
@@ -210,14 +217,56 @@
   </div><!-- End Grid cards -->
 </section>
 <!-- End Info programa -->
+
+<!-- modal informacion de tratamientos-->
+<div class="modal fade" id="modalTratamientosAlicuota" tabindex="-1" style="display: none;" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 id="modalTratamientosAlicuota_titulo" class="modal-title"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div id="modalTratamientosAlicuota_contenido" class="modal-body">
+      </div>
+    </div>
+  </div>
+</div>
+<!-- fin modal informacion de tratamientos-->
+
+
 <script>
     $('#tableAlicuotas').bootstrapTable({
-        onClickRow: function (row, $element) {
-            // row: the record corresponding to the clicked row, 
-            // $element: the tr element.
-            // alert(row.identificador + " - " + row.codigo_recogida__codigo_csn__nombre + " - " + row.codigo_recogida__codigo_csn__nombre + " - " + row.codigo_recogida__codigo_procedencia__nombre + " - " + row.fecha_hora_recogida + " - " + row.fecha_hora_recepcion);
-            window.location.href = '/private/gestionmuestras/infoMuestra/'+row.identificador+'/';
-        },
+        columns: [{
+                title: 'ID',
+                sortable: 'true',
+                formatter: function (value, row) {
+                    return row.identificador + ' <i class="fa-regular fa-circle-info" data-bs-toggle="modal" data-bs-target="#modalTratamientosAlicuota" onclick="consultarInfoAlicuota(' + row.identificador + ')"></i>';
+                }
+            },{
+                title: 'DETERMINACIÓN',
+                sortable: 'true',
+                field: 'id_analiticas__nombre'
+            },{
+                title: 'FECHA ENTREGA',
+                field: 'fecha_hora_entrega',
+                sortable: "true"
+            },{
+                title: 'ANALISTA',
+                field: 'analista_tecnico__nombre',
+                sortable: "true"
+            },{
+                title: 'CANTIDAD',
+                field: 'cantidad_muestra_analizada',
+                sortable: "true"
+            },{
+                title: 'ESTADO',
+                field: 'estado_alicuota__descripcion',
+                sortable: "true"
+            }],
+        locale: "es-ES",
+        search: true,
+        sortName: 'doc',
+        sortOrder: 'asc',
         exportDataType: "",
         exportTypes: ['pdf', 'xml', 'csv', 'json'],
     })

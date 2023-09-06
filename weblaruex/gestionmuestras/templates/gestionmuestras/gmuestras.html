@@ -149,6 +149,55 @@
         </div>
       </div>
 
+      <!-- Card Administracion -->
+      <!-- only if user is administrator -->
+      {% if user.is_superuser %}
+      <div class="col-xxl-3 col-lg-4 col-md-6 col-sm-12">
+        <div class="card info-card sales-card">
+          <a href="{% url 'gestionmuestras:gestmuesCapturarInformeAlfa' %}" class="card-body">
+            <h5 class="card-title"></h5>
+            <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="fa-sharp fa-solid fa-table-pivot"></i>
+                </div>
+                <div class="ps-3">
+                  <h6>Captura informe alfa</h6>
+                </div>
+            </div>
+          </a>
+          
+        </div>
+        <div class="card info-card sales-card">
+          <a href="{% url 'gestionmuestras:gestmuesCapturarDBFgestmues' %}" class="card-body">
+            <h5 class="card-title"></h5>
+            <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="fa-sharp fa-solid fa-table-pivot"></i>
+                </div>
+                <div class="ps-3">
+                  <h6>Cargar dbf recogida</h6>
+                </div>
+            </div>
+          </a>
+        </div>
+        <div class="card info-card sales-card">
+          <a href="{% url 'gestionmuestras:gestmuesCapturarExcelCopuma' %}" class="card-body">
+            <h5 class="card-title"></h5>
+            <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="fa-sharp fa-solid fa-table-pivot"></i>
+                </div>
+                <div class="ps-3">
+                  <h6>Cargar excel Copuma</h6>
+                </div>
+            </div>
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    <!-- End Card -->
+
+    
 
     </div><!-- End Grid cards -->
     
