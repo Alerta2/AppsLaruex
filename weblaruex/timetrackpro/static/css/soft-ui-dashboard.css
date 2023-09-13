@@ -26698,5 +26698,53 @@ pre[class*="language-"] {
 /* 
 * Mi propio CSS
 */
+/* Estilos para el botón cuando se aplica la clase "botonAgregar" */
+.botonAgregar {
+  background-image: linear-gradient(to bottom, #eba43d, #ffcc00); /* Cambia los colores según tu preferencia */
+  background-color: transparent; /* Para que el fondo no sea completamente opaco */
+  color: white; /* Cambia el color del texto si es necesario */
+  border: none; /* Elimina el borde si lo tienes */
+  text-decoration: none; /* Elimina la subraya en el enlace */
+  padding: 8px; /* Ajusta el espacio alrededor del contenido */
+  border-radius: 50px; /* Agrega esquinas redondeadas si lo deseas */
+}
+
+/* Estilos para el botón cuando se aplica la clase "botonAgregar" al hacer hover */
+.botonAgregar:hover {
+  background-image: linear-gradient(to bottom, #ffcc00, #eba43d); /* Cambia los colores según tu preferencia */
+  color: white; /* Cambia el color del texto si es necesario */
+}
+
+  /* Estilos para el campo de entrada de archivos personalizado */
+  .custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(10deg, #1d536e, #ebedee); /* Degradado diagonal */
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease; /* Efecto de transición en el fondo */
+  }
+  
+  /* Cambia el fondo del botón personalizado al pasar el cursor */
+  .custom-file-upload:hover {
+    background: linear-gradient(10deg, #ebedee, #1d536e); /* Cambia los colores del degradado */
+  }
+  
+  /* Oculta el botón de selección de archivo por defecto */
+  .custom-file-upload input[type="file"] {
+    display: none;
+  }
+
+  /*estilo boton cerrar X, de los modal */
+  .close-modal{
+    border: none;
+    background: none;
+    font-size: 25px;
+    color: #4D4D4D;
+  }
+  
 
 /*# sourceMappingURL=dashboard-free.css.map */

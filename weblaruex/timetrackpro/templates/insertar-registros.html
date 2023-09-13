@@ -1,0 +1,632 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h6><a href="" class="mx-1" title="Añadir Equipo" data-toggle="modal" data-target="#modalFormularioAddEquipo" style="color: #eba43d"><i
+            class="fa-solid fa-square-plus fa-2x add"></i></a>Registros insertados</h6>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Empleado</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Function</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                  <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Employed</th>
+                  <th class="text-secondary opacity-7"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div>
+                        <img src="{% static 'img/team-2.jpg' %}" class="avatar avatar-sm me-3" alt="user1">
+                      </div>
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-sm">John Michael</h6>
+                        <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0">Manager</p>
+                    <p class="text-xs text-secondary mb-0">Organization</p>
+                  </td>
+                  <td class="align-middle text-center text-sm">
+                    <span class="badge badge-sm bg-gradient-success">Online</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">23/04/18</span>
+                  </td>
+                  <td class="align-middle">
+                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                      Edit
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div>
+                        <img src="{% static 'img/team-3.jpg' %}" class="avatar avatar-sm me-3" alt="user2">
+                      </div>
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-sm">Alexa Liras</h6>
+                        <p class="text-xs text-secondary mb-0">alexa@creative-tim.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0">Programator</p>
+                    <p class="text-xs text-secondary mb-0">Developer</p>
+                  </td>
+                  <td class="align-middle text-center text-sm">
+                    <span class="badge badge-sm bg-gradient-secondary">Offline</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">11/01/19</span>
+                  </td>
+                  <td class="align-middle">
+                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                      Edit
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div>
+                        <img src="{% static 'img/team-4.jpg' %}" class="avatar avatar-sm me-3" alt="user3">
+                      </div>
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-sm">Laurent Perrier</h6>
+                        <p class="text-xs text-secondary mb-0">laurent@creative-tim.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0">Executive</p>
+                    <p class="text-xs text-secondary mb-0">Projects</p>
+                  </td>
+                  <td class="align-middle text-center text-sm">
+                    <span class="badge badge-sm bg-gradient-success">Online</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">19/09/17</span>
+                  </td>
+                  <td class="align-middle">
+                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                      Edit
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div>
+                        <img src="{% static 'img/team-3.jpg' %}" class="avatar avatar-sm me-3" alt="user4">
+                      </div>
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-sm">Michael Levi</h6>
+                        <p class="text-xs text-secondary mb-0">michael@creative-tim.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0">Programator</p>
+                    <p class="text-xs text-secondary mb-0">Developer</p>
+                  </td>
+                  <td class="align-middle text-center text-sm">
+                    <span class="badge badge-sm bg-gradient-success">Online</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">24/12/08</span>
+                  </td>
+                  <td class="align-middle">
+                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                      Edit
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div>
+                        <img src="{% static 'img/team-2.jpg' %}" class="avatar avatar-sm me-3" alt="user5">
+                      </div>
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-sm">Richard Gran</h6>
+                        <p class="text-xs text-secondary mb-0">richard@creative-tim.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0">Manager</p>
+                    <p class="text-xs text-secondary mb-0">Executive</p>
+                  </td>
+                  <td class="align-middle text-center text-sm">
+                    <span class="badge badge-sm bg-gradient-secondary">Offline</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">04/10/21</span>
+                  </td>
+                  <td class="align-middle">
+                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                      Edit
+                    </a>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div>
+                        <img src="{% static 'img/team-4.jpg' %}" class="avatar avatar-sm me-3" alt="user6">
+                      </div>
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-sm">Miriam Eric</h6>
+                        <p class="text-xs text-secondary mb-0">miriam@creative-tim.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0">Programtor</p>
+                    <p class="text-xs text-secondary mb-0">Developer</p>
+                  </td>
+                  <td class="align-middle text-center text-sm">
+                    <span class="badge badge-sm bg-gradient-secondary">Offline</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">14/09/20</span>
+                  </td>
+                  <td class="align-middle">
+                    <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                      Edit
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h6>Projects table</h6>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="table-responsive p-0">
+            <table class="table align-items-center justify-content-center mb-0">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Project</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Budget</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
+                  <th class="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7 ps-2">Completion</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2">
+                      <div>
+                        <img src="{% static 'img/small-logos/logo-spotify.svg' %}" class="avatar avatar-sm rounded-circle me-2" alt="spotify">
+                      </div>
+                      <div class="my-auto">
+                        <h6 class="mb-0 text-sm">Spotify</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-sm font-weight-bold mb-0">$2,500</p>
+                  </td>
+                  <td>
+                    <span class="text-xs font-weight-bold">working</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                      <span class="me-2 text-xs font-weight-bold">60%</span>
+                      <div>
+                        <div class="progress">
+                          <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="align-middle">
+                    <button class="btn btn-link text-secondary mb-0">
+                      <i class="fa fa-ellipsis-v text-xs"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2">
+                      <div>
+                        <img src="{% static 'img/small-logos/logo-invision.svg' %}" class="avatar avatar-sm rounded-circle me-2" alt="invision">
+                      </div>
+                      <div class="my-auto">
+                        <h6 class="mb-0 text-sm">Invision</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-sm font-weight-bold mb-0">$5,000</p>
+                  </td>
+                  <td>
+                    <span class="text-xs font-weight-bold">done</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                      <span class="me-2 text-xs font-weight-bold">100%</span>
+                      <div>
+                        <div class="progress">
+                          <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="align-middle">
+                    <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
+                      <i class="fa fa-ellipsis-v text-xs"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2">
+                      <div>
+                        <img src="{% static 'img/small-logos/logo-jira.svg' %}" class="avatar avatar-sm rounded-circle me-2" alt="jira">
+                      </div>
+                      <div class="my-auto">
+                        <h6 class="mb-0 text-sm">Jira</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-sm font-weight-bold mb-0">$3,400</p>
+                  </td>
+                  <td>
+                    <span class="text-xs font-weight-bold">canceled</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                      <span class="me-2 text-xs font-weight-bold">30%</span>
+                      <div>
+                        <div class="progress">
+                          <div class="progress-bar bg-gradient-danger" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="30" style="width: 30%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="align-middle">
+                    <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
+                      <i class="fa fa-ellipsis-v text-xs"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2">
+                      <div>
+                        <img src="{% static 'img/small-logos/logo-slack.svg' %}" class="avatar avatar-sm rounded-circle me-2" alt="slack">
+                      </div>
+                      <div class="my-auto">
+                        <h6 class="mb-0 text-sm">Slack</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-sm font-weight-bold mb-0">$1,000</p>
+                  </td>
+                  <td>
+                    <span class="text-xs font-weight-bold">canceled</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                      <span class="me-2 text-xs font-weight-bold">0%</span>
+                      <div>
+                        <div class="progress">
+                          <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0" style="width: 0%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="align-middle">
+                    <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
+                      <i class="fa fa-ellipsis-v text-xs"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2">
+                      <div>
+                        <img src="{% static 'img/small-logos/logo-webdev.svg'  %}" class="avatar avatar-sm rounded-circle me-2" alt="webdev">
+                      </div>
+                      <div class="my-auto">
+                        <h6 class="mb-0 text-sm">Webdev</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-sm font-weight-bold mb-0">$14,000</p>
+                  </td>
+                  <td>
+                    <span class="text-xs font-weight-bold">working</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                      <span class="me-2 text-xs font-weight-bold">80%</span>
+                      <div>
+                        <div class="progress">
+                          <div class="progress-bar bg-gradient-info" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="80" style="width: 80%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="align-middle">
+                    <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
+                      <i class="fa fa-ellipsis-v text-xs"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex px-2">
+                      <div>
+                        <img src="{% static 'img/small-logos/logo-xd.svg' %}" class="avatar avatar-sm rounded-circle me-2" alt="xd">
+                      </div>
+                      <div class="my-auto">
+                        <h6 class="mb-0 text-sm">Adobe XD</h6>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-sm font-weight-bold mb-0">$2,300</p>
+                  </td>
+                  <td>
+                    <span class="text-xs font-weight-bold">done</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                      <span class="me-2 text-xs font-weight-bold">100%</span>
+                      <div>
+                        <div class="progress">
+                          <div class="progress-bar bg-gradient-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="align-middle">
+                    <button class="btn btn-link text-secondary mb-0" aria-haspopup="true" aria-expanded="false">
+                      <i class="fa fa-ellipsis-v text-xs"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- formulario añadir equipo  -->
+<div id="modalFormularioAddEquipo" class="modal fade" tabindex="1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="TituloModal">Añadir Equipo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="formularioModalAddEquipo" action="/private/docLaruex/agregarArchivo/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group">
+            <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+              value="Equipo" style="display: none;" />
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="habilitacion">Habilitación</label>
+                <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
+                  {% for habilitacion in habilitaciones %}
+                  <option value="{{habilitacion.id}}">
+                    {{habilitacion.titulo}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="ubicacion">Ubicación</label>
+                <select class="form-select" data-rule="required" id="ubicacion" name="ubicacion">
+                  {% for ubicacion in ubicaciones %}
+                  <option value="{{ubicacion.id}}">{% if ubicacion.id__padre %} [{{ ubicacion.id__padre__nombre}}] {% endif %} 
+                    {{ubicacion.id__nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="cod_laruex">Código Laruex</label>
+                <input required type="text" class="form-control" id="cod_laruex" placeholder="2331 " name="cod_laruex"
+                  data-rule="required" pattern="[0-9]{4,6}" title="No es necesario añadir /2021" value="{{ ultimoCodigo }}"/>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="cod_uex">Código Uex</label>
+                <input type="text" class="form-control" id="cod_uex" value="00000" name="cod_uex"
+                   pattern="[0-9]{5,6}"/>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="fechaAlta">Fecha de Alta</label>
+                <input type="date" id="fechaAlta" name="fechaAlta" class="form-control" required />
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="importe">Importe con iva</label>
+                <input type="number" step="0.01" class="form-control" id="importe" placeholder="4,16" name="importe"
+                  data-rule="required" oninput="calcularPrecioSinIva(this.value)"/>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="nombreObjeto">Nombre del Equipo</label>
+                <input required type="text" class="form-control" id="nombreObjeto" placeholder="Monitor 4k 60Hz"
+                  name="nombreObjeto" data-rule="required" title="No permite guiones ni otros caracteres que no sean espacios"/>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="modeloEquipo">Modelo</label>
+                <input type="text" class="form-control" id="modeloEquipo" placeholder="MK-H210"
+                  name="modeloEquipo" />
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="form-group">
+                <label for="num_serie">S/N</label>
+                <input required type="text" class="form-control" id="num_serie" placeholder="201520724 " name="num_serie"
+                  data-rule="required"  title="No permite guiones ni otros caracteres que no sean espacios"/>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="tipo_equipo">Tipo de Equipo</label>
+                <select class="form-select" data-rule="required" id="tipo_equipo" name="tipo_equipo">
+                  {% for tipo_equipo in tipoEquipo %}
+                  <option value="{{tipo_equipo.id}}">
+                    {{tipo_equipo.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="proveedor">Proveedor</label>
+                <select class="form-select" data-rule="required" id="proveedor" name="proveedor">
+                  {% for proveedor in proveedores %}
+                  <option value="{{proveedor.id}}">
+                    {{proveedor.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            
+            <div class="col">
+              <div class="form-group">
+                <label for="fabricante">Fabricante</label>
+                <select class="form-select" data-rule="required" id="fabricante" name="fabricante">
+                  {% for fabricante in fabricantes %}
+                  <option value="{{fabricante.id}}">
+                    {{fabricante.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="form-group">
+                <label for="grupoEquipo">Grupo</label>
+                <select class="form-select" data-rule="required" id="grupoEquipo" name="grupoEquipo">
+                  {% for grupo in gruposEquipos %}
+                    <option value="{{grupo.id}}">{{grupo.nombre}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="descripcion">Descripción del Equipo</label>
+                <textarea type="text" class="form-control" id="descripcion" placeholder="Características: 1376L/min"
+                  name="descripcion" data-rule="required"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col d-flex justify-content-center">
+              <div class="form-check my-auto">
+                <input class="form-check-input" type="checkbox" id="altaUex" name="altaUex" >
+                <label class="form-check-label" for="altaUex" style="font-size: 1.2rem; color: #195746;">
+                  <i class="fa-duotone fa-triangle-exclamation"></i>
+                  Marcar si hay que dar de alta el equipo en la Uex
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row" >
+            <div class="col d-flex justify-content-center">
+              <div class="form-group">
+                <label for="imagenEquipo">
+                  <i class="fa-duotone fa-image fa-4x addImagen"></i>
+                </label>
+                <input type="file" class="form-control-file" style="display: none; visibility: none;"
+                  id="imagenEquipo" name="imagenEquipo"
+                  onchange="mostrarNombreImagen(this.value)" />
+                <div class="text-center"><strong id="mostrarNombreImagen"><br></strong>
+                  <spam id="imagen-name"></spam>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
+              Cerrar
+            </button>
+            <button id="reset" type="reset" class="btn btn-secondary" hidden>
+            </button>
+            <button type="submit" value="submit" class="btn btn-primary" >
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div><!-- END formulario añadir equipo  -->
+
+{% endblock %}

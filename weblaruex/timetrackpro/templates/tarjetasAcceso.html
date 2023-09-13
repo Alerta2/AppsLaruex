@@ -1,37 +1,7 @@
 {% extends "base/base_timetrackpro.html" %}
 {% load static %}
 {% block content %}
-<style>
-/* 
-  background: linear-gradient(45deg, #fdfbfb, #ebedee); 
-  background: linear-gradient(45deg, #1d536e, #fdfbfb);  */
 
-
-  /* Estilos para el campo de entrada de archivos personalizado */
-.custom-file-upload {
-  display: inline-block;
-  padding: 10px 20px;
-  background: linear-gradient(10deg, #1d536e, #ebedee); /* Degradado diagonal */
-  border: none;
-  border-radius: 5px;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s ease; /* Efecto de transición en el fondo */
-}
-
-/* Cambia el fondo del botón personalizado al pasar el cursor */
-.custom-file-upload:hover {
-  background: linear-gradient(10deg, #ebedee, #1d536e); /* Cambia los colores del degradado */
-}
-
-/* Oculta el botón de selección de archivo por defecto */
-.custom-file-upload input[type="file"] {
-  display: none;
-}
-
-
-</style>
 <div class="row">
   <div class="col-lg-12">
     <div class="row">

@@ -102,7 +102,71 @@ def verTarjetaAcceso(request, id):
         "administrador":True,
     }
 
-    return render(request,"verTarjetaAcceso.html", infoVista) 
+    return render(request,"verTarjetaAcceso.html", infoVista)
+ 
+
+def registrosInsertados(request):
+
+        # obtengo los datos necesarios para la vista
+    navBar = NavBar.objects.using("timetrackpro").values()
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+    }
+    return render(request,"registros-insertados.html",infoVista)
+
+def VerRegistro(request, id):
+    print("-----------------------")
+    print("visualizo registro nº: ", id)
+    print("-----------------------")
+
+    # obtengo los datos necesarios para la vista
+    navBar = NavBar.objects.using("timetrackpro").values()
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+    }
+    return render(request,"registros-insertados.html",infoVista)
+
+
+def agregarRegistro(request):
+    print("agregar registro --------")
+
+    navBar = NavBar.objects.using("timetrackpro").values()
+    if request.method == 'POST':
+        
+        print("agregar registro ---- 2 ----")
+        seccion = request.POST.get("seccion")
+        mes = request.POST.get("mes")
+        year = request.POST.get("year")
+        fecha = datetime.now()
+        fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
+        nuevoRegistro = RegistrosJornadaInsertados(seccion=seccion, mes=mes, year=year, fecha_lectura=fecha, insertador=AuthUser.objects.using("timetrackpro").filter(id=int(request.POST.get("registrador")))[0])
+        nuevoRegistro.save(using='timetrackpro')
+
+        if request.FILES['archivoSeleccionado']:
+            print("agregar registro ---- 3 ----")
+            nombreArchivo = mes + "_" + year + "_" + seccion + '_registro.' + request.FILES['archivoSeleccionado'].name.split('.')[-1]
+            rutaArchivo = '/timetrackpro/registros_insertados/'
+            ruta = settings.MEDIA_PRODUCCION + rutaArchivo + nombreArchivo
+            subirDocumento(request.FILES['archivoSeleccionado'], ruta)
+            nuevoRegistro.ruta = ruta
+            nuevoRegistro.save(using='timetrackpro')
+            print("agregar registro ---- 4 ----")
+        return VerRegistro(request, nuevoRegistro.id)
+    else:
+        # obtengo los datos necesarios para la vista
+        infoVista = {
+            "navBar":navBar,
+            "administrador":True,
+        }
+        return render(request,"registros-insertados.html",infoVista)
+
+
 
 
 def documentacion(request):
@@ -118,8 +182,17 @@ def dashBoard(request):
     navBar = NavBar.objects.using("timetrackpro").values()
     return render(request,"dashboard.html",{"navBar":navBar})
 
-def tablas(request):
-    return render(request,"tables.html",{})
+def tablas(request):        
+    # obtengo los datos necesarios para la vista
+    navBar = NavBar.objects.using("timetrackpro").values()
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+    }
+    return render(request,"registros-insertados.html",infoVista)
+
 
 def facturacion(request):
     navBar = NavBar.objects.using("timetrackpro").values()
