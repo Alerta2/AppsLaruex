@@ -19,15 +19,11 @@
 {% block content %}
 
 <div class="card m-3">
-  <div class="card-header">
-    <h5 class="card-title">Hola holita</h5>
-  </div>
   <div class="card-body">
     <div id='calendarioAnual' class="mb-3 mt-3"></div>
 
   </div>
 </div>
-
 
 <script>
 
@@ -35,7 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendarioAnual');
     var calendar = new FullCalendar.Calendar(calendarEl, {
       themeSystem: 'bootstrap5',
-
+      events: "{% url 'timetrackpro:datos-festivos-calendario' %}",
+      eventColor: '#eju099', // color de los eventos
+      
       height: 650, // indico el maximo de alto que puede tener el calendario
       
       locale: 'es', // el idioma del calendario
@@ -51,14 +49,13 @@ document.addEventListener('DOMContentLoaded', function() {
       customButtons: {
         // declaración de botones personalizados
         myCustomButton: {
-          text: 'custom!',
-
+          text: 'Agregar festivo',
+          // aplicar clase al boton
           click: function() {
             alert('clicked the custom button!');
           }
         }
-      },
-
+      }, 
       headerToolbar: { // la barra superior donde se encuentra el titulo y los botones
         left: 'prev,next today myCustomButton',
         center: 'title',

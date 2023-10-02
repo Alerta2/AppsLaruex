@@ -925,6 +925,32 @@ def calendarioAnualFestivos(request):
     }
     return render(request,"calendarioAnualFestivos.html",infoVista)
 
+
+
+def datosFestivosCalendario(request):
+    festivos = FestivosYVacaciones.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+    salida = []
+    colores = {
+        # "text-gradient text-info":"#17c1e8",
+        "text-gradient text-info":"#BEDAE3",
+        "text-gradient text-success":"#C4E9DA",
+        "text-gradient text-primary":"#FEDSCF",
+        "text-gradient text-warning":"#D3C7E6",
+        "text-gradient text-dark":"#32325d",
+        "text-gradient text-danger":"#F1B598"
+    }
+
+    for festivo in festivos:
+        salida.append({
+            'id':festivo['id'],
+            'title':festivo['nombre'],
+            'start':festivo['fecha_inicio'],
+            'end':festivo['fecha_fin'],
+            'color':colores[festivo['tipo_festividad__color']]
+        })
+    return JsonResponse(salida, safe=False)
+
+
 def calendarioFestivos(request, mes):
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
