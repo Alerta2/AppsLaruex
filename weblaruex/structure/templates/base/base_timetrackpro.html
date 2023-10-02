@@ -22,6 +22,7 @@
       background-image: url('{% static "img/curved-images/curved1.jpg" %}');
       /* Otras propiedades de estilo aquí */
   }
+  
   .background-timetrackpro-c6{
       background-image: url('{% static "img/curved-images/curved6.jpg" %}');
       /* Otras propiedades de estilo aquí */
@@ -66,9 +67,11 @@
   <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
 
   <!-- Agrega los scripts de Bootstrap y JavaScript -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
+  <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@2.11.6/dist/umd/popper.min.js"></script>
+  
 
   <!-- JQuery -->
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
@@ -79,8 +82,23 @@
   <!-- Bootstrap -->
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 
+  <!-- bootstrap table -->
+  <link href="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.css" rel="stylesheet">
 
 
+  <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.js" ></script>
+  <!-- <script type="text/javascript" src="{% static 'js/moment.min.js' %}"></script> -->
+  <script src="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table-locale-all.min.js"></script>
+  <script src="https://unpkg.com/bootstrap-table@1.19.1/dist/extensions/export/bootstrap-table-export.min.js" ></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.19.1/extensions/print/bootstrap-table-print.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.10.21/tableExport.min.js" ></script>
+  <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.10.21/libs/jsPDF/jspdf.min.js" ></script>
+  <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.10.21/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js" ></script>
+  <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/extensions/export/bootstrap-table-export.min.js" ></script>
+
+  {% block imports %} {% endblock %}
 </head>
 
 <body class="g-sidenav-show bg-gray-100">

@@ -1,0 +1,153 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+<div class="page-header min-vh-75">
+  <div class="container filaForm">
+    <div class="row d-flex align-items-center">
+      <div class="col-md-4">
+        
+      <form action="{% url 'timetrackpro:editar-tarjeta-acceso' id=tarjeta.id %}" method="POST"
+        enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="d-block shadow-xl border-radius-xl" style="position: relative; display: inline-block;">
+
+        <img id="actual-imagen-tarjeta" {% if tarjeta.imagen %} src="{% static 'img/timetrackpro/tarjetas/' %}{{ tarjeta.imagen }}"{% else %} src="{% static 'img/timetrackpro/tarjetas/not_found.jpeg' %}" {% endif %} alt="img-blur-shadow" class="img-fluid shadow border-radius-xl" style="max-width: 100%; height: auto;">
+        {% if not tarjeta.imagen %}
+        <div class="card-overlay" id="cardOverlay">
+          <div class="card-text-overlay">
+            No existe imagen para esta tarjeta
+          </div>
+        </div>
+        {% endif %}
+        <a href="" title="subir-imagen-tarjeta" data-toggle="modal" data-target="#modalFormulario"><i class="fa-kit fa-solid-image-pen fa-2xl" style="position: absolute; bottom: 1.5rem; right: 0.625rem;"></i></a>
+        <input type="file" id="fotoSeleccionada" name="fotoSeleccionada" accept="image/*" onchange="previsualizarImagenTarjeta()" style="display:none">
+      </div>
+      </div>
+      <div class="col-lg-8">
+          <div class="accordion" id="accordionEditarEmpleado">
+            <!-- DATOS DE LA TARJETA DE ACCESO -->
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingDatosTarjeta">
+                  <h3 class="font-weight-bolder text-danger text-gradient">Editar Datos Tarjeta de {{tarjeta.nombre|title}}  {{tarjeta.apellidos|title}}</h3>
+              </h2>
+                <div>                  
+                  <div class="row">
+
+                    <div class="col-xl-3">
+                      <label>ID Tarjeta</label>
+                      <div class="mb-3">
+                        <input type="text" class="form-control" aria-label="DNI del empleado"
+                          id="id_tarjeta" name="id_tarjeta" aria-describedby="text-addon"
+                          value="{{tarjeta.id_tarjeta}}">
+                      </div>
+                    </div>
+                    
+                    <div class="col-xl-3">
+                      <label>Fecha de Alta</label>
+                      <div class="mb-3">
+                        <input type="date" class="form-control" aria-label="Nombre en el dispositivo"
+                          aria-describedby="text-addon" name="fechaAlta" id="fechaAlta"
+                          value="{{tarjeta.fecha_alta|safe}}">
+                      </div>
+                    </div>
+                    
+                    <div class="col-xl-3">
+                      <label>Fecha validez</label>
+                      <div class="mb-3">
+                        <input type="date" class="form-control" aria-label="Nombre en el dispositivo"
+                          aria-describedby="text-addon" name="fechaExpiracion" id="fechaExpiracion"
+                          {% if tarjeta.fecha_baja %} value="{{tarjeta.fecha_baja|safe}}" {% endif %}>
+                      </div>
+                    </div>
+                    
+                    <div class="col-xl-3">
+                      <label>¿La tarjeta está activa?</label>
+                      <div class="form-switch ps-1 my-2">
+                        <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.activo %} checked {% endif %} name="tarjeta_activa" id="tarjeta_activa">
+                      </div>
+                    </div>
+
+                  </div>
+                                   
+                  <div class="row">
+                    <div class="col-xl-3">
+                      <label>DNI</label>
+                      <div class="mb-3">
+                        <input type="text" class="form-control" aria-label="DNI del empleado" aria-describedby="text-addon" value="{{tarjeta.dni}}" id="dni" name="dni">
+                      </div>
+                    </div>
+
+                    <div class="col-xl-4">
+                      <label>Nombre</label>
+                      <div class="mb-3">
+                        <input type="text" class="form-control" placeholder="Nombre completo" aria-label="Nombre"
+                          aria-describedby="text-addon" name="nombre" id="nombre" value="{{tarjeta.nombre}}">
+                      </div>
+                    </div>
+                    <div class="col-xl-5">
+                      <label>Apellidos</label>
+                      <div class="mb-3">
+                        <input type="text" class="form-control" placeholder="Apellidos" aria-label="Apellidos del empleado"
+                          aria-describedby="text-addon" name="apellidos" id="apellidos"
+                          value="{{tarjeta.apellidos}}">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-4 mb-4">
+                      <div class="col-xl-12">
+                        <label class="d-inline">Puede acceder a</label>
+                        <div class="d-inline form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">Alerta2</label>
+                          <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.acceso_alerta2 %} checked {% endif %} id="acceso_alerta2" name="acceso_alerta2">
+                        </div>
+                        <div class="d-inline form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">Laboratorio</label>
+                          <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.acceso_laboratorios %} checked {% endif %} id="acceso_laboratorio" name="acceso_laboratorio">
+                        </div>
+                        <div class="d-inline form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">CPD</label>
+      
+                          <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.acceso_cpd %} checked {% endif %} id="acceso_cpd" name="acceso_cpd">
+                        </div>
+                      </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <button type="submit" value="submit" class="btn bg-gradient-danger w-100 mt-4 mb-0">Guardar</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // JavaScript para activar el input cuando se hace clic en el enlace
+  document.querySelector("a[title='subir-imagen-tarjeta']").addEventListener("click", function (e) {
+    e.preventDefault(); // Evita que el enlace redireccione
+    document.getElementById("fotoSeleccionada").click(); // Simula un clic en el input
+  });
+
+  // Función para previsualizar la imagen seleccionada
+  function previsualizarImagenTarjeta() {
+    var input = document.getElementById("fotoSeleccionada");
+    var imagen = document.getElementById("actual-imagen-tarjeta");
+    var div = document.getElementById("cardOverlay");
+
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        imagen.src = e.target.result;
+        div.style.display = "none";
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
+
+{% endblock %}

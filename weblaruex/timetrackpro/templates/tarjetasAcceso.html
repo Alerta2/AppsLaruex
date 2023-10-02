@@ -315,30 +315,30 @@
 
 <script>
 function previsualizarImagen() {
-    var archivoInput = document.getElementById('imagenTarjeta');
-    var imagenPrevia = document.getElementById('imagenPrevia');
-    var selector = document.getElementById('selectorImagen');
-    var etiqueta = document.getElementById('labelImagenSeleccionada');
-    var nombreImagen = document.getElementById('nombreImagenSeleccionada');
+  var archivoInput = document.getElementById('imagenTarjeta');
+  var imagenPrevia = document.getElementById('imagenPrevia');
+  var selector = document.getElementById('selectorImagen');
+  var etiqueta = document.getElementById('labelImagenSeleccionada');
+  var nombreImagen = document.getElementById('nombreImagenSeleccionada');
 
-    if (archivoInput.files && archivoInput.files[0]) {
-      var lector = new FileReader();
+  if (archivoInput.files && archivoInput.files[0]) {
+    var lector = new FileReader();
 
-      lector.onload = function(e) {
-        imagenPrevia.src = e.target.result;
-        imagenPrevia.style.display = 'block';
-      }
-      selector.style.display = 'none';
-      //eliminar atributo hidden de la etiqueta
-      etiqueta.removeAttribute("hidden");
-      nombreImagen.innerHTML = archivoInput.files[0].name;
-
-      lector.readAsDataURL(archivoInput.files[0]);
-    } else {
-      imagenPrevia.src = '';
-      imagenPrevia.style.display = 'none';
+    lector.onload = function(e) {
+      imagenPrevia.src = e.target.result;
+      imagenPrevia.style.display = 'block';
     }
+    selector.style.display = 'none';
+    //eliminar atributo hidden de la etiqueta
+    etiqueta.removeAttribute("hidden");
+    nombreImagen.innerHTML = archivoInput.files[0].name;
+
+    lector.readAsDataURL(archivoInput.files[0]);
+  } else {
+    imagenPrevia.src = '';
+    imagenPrevia.style.display = 'none';
   }
+}
 
 // funcion para mostrar los datos ingresados 
 // Obtén una lista de todos los campos de entrada

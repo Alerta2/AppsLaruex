@@ -1,0 +1,79 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+
+{% block imports %}
+
+    <!-- fullcalendar-->
+  <!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.9/index.global.min.js'></script> -->
+
+  <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" />
+  <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar.js' %}"></script>
+  <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar_es.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_anual.css' %}" />
+    <!-- disponible para configuración servidor-->
+
+    <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
+
+  {% endblock %}
+
+{% block content %}
+
+<div class="card m-3">
+  <div class="card-header">
+    <h5 class="card-title">Hola holita</h5>
+  </div>
+  <div class="card-body">
+    <div id='calendarioAnual' class="mb-3 mt-3"></div>
+
+  </div>
+</div>
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendarioAnual');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      themeSystem: 'bootstrap5',
+
+      height: 650, // indico el maximo de alto que puede tener el calendario
+      
+      locale: 'es', // el idioma del calendario
+      handleWindowResize: true, // si se puede redimensionar el calendario
+      initialView: 'dayGridMonth', // la vista inicial del calendario
+      buttonText: { // los textos de los botones
+        today: 'Hoy',
+        month: 'Mes',
+        week: 'Semana',
+        day: 'Día',
+        list: 'Lista'
+      },
+      customButtons: {
+        // declaración de botones personalizados
+        myCustomButton: {
+          text: 'custom!',
+
+          click: function() {
+            alert('clicked the custom button!');
+          }
+        }
+      },
+
+      headerToolbar: { // la barra superior donde se encuentra el titulo y los botones
+        left: 'prev,next today myCustomButton',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      }
+    });
+    calendar.render(); // renderizo el calendario
+    calendar.updateSize(); // actualizo el tamaño del calendario
+
+
+
+  });
+
+
+</script>
+
+    
+{% endblock %}

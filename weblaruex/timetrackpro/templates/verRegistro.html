@@ -1,0 +1,174 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+
+
+
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-header pb-0">
+        <!-- <div class="card-header pb-0  d-flex align-items-center"> -->
+            <h6>Registro de {{registro.seccion}}</h6>
+            <h6>{{registro.mes}} de {{registro.year}}</h6>
+      </div>
+      <div class="card-body px-0 pt-0 pb-2">
+        <div class="table-responsive p-0">
+          <table class="table align-items-center mb-0">
+            <thead>
+              <tr>
+                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Empleado</th>
+                <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Function</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Employed
+                </th>
+                <th class="text-secondary opacity-7"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="d-flex px-2 py-1">
+                    <div>
+                      <img src="{% static 'img/team-2.jpg' %}" class="avatar avatar-sm me-3" alt="user1">
+                    </div>
+                    <div class="d-flex flex-column justify-content-center">
+                      <h6 class="mb-0 text-sm">John Michael</h6>
+                      <p class="text-xs text-secondary mb-0">john@creative-tim.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p class="text-xs font-weight-bold mb-0">Manager</p>
+                  <p class="text-xs text-secondary mb-0">Organization</p>
+                </td>
+                <td class="align-middle text-center text-sm">
+                  <span class="badge badge-sm bg-gradient-success">Online</span>
+                </td>
+                <td class="align-middle text-center">
+                  <span class="text-secondary text-xs font-weight-bold">23/04/18</span>
+                </td>
+                <td class="align-middle">
+                  <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip"
+                    data-original-title="Edit user">
+                    Edit
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="d-flex px-2 py-1">
+                    <div>
+                      <img src="{% static 'img/team-3.jpg' %}" class="avatar avatar-sm me-3" alt="user2">
+                    </div>
+                    <div class="d-flex flex-column justify-content-center">
+                      <h6 class="mb-0 text-sm">Alexa Liras</h6>
+                      <p class="text-xs text-secondary mb-0">alexa@creative-tim.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p class="text-xs font-weight-bold mb-0">Programator</p>
+                  <p class="text-xs text-secondary mb-0">Developer</p>
+                </td>
+                <td class="align-middle text-center text-sm">
+                  <span class="badge badge-sm bg-gradient-secondary">Offline</span>
+                </td>
+                <td class="align-middle text-center">
+                  <span class="text-secondary text-xs font-weight-bold">11/01/19</span>
+                </td>
+                <td class="align-middle">
+                  <a href="javascript:;" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip"
+                    data-original-title="Edit user">
+                    Edit
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-header pb-0">
+        <h6>Projects table</h6>
+      </div>
+      <div class="card-body px-0 pt-0 pb-2">
+        <div class="table-responsive p-0">
+          <table id="tabla_registros" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
+  data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+  data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+  data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-row-style="rowStyle"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    $("#tabla_registros").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/timetrackpro/datos-registro/{{registro.id}}/",
+    cache: false, 
+    columns: [
+      {
+        title: "Usuario",
+        field: "id_empleado__nombre",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombreArchivo = row.mes +" "+ row.year;
+          var ruta = row.ruta;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombreArchivo+'</h6><p class="text-xs text-secondary mb-0">'+ ruta +'</p></div>';
+          return div;
+        }
+      },
+      {
+        title: "Función",
+        field: "ubicacion_actual__id__nombre",
+        align: "center",
+      },
+      {
+        title: "Estado",
+        field: "ubicacion_actual__id__nombre",
+        align: "center",
+      },
+      {
+        title: "Fecha",
+        field: "ubicacion_actual__id__nombre",
+        align: "center",
+      },
+      {
+        title: "Lugar",
+        field: "ubicacion_actual__id__nombre",
+        align: "center",
+      },{
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+
+                  
+        var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+
+</script>
+
+
+{% endblock %}

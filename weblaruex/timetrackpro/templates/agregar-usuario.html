@@ -1,0 +1,170 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+  <div class="page-header min-vh-75">
+    <div class="container filaForm">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="card card-plain">
+            <div class="card-header pb-0 text-left bg-transparent">
+              <h3 class="font-weight-bolder text-info text-gradient">Datos del empleado</h3>
+              <p class="mb-0">Introduce los datos del empleado</p>
+            </div>
+            <div class="card-body">
+              <form action="{% url 'timetrackpro:agregar-usuario' %}" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row">
+                  <div class="col-xl-2">
+                    <label>ID</label>
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="ID en el dispositivo" aria-label="Nombre en el dispositivo" id="id_empleado_maquina" name="id_empleado_maquina" aria-describedby="text-addon">
+                    </div>
+                  </div>
+                  <div class="col-xl-4">
+                    <label>Nombre</label>
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="Nombre en el dispositivo" aria-label="Nombre en el dispositivo" id="nombre_empleado_maquina" name="nombre_empleado_maquina" aria-describedby="text-addon">
+                    </div>
+                  </div>
+                  <div class="col-xl-3">
+                    <label>DNI</label>
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="12345678-A" aria-label="DNI del empleado" id="dni_empleado" name="dni_empleado" aria-describedby="text-addon">
+                    </div>
+                  </div>
+                  <div class="col-xl-3">
+                    <label>Fecha de Nacimiento</label>
+                    <div class="mb-3">
+                      <input type="date" class="form-control" aria-label="Nombre en el dispositivo" aria-describedby="text-addon" name="fechaNacimiento_empleado" id="fechaNacimiento_empleado">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xl-4">
+                    <label>Nombre</label>
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="Nombre completo" aria-label="Nombre" aria-describedby="text-addon" name="nombre_empleado" id="nombre_empleado" required>
+                    </div>
+                  </div>
+                  <div class="col-xl-8">
+                    <label>Apellidos</label>
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="Apellidos" aria-label="Apellidos del empleado" aria-describedby="text-addon" name="apellidos_empleado" id="apellidos_empleado" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xl-4">
+                    <label>Puesto</label>
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="Nombre en el dispositivo" aria-label="Nombre en el dispositivo" aria-describedby="text-addon" name="puesto_empleado" id="puesto_empleado">
+                    </div>
+                  </div>
+                  <div class="col-xl-8">
+                    <label>Dirección</label>
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="Calle Principal 3 3ºB" aria-label="Dirección del empleado" aria-describedby="text-addon" name="direccion_empleado" id="direccion_empleado">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xl-4">
+                    <label>Teléfono</label>
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="666555255" id="telefono" name="telefono" aria-label="Teléfono" aria-describedby="text-addon">
+                    </div>
+                  </div>
+                  <div class="col-xl-4">
+                    <label>Teléfono 2</label>
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="666555255" id="telefono2" name="telefono2" aria-label="Teléfono 2" aria-describedby="text-addon">
+                    </div>
+                  </div>
+                  <div class="col-xl-4">
+                    <label>Extension</label>
+                    <div class="mb-3">
+                      <input type="text" class="form-control" placeholder="66656" id="extension_empleado" name="extension_empleado" aria-label="Extensión" aria-describedby="text-addon">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xl-6">
+                    <label>Email</label>
+                    <div class="mb-3">
+                      <input type="email" class="form-control" placeholder="correo@correo.es" id="email" name="email" aria-label="Email" aria-describedby="email-addon">
+                    </div>
+                  </div>
+                  <div class="col-xl-6">
+                    <label>Email 2</label>
+                    <div class="mb-3">
+                      <input type="email" class="form-control" placeholder="correo@correo.es" id="email2" name="email2" aria-label="Email" aria-describedby="email-addon">
+                    </div>
+                  </div>
+                </div>
+                <div class="row d-flex align-items-center">
+                  <div class="col-xl-2">
+                    <label class="custom-file-upload" for="fotoEmpleadoSeleccionado" id="labelImagenEmpleadoSeleccionada">Foto del empleado</label>
+                    
+                    <input type="file" id="fotoEmpleadoSeleccionado" name="fotoEmpleadoSeleccionado" accept="image/*" onchange="previsualizarImagenEmpleado()" style="display:none">
+                    
+                    <img class="w-75 rounded" id="imagenSubida" src="" alt="foto_empleado" hidden>
+                    
+                  </div>
+                  <div class="col-xl-10">
+                    <label>Información adicional</label>
+                    <div class="mb-3">
+                      <textarea type="text" class="form-control" placeholder="Agrege la información adicional del empleado" aria-label="Información adicional del empleado" id="infoAdicional_empleado" name="infoAdicional_empleado" aria-describedby="text-addon"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center">
+                  <button type="submit" value="submit" class="btn bg-gradient-info w-100 mt-4 mb-0">Guardar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4" >
+          <div class="oblique position-absolute top-0 h-100 d-lg-block d-none me-n8">
+            <div class="oblique-image bg-cover position-absolute fixed-top ms-auto h-100 z-index-0 ms-n6 background-timetrackpro-c6">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  
+<script>
+  function previsualizarImagenEmpleado() {
+  var archivoInput = document.getElementById('fotoEmpleadoSeleccionado');
+  var imagenPrevia = document.getElementById('imagenSubida');
+  var etiqueta = document.getElementById('labelImagenEmpleadoSeleccionada');
+  var nombreImagen = document.getElementById('nombreImagenSeleccionada');
+
+  if (archivoInput.files && archivoInput.files[0]) {
+    var lector = new FileReader();
+
+    lector.onload = function(e) {
+
+      imagenPrevia.src = e.target.result;
+      imagenPrevia.style.display = 'block';
+
+      // Ocultar el label y el input
+      etiqueta.style.display = 'none';
+      archivoInput.style.display = 'none';
+
+      // Mostrar la imagen en el elemento img
+      imagenPrevia.removeAttribute('hidden');
+    }
+    lector.readAsDataURL(archivoInput.files[0]);
+  }
+}
+
+</script>
+
+{% endblock %}
