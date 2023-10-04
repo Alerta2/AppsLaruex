@@ -928,26 +928,22 @@ def calendarioAnualFestivos(request):
 
 
 def datosFestivosCalendario(request):
-    festivos = FestivosYVacaciones.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+    # obtengo los festivos registrados en la base de datos
+    festivos = FestivosYVacaciones.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
+    # creo una lista vacía para guardar los datos de los festivos
     salida = []
-    colores = {
-        # "text-gradient text-info":"#17c1e8",
-        "text-gradient text-info":"#BEDAE3",
-        "text-gradient text-success":"#C4E9DA",
-        "text-gradient text-primary":"#FEDSCF",
-        "text-gradient text-warning":"#D3C7E6",
-        "text-gradient text-dark":"#32325d",
-        "text-gradient text-danger":"#F1B598"
-    }
 
+    # recorro los festivos y los guardo en la lista
     for festivo in festivos:
+        # inserto los datos en la lista siguiendo la estructura que requiere el calendario
         salida.append({
             'id':festivo['id'],
             'title':festivo['nombre'],
             'start':festivo['fecha_inicio'],
             'end':festivo['fecha_fin'],
-            'color':colores[festivo['tipo_festividad__color']]
+            'color':festivo['tipo_festividad__color_calendario']
         })
+    # devuelvo la lista en formato json
     return JsonResponse(salida, safe=False)
 
 
