@@ -1032,6 +1032,58 @@ def eliminarFestivo(request, id):
     }
     return render(request,"eliminarFestivo.html",{})
 
+def erroresRegistro(request, mes=None):
+    festivos = None
+    tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
+    if mes == None:
+        festivos = FestivosYVacaciones.objects.using("timetrackpro").order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+    else:
+        festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(year=mes).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+    # current_url = request.path[1:]
+    navBar = NavBar.objects.using("timetrackpro").values()
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "festivos":list(festivos),
+        "mes":mes, 
+        "tipoFestivos":list(tipoFestivos)
+    }
+    return render(request,"festivos.html",infoVista)
+
+
+'''-------------------------------------------
+                                Módulo: erroresRegistroEmpleado
+
+- Descripción: 
+Permite visualizar a los empleados que han tenido algún error en el registro de su jornada laboral.
+
+- Precondiciones:
+El usuario debe estar autenticado.
+Puede filtrar por año, mes y empleado.
+
+- Postcondiciones:
+Devuelve un listado de errores de registro de jornada laboral en función del filtro que se ha introducido por la url.
+
+-------------------------------------------'''
+def erroresRegistroEmpleado(request, idEmpleado, year=None, mes=None):
+    id = idEmpleado
+    festivos = None
+    tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
+    if mes == None:
+        festivos = FestivosYVacaciones.objects.using("timetrackpro").order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+    else:
+        festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(year=mes).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+    # current_url = request.path[1:]
+    navBar = NavBar.objects.using("timetrackpro").values()
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "festivos":list(festivos),
+        "mes":mes, 
+        "tipoFestivos":list(tipoFestivos)
+    }
+    return render(request,"festivos.html",infoVista)
+
 def documentacion(request):
     return render(request,"documentation.html",{})
 

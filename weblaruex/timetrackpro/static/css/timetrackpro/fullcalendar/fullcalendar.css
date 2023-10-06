@@ -1368,11 +1368,6 @@ A VERTICAL event
     border: 1px solid #ddd;
     border: 1px solid var(--fc-border-color, #ddd);
   }
-.fc {
-
-  /* message when no events */
-
-}
 .fc .fc-list-empty {
     background-color: rgba(208, 208, 208, 0.3);
     background-color: var(--fc-neutral-bg-color, rgba(208, 208, 208, 0.3));

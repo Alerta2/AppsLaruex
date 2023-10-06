@@ -62,5 +62,9 @@ urlpatterns = [
     path('private/timetrackpro/agregar-festivo/', agregarFestivo , name='agregar-festivo'),
     path('private/timetrackpro/agregar-festivo/<slug:id>/', editarFestivo , name='editar-festivo'),
     path('private/timetrackpro/agregar-festivo/<slug:id>/', eliminarFestivo , name='eliminar-festivo'),
+
+    # información relacionada con los empleados
+    path('private/timetrackpro/errores-en-registros/<slug:mes>/', erroresRegistro , name='errores-en-registros'),
+    path('private/timetrackpro/errores-en-registros/<slug:idEmpleado>/<slug:year>/<slug:mes>/', erroresRegistroEmpleado , name='errores-en-registros-empleado'),
     
 ]

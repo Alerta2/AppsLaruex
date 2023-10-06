@@ -60,7 +60,13 @@ document.addEventListener('DOMContentLoaded', function() {
         left: 'prev,next today myCustomButton',
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay'
-      }
+      },
+      // Esta función se ejecutará cuando se haga clic en un día en el calendario         
+      dateClick: function(info) {
+            var eventTitle = prompt('Indica cual es el festivo:');
+            
+  
+        },
     });
     calendar.render(); // renderizo el calendario
     calendar.updateSize(); // actualizo el tamaño del calendario

@@ -44,7 +44,7 @@
             <div class="d-flex justify-content-start">
               <h5>Calendario Vaciones LARUEX
               </h5><a class="ms-2" data-bs-toggle="información sobre leyendas de color" data-bs-placement="bottom"
-                title="Dar de alta un empleado en la aplicación" data-toggle="modal" data-target="#modalInfoLeyenda">
+                title="Información sobre las leyendas de color de los festivos" data-toggle="modal" data-target="#modalInfoLeyenda">
                 <i class="fa-solid fa-info fa-lg btn bg-gradient-leyenda"></i>
               </a>
 
@@ -133,7 +133,7 @@
       </div>
       <div class="modal-body">
         {% for tipo in tipoFestivos %}
-        <p class="text-sm">
+        <p class="text-xl">
           <i class="fa-solid fa-party-horn {{tipo.color}}" aria-hidden="true"></i>
           <span class="font-weight-bold ms-1">{{tipo.nombre}}</span>
         </p>

@@ -4,56 +4,55 @@
     height: 100%;
 }
 
-/*Color fondo del calendario*/
-.fc-daygrid-body,
-.fc-list-table, .fc-listWeek-view {
-    background: rgba(255, 255, 255, 1);
-}   
 
-/*Color cabecera del calendario*/
-.fc-col-header {
-    background: linear-gradient(180deg, #16222A, #3A6073);
-    color: #fff;
+.fc-theme-standard .fc-scrollgrid{
+  border-color: transparent;
+  background-color: transparent;
+}  
+
+.fc-theme-standard td,
+  .fc-theme-standard th {
     border-color: transparent;
-}
-.fc .fc-col-header-cell-cushion {
-    display: inline-block; /* x-browser for when sticky (when multi-tier header) */
-    padding: 2px 4px;
-    color: #fff;
-}
-
-.fc-col-header-cell:hover {
-    background: linear-gradient(180deg, #697581,  #3A6073);
-    
-}
-
-.fc .fc-button-primary {
-    color: #fff;
-    color: var(--fc-button-text-color, #fff);
-    background: linear-gradient(180deg, #16222A, #3A6073);
-    /* border-color: #2C3E50; */
-    /* border-color: var(--fc-button-border-color, #2C3E50); */
+    background-color: transparent;
   }
 
-  .fc .fc-button-primary:hover {
-    color: #fff;
-    color: var(--fc-button-text-color, #fff);
-    background: #1e2b37;
-    border-color: #1a252f;
-    border-color: var(--fc-button-hover-border-color, #1a252f);
+  .fc-daygrid-day-frame {
+    /* color: #30a898; */
+    font-weight: bold;
+    font-size: 20px;
+    text-transform: capitalize;
   }
   
-
-  .fc .fc-button-primary:not(:disabled):active,
-  .fc .fc-button-primary:not(:disabled).fc-button-active {
-    color: #fff;
-    color: var(--fc-button-text-color, #fff);
-    background-color: #1a252f;
-    background-color: var(--fc-button-active-bg-color, #1a252f);
-    border-color: #151e27;
-    border-color: var(--fc-button-active-border-color, #151e27);
+  
+  table[role="presentation"]  tr[role="row"] th[role="columnheader"]{
+    border-color: transparent;
+    background-color: transparent;
+    /* background-color: #30a898; */
+    border-bottom: 3px solid #676d6c34; /* Ajusta el color y el grosor según tus preferencias */
+  
   }
-  .fc .fc-button-primary:not(:disabled):active:focus,
-  .fc .fc-button-primary:not(:disabled).fc-button-active:focus {
-    box-shadow: 0 0 0 0.2rem rgba(76, 91, 106, 0.5);
+  
+  .fc-col-header-cell-cushion{
+    border-radius: 10px;
+    background-color: transparent;
+    background-color: rgba(252, 252, 252, 0.689);
+    color: #30a898;
+    font-weight: bold;
+    font-size: 20px;
+    /* text-transform: capitalize; */
   }
+  
+  
+  
+  tbody[role="rowgroup"] tr[role="row"] td[role="gridcell"]{
+    border-color: transparent;
+    background-color: transparent;
+    font-size: 20px;
+    text-transform: capitalize;
+    /* background-color: #30a898; */
+  }
+  
+  /* .fc-scrollgrid-sync-inner{
+    color: #30a898;
+    font-weight: bold;
+  } */
