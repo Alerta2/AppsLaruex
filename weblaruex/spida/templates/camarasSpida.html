@@ -94,6 +94,20 @@ html, body{
 </div>
 
 <div class="container">
+    <!-- formulario para seleccionar la estacion -->
+    <form action="/private/spida/consultarCamaras/" method="post">
+        {% csrf_token %}
+        <!-- select de la estacion a consultar -->
+        <label for="estacion" style="color: #fff;">Selecciona la estación a consultar</label>
+        <select name="estacion" id="estacion" class="form-control" style="width: 50%; margin: 0 auto; margin-bottom: 20px;">
+          <option value="spida01">spida01</option>
+          <option value="spida02">spida02</option>
+          <option value="spida03">spida03</option>
+          <option value="spida04">spida04</option>
+        </select>
+        <!-- boton de enviar -->
+        <button type="submit" class="btn btn-primary" style="width: 50%; margin: 0 auto; margin-bottom: 20px;">Consultar</button>
+    </form>
         <p style="color: #fff;">Mostrar las cámaras aquí</p>
 </div>
 

@@ -737,17 +737,28 @@ def getLegendaRadar(request):
 ''' Consulta las cámaras de las estaciones de la red SPIDA '''
 @permission_required('auth.spida_documentacion')
 def getCamarasEstaciones(request):
-
-    # como consultar camara ejemplo
-    fechaHora = datetime.now().astimezone(pytz.timezone("Europe/Madrid"))
-    # en la ip tendrás que poner la url con la que consultas la camara con vlc
-    camara = {"nombre":"azuaga", "ip":'http://172.20.36.19/videostream.cgi?user=rvra&pwd=rvra&resolution=32&rate=0'}
-    try:
-        vid = cv2.VideoCapture(camara["ip"])
-        ret, frame = vid.read()
-        cv2.putText(frame,camara["nombre"]+" "+fechaHora.strftime("%m/%d/%Y, %H:%M:%S"), (10,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, 3)	
-        cv2.imwrite(settings.STATIC_ROOT +"papel/"+camara["nombre"]+'.jpg', frame)
-    except Exception as e:
-        print("ERROR CARGANDO CAMARA", camara["nombre"], e)
+    # si viene desde el formulario entra por aquí
+    if request.method == 'POST':
+        print(request.POST)
+        '''
+        # como consultar camara ejemplo
+        fechaHora = datetime.now().astimezone(pytz.timezone("Europe/Madrid"))
+        # en la ip tendrás que poner la url con la que consultas la camara con vlc
+        camara = {"nombre":"spida01", "ip":'http://172.20.36.19/videostream.cgi?user=rvra&pwd=rvra&resolution=32&rate=0'}
+        try:
+            vid = cv2.VideoCapture(camara["ip"])
+            ret, frame = vid.read()
+            cv2.putText(frame,camara["nombre"]+" "+fechaHora.strftime("%m/%d/%Y, %H:%M:%S"), (10,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2, 3)	
+            cv2.imwrite(camara["nombre"]+'.jpg', frame)
+        except Exception as e:
+            print("ERROR CARGANDO CAMARA", camara["nombre"], e)
+            '''
     
-    return render(request,"camarasSpida.html",{})
+        # aquí habrá que consultar la imagen y mandarla a la web
+
+        return render(request, "camarasSpida.html",{})
+    
+    # si no viene desde el formulario entra por aquí y entrega la web sin nada
+    else:
+        # aquí falta obtener los nombre de las estaciones para rellenar el select del formulario
+        return render(request, "camarasSpida.html",{})
