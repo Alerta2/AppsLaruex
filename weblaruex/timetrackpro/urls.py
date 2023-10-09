@@ -60,6 +60,7 @@ urlpatterns = [
     path('private/timetrackpro/festivos/', festivos , name='festivos'),
     path('private/timetrackpro/festivos/<slug:year>/', festivos , name='festivos-year'),
     path('private/timetrackpro/agregar-festivo/', agregarFestivo , name='agregar-festivo'),
+    path('private/timetrackpro/agregar-festivo-desde-calendario/', agregarFestivoCalendario , name='agregar-festivo-desde-calendario'),
     path('private/timetrackpro/agregar-festivo/<slug:id>/', editarFestivo , name='editar-festivo'),
     path('private/timetrackpro/agregar-festivo/<slug:id>/', eliminarFestivo , name='eliminar-festivo'),
 
