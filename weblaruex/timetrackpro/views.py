@@ -927,9 +927,13 @@ def calendarioAnualFestivos(request):
 
 
 
-def datosFestivosCalendario(request):
+def datosFestivosCalendario(request, year=None):
     # obtengo los festivos registrados en la base de datos
-    festivos = FestivosYVacaciones.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
+    festivos = []
+    if year == None:
+        festivos = FestivosYVacaciones.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
+    else:
+        festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(year=year).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
     # creo una lista vacía para guardar los datos de los festivos
     salida = []
 
@@ -946,8 +950,20 @@ def datosFestivosCalendario(request):
     # devuelvo la lista en formato json
     return JsonResponse(salida, safe=False)
 
+'''-------------------------------------------
+                                Módulo: calendarioFestivos
 
-def calendarioFestivos(request, mes):
+- Descripción: 
+Permite visualizar el calendario dado un mes y un año concretos, el año es opcional.
+
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+Devuelve un listado festivos para ese año y mes concretros
+
+-------------------------------------------'''
+def calendarioFestivos(request,mes, year=None):
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
     navBar = NavBar.objects.using("timetrackpro").values()
@@ -956,13 +972,15 @@ def calendarioFestivos(request, mes):
     if len(mes) == 1:
         mesInicial = "0" + mesInicial
     
-    yearInicial = str(datetime.now().year)
+    if year == None:
+        yearInicial = str(datetime.now().year)
+    else:
+        yearInicial = str(year)
     diaInicial = "01"
 
     festivos = []
     if FestivosYVacaciones.objects.using("timetrackpro").filter(fecha_inicio__month=mes).exists():
         festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(fecha_inicio__month=mes).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
-        yearInicial = str(festivos[0]['year'])
     
     initialDate = yearInicial + "-" + mesInicial + "-" + diaInicial
     
@@ -975,6 +993,8 @@ def calendarioFestivos(request, mes):
         "tipoFestivos":list(tipoFestivos)
     }
     return render(request,"calendarioFestivos.html",infoVista)
+
+
 
 def agregarFestivo(request):
     if request.method == 'POST':
