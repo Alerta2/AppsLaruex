@@ -951,12 +951,27 @@ def calendarioFestivos(request, mes):
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
     navBar = NavBar.objects.using("timetrackpro").values()
-    festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(fecha_inicio__month=mes).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+    
+    mesInicial = str(mes)
+    if len(mes) == 1:
+        mesInicial = "0" + mesInicial
+    
+    yearInicial = str(datetime.now().year)
+    diaInicial = "01"
+
+    festivos = []
+    if FestivosYVacaciones.objects.using("timetrackpro").filter(fecha_inicio__month=mes).exists():
+        festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(fecha_inicio__month=mes).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+        yearInicial = str(festivos[0]['year'])
+    
+    initialDate = yearInicial + "-" + mesInicial + "-" + diaInicial
+    
+    
     infoVista = {
         "navBar":navBar,
         "administrador":True,
         "festivos":list(festivos),
-        "mes":mes,
+        "initialDate":initialDate,
         "tipoFestivos":list(tipoFestivos)
     }
     return render(request,"calendarioFestivos.html",infoVista)
@@ -992,6 +1007,25 @@ def agregarFestivo(request):
     }
 
     return render(request,"agregarFestivos.html", infoVista)
+
+def agregarFestivoCalendario(request):
+    if request.method == 'POST':
+        nombre = request.POST.get("nombre_festividad_seleccionada")
+        idTipo = request.POST.get("tipo_festividad_seleccionada")
+        tipo = TipoFestivos.objects.using("timetrackpro").filter(id=idTipo)[0]
+        fecha = request.POST.get("fecha_inicio_seleccionada")
+        mes = fecha.split("-")[1]
+        year = request.POST.get("year_actual")
+
+        
+        nuevoFestivo = FestivosYVacaciones(nombre=nombre, tipo_festividad=tipo, fecha_inicio=fecha, fecha_fin=fecha, year=year)
+        nuevoFestivo.save(using='timetrackpro')
+        return redirect('timetrackpro:calendario-festivos', mes=mes)    
+    
+    return festivos(request)
+
+    
+
 
 def editarFestivo(request, id):
     festivo = FestivosYVacaciones.objects.using("timetrackpro").filter(id=id)[0]
