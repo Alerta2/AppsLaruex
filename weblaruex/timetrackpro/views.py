@@ -911,22 +911,6 @@ def festivos(request, year=None):
     }
     return render(request,"festivos.html",infoVista)
 
-def calendarioAnualFestivos(request):
-    tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
-    # current_url = request.path[1:]
-    navBar = NavBar.objects.using("timetrackpro").values()
-    
-    festivos = FestivosYVacaciones.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
-    infoVista = {
-        "navBar":navBar,
-        "administrador":True,
-        "festivos":list(festivos),
-        "tipoFestivos":list(tipoFestivos)
-    }
-    return render(request,"calendarioAnualFestivos.html",infoVista)
-
-
-
 def datosFestivosCalendario(request, year=None):
     # obtengo los festivos registrados en la base de datos
     festivos = []

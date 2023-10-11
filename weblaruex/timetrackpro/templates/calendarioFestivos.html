@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" />
   <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar.js' %}"></script>
   <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar_es.js' %}"></script>
-  <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_anual.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_mesual.css' %}" />
     <!-- disponible para configuración servidor-->
 
     <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
@@ -34,8 +34,7 @@
       {% endif %}
     </div>
   </div>
-  {{initialDate}}
-    <div id='calendarioAnual' class="mb-3 mt-3"></div>
+    <div id='calendarioMensual' class="mb-3 mt-3"></div>
 
   </div>
 </div>
@@ -175,7 +174,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var calendarDiv = document.getElementById('calendarioAnual');
+    var calendarDiv = document.getElementById('calendarioMensual');
     var initialDate = '{{initialDate}}';
     var calendar = new FullCalendar.Calendar(calendarDiv, {
       initialDate: initialDate, // will be parsed as local

@@ -56,7 +56,7 @@ urlpatterns = [
     # festivos
     path('private/timetrackpro/datos-festivos-calendario/<slug:year>/', datosFestivosCalendario , name='datos-festivos-calendario'),
     path('private/timetrackpro/datos-festivos-calendario/', datosFestivosCalendario , name='datos-festivos-calendario'),
-    path('private/timetrackpro/calendario-anual-festivos/', calendarioAnualFestivos , name='calendario-anual-festivos'),
+    
     path('private/timetrackpro/calendario-festivos/<slug:mes>/<slug:year>/', calendarioFestivos , name='calendario-festivos'),
     path('private/timetrackpro/calendario-festivos/<slug:mes>/', calendarioFestivos , name='calendario-festivos'),
     path('private/timetrackpro/festivos/', festivos , name='festivos'),
