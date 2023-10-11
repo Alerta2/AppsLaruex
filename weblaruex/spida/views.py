@@ -744,7 +744,7 @@ def getCamarasEstaciones(request):
         # como consultar camara ejemplo
         fechaHora = datetime.now().astimezone(pytz.timezone("Europe/Madrid"))
         # en la ip tendrás que poner la url con la que consultas la camara con vlc
-        camara = {"nombre":"spida01", "ip":'http://172.20.36.19/videostream.cgi?user=rvra&pwd=rvra&resolution=32&rate=0'}
+        camara = {"nombre":"spida01", "ip":'http://172.20.36.19/videostream.cgi?user=&pwd=&resolution=32&rate=0'}
         try:
             vid = cv2.VideoCapture(camara["ip"])
             ret, frame = vid.read()
