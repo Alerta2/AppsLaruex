@@ -31,16 +31,9 @@
 
 
 
-  <!-- calendar files -->
-  <link href="{% static 'niceAdminAssets' %}/css/fullcalendar.css" rel='stylesheet' />
-  <link href="{% static 'niceAdminAssets' %}/css/fullcalendar.print.css" rel='stylesheet' media='print' />
   <script src="{% static 'niceAdminAssets' %}/js/jquery-1.10.2.js" type="text/javascript"></script>
   <script src="{% static 'niceAdminAssets' %}/js/jquery-ui.custom.min.js" type="text/javascript"></script>
-  <script src="{% static 'niceAdminAssets' %}/js/fullcalendar.js" type="text/javascript"></script>
 
-  <!-- calendar files full calendar Paula -->
-  <link href="{% static 'fullCalendar' %}/lib/main.css"  rel="stylesheet"/>
-  <script src="{% static 'fullCalendar' %}/lib/main.js" type="text/javascript"></script>
   <script>
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -130,7 +123,7 @@
   <!-- Template Main JS File -->
   <script src="{% static 'niceAdminAssets' %}/js/main.js"></script>
 
-  
+  {% block imports %} {% endblock %}
 
 </body>
 

@@ -400,6 +400,10 @@ urlpatterns = [
     path('private/docLaruex/calendario/',
          calendario, name='docLaruexCalendario'),
 
+     # muestra los datos para rellanar el calendario
+    path('private/docLaruex/datosCalendario/',
+         datosCalendario, name='docLaruexDatosCalendario'),
+
 
 # ---------------------------------------------------------
 #                         FORMATOS 
@@ -721,7 +725,6 @@ urlpatterns = [
     path('private/docLaruex/editarEvento/<slug:id>/', editarEvento, name='docLaruexEditarEvento'), 
     path('private/docLaruex/equiposUbicacionesDatos', DatosEquiposUbicaciones, name='docLaruexEquiposUbicacionesDatos'),
     path('private/docLaruex/equiposUbicacionesDatosFiltro/<str:tipo>/', DatosEquiposUbicacionesFiltro, name='docLaruexEquiposUbicacionesDatosFiltro'),
-    
     path('private/docLaruex/formatoDatosFiltrados/<slug:procedimiento>/', formatosDatosFiltrados, name='docLaruexFormatosDatosFiltrados'),
     
 # ---------------------------------------------------------

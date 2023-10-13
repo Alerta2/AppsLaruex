@@ -4032,6 +4032,42 @@ def subirDocumento(f, destino):
         for chunk in f.chunks():
             destination.write(chunk)
 
+
+'''-------------------------------------------
+                                Módulo: datosCalendario
+
+- Descripción: 
+Proporciona información de las tareas programadas en la vista de calendario
+
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+Devuelve una lista con los eventos que se van a mostrar en el calendario
+
+-------------------------------------------'''
+@login_required
+def datosCalendario(request):
+
+
+    tareas = TareasProgramadas.objects.using('docLaruex').values('id','id_evento__nombre','fecha_proximo_mantenimiento','id_evento__tipo_evento__color')
+    # creo una lista vacía para guardar los datos de los festivos
+    salida = []
+
+    # recorro los festivos y los guardo en la lista
+    for tarea in tareas:
+        # inserto los datos en la lista siguiendo la estructura que requiere el calendario
+        fechaFormateada = tarea['fecha_proximo_mantenimiento'].strftime("%Y-%m-%d")
+        salida.append({
+            'id':tarea['id'],
+            'title':tarea['id_evento__nombre'],
+            'start':fechaFormateada,
+            'color':tarea['id_evento__tipo_evento__color']
+        })
+
+    # devuelvo la lista en formato json
+    return JsonResponse(salida, safe=False)                
+
 '''-------------------------------------------
                                 Módulo: calendario
 
@@ -4047,7 +4083,10 @@ El usuario debe estar autenticado.
 @login_required
 def calendario(request):
     itemsMenu = MenuBar.objects.using("docLaruex").values()
-    return render(request, "docLaruex/fullCalendar.html",{"itemsMenu":itemsMenu})
+    return render(request, "docLaruex/calendario.html",{"itemsMenu":itemsMenu})
+
+
+
 
 '''-------------------------------------------
                                 Módulo: consultarArchivo
