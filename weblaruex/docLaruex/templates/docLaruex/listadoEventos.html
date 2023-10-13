@@ -321,12 +321,21 @@ transform: scale(0.95);
       <div class="modal-body">
         <div class="row">
           <div class="col">
-            <p>La estructura de datos debe ser en formato JSON, ejemplo:</p>
+            <strong>Ejemplo de estructura en formato JSON para definir un evento:</strong>
+            <pre>
+              <code>
+                  {
+                    "Nombre": "string", 
+                    "Fecha": "date",
+                    "Apto": "boolean"
+                  }
+              </code>
+            </pre>
+            <strong>Definición de diferentes tipos de datos en un JSON:</strong>
             <pre>
               <code>
                 {
-                  "string": "Hola mundo",
-                  "boolean": true,
+                  "string": "Hola mundo",                
                   "null": null,
                   "datetime": "2023-05-10T12:34:56",
                   "date": "2023-05-10",
