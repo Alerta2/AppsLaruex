@@ -689,15 +689,17 @@ aria-hidden="true">
             align: "center",
             formatter: function (value, row) {
 
-              var botonAgregarTarea = '<a href="/private/docLaruex/agregarTarea/' + row.id + '/' + '" class="mx-1" title="Agregar Tarea" data-toggle="modal" data-target="#modalAgregarTarea" onclick="$('+"'#formularioModalAgregarTarea').attr('action', '/private/docLaruex/agregarTarea/"+ row.id +"/');"+'" ><i class="fa-solid fa-plus fa-lg" style="color:#CA6702"></i></a>';
 
-              var botonModificarEvento = '<a href="/private/docLaruex/editarEvento/' + row.id + '/" class="mx-1" title="Editar evento"><i class="fa-duotone fa-money-check-pen fa-lg" style="color:#032525" ></i></a>';
+              var botonAgregarTarea = '<li><a class="dropdown-item border-radius-md" href="/private/docLaruex/agregarTarea/'+ row.id + '/' +'" title="Agregar Tarea" data-toggle="modal" data-target="#modalAgregarTarea" onclick="$('+"'#formularioModalAgregarTarea').attr('action', '/private/docLaruex/agregarTarea/"+ row.id +"/');"+'">Agregar Tarea</a></li>';
+
+              var botonModificarEvento = '<li><a class="dropdown-item border-radius-md" href="/private/docLaruex/editarEvento/' + row.id + '/" title="Editar evento">Editar Evento</a></li>';
+
+              var botonEliminarEvento = '<li><a class="dropdown-item border-radius-md" href="/private/docLaruex/eliminarEvento/' + row.id + '/' + '" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarEvento" onclick="$('+"'#formularioModalEliminarEvento').attr('action', '/private/docLaruex/eliminarEvento/"+ row.id +"/');"+'">Eliminar Evento</a></li>';
 
 
-              var botonEliminarEvento = '<a href="/private/docLaruex/eliminarEvento/' + row.id + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarEvento" onclick="$('+"'#formularioModalEliminarEvento').attr('action', '/private/docLaruex/eliminarEvento/"+ row.id +"/');"+'" ><i class="fa-solid fa-x fa-lg" style="color:#AE2012"></i></a>';
+              var dropdownMenu ='<div class="dropdown float-lg-center "><a id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v text-secondary"></i></a><ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">'+ botonAgregarTarea + botonModificarEvento + botonEliminarEvento +'</ul></div>';
 
-              
-                return (botonAgregarTarea + botonModificarEvento + botonEliminarEvento);
+              return dropdownMenu;
                 
             }
         },
