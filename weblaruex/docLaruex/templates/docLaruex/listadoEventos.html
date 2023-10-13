@@ -1,103 +1,13 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
+
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/bootstrapTable_docLaruex.css' %}" />
+
+{% endblock %}
 {% block content %}
 
-
-<style>
-  /*--------------------------------------------------------------
-# Tabla
---------------------------------------------------------------*/
-ul.pagination li .page-link {
-    background-color: rgb(255, 255, 255) !important;
-    color: rgb(41, 68, 87);
-
-  }
-
-  ul.pagination li.active .page-link {
-    background-color: rgb(41, 68, 87) !important;
-    border-color: rgb(41, 68, 87) !important;
-  }
-
-  ul.pagination li .page-link:hover {
-    filter: brightness(85%);
-
-  }
-
-  ul.pagination li.active .page-link:hover {
-    filter: brightness(120%);
-
-  }
-
-  .btn-light {
-    color: rgb(41, 68, 87);
-  }
-
-  th {
-    color: rgb(41, 68, 87);
-  }
-  /*--------------------------------------------------------------
-# Ir a Eventos
---------------------------------------------------------------*/
-.cta {
-position: relative;
-margin: auto;
-padding: 12px 18px;
-transition: all 0.2s ease;
-border: none;
-background: none;
-}
-
-.cta:before {
-content: "";
-position: absolute;
-top: 0;
-left: 0;
-display: block;
-border-radius: 50px;
-background: #d4e4e2;
-width: 45px;
-height: 45px;
-transition: all 0.3s ease;
-}
-
-.cta span {
-position: relative;
-font-family: "Ubuntu", sans-serif;
-font-size: 18px;
-font-weight: 700;
-letter-spacing: 0.05em;
-color: #087B6C;
-}
-
-
-
-.cta:hover:before {
-width: 100%;
-background: #d4e4e2;
-}
-
-.cta:active {
-transform: scale(0.95);
-}
-
-
-.form-check-input:checked {
-    background-color: #087B6C;
-    border-color: #087B6C;
-}
-
-.form-check-input:focus {
-    outline: 0;
-    box-shadow: 0 0 0 0.25rem rgba(16, 223, 161, 0.432);
-}
-.select:hover{
-  color: #94d2bd;
-}
-
-.agregarFormacion:hover{
-  color: #ca6702;
-}
-</style>
 
 <!-- breadcrumb   -->
 <div class="card-body">

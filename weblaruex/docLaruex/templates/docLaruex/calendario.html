@@ -1,7 +1,6 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
 
-
 {% block imports %}
 
     <!-- fullcalendar-->
@@ -13,6 +12,9 @@
     <!-- disponible para configuración servidor-->
     <!-- <link rel="stylesheet" href="{% static 'css/docLaruex/fullcalendar/fullcalendar.css' %}" /> -->
 
+  
+  <link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+
 {% endblock %}
 
 {% block content %}
@@ -23,10 +25,33 @@
   </div>
 </div>
 
+<! -- Modal con información del evento -->
 
 
+<div id="modalInformacionEvento" tabindex="-1" role="dialog" class="modal fade"
+  aria-labelledby="modalInformacionEvento" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered ">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Información del Evento</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true" onclick="forzarCierre()">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <span ><strong>Fecha límite: </strong><span id="fechaLimite"></span></span>
+        <br>
+        <span ><strong>Evento: </strong><span id="nombreEvento"></span></span>
 
-
+      </div>
+      <div class="modal-footer">
+        <button id="botonVerTarea" class="cta" title="Ver la tarea">
+          <span>Ver la tarea</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var calendarDiv = document.getElementById('calendarioEventos');
@@ -56,6 +81,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     calendar.render(); // renderizo el calendario
     calendar.updateSize(); // actualizo el tamaño del calendario
+    // pulsar sobre un evento
+    calendar.on('eventClick', function(info) {
+      info.el.style.opacity = '0.4'; // Cambia el valor para ajustar la opacidad
+      $('#modalInformacionEvento').modal('show');
+      $('#nombreEvento').html(info.event.title);
+      $('#fechaLimite').html(info.event.start.toLocaleDateString());
+      var id = info.event.id;
+      var url = "{% url 'docLaruex:docLaruexVerTarea' id=0 %}".replace('0', id);
+      $('#botonVerTarea').attr('onclick', "location.href='" + url + "'");
+      $('#modalInformacionEvento').on('hidden.bs.modal', function (e) {
+        info.el.style.opacity = '1'; // Cambia el valor para ajustar la opacidad
+      });
+
+
+
+    });
 
 
 
@@ -65,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   function forzarCierre(){
-    $('#modalAgregarFestivoDesdeCalendario').modal('hide');
+    $('#modalInformacionEvento').modal('hide');
   }
 </script>
 

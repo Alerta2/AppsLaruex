@@ -4062,7 +4062,9 @@ def datosCalendario(request):
             'id':tarea['id'],
             'title':tarea['id_evento__nombre'],
             'start':fechaFormateada,
-            'color':tarea['id_evento__tipo_evento__color']
+            'color':'#ffffff',
+            'borderColor': tarea['id_evento__tipo_evento__color'],
+            'textColor': tarea['id_evento__tipo_evento__color']            
         })
 
     # devuelvo la lista en formato json
