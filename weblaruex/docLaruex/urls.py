@@ -748,6 +748,8 @@ urlpatterns = [
 
     #vista de los mantenimientos asociados al equipo o ubicacion
 
-    #path('private/docLaruex/verMantenimientosAsociados/<slug:id>/', verMantenimientosAsociados, name='docLaruexVerMantenimientosAsociados'), 
+    path('private/docLaruex/verMantenimientosAsociados/<slug:id>/', verMantenimientosAsociados, name='docLaruexVerMantenimientosAsociados'), 
+    path('private/docLaruex/datosMantenimientosAsociados/<slug:id>/', datosMantenimientosAsociados, name='docLaruexMantenimientosAsociadosDatos'),
+    
 ]
 

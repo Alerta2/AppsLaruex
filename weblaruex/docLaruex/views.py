@@ -7426,3 +7426,48 @@ def datosTareasProximas(request):
 
     return JsonResponse(list(tareasFiltradas), safe=False)
 
+
+
+'''------------------------------------------
+                                Módulo: verMantenimientosAsociados
+
+- Descripción: 
+Este módulo se encarga de mostrar la información de los mantenimientos asociados a una ubicación o a un equipo.
+
+- Precondiciones:
+El usuario debe haber iniciado sesión.
+Se debe haber seleccionado una ubicacion u equipo existente en la base de datos para visualizar su información.
+
+- Postcondiciones:
+Se debe mostrar la información detallada del objeto seleccionado.
+El objeto debe existir debe existir en la base de datos.
+Deben existir mantenimientos asociados en la base de datos de lo contrario mostrá una página que indica que no existen.
+-------------------------------------------'''   
+@login_required
+def verMantenimientosAsociados(request, id):
+    
+    itemsMenu = MenuBar.objects.using("docLaruex").values()
+    objeto = Objeto.objects.using('docLaruex').filter(id=id)[0]
+
+    return render(request,"docLaruex/listaMantenimientosAsociados.html",{"itemsMenu": itemsMenu, "objeto":objeto, "administrador": esAdministrador(request.user.id)})
+
+
+'''------------------------------------------
+                                Módulo: datosMantenimientosAsociados
+
+- Descripción: 
+Este módulo es utilizado para obtener una lista de tareas en el sistema que pueden ser asociados a una habilitación específica. Retorna una lista de objetos JSON con la información de las tareas.
+
+- Precondiciones:
+ 
+El usuario debe estar autenticado en el sistema.
+
+- Postcondiciones:
+
+Se retorna una lista de objetos JSON con la información de los usuarios.
+
+-------------------------------------------'''       
+@login_required
+def datosMantenimientosAsociados(request,id):
+        mantenimientos = TareasProgramadas.objects.using("docLaruex").filter(id_objeto=id,id_objeto__id_habilitacion__in=comprobarHabilitaciones(request.user.id), id_evento__estado__id=2).values( 'id', 'id_evento', 'id_evento__id', 'id_evento__nombre', 'id_evento__tipo_evento__nombre', 'id_evento__procedimiento_asociado', 'id_evento__procedimiento_asociado__id_doc__nombre', 'fecha_proximo_mantenimiento', 'fecha_ultimo_mantenimiento', 'fecha_inicial','id_objeto', 'id_objeto__id', 'id_objeto__nombre', 'id_objeto__tipo', 'id_evento__periodicidad__id', 'id_evento__periodicidad__cantidad', 'id_evento__periodicidad__unidad')
+        return JsonResponse(list(mantenimientos), safe=False)
