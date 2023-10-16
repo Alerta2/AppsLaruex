@@ -1,38 +1,13 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/bootstrapTable_docLaruex.css' %}" />
 
+{% endblock %}
 {% block content %}
 
 <style>
-  ul.pagination li .page-link {
-    background-color: rgb(255, 255, 255) !important;
-    color: rgb(41, 68, 87);
-
-  }
-
-  ul.pagination li.active .page-link {
-    background-color: rgb(41, 68, 87) !important;
-    border-color: rgb(41, 68, 87) !important;
-  }
-
-  ul.pagination li .page-link:hover {
-    filter: brightness(85%);
-
-  }
-
-
-  ul.pagination li.active .page-link:hover {
-    filter: brightness(120%);
-
-  }
-
-  .btn-light {
-    color: rgb(41, 68, 87);
-  }
-
-  th {
-    color: rgb(41, 68, 87);
-  }
 
   table {
     width: auto;
@@ -40,121 +15,6 @@
     font-size: auto;
     padding: auto;
     margin: auto;
-  }
-
-  #flechas {
-    width: auto;
-    height: auto;
-  }
-
-  /* --------------------------------
-  *  ESTILO DE LOS BOTONES
-  -----------------------------------*/
-  .add:hover {
-    color: #ce8312;
-  }
-
-  .duplicar:hover {
-    color: #005f73;
-  }
-
-  .eliminar:hover {
-    color: #9b2226;
-  }
-
-  .mover:hover {
-    color: #001219;
-  }
-
-  .print:hover {
-    color: #001219;
-  }
-
-  /*  3 estilo del campo añadir archivo*/
-  .addFichero {
-    color: rgb(9, 58, 65);
-  }
-
-  .addFichero:hover {
-    color: rgb(133, 198, 228);
-  }
-
-
-  .addFichero:hover {
-    color: rgb(133, 198, 228);
-  }
-
-  /* estilo añadirFichero PDF*/
-  .addFicheroPDF {
-    color: rgb(161, 16, 32);
-  }
-
-  .addFicheroPDF:hover {
-    color: rgb(99, 10, 20);
-  }
-
-  .enviarNotificacion:hover {
-    color: #064061;
-  }
-
-  /* estilo añadirFichero PDF*/
-  .addFoto {
-    color: #064061;
-  }
-
-  .addFoto:hover {
-    color: #397fa7;
-  }
-
-  .okFoto {
-    color: #25bd71;
-  }
-
-  .file-upload {
-    border: 1px solid #ccc;
-    display: inline-block;
-    padding: 6px 12px;
-    cursor: pointer;
-  }
-
-  /* ===============================
-  *  Estilo del los botones
-  =================================*/
-
-  .agregarFormacion:hover {
-    color: #032031;
-  }
-
-  .descargaPDF:hover {
-    color: #c36d0b;
-  }
-
-  .eliminar:hover {
-    color: #4f0208;
-  }
-
-  .retirarStockUbicacion:hover {
-    color: #042e37;
-  }
-
-  .entrar:hover {
-    color: #195746;
-  }
-
-  .modificarObjeto:hover {
-    color: #bb3e03;
-  }
-
-
-  .generarQR {
-    --fa-primary-color: #6a3c90;
-    --fa-secondary-color: #6a3c90;
-  }
-
-  .generarQR:hover {
-    --fa-primary-color: #c7a9e0;
-    --fa-secondary-color: #9875b5;
-    ;
   }
 
 </style>
@@ -212,19 +72,19 @@
                         
                           <h2 style="color:#08ca76"><strong>Próximo mantenimiento</strong></h2>
                           <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
-                          <h2 style="color:#08ca76"><i class="fa-duotone fa-calendar-days fa-beat me-2"
+                          <h2 style="color:#08ca76"><i class="fa-solid fa-calendar-days fa-beat me-2"
                             style="color: #08ca76;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
                         {% elif r.estado == 2 %}
                           <h2 style="color:#ffd622"><strong>Cuidado, mantenimiento a punto de cumplir</strong></h2>
                           <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
-                          <h2 style="color:#ffd622"><i class="fa-duotone fa-calendar-days fa-beat me-2"
+                          <h2 style="color:#ffd622"><i class="fa-solid fa-calendar-days fa-beat me-2"
                             style="color: #ffd622;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
 
                           {% elif r.estado == 4 %}
                           
                           <h2 style="color:#ff2222"><strong>¡Alerta!, mantenimiento fuera de plazo</strong></h2>
                           <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
-                          <h2 style="color:#ff2222"><i class="fa-duotone fa-calendar-days fa-beat me-2"
+                          <h2 style="color:#ff2222"><i class="fa-solid fa-calendar-days fa-beat me-2"
                             style="color: #ff2222;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
                           {% elif r.estado == 5 %}
                           <h2 style="color:#e5500c"><strong>Mantenimiento Cancelado</strong></h2>
@@ -500,7 +360,7 @@
                         class="fa-solid fa-square-plus add fa-2x"></i></a>
 
                     <a href="" class="mx-1" title="Duplicar" data-toggle="modal" data-target="#modalDuplicarEquipo"
-                      style="color:#005f73"><i class="fa-duotone fa-copy agregarFormacion fa-2x"></i></a>
+                      style="color:#005f73"><i class="fa-duotone fa-copy duplicarEquipo fa-2x"></i></a>
 
                     <a href="https://www.unex.es/organizacion/servicios-universitarios/servicios/servicio_gestion_economica/documentos/seccion-de-patrimonio/formularios"
                       target="_blank" title="Acceso a formularios de la uex para altas y bajas de equipos"><img
@@ -550,8 +410,7 @@
                 {% endif %}
 
                 <div class="activity-content"><a
-                    href="\private/docLaruex/verObjeto/{{ historico.id_ubicacion__id__id }}" style="color:#005f73">{{
-                    historico.id_ubicacion__id__nombre }}</a></div>
+                    href="\private/docLaruex/verObjeto/{{ historico.id_ubicacion__id__id }}" style="color:#005f73">{{historico.id_ubicacion__id__nombre }}</a></div>
               </div>
               {% else %}
               <div class="activity-item d-flex">
@@ -605,8 +464,7 @@
           <h2 class="accordion-header" id="flush-headingReferenciasEquipo">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
               data-bs-target="#flush-collapseReferenciasEquipo" aria-expanded="false"
-              aria-controls="flush-collapseReferenciasEquipo">Documentos relacionados con el equipo {{ equipo.id.nombre
-              }}
+              aria-controls="flush-collapseReferenciasEquipo">Documentos relacionados con el equipo {{ equipo.id.nombre }}
             </button>
           </h2>
           <div id="flush-collapseReferenciasEquipo" class="accordion-collapse collapse"
