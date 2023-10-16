@@ -20,8 +20,8 @@
         <a href="" title="Asociar Archivo" class="mx-" data-toggle="modal" data-toggle="tooltip"
           data-target="#modalAsociarArchivo" style="color: #0A9396; " download><i class="fa-solid fa-link enlace enviarNotificacion"></i></a>
         
-          {% if tarea %}
-          <a href="/private/docLaruex/verTarea/{{tarea.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento" style="color:#511f31"><i class="fa-duotone fa-screwdriver-wrench enviarNotificacion"></i></a>
+          {% if registros %}
+          <a href="/private/docLaruex/verMantenimientosAsociados/{{ubicacion.id.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento" style="color:#511f31"><i class="fa-duotone fa-screwdriver-wrench enviarNotificacion"></i></a>
           {% endif %}
           <a  class="mx-1" title="editar ubicación" data-target="#modalEditarUbicacion" data-toggle="modal"
           style="color: #bb3e03; align-items: md-center"><i class="fa-duotone fa-money-check-pen editarObjeto"></i></a>  

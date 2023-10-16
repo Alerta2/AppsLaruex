@@ -7445,11 +7445,15 @@ Deben existir mantenimientos asociados en la base de datos de lo contrario mostr
 -------------------------------------------'''   
 @login_required
 def verMantenimientosAsociados(request, id):
-    
     itemsMenu = MenuBar.objects.using("docLaruex").values()
-    objeto = Objeto.objects.using('docLaruex').filter(id=id)[0]
 
-    return render(request,"docLaruex/listaMantenimientosAsociados.html",{"itemsMenu": itemsMenu, "objeto":objeto, "administrador": esAdministrador(request.user.id)})
+    if TareasProgramadas.objects.using("docLaruex").filter(id_objeto=id).exists():
+        
+        objeto = Objeto.objects.using('docLaruex').filter(id=id)[0]
+
+        return render(request,"docLaruex/listaMantenimientosAsociados.html",{"itemsMenu": itemsMenu, "objeto":objeto, "administrador": esAdministrador(request.user.id)})
+    else:
+        return render(request,"docLaruex/404_sinMantenimientos.html", {"itemsMenu": itemsMenu})
 
 
 '''------------------------------------------

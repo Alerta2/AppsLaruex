@@ -324,8 +324,8 @@
                 <a href="/private/docLaruex/generarQR/{{ request.build_absolute_uri }}/{{ equipo.cod_laruex}}"
                   title="GenerarQR"><i class="fa-duotone fa-barcode-read generarQR mx-2 fa-2x"></i></a>
 
-                {% if tarea %}
-                <a href="/private/docLaruex/verTarea/{{tarea.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento"
+                {% if registros %}
+                <a href="/private/docLaruex/verMantenimientosAsociados/{{equipo.id.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento"
                   style="color:#511f31"><i class="fa-duotone fa-screwdriver-wrench fa-2x enviarNotificacion"></i></a>
                 {% endif %}
               </div>
