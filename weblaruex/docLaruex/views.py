@@ -2196,12 +2196,31 @@ def InfoVerObjeto(request, id):
     elif objeto.tipo == "Equipo":
         tarea = None
         registro = None
+        registros = []
         if TareasProgramadas.objects.using("docLaruex").filter(id_objeto=str(objeto.id)).exists():
             tarea = TareasProgramadas.objects.using("docLaruex").filter(id_objeto=str(objeto.id)).values('id', 'fecha_proximo_mantenimiento')[0]
-
-            if RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).exists():
-                registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).order_by('-id').values('id', 'estado', 'estado__id')[0]
+            tareas = TareasProgramadas.objects.using("docLaruex").order_by('fecha_proximo_mantenimiento').filter(id_objeto=str(objeto.id)).values('id', 'fecha_proximo_mantenimiento')
+        # comprobamos si tareas tiene más de un elemento 
         
+            if len(tareas) > 1:
+                # tareas = tareas[1:] #eliminamos la primera tarea, pues ya la hemos obtenido antes
+                # obtengo el último registro de cada tarea
+                for t in tareas:
+                    if RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=t['id']).exists():
+                        registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=t['id']).order_by('-id').values('id', 'estado', 'estado__id', 'id_tarea_programada', 'id_tarea_programada','fecha_programada')[0]
+                        # agrego información del evento al registro
+                        registro['evento'] = TareasProgramadas.objects.using("docLaruex").filter(id=t['id']).values('id_evento__nombre','id_evento__id', 'id_evento__tipo_evento','id_evento__procedimiento_asociado', 'id_evento__estado', 'id_evento__periodicidad', 'id_evento__formato_asociado', 'observaciones')[0]
+                        registros.append(registro)
+
+
+            else: 
+                if RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).exists():
+                    registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).order_by('-id').values('id', 'estado', 'estado__id', 'id_tarea_programada', 'fecha_programada')[0]
+                    # agrego información del evento asociado a la tarea
+                    registro['evento'] = TareasProgramadas.objects.using("docLaruex").filter(id=tarea['id']).values('id_evento__nombre','id_evento__id', 'id_evento__tipo_evento','id_evento__procedimiento_asociado', 'id_evento__estado', 'id_evento__periodicidad', 'id_evento__formato_asociado', 'observaciones')[0]
+                    registros.append(registro)
+
+  
         habilitacionesUsuario, cargo, rol = comprobarHabilitacion(request.user.id, objeto.id_habilitacion.id)
         
         #genera un código_laruex consecutivo
@@ -2233,7 +2252,7 @@ def InfoVerObjeto(request, id):
             return render(
                 request,
                 "docLaruex/equipo.html",
-                {"ultimoCodigo": ultimoCodigo,"itemsMenu": itemsMenu, "equipo": equipo, "historicoUbicaciones": historicoUbicaciones, "ubicacionActual":ubicacionActual, "restoUbicaciones":restoUbicaciones, "tipoDocumentos":tipoDocumentos, "ubicaciones":list(ubicaciones), "habilitaciones":list(habilitaciones), "habilitacionesUsuario": list(habilitacionesUsuario),"administrador": administrador, "estados":estados, "cargo":cargo, "proveedores":list(proveedores), "rol":rol, "tarea":tarea, "registro":registro}
+                {"ultimoCodigo": ultimoCodigo,"itemsMenu": itemsMenu, "equipo": equipo, "historicoUbicaciones": historicoUbicaciones, "ubicacionActual":ubicacionActual, "restoUbicaciones":restoUbicaciones, "tipoDocumentos":tipoDocumentos, "ubicaciones":list(ubicaciones), "habilitaciones":list(habilitaciones), "habilitacionesUsuario": list(habilitacionesUsuario),"administrador": administrador, "estados":estados, "cargo":cargo, "proveedores":list(proveedores), "rol":rol, "tarea":tarea, "registro":registro, "tareas":list(tareas), "registros":list(registros), "itemsRegistros":range(len(registros))}
             ) 
         else:
             return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})

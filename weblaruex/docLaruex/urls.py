@@ -745,5 +745,9 @@ urlpatterns = [
     path('private/docLaruex/eliminarRegistroTarea/<slug:id>/', eliminarRegistroTarea, name='docLaruexEliminarRegistroTarea'),
     path('private/docLaruex/tareasProximas', tareasProximas, name='docLaruexTareasProximas'),
     path('private/docLaruex/tareasProximasDatos', datosTareasProximas, name='docLaruexTareasProximasDatos'),
+
+    #vista de los mantenimientos asociados al equipo o ubicacion
+
+    path('private/docLaruex/verMantenimientosAsociados/<slug:id>/', verMantenimientosAsociados, name='docLaruexVerMantenimientosAsociados'), 
 ]
 

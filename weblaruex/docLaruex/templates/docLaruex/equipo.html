@@ -106,7 +106,7 @@
     color: #397fa7;
   }
 
-    .okFoto {
+  .okFoto {
     color: #25bd71;
   }
 
@@ -156,6 +156,7 @@
     --fa-secondary-color: #9875b5;
     ;
   }
+
 </style>
 
 <!-- breadcrumb   -->
@@ -193,35 +194,65 @@
 <section class="section dashboard d-flex justify-content-center">
   <div class="row">
     <div class="col-lg-4 col-md-6 col-12 my-auto">
-      {% if tarea %}
-      <!-- Código Laruex Card -->
-      <div class="card info-card revenue-card">
-        <div class="card-body">
-          <div class="d-flex align-items-center">
 
-            <div class="ps-3 text-center">
-              {% if registro.estado__id == 1 %}
-              <h6>Próximo mantenimiento</h6>
-              <h2 style="color:#005f73"><i class="fa-duotone fa-clock fa-beat fa-lg me-2"
-                  style="color: #005f73;"></i><strong>{{tarea.fecha_proximo_mantenimiento|date}}</strong></h2>
-              {% elif registro.estado__id == 2 %}
-              <h6>Cuidado, mantenimiento a punto de cumplir</h6>
+          {% if registros %}
+          <div id="carouselTareasProgramadas" class="carousel slide" data-ride="carousel">
+            <div class="card " style="background-color: #19292fda; border-radius: 5px;">
+              <div class="card-body">
 
-              <h2 style="color:#bb3e03"><i class="fa-duotone fa-clock fa-beat fa-lg me-2"
-                  style="color: #bb3e03;"></i><strong>{{tarea.fecha_proximo_mantenimiento|date}}</strong></h2>
+                  <ol class="carousel-indicators my-2">
+                    {% for i in itemsRegistros %}
+                    <li data-target="#carouselTareasProgramadas" data-slide-to="{{i}}" {%if i == 0 %} class="active" {% endif %}></li>
+                    {% endfor %}
+                  </ol>
+                    <div class="carousel-inner text-center">
+                      {% for r in registros %}
+                      <div class="carousel-item {% if forloop.first %} active {% endif %}  ">
+                        {% if r.estado == 1 %}
+                        
+                          <h2 style="color:#08ca76"><strong>Próximo mantenimiento</strong></h2>
+                          <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                          <h2 style="color:#08ca76"><i class="fa-duotone fa-calendar-days fa-beat me-2"
+                            style="color: #08ca76;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
+                        {% elif r.estado == 2 %}
+                          <h2 style="color:#ffd622"><strong>Cuidado, mantenimiento a punto de cumplir</strong></h2>
+                          <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                          <h2 style="color:#ffd622"><i class="fa-duotone fa-calendar-days fa-beat me-2"
+                            style="color: #ffd622;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
 
-              {% elif registro.estado__id == 4 %}
-              <h6 class="my-2">¡Alerta!, mantenimiento fuera de plazo</h6>
-              <h2 style="color:#ae2012"><i class="fa-duotone fa-clock fa-beat fa-lg me-2"
-                  style="color: #ae2012;"></i><strong>{{tarea.fecha_proximo_mantenimiento|date}}</strong></h2>
-              {% else %}
-              <h6 class="my-2"><strong>Mantenimiento cancelado</strong></h3>
-                {% endif %}
+                          {% elif r.estado == 4 %}
+                          
+                          <h2 style="color:#ff2222"><strong>¡Alerta!, mantenimiento fuera de plazo</strong></h2>
+                          <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                          <h2 style="color:#ff2222"><i class="fa-duotone fa-calendar-days fa-beat me-2"
+                            style="color: #ff2222;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
+                          {% elif r.estado == 5 %}
+                          <h2 style="color:#e5500c"><strong>Mantenimiento Cancelado</strong></h2>
+                          <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                          {% else %}
+                          <h2 class="text-white"><strong>Sin mantenimiento asignado</strong></h3>
+
+                          {% endif %}
+                      </div>
+                      {% endfor %}
+                    </div>
+
+                  
+
+
+                </div>
+              </div>
+              <a class="carousel-control-prev" href="#carouselTareasProgramadas" role="button" data-slide="prev" style="background-color: transparent !important;">
+                <i class="fa-solid fa-angle-left fa-2x me-4" style="color: #ffffff7b;"></i>
+              </a>
+              <a class="carousel-control-next" href="#carouselTareasProgramadas" role="button" data-slide="next" style="background-color: transparent !important;">
+                <i class="fa-solid fa-angle-right fa-2x ms-4" style="color: #ffffff7b;"></i>
+
+              </a>
             </div>
-          </div>
-        </div>
-      </div><!-- Código Laruex Card -->
-      {% endif %}
+          
+          {% endif %}
+
       <!-- Fecha de alta Card -->
       <div class="card info-card revenue-card">
         <div class="card-body">
@@ -519,7 +550,8 @@
                 {% endif %}
 
                 <div class="activity-content"><a
-                    href="\private/docLaruex/verObjeto/{{ historico.id_ubicacion__id__id }}" style="color:#005f73">{{ historico.id_ubicacion__id__nombre }}</a></div>
+                    href="\private/docLaruex/verObjeto/{{ historico.id_ubicacion__id__id }}" style="color:#005f73">{{
+                    historico.id_ubicacion__id__nombre }}</a></div>
               </div>
               {% else %}
               <div class="activity-item d-flex">
@@ -550,7 +582,7 @@
                 <i class="fa-solid fa-info"></i>
               </div>
               <div class="ps-3">
-                <span class="text-dark medium pt-1 fw-bold" style="white-space: pre-line;">{{ equipo.descripcion}}</span>
+                <span class="text-dark medium pt-1 fw-bold" style="white-space: pre-line;">{{equipo.descripcion}}</span>
               </div>
             </div>
 
@@ -573,7 +605,8 @@
           <h2 class="accordion-header" id="flush-headingReferenciasEquipo">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
               data-bs-target="#flush-collapseReferenciasEquipo" aria-expanded="false"
-              aria-controls="flush-collapseReferenciasEquipo">Documentos relacionados con el equipo {{ equipo.id.nombre }}
+              aria-controls="flush-collapseReferenciasEquipo">Documentos relacionados con el equipo {{ equipo.id.nombre
+              }}
             </button>
           </h2>
           <div id="flush-collapseReferenciasEquipo" class="accordion-collapse collapse"
@@ -796,7 +829,7 @@
                 <div class="form-group">
                   <select class="form-select" data-rule="required" id="habilitacionAddDocumento" name="habilitacion"
                     style="display: none;">
-                    <option value="{{equipo.id.id_habilitacion.id}}" >
+                    <option value="{{equipo.id.id_habilitacion.id}}">
                       {{equipo.id.id_habilitacion.titulo}}
                     </option>
                   </select>
@@ -1293,13 +1326,13 @@
     nombreFoto.innerHTML = value;
 
     icono = document.getElementById('iconoFotoUpload');
-    
-    icono.classList.remove("fa-duotone","fa-image", "addFoto");
+
+    icono.classList.remove("fa-duotone", "fa-image", "addFoto");
     console.log(icono);
-    icono.classList.add("fa-duotone","fa-circle-check", "okFoto");
+    icono.classList.add("fa-duotone", "fa-circle-check", "okFoto");
 
     document.getElementById('mostrarNombreFotoEquipo').style.display = 'none';
-    }
+  }
 
   // ===================== Tabla con lista de notificaciones =====================
   $("#tabla_notificaciones").bootstrapTable({
