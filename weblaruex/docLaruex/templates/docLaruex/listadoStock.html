@@ -91,7 +91,7 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
               <div class="form-group">
                 <label for="cantidad">Cantidad</label>
                 <input type="number" step="0.25" class="form-control" id="cantidad" placeholder="4,25" name="cantidad"
-                  data-rule="required" />
+                  data-rule="required"  min="0"/>
               </div>
             </div>
             <div class="col-3">
@@ -223,7 +223,7 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
               <div class="form-group">
                 <label for="cantidadAgregada">Cantidad</label>
                 <input type="number" step="0.01" class="form-control" id="cantidadAgregada" name="cantidadAgregada"
-                  data-rule="required" placeholder="0" required/>
+                  data-rule="required" placeholder="0" min="0" required/>
               </div>
             </div>
           </div>
