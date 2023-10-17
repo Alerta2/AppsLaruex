@@ -2174,6 +2174,7 @@ def InfoVerObjeto(request, id):
 
         tarea = None
         registro = None
+        tareas = []
         
         registros = []
         if TareasProgramadas.objects.using("docLaruex").filter(id_objeto=str(objeto.id)).exists():
@@ -2219,6 +2220,7 @@ def InfoVerObjeto(request, id):
         tarea = None
         registro = None
         registros = []
+        tareas = []
         if TareasProgramadas.objects.using("docLaruex").filter(id_objeto=str(objeto.id)).exists():
             tarea = TareasProgramadas.objects.using("docLaruex").filter(id_objeto=str(objeto.id)).values('id', 'fecha_proximo_mantenimiento')[0]
             tareas = TareasProgramadas.objects.using("docLaruex").order_by('fecha_proximo_mantenimiento').filter(id_objeto=str(objeto.id)).values('id', 'fecha_proximo_mantenimiento')
