@@ -19,6 +19,11 @@ python manage.py collectstatic # cargar los archivos estaticos de la app nuevos
 python manage.py makemessages --all # cargar mensajes para traducir
 django-admin compilemessages # compilar traducciones
 
+# ejecutar en el servidor varias apps a la vez es necesario configurar varios puertos 
+python manage.py runserver 7000 # iniciar la ejecución del servidor en un puerto determinado
+python manage.py runserver 127.0.0.1:7000 # iniciar la ejecución del servidor en un puerto determinado
+python manage.py runserver 0:7000 # iniciar la ejecución del servidor en un puerto determinado
+
 ## CODIGOS UTILES
 
 definir función que llame a un view

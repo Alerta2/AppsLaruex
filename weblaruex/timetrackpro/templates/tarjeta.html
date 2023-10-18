@@ -1,0 +1,99 @@
+
+
+{% extends "base/base_timetrackpro.html" %}
+
+{% load static %}
+{% block imports %}
+  <link rel="stylesheet" href="{% static 'css/timetrackpro/tarjeta_acceso.css' %}" />
+{% endblock %}
+<style>
+  
+</style>
+{% block content %}
+<div class="row">
+  <div class="col d-flex justify-content-center">
+    <div class="flip-card">
+      <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <div class="row">
+              <div class="col">
+                <img class="logo-uex" src="{% static '/img/logos/uex_logo.png'%}" alt="logo" x="0px" y="0px"  height="48"  viewBox="0 0 48 48">
+                <p class="heading_8264">LABORATORIO DE RADIACTIVIDAD AMBIENTAL DE LA UNIVERSIDAD DE EXTREMADURA
+                </p>
+
+              </div>
+            </div>
+            <!-- <img class="w-100 rounded" id="imagenPrevia" src="{% static '/img/empleados/1_usuario.png'%}" alt="foto_empleado"> -->
+            <div class="row">
+              <div class="col">
+                {% if tarjeta.imagen %}
+                <img class="foto" src="{% static '/img/timetrackpro/tarjetas/'%}{{tarjeta.imagen}}" id="imagenActual" alt="logo" x="0px" y="0px"  height="124" width="100" viewBox="0 0 124 124">
+                {% else %}
+                
+                <img class="foto" src="{% static '/img/timetrackpro/tarjetas/not_found.jpeg'%}" id="imagenActual" alt="logo" x="0px" y="0px"  height="124" width="100" viewBox="0 0 124 124">
+                {% endif %}
+              
+                <p class="labelTarejetaAcceso">Tarjeta de acceso</p>
+                <p class="nombre">{{tarjeta.nombre}}</p>
+                <p class="apellidos">{{tarjeta.apellidos}}</p>
+                <p class="dni">{{tarjeta.dni|slice:-1}}-{{tarjeta.dni|last}}</p>
+  
+
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+    
+                <img class="logo-laruex-anverso" src="{% static '/img/logos/laruex_logo.png'%}" alt="logo" x="0px" y="0px"  height="48"  viewBox="0 0 48 48">
+                
+                <img class="logo-alerta2-anverso" src="{% static '/img/logos/alerta2_logo.png'%}" alt="logo" x="0px" y="0px"  height="30"  viewBox="0 0 48 48">
+              </div>
+            </div>
+
+          </div>
+          <div class="flip-card-back">
+            <div class="row">
+              <div class="col">
+    
+                <img class="logo-laruex-reverso" src="{% static '/img/logos/laruex_logo.png'%}" alt="logo" x="0px" y="0px"  height="48"  viewBox="0 0 48 48">
+                
+                <img class="logo-alerta2-reverso" src="{% static '/img/logos/alerta2_logo.png'%}" alt="logo" x="0px" y="0px"  height="30"  viewBox="0 0 48 48">
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col">
+                <div class="infoGeneral-card">
+                  <p>{{infoGeneralTarjeta}}</p>
+                  <p class="my-1">{{infoPersonalTarjeta}}</p>
+                  <p>{{infoContactoTarjeta}}</p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <p class="expiraLabel">Expira</p>
+                {% if tarjeta.fecha_expiracion %}
+                {% with tarjeta.fecha_expiracion|date:"Y" as year %}
+                  {% with tarjeta.fecha_expiracion|date:"m" as mes %}
+                  <p class="fechaExpiracion">{{mes}} / {{year|slice:"-2:"}}</p>
+                  {% endwith %}
+                {% endwith %}
+
+                {% else %}
+                <p class="fechaExpiracion">12 / 50</p>
+
+                {% endif %}
+                <p class="numeroTarjetaLabel">Nº Tarjeta</p>
+                <p class="numeroTarjeta">{{tarjeta.id_tarjeta}}</p>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+{% endblock %}

@@ -375,6 +375,7 @@ class TarjetasAcceso(models.Model):
     id_tarjeta = models.CharField(db_column='ID_tarjeta', max_length=255, blank=True, null=True)  # Field name made lowercase.
     fecha_alta = models.DateField(db_column='fecha_alta')  # Field name made lowercase.
     fecha_baja = models.DateField(db_column='fecha_baja', blank=True, null=True)  # Field name made lowercase.
+    fecha_expiracion = models.DateField(db_column='fecha_expiracion', blank=True, null=True)  # Field name made lowercase.
     activo = models.IntegerField(db_column='activo')
 
     class Meta:

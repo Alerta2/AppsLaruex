@@ -13,6 +13,11 @@ import unicodedata
 from django.db.models import Q
 
 
+# ? información tarjeta acceso reverso
+infoGeneralTarjeta ="Este carné es propiedad del LARUEX y deberá devuelto al departamento de administración una vez acabada la relación contractual con el mismo."
+infoPersonalTarjeta = "El carné es personal e intransferible, por lo que cederlo a cualquier otra persona supondrá una grave violación de las normas del laboratorio."
+infoContactoTarjeta = "Se ruega a quien encuentre este carné se ponga en contacto en el teléfono +34 927 251 389."
+
 
 excluidos = ["Prueba", "Pruebas", "prueba", "pruebas", "PRUEBA", "PRUEBAS", "Usuario Pruebas",  "test", "TEST", "Test" , " ", "", "root", "CSN", "PCivil Provisional", "Protección Civil", "JEx", "Admin", "admin"]
 
@@ -22,10 +27,6 @@ def home(request):
     return render(request,"home.html",{"navBar":navBar})
 
 def tarjetasAcceso(request):
-    infoGeneralTarjeta = settings.INFO_GENERAL_TARJETA_CONTACTO 
-
-    infoPersonalTarjeta = settings.INFO_PERSONAL_TARJETA_CONTACTO
-    infoContactoTarjeta = settings.INFO_AVISO_TARJETA_CONTACTO
     # obtengo los datos necesarios para la vista
     navBar = NavBar.objects.using("timetrackpro").values()
     tarjetasActivas = TarjetasAcceso.objects.using("timetrackpro").filter(activo=1).order_by("nombre").values()
@@ -91,10 +92,7 @@ def agregarTarjetaAcceso(request):
     return tarjetasAcceso(request)  
 
 def verTarjetaAcceso(request, id):
-    # información tarjeta acceso reverso
-    infoGeneralTarjeta = settings.INFO_GENERAL_TARJETA_CONTACTO 
-    infoPersonalTarjeta = settings.INFO_PERSONAL_TARJETA_CONTACTO
-    infoContactoTarjeta = settings.INFO_AVISO_TARJETA_CONTACTO
+
 
     # obtengo los datos necesarios para la vista
     navBar = NavBar.objects.using("timetrackpro").values()
@@ -104,8 +102,12 @@ def verTarjetaAcceso(request, id):
     infoVista = {
         "navBar":navBar,
         "administrador":True,
+        "tarjeta":tarjeta,
+        "infoGeneralTarjeta":infoGeneralTarjeta,
+        "infoPersonalTarjeta":infoPersonalTarjeta,
+        "infoContactoTarjeta":infoContactoTarjeta
     }
-    return render(request,"verTarjetaAcceso.html", infoVista)
+    return render(request,"tarjeta.html", infoVista)
  
 
 def editarTarjetaAcceso(request, id):

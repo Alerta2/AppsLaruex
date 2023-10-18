@@ -23,7 +23,7 @@ urlpatterns = [
     # registros de las tarjetas de acceso
     path('private/timetrackpro/tarjetas-de-acceso', tarjetasAcceso ,name='tarjetas-de-acceso'),
     path('private/timetrackpro/agregar-tarjeta', agregarTarjetaAcceso ,name='agregar-tarjeta'),
-    path('private/timetrackpro/tarjeta-de-acceso/<slug:id>', verTarjetaAcceso ,name='ver-tarjeta-acceso'),
+    path('private/timetrackpro/tarjeta/<slug:id>', verTarjetaAcceso ,name='ver-tarjeta-acceso'),
     # registros insertados en la base de datos  
     path('private/timetrackpro/agregar-registro', agregarRegistro , name='agregar-registro'),
     path('private/timetrackpro/registros-insertados', registrosInsertados , name='registros-insertados'),

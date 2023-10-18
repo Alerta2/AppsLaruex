@@ -1,0 +1,181 @@
+/*!
+=========================================================
+* Tarjeta de acceso CSS
+=========================================================
+
+* Sandra Balás Sánchez
+
+=========================================================
+*/
+
+.flip-card {
+  background-color: transparent;
+  width: 400px;
+  /* width: 240px;
+  height: 154px; */
+  height: 256px;
+  perspective: 1000px;
+  color: white;
+}
+
+.heading_8264 {
+  position: absolute;
+  letter-spacing: .1em;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.7em;
+  top: 2.7em;
+  left: 5.3em; /* 18.6em */
+  right: 2em;
+}
+
+.logo-uex {
+  position: absolute;
+  left: 1.5em;
+  top: 1.5em;
+}
+.logo-laruex-anverso {
+  position: absolute;
+  top: 12em;
+  right: 1.4em;
+}
+.logo-alerta2-anverso {
+  position: absolute;
+  top: 12.7em;
+  right: 6.6em;
+}
+.logo-laruex-reverso {
+  position: absolute;
+  top: 1em;
+  left: 1.4em;
+}
+.logo-alerta2-reverso {
+  position: absolute;
+  top: 1.2em;
+  left: 6.6em;
+}
+.foto {
+  position: absolute;
+  top: 5.8em;
+  left: 1.5em;
+  border-radius: 7%;
+}
+
+.labelTarejetaAcceso{
+  
+  position: absolute;
+  font-size: .85em;
+  top: 8em;
+  left: 10.2em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.nombre {
+  position: absolute;
+  font-weight: bold;
+  font-size: 0.9em;
+  top: 9em;
+  left: 9.7em;
+}
+
+.apellidos {
+  position: absolute;
+  font-weight: bold;
+  font-size: 0.9em;
+  top: 10.5em;
+  left: 9.7em;
+}
+
+.dni {
+  position: absolute;
+  font-weight: bold;
+  font-size: 0.9em;
+  top: 12em;
+  left: 9.7em;
+}
+
+.infoGeneral-card{
+  position: absolute;
+  top: 5em;
+  left: 0.9em;
+  right: 0.9em;
+}
+.infoGeneral-card p{
+  font-size: 0.65em;
+  margin: 0;
+}
+
+.expiraLabel {
+  position: absolute;
+  font-weight: bold;
+  color: rgb(201, 213, 228);
+  top: 16.5em;
+  left: 1.7em;
+  font-size: .75em;
+}
+
+.fechaExpiracion {
+  position: absolute;
+  font-weight: bold;
+  
+  font-size: .75em;
+  top: 17.9em;
+  left: 1.7em;
+}
+.numeroTarjetaLabel {
+  position: absolute;
+  font-weight: bold;
+  color: rgb(201, 213, 228);
+  top: 16.5em;
+  left: 6.8em;
+  font-size: .75em;
+}
+
+.numeroTarjeta{
+  
+  position: absolute;
+  font-weight: bold;
+  
+  font-size: .75em;
+  top: 17.9em;
+  left: 6.8em;
+}
+
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  box-shadow: 0 8px 14px 0 rgba(0,0,0,0.2);
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 1rem;
+}
+
+.flip-card-front {
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 2px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -1px 0px inset;
+  background-image: linear-gradient(310deg, #141727 0%, #3a576f 100%);
+}
+
+.flip-card-back {
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 2px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -1px 0px inset;
+  background-image: linear-gradient(310deg, #3a576f 0%, #141727 100%);
+  transform: rotateY(180deg);
+}
