@@ -1,96 +1,14 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+
+{% endblock %}
 
 {% block content %}
-<style>
 
-    /*--------------------------------------------------------------
-    # Botón agregar proveedor
-    --------------------------------------------------------------*/
-    .cta {
-    position: relative;
-    margin: auto;
-    padding: 12px 18px;
-    transition: all 0.2s ease;
-    border: none;
-    background: none;
-    }
-
-    .cta:before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    border-radius: 50px;
-    background: #d4e4e2;
-    width: 45px;
-    height: 45px;
-    transition: all 0.3s ease;
-    }
-
-    .cta span {
-    position: relative;
-    font-family: "Ubuntu", sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    color: #087B6C;
-    }
-
-
-
-    .cta:hover:before {
-    width: 100%;
-    background: #d4e4e2;
-    }
-
-    .cta:active {
-    transform: scale(0.95);
-    }
-
-  /* ===============================
-  *  Estilo del los botones
-  =================================*/
-  
-.agregarFormacion:hover {
-    color: #051925;
-  }
-  .descargaPDF:hover {
-    color: #ffa60a;
-  }
-  .retirarStock:hover{
-    color: #492160;
-  }
-
-  .retirarStockUbicacion:hover{
-    color: #042e37;
-  }
-  
-  /* ===============================
-  *  Estilo del las pestañas
-  =================================*/
-  
-  .nav-tabs-bordered .nav-link {
-    margin-bottom: -2px;
-    border: none;
-    color: #2c384e;
-}
-  .nav-tabs-bordered .nav-link.active {
-    background-color: #fff;
-    color: #4154f1;
-    border-bottom: 2px solid #4154f1;
-}
-.nav-tabs {
-    --bs-nav-tabs-border-color: #dee2e6;
-    --bs-nav-tabs-border-radius: 0.375rem;
-    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
-    --bs-nav-tabs-link-active-color: #495057;
-    --bs-nav-tabs-link-active-bg: #fff;
-    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
-    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
-}
-</style>
 
 
 
@@ -139,7 +57,7 @@
             {% if habilitacionNecesaria in habilitacionesUsuario or administrador %}
             
             <a href="" class="mx-1" title="Agregar Stock" data-toggle="modal"
-              data-target="#modalFormularioAgregarUnidadesStockProveedor" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-2x agregarFormacion"></i></a>
+              data-target="#modalFormularioAgregarUnidadesStockProveedor" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-2x agregarStockProveedor"></i></a>
             
             <a href="" class="mx-1" title="Agregar Stock" data-toggle="modal"
               data-target="#modalFormularioAgregarUnidadesStock" style="color: #db870a"><i
