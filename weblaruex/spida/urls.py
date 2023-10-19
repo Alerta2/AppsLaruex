@@ -38,5 +38,9 @@ urlpatterns = [
     path('spida/solar/',  getHorariosSol ,name='HorariosSol'), #DATOS: horas de salida y puesta de sol 
     path('spida/legendMN/',  getLegendaModelosNumericos ,name='LegendModelosNumericos'), #DATOS: colores de la leyeda de la Precipitacion Acum 1 h (Modelos Numericos Aemet)
     path('spida/legendRadar/',  getLegendaRadar ,name='LegendRadar'), #DATOS: colores de la leyeda de la Precipitacion Acum 1 h (Radar Aemet)
+
+
+    # nuevas urls
+    path('private/spida/consultarCamaras/',  getCamarasEstaciones ,name='SpidaConsultaCamaras'), #DATOS: colores de la leyeda de la Precipitacion Acum 1 h (Radar Aemet)
 ]
 
