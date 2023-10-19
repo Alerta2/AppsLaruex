@@ -81,8 +81,17 @@ html, body{
 			font-weight: bold;
 }
 
+#resultado{
+    color: #ffffff
+}
 
+.form-group {
+    margin-right: 15px;
+}
 
+.form-inline {
+    margin-bottom: 30px;
+}
 </style>
 {% endblock %}
 
@@ -94,25 +103,73 @@ html, body{
 </div>
 
 <div class="container">
-    <!-- formulario para seleccionar la estacion -->
-    <form action="/private/spida/consultarCamaras/" method="post">
+
+  <div class="row">
+    <div class="col">
+      <p class="text-left" style="color: #fff;margin-top:25px ">Selecciona la estación a consultar:</p>
+    </div>
+  </div>
+
+      <!-- formulario para seleccionar la estacion -->
+      <form id="formularioCamara" class="form-inline" method="post">
         {% csrf_token %}
         <!-- select de la estacion a consultar -->
-        <label for="estacion" style="color: #fff;">Selecciona la estación a consultar</label>
-        <select name="estacion" id="estacion" class="form-control" style="width: 50%; margin: 0 auto; margin-bottom: 20px;">
-          <option value="spida01">spida01</option>
-          <option value="spida02">spida02</option>
-          <option value="spida03">spida03</option>
-          <option value="spida04">spida04</option>
-        </select>
+	<div class="form-group mb-6">
+	  <label for="estacion" class="sr-only">estacion</label>
+          <select name="estacion" id="estacion" class="form-control">
+	    {% for camara in camaras %}
+            <option value="{{camara.id}}">{{camara.descripcion}}</option>
+	    {% endfor %}
+          </select>
+	</div>
         <!-- boton de enviar -->
-        <button type="submit" class="btn btn-primary" style="width: 50%; margin: 0 auto; margin-bottom: 20px;">Consultar</button>
-    </form>
-        <p style="color: #fff;">Mostrar las cámaras aquí</p>
+        <button type="submit" class="btn btn-primary">Consultar</button>
+      </form>
+
+  <div class="row">
+    <div class="col">
+      <p class="text-center" id='resultado' style="color: #fff;"> </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <img id="imagenEstacion" src="" class="img-fluid">
+    </div>
+  </div>
 </div>
 
 
 <script>
+  $("#formularioCamara").submit(function (e) {
+      //var nombre_estacion=$('#estacion').getValue();
+      var selectEstaciones = document.getElementById('estacion');
+      var nombreEstacion = selectEstaciones.options[selectEstaciones.selectedIndex].text;
+      $("#resultado").html("Descargando imagen de <b>" + nombreEstacion + "</b>");
 
+      // cancelamos el funcionamiento por defecto del boton submit
+      e.preventDefault();
+      // capturamos la información del formulario
+      var data = new FormData(this);
+      // ejecuta una url/action con la capacidad de gestionar la salida
+      $.ajax({
+	  url: "/private/spida/consultarCamaras/",
+	  type: "POST",
+	  data: data,
+	  cache: false,
+	  contentType: false,
+	  processData: false,
+	  // gestiono el return del view
+	  success: function (data) {
+	      if (data.resultado == true){
+		  $("#resultado").html('Imagen descargada de <b>' + data.descripcion + '</b> con fecha Local: <b>' + data.fechahora_local + '</b> Utc: <b>' + data.fechahora_utc) + '</b>';
+		  $("#imagenEstacion").attr("src", "{% static 'spidacam/'%}" + data.imagen + '?' + new Date().getTime());
+	      } else {
+		  $("#resultado").html('No ha sido posible descargar la imagen de ' + nombreEstacion );
+		  $("#imagenEstacion").attr("src", "");
+	      }
+	  }
+      });
+  });
 </script>
 {% endblock %}
