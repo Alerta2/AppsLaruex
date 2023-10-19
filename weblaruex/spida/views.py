@@ -998,12 +998,34 @@ def getLegendaRadar(request):
 
 ''' Consulta las cámaras de las estaciones de la red SPIDA '''
 
-
 @permission_required('auth.spida_documentacion')
 def getCamarasEstaciones(request):
     # si viene desde el formulario entra por aquí
     if request.method == 'POST':
+        print(request.POST['estacion'], type(request.POST['estacion']))
+
+        localdt = datetime.now().astimezone(pytz.timezone("Europe/Madrid"))
         utcdt = datetime.utcnow()
+
+        spdcam = RelacionEstacionesCamaras.objects.using('spida_web').filter(
+            id=int(request.POST['estacion'])).values().first()
+
+        print(spdcam['descripcion'])
+
+        webcam = {
+            'name':
+            'spida' + str(spdcam['id']),
+            'descripcion' : spdcam['descripcion'],
+            'rstp':
+            'rtsp://' + spdcam['user_cam'] + ':' + spdcam['pass_cam'] + '@' +
+            spdcam['codigo_spida'] + '.selfip.net:' + str(spdcam['puerto']) +
+            '/Streaming/channels/102',
+            'http':
+            'http://' + spdcam['user_cam'] + ':' + spdcam['pass_cam'] + '@' +
+            spdcam['codigo_spida'] + '.selfip.net:' + str(spdcam['puerto']) +
+            '/ISAPI/Streaming/channels/1/picture/'
+        }
+
         try:
             vid = cv2.VideoCapture(webcam['http'])
         except cv2.error as e:
@@ -1032,5 +1054,8 @@ def getCamarasEstaciones(request):
 
     # si no viene desde el formulario entra por aquí y entrega la web sin nada
     else:
-        # aquí falta obtener los nombre de las estaciones para rellenar el select del formulario
-        return render(request, "camarasSpida.html",{})
+        # aquí falta obtener los nombre de las estaciones para
+        # rellenar el select del formulario
+        return render(
+            request, "camarasSpida.html",
+            {'camaras': RelacionEstacionesCamaras.objects.using('spida_web')})
