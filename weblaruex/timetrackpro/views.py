@@ -13,6 +13,22 @@ import unicodedata
 from django.db.models import Q
 
 
+# ? Configuración de mensajes de 
+iconosAviso ={
+    "success":"fa-solid fa-circle-check",
+    "danger":"fa-solid fa-triangle-exclamation",
+    "warning":"fa-solid fa-triangle-exclamation",
+    "info":"fa-solid fa-circle-exclamation"
+}
+alerta = {
+    "activa": False,
+    "icono": iconosAviso["success"],
+    "tipo": "success",
+    "mensaje": "Publicación editada correctamente."
+    
+
+}
+
 # ? información tarjeta acceso reverso
 infoGeneralTarjeta ="Este carné es propiedad del LARUEX y deberá devuelto al departamento de administración una vez acabada la relación contractual con el mismo."
 infoPersonalTarjeta = "El carné es personal e intransferible, por lo que cederlo a cualquier otra persona supondrá una grave violación de las normas del laboratorio."
@@ -20,6 +36,7 @@ infoContactoTarjeta = "Se ruega a quien encuentre este carné se ponga en contac
 
 
 excluidos = ["Prueba", "Pruebas", "prueba", "pruebas", "PRUEBA", "PRUEBAS", "Usuario Pruebas",  "test", "TEST", "Test" , " ", "", "root", "CSN", "PCivil Provisional", "Protección Civil", "JEx", "Admin", "admin"]
+
 
 
 def home(request):
@@ -92,8 +109,7 @@ def agregarTarjetaAcceso(request):
     return tarjetasAcceso(request)  
 
 def verTarjetaAcceso(request, id):
-
-
+    
     # obtengo los datos necesarios para la vista
     navBar = NavBar.objects.using("timetrackpro").values()
     tarjeta = TarjetasAcceso.objects.using("timetrackpro").filter(id=id).values()[0]
@@ -105,13 +121,13 @@ def verTarjetaAcceso(request, id):
         "tarjeta":tarjeta,
         "infoGeneralTarjeta":infoGeneralTarjeta,
         "infoPersonalTarjeta":infoPersonalTarjeta,
-        "infoContactoTarjeta":infoContactoTarjeta
+        "infoContactoTarjeta":infoContactoTarjeta,
+        "alerta":alerta
     }
     return render(request,"tarjeta.html", infoVista)
  
 
 def editarTarjetaAcceso(request):
-    print ("---- editar tarjeta acceso ----")
     id = request.POST.get("idTarjeta")
     # obtengo los datos necesarios para la vista
     tarjeta = TarjetasAcceso.objects.using("timetrackpro").filter(id=id)[0]
@@ -170,24 +186,35 @@ def editarTarjetaAcceso(request):
         tarjeta.acceso_cpd = 1
     else:
         tarjeta.acceso_cpd = 0
-
     
+    alerta["activa"] = True
+    alerta["tipo"] = "success"
+    alerta["mensaje"] = "Tarjeta editada correctamente."
+    alerta["icono"] = iconosAviso["success"]
 
+    try: 
+        if request.FILES['imagenTarjeta'] and request.FILES['imagenTarjeta'] is not None:
+            if tarjeta.imagen is not None:
+                rutaActual = settings.STATIC_ROOT + settings.RUTA_TARJETAS_TIMETRACKPRO + tarjeta.imagen
+                if os.path.isfile(rutaActual):
+                    os.remove(rutaActual)         
 
-    if 'imagenTarjeta' in request.FILES:
-        print("--- imagen", request.FILES['imagenTarjeta'])
-        print("--- --------- ------ ----")
-        if tarjeta.imagen is not None:
-            rutaActual = settings.STATIC_ROOT + settings.RUTA_TARJETAS_TIMETRACKPRO + tarjeta.imagen
-            if os.path.isfile(rutaActual):
-                os.remove(rutaActual)
-        nombreArchivo = str(tarjeta.id) + '_tarjeta.' + request.FILES['imagenTarjeta'].name.split('.')[-1]
-        ruta = settings.STATIC_ROOT + settings.RUTA_TARJETAS_TIMETRACKPRO + nombreArchivo
-        subirDocumento(request.FILES['imagenTarjeta'], ruta)
-        tarjeta.imagen = nombreArchivo
+            nombreImagen = str(tarjeta.id) + '_tarjeta.' + request.FILES['imagenTarjeta'].name.split('.')[-1]
+            ruta = settings.STATIC_ROOT + settings.RUTA_TARJETAS_TIMETRACKPRO + nombreImagen
+            subirDocumento(request.FILES['imagenTarjeta'], ruta)
+            tarjeta.imagen = nombreImagen
+        else:
+            alerta["tipo"] = "danger"   
+            alerta["mensaje"] = "Error al subir la foto"
+            alerta["icono"] = iconosAviso["danger"]
+    except:
+        #cambiar
+        print("Error al subir la foto")
+ 
+
     tarjeta.save(using='timetrackpro')
-    
     return redirect('timetrackpro:ver-tarjeta-acceso', id=id)
+
 
 
 def registrosInsertados(request):
