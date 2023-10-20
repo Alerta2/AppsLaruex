@@ -137,10 +137,16 @@
                 </div>
                 <div class="row container" id="selectorImagen">
                   <div class="col">
-                    <label class="custom-file-upload" for="imagenTarjeta">
+                    
+                    <a href=""  title="subir-imagen" data-toggle="modal"  ><i id="iconoInput" class="fa-duotone fa-camera-retro fa-beat fa-4x"></i></a>
+            
+
+                    <input type="file" id="imagenTarjeta" name="imagenTarjeta" accept="image/*"
+                    onchange="previsualizarImagen()" style="display:none">
+                    <!-- <label class="custom-file-upload" for="imagenTarjeta">
                       Seleccionar una foto
                     </label>
-                    <input type="file" id="imagenTarjeta" name="imagenTarjeta" accept="image/*" onchange="previsualizarImagen()" style="display:none" required>
+                    <input type="file" id="imagenTarjeta" name="imagenTarjeta" accept="image/*" onchange="previsualizarImagen()" style="display:none" required> -->
                   </div>
                 </div>
               </div>
@@ -148,11 +154,11 @@
               <div class="row mb-3">
                 <div class="col-12 col-md-4">
                 <label for="nombre" class="col-md-3 col-lg-3 col-form-label">Nombre</label>
-                  <input type="text" id="nombre" name="nombre" class="form-control" placeholder="María Dolores" data-target="nameCard" maxlength="14" required/>
+                  <input type="text" id="nombre" name="nombre" class="form-control" placeholder="María Dolores" data-target="nameCard" maxlength="40" required/>
                 </div>
                 <div class="col-12 col-md-4">
                 <label for="apellidos" class="col-md-3 col-lg-3 col-form-label">Apellidos</label>
-                  <input type="text" id="apellidos" name="apellidos" class="form-control" placeholder="García Sánchez" data-target="lastNameCard" maxlength="14" required/>
+                  <input type="text" id="apellidos" name="apellidos" class="form-control" placeholder="García Sánchez" data-target="lastNameCard" maxlength="40" required/>
                 </div>
                 <div class="col-12 col-md-4">
                 <label for="dni" class="col-md-3 col-lg-3 col-form-label">DNI</label>
@@ -313,13 +319,19 @@
 
 
 <script>
+  // JavaScript para activar el input cuando se hace clic en el enlace
+  document.querySelector("a[title='subir-imagen']").addEventListener("click", function (e) {
+  e.preventDefault(); // Evita que el enlace redireccione
+  document.getElementById("imagenTarjeta").click(); // Simula un clic en el input
+});
+
 function previsualizarImagen() {
   var archivoInput = document.getElementById('imagenTarjeta');
   var imagenPrevia = document.getElementById('imagenPrevia');
   var selector = document.getElementById('selectorImagen');
   var etiqueta = document.getElementById('labelImagenSeleccionada');
   var nombreImagen = document.getElementById('nombreImagenSeleccionada');
-
+  var iconoInput = document.getElementById('iconoInput');
   if (archivoInput.files && archivoInput.files[0]) {
     var lector = new FileReader();
 
@@ -333,6 +345,8 @@ function previsualizarImagen() {
     nombreImagen.innerHTML = archivoInput.files[0].name;
 
     lector.readAsDataURL(archivoInput.files[0]);
+
+    iconoInput.setAttribute("hidden", "true");
   } else {
     imagenPrevia.src = '';
     imagenPrevia.style.display = 'none';

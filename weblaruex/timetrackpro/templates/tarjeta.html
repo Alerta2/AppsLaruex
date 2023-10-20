@@ -1,99 +1,245 @@
-
-
 {% extends "base/base_timetrackpro.html" %}
-
 {% load static %}
 {% block imports %}
-  <link rel="stylesheet" href="{% static 'css/timetrackpro/tarjeta_acceso.css' %}" />
+<link rel="stylesheet" href="{% static 'css/timetrackpro/tarjeta_acceso.css' %}" />
 {% endblock %}
-<style>
-  
-</style>
+
+
 {% block content %}
-<div class="row">
-  <div class="col d-flex justify-content-center">
-    <div class="flip-card">
-      <div class="flip-card-inner">
-          <div class="flip-card-front">
-            <div class="row">
-              <div class="col">
-                <img class="logo-uex" src="{% static '/img/logos/uex_logo.png'%}" alt="logo" x="0px" y="0px"  height="48"  viewBox="0 0 48 48">
-                <p class="heading_8264">LABORATORIO DE RADIACTIVIDAD AMBIENTAL DE LA UNIVERSIDAD DE EXTREMADURA
-                </p>
+<div class="page-header min-vh-75">
+  <div class="container filaForm">
+    <div class="row d-flex align-items-center">
+      <div class="col col-lg-4 col-md-12 pb-4">
+        <div class="row">
 
-              </div>
-            </div>
-            <!-- <img class="w-100 rounded" id="imagenPrevia" src="{% static '/img/empleados/1_usuario.png'%}" alt="foto_empleado"> -->
-            <div class="row">
-              <div class="col">
-                {% if tarjeta.imagen %}
-                <img class="foto" src="{% static '/img/timetrackpro/tarjetas/'%}{{tarjeta.imagen}}" id="imagenActual" alt="logo" x="0px" y="0px"  height="124" width="100" viewBox="0 0 124 124">
-                {% else %}
-                
-                <img class="foto" src="{% static '/img/timetrackpro/tarjetas/not_found.jpeg'%}" id="imagenActual" alt="logo" x="0px" y="0px"  height="124" width="100" viewBox="0 0 124 124">
-                {% endif %}
-              
-                <p class="labelTarejetaAcceso">Tarjeta de acceso</p>
-                <p class="nombre">{{tarjeta.nombre}}</p>
-                <p class="apellidos">{{tarjeta.apellidos}}</p>
-                <p class="dni">{{tarjeta.dni|slice:-1}}-{{tarjeta.dni|last}}</p>
-  
+        <!-- Tarjeta flip --> 
+        <div class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <div class="row">
+                <div class="col">
 
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-    
-                <img class="logo-laruex-anverso" src="{% static '/img/logos/laruex_logo.png'%}" alt="logo" x="0px" y="0px"  height="48"  viewBox="0 0 48 48">
-                
-                <img class="logo-alerta2-anverso" src="{% static '/img/logos/alerta2_logo.png'%}" alt="logo" x="0px" y="0px"  height="30"  viewBox="0 0 48 48">
-              </div>
-            </div>
+                  <img class="logo-uex" src="{% static '/img/logos/uex_logo.png'%}" alt="logo">
 
-          </div>
-          <div class="flip-card-back">
-            <div class="row">
-              <div class="col">
-    
-                <img class="logo-laruex-reverso" src="{% static '/img/logos/laruex_logo.png'%}" alt="logo" x="0px" y="0px"  height="48"  viewBox="0 0 48 48">
-                
-                <img class="logo-alerta2-reverso" src="{% static '/img/logos/alerta2_logo.png'%}" alt="logo" x="0px" y="0px"  height="30"  viewBox="0 0 48 48">
-              </div>
-            </div>
-            
-            <div class="row">
-              <div class="col">
-                <div class="infoGeneral-card">
-                  <p>{{infoGeneralTarjeta}}</p>
-                  <p class="my-1">{{infoPersonalTarjeta}}</p>
-                  <p>{{infoContactoTarjeta}}</p>
+                  <span class="laruex text-xs text-center">LABORATORIO DE RADIACTIVIDAD AMBIENTAL DE LA UNIVERSIDAD DE EXTREMADURA</span>
+
                 </div>
               </div>
+              
+              <div class="row mt-0">
+                <div class="col-4">
+
+                  <img class="foto mx-2" {% if tarjeta.imagen %}
+                    src="{% static '/img/timetrackpro/tarjetas/'%}{{tarjeta.imagen}}" {% else %}
+                    src="{% static '/img/timetrackpro/tarjetas/not_found.jpeg'%}" {% endif %} id="imagenActual"
+                    alt="logo" height="124" width="100" viewBox="0 0 124 124">
+
+                </div>
+                <div class="col-7 mt-4">
+
+                  <ul class="text-start  my-auto align-middle" style=" list-style: none;">
+                    <li class="font-weight-light">Tarjeta de acceso</li>
+
+                    <li class="text-sm text-uppercase font-weight-bold">{{tarjeta.nombre}}</li>
+
+                    <li class="text-uppercase font-weight-bold text-sm">{{tarjeta.apellidos}}</li>
+
+                    <li class="text-uppercase font-weight-bold text-sm">{{tarjeta.dni|slice:-1}}-{{tarjeta.dni|last}}
+                    </li>
+                  </ul>
+
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="d-flex justify-content-end">
+                    <img class="logo-laruex-anverso" src="{% static '/img/logos/laruex_logo.png'%}" alt="logo" x="0px"
+                      y="0px" viewBox="0 0 48 48">
+
+                    <img class="logo-alerta2-anverso" src="{% static '/img/logos/alerta2_logo.png'%}" alt="logo" x="0px"
+                      y="0px" viewBox="0 0 48 48">
+
+                  </div>
+                </div>
+              </div>
+
             </div>
-            <div class="row">
-              <div class="col">
-                <p class="expiraLabel">Expira</p>
-                {% if tarjeta.fecha_expiracion %}
-                {% with tarjeta.fecha_expiracion|date:"Y" as year %}
+            <div class="flip-card-back">
+              <div class="row">
+                <div class="col">
+
+                  <img class="logo-laruex-reverso" src="{% static '/img/logos/laruex_logo.png'%}" alt="logo">
+
+                  <img class="logo-alerta2-reverso" src="{% static '/img/logos/alerta2_logo.png'%}" alt="logo">
+                </div>
+              </div>
+
+              <div class="row mt-1 ">
+                <div class="col-11 mx-auto">
+                  <div>
+                    <p class="text-xs mt-1 mb-0">{{infoGeneralTarjeta}}</p>
+                    <p class="text-xs mt-0 mb-0">{{infoPersonalTarjeta}}</p>
+                    <p class="text-xs">{{infoContactoTarjeta}}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <p class="expiraLabel">Expira</p>
+                  {% if tarjeta.fecha_expiracion %}
+                  {% with tarjeta.fecha_expiracion|date:"Y" as year %}
                   {% with tarjeta.fecha_expiracion|date:"m" as mes %}
                   <p class="fechaExpiracion">{{mes}} / {{year|slice:"-2:"}}</p>
                   {% endwith %}
-                {% endwith %}
+                  {% endwith %}
 
-                {% else %}
-                <p class="fechaExpiracion">12 / 50</p>
+                  {% else %}
+                  <p class="fechaExpiracion">12 / 50</p>
 
-                {% endif %}
-                <p class="numeroTarjetaLabel">Nº Tarjeta</p>
-                <p class="numeroTarjeta">{{tarjeta.id_tarjeta}}</p>
+                  {% endif %}
+                  <p class="numeroTarjetaLabel">Nº Tarjeta</p>
+                  <p class="numeroTarjeta">{{tarjeta.id_tarjeta}}</p>
+                </div>
               </div>
             </div>
           </div>
+          <a class="modificarImagen" href="" title="subir-imagen" data-toggle="modal" data-target="#modalFormulario"><i
+              class="fa-kit fa-solid-image-pen fa-2x" style="position: absolute; bottom: -1rem; right: -1rem;"></i></a>
+
+
+          <input type="file" id="imagenTarjeta" name="imagenTarjeta" accept="image/*" onchange="previsualizarImagen()"
+            style="display:none">
+        </div>
+
+        <!-- END Tarjeta flip -->
+        </div>
+
+
       </div>
+      <div class="col col-xl-8 col-lg-8 col-md-12">
+        <form id="formularioEditarTarjetaAcceso" action="{% url 'timetrackpro:editar-tarjeta-acceso' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <h3 class="font-weight-bolder text-danger text-gradient">Editar Datos Tarjeta de acceso</h3>
+
+
+
+
+          <!-- DATOS DE LA TARJETA DE ACCESO -->
+          <div class="row">
+
+            <div class="col-xl-3">
+              <label>ID Tarjeta</label>
+              <div class="mb-3">
+                <input type="text" class="form-control" aria-label="DNI del empleado" id="numeroTarjeta"
+                  name="numeroTarjeta" aria-describedby="text-addon" value="{{tarjeta.id_tarjeta}}">
+                <input type="text" id="idTarjeta" name="idTarjeta" class="form-control" value="{{tarjeta.id}}" hidden />
+
+              </div>
+            </div>
+
+            <div class="col-xl-3">
+              <label>Fecha de Alta</label>
+              <div class="mb-3">
+                <input type="date" class="form-control" aria-label="Nombre en el dispositivo"
+                  aria-describedby="text-addon" name="fechaAlta" id="fechaAlta" value="{{tarjeta.fecha_alta|safe}}">
+              </div>
+            </div>
+
+            <div class="col-xl-3">
+              <label>Fecha de Expiración</label>
+              <div class="mb-3">
+                <input type="date" class="form-control" aria-label="Nombre en el dispositivo"
+                  aria-describedby="text-addon" name="fechaExpiracion" id="fechaExpiracion"
+                  value="{{tarjeta.fecha_baja|safe}}">
+              </div>
+            </div>
+
+            <div class="col-xl-3">
+              <label>¿La tarjeta está activa?</label>
+              <div class="form-switch ps-1 my-2">
+                <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.activo == 1 %} checked {% endif %} name="tarjeta_activa" id="tarjeta_activa">
+              </div>
+            </div>
+
+          </div>
+
+          <div class="row">
+            <div class="col-xl-3">
+              <label>DNI</label>
+              <div class="mb-3">
+                <input type="text" class="form-control" aria-label="DNI del empleado" aria-describedby="text-addon"
+                  id="dni" name="dni" value="{{tarjeta.dni}}">
+              </div>
+            </div>
+
+            <div class="col-xl-4">
+              <label>Nombre</label>
+              <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Nombre completo" aria-label="Nombre"
+                  aria-describedby="text-addon" name="nombre_empleado_tarjeta" id="nombre_empleado_tarjeta"
+                  value="{{tarjeta.nombre}}">
+              </div>
+            </div>
+            <div class="col-xl-5">
+              <label>Apellidos</label>
+              <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Apellidos" aria-label="Apellidos del empleado"
+                  aria-describedby="text-addon" name="apellidos_empleado_tarjeta" id="apellidos_empleado_tarjeta"
+                  value="{{tarjeta.apellidos}}">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4 mb-4">
+            <div class="col-xl-12">
+              <label class="d-inline">Puede acceder a</label>
+              <div class="d-inline form-switch ps-0">
+                <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">Alerta2</label>
+                <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.acceso_alerta2 == 1 %} checked {% endif %} id="acceso_alerta2" name="acceso_alerta2">
+              </div>
+              <div class="d-inline form-switch ps-0">
+                <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">Laboratorio</label>
+                <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.acceso_laboratorios == 1 %} checked {% endif %} id="acceso_laboratorio" name="acceso_laboratorio">
+              </div>
+              <div class="d-inline form-switch ps-0">
+                <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">CPD</label>
+
+                <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.acceso_cpd == 1 %} checked {% endif %} id="acceso_cpd" name="acceso_cpd">
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <button type="submit" value="submit" class="btn bg-gradient-danger mt-4 mb-0">Guardar</button>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
-
 </div>
 
+
+<script>
+  // JavaScript para activar el input cuando se hace clic en el enlace
+  document.querySelector("a[title='subir-imagen']").addEventListener("click", function (e) {
+    e.preventDefault(); // Evita que el enlace redireccione
+    document.getElementById("imagenTarjeta").click(); // Simula un clic en el input
+  });
+
+  // Función para previsualizar la imagen seleccionada
+  function previsualizarImagen() {
+    var input = document.getElementById("imagenTarjeta");
+    var imagen = document.getElementById("imagenActual");
+
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        imagen.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
 
 {% endblock %}

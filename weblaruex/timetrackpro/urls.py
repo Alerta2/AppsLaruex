@@ -24,6 +24,7 @@ urlpatterns = [
     path('private/timetrackpro/tarjetas-de-acceso', tarjetasAcceso ,name='tarjetas-de-acceso'),
     path('private/timetrackpro/agregar-tarjeta', agregarTarjetaAcceso ,name='agregar-tarjeta'),
     path('private/timetrackpro/tarjeta/<slug:id>', verTarjetaAcceso ,name='ver-tarjeta-acceso'),
+    path('private/timetrackpro/editar-tarjeta', editarTarjetaAcceso ,name='editar-tarjeta-acceso'),
     # registros insertados en la base de datos  
     path('private/timetrackpro/agregar-registro', agregarRegistro , name='agregar-registro'),
     path('private/timetrackpro/registros-insertados', registrosInsertados , name='registros-insertados'),
@@ -36,10 +37,6 @@ urlpatterns = [
     path('private/timetrackpro/empleados/', empleados , name='empleados'),
     path('private/timetrackpro/ver-empleado/<slug:id>/', verEmpleado , name='ver-empleado'),
     path('private/timetrackpro/editar-empleado/<slug:id>/', editarEmpleado , name='editar-empleado'),
-
-    # información de las tarjetas de acceso
-    
-    path('private/timetrackpro/editar-tarjeta-acceso/<slug:id>/', editarTarjetaAcceso , name='editar-tarjeta-acceso'),
 
     # información de los usuarios del sistema
     path('private/timetrackpro/asociar-usuario/', asociarUsuario , name='asociar-usuario'),
