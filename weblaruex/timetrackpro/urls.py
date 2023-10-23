@@ -66,8 +66,6 @@ urlpatterns = [
     # información relacionada con los empleados
     path('private/timetrackpro/errores-en-registros/<slug:mes>/', erroresRegistro , name='errores-en-registros'),
     path('private/timetrackpro/errores-en-registros/<slug:idEmpleado>/<slug:year>/<slug:mes>/', erroresRegistroEmpleado , name='errores-en-registros-empleado'),
-    
-    
 
     #Permisos
     path('private/timetrackpro/permisos/', permisos , name='permisos'),
