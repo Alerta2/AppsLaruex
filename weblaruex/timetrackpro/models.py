@@ -101,14 +101,7 @@ class AuthGroupPermissions(models.Model):
         db_table = 'auth_group_permissions'
         unique_together = (('group', 'permission'),)
 
-class Duraciones(models.Model):
-    id = models.IntegerField(primary_key=True)
-    unidad = models.CharField(max_length=255, blank=True, null=True)
-    categoria = models.CharField(max_length=255, blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'duraciones'
 
 class RegistrosJornadaInsertados(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -195,28 +188,33 @@ class MaquinaControlAsistencia(models.Model):
         db_table = 'maquina_control_asistencia'
 
 
-class PeriodoAntelacion(models.Model):
-    id = models.IntegerField(primary_key=True)
-    unidad = models.CharField(max_length=255, blank=True, null=True)
-    categoria = models.CharField(max_length=255, blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'periodo_antelacion'
 
 
 class Permisos(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(db_column='id', primary_key=True)
     nombre = models.CharField(max_length=255, blank=True, null=True)
-    duracion = models.ForeignKey(Duraciones, models.DO_NOTHING, db_column='duracion', blank=True, null=True)
-    periodo_antelacion = models.ForeignKey(PeriodoAntelacion, models.DO_NOTHING, db_column='periodo_antelacion', blank=True, null=True)
+    duracion = models.IntegerField(blank=True, null=True)
+    naturales_o_habiles = models.CharField(max_length=2500)
+    periodo_antelacion = models.CharField(max_length=11, blank=True, null=True)
+    fecha_maxima_solicitud = models.DateField(blank=True, null=True)
     acreditar = models.IntegerField(blank=True, null=True)
     doc_necesaria = models.CharField(max_length=255, blank=True, null=True)
     legislacion_aplicable = models.CharField(max_length=255, blank=True, null=True)
+    bonificable_por_antiguedad = models.IntegerField()
+    bonificacion_por_15_years = models.IntegerField()
+    bonificacion_por_20_years = models.IntegerField()
+    bonificacion_por_25_years = models.IntegerField()
+    bonificacion_por_30_years = models.IntegerField()
+    year = models.IntegerField()
+    es_permiso_retribuido = models.IntegerField()
+    pas = models.IntegerField()
+    pdi = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'permisos'
+
 
 
 class RegistroAusenciasAceptadas(models.Model):

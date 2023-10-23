@@ -92,16 +92,6 @@ class AuthUserUserPermissions(models.Model):
         unique_together = (('user', 'permission'),)
 
 
-class Duraciones(models.Model):
-    id = models.IntegerField(primary_key=True)
-    unidad = models.CharField(max_length=255, blank=True, null=True)
-    categoria = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'duraciones'
-
-
 class Empleados(models.Model):
     id = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=255, blank=True, null=True)
@@ -175,24 +165,23 @@ class NavBar(models.Model):
         db_table = 'nav_bar'
 
 
-class PeriodoAntelacion(models.Model):
-    id = models.IntegerField(primary_key=True)
-    unidad = models.CharField(max_length=255, blank=True, null=True)
-    categoria = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'periodo_antelacion'
-
-
 class Permisos(models.Model):
     id = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=255, blank=True, null=True)
-    duracion = models.ForeignKey(Duraciones, models.DO_NOTHING, db_column='duracion', blank=True, null=True)
-    periodo_antelacion = models.ForeignKey(PeriodoAntelacion, models.DO_NOTHING, db_column='periodo_antelacion', blank=True, null=True)
+    duracion = models.IntegerField(blank=True, null=True)
+    naturales_o_habiles = models.CharField(max_length=2500)
+    periodo_antelacion = models.CharField(max_length=11, blank=True, null=True)
+    fecha_maxima_solicitud = models.DateField(blank=True, null=True)
     acreditar = models.IntegerField(blank=True, null=True)
     doc_necesaria = models.CharField(max_length=255, blank=True, null=True)
     legislacion_aplicable = models.CharField(max_length=255, blank=True, null=True)
+    bonificable_por_antiguedad = models.IntegerField()
+    bonificacion_por_15_years = models.IntegerField(blank=True, null=True)
+    bonificacion_por_20_years = models.IntegerField(blank=True, null=True)
+    bonificacion_por_25_years = models.IntegerField(blank=True, null=True)
+    bonificacion_por_30_years = models.IntegerField(blank=True, null=True)
+    year = models.IntegerField()
+    es_permiso_retribuido = models.IntegerField()
 
     class Meta:
         managed = False
@@ -359,6 +348,7 @@ class TarjetasAcceso(models.Model):
     fecha_alta = models.DateField()
     fecha_baja = models.DateField(blank=True, null=True)
     activo = models.IntegerField()
+    fecha_expiracion = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -368,6 +358,8 @@ class TarjetasAcceso(models.Model):
 class TipoFestivos(models.Model):
     id = models.IntegerField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
+    color = models.CharField(db_column='Color', max_length=50)  # Field name made lowercase.
+    color_calendario = models.CharField(db_column='Color_calendario', max_length=20)  # Field name made lowercase.
 
     class Meta:
         managed = False

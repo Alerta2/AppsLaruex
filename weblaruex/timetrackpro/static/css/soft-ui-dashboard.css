@@ -26783,6 +26783,10 @@ pre[class*="language-"] {
     border: transparent !important;
     float: right !important;
   }
+  .bootstrap-table .fixed-table-toolbar #toolbar{
+    float: left !important;
+  }
+
 
 
 .bootstrap-table .table tbody tr{
