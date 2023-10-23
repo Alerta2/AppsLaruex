@@ -1182,6 +1182,27 @@ def signUp(request):
 '''-------------------------------------------
         Permisos de empleados
 -------------------------------------------'''
+'''-------------------------------------------
+                                Módulo: permisos
+
+- Descripción: 
+listado de permisos reconocidos que cualquier empleado puede disfrutar
+
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+
+-------------------------------------------'''
+def datosPermisos(request, year=None):
+    # obtengo los datos necesarios para la vista
+    if year == None:
+        permisos = Permisos.objects.using("timetrackpro").values('id','nombre', 'duracion', 'naturales_o_habiles', 'periodo_antelacion', 'fecha_maxima_solicitud', 'acreditar', 'doc_necesaria', 'legislacion_aplicable', 'bonificable_por_antiguedad', 'bonificacion_por_15_years', 'bonificacion_por_20_years', 'bonificacion_por_25_years', 'bonificacion_por_30_years', 'year', 'es_permiso_retribuido', 'pas', 'pdi')
+    else:
+        permisos = Permisos.objects.using("timetrackpro").filter(year=year).values('id','nombre', 'duracion', 'naturales_o_habiles', 'periodo_antelacion', 'fecha_maxima_solicitud', 'acreditar', 'doc_necesaria', 'legislacion_aplicable', 'bonificable_por_antiguedad', 'bonificacion_por_15_years', 'bonificacion_por_20_years', 'bonificacion_por_25_years', 'bonificacion_por_30_years', 'year', 'es_permiso_retribuido', 'pas', 'pdi')
+
+    # devuelvo la lista en formato json
+    return JsonResponse(list(permisos), safe=False)
 
 '''-------------------------------------------
                                 Módulo: permisos
@@ -1309,31 +1330,21 @@ def agregarPermiso(request, year=None):
             # return redirect('timetrackpro:permisos', id=nuevoRegistro.id)
     else:
         return render(request,"agregar-permisos.html", infoVista)
+    
 
-'''-------------------------------------------
-                                Módulo: permisos
-
-- Descripción: 
-listado de permisos reconocidos que cualquier empleado puede disfrutar
-
-- Precondiciones:
-El usuario debe estar autenticado.
-
-- Postcondiciones:
-
--------------------------------------------'''
-def datosPermisos(request, year=None):
-    # obtengo los datos necesarios para la vista
+def verPermiso(request, id):
+    permiso = Permisos.objects.using("timetrackpro").filter(id=id)[0]
     navBar = NavBar.objects.using("timetrackpro").values()
-
 
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
         "administrador":True,
+        "permiso":permiso,
     }
+    return render(request,"verPermiso.html",infoVista)
 
-    return render(request,"permisos.html", infoVista)
+
 
 '''-------------------------------------------
                                 Módulo: subirDocumento

@@ -28,22 +28,21 @@
     <div class="col-12">
       <div class="card mb-4">
         <div class="card-header pb-0">
-          <h5>Permisos
-
-            <a href="{% url 'timetrackpro:agregar-permiso' %}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Agregar un nuevo usuario a la máquina" data-toggle="modal" data-target="#modalAgregarUsuarioMaquina">
-              <i class="fa-solid fa-user-plus ps-2"></i>
-            </a>
-          </h5>
+          <h5>Permisos</h5>
           
             
         </div>
         <div class="card-body px-0 pt-0 pb-2">
           <div class="table-responsive p-0 mx-4">
             
-      <div id="toolbar">
-        <a href="" class="mx-1" title="añadir Equipo" data-toggle="modal" data-target="#modalFormularioAddStock"><i class="fa-solid fa-square-plus fa-2x "></i></a>
+       <div id="toolbar">
+
+        <button class="botonLink" data-toggle="modal" data-target="#modalAgregarPermiso">
+          <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+          <div class="text text-sm">Agregar permiso</div>
+        </button>
       </div>
-            <table id="tabla_usuarios_maquina" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
+            <table id="tabla_permisos" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
     data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
     data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
     data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-row-style="rowStyle"></table>
@@ -53,7 +52,7 @@
     </div>
   </div>
 
-  <div id="modalAgregarUsuarioMaquina" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAgregarUsuarioMaquina"
+  <div id="modalAgregarPermiso" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAgregarPermiso"
   aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -162,14 +161,14 @@
 
 
   <script>
-    $("#tabla_usuarios_maquina").bootstrapTable({
+    $("#tabla_permisos").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "/private/timetrackpro/datos-usuarios-maquina",
+    url: "{% url 'timetrackpro:datos-permisos' %}",
     cache: false, 
     columns: [
       {
-        title: "Empleado",
+        title: "Permiso",
         field: "id",
         halign:"left",
         sortable: true,
@@ -177,98 +176,134 @@
         formatter: function(value, row) {
           var nombre = row.nombre;
           var id_usuario = row.id;
-          var divIcono = '<div class="col-2 "><h6 class="mb-0 text-sm"><i class="fa-solid fa-user fa-xl pe-2"></i></h6></div>';
-          var divDatos = '<div class="col-10"><h6 class="mb-0 text-sm">'+ nombre +'</h6><p class="text-xs text-secondary mb-0">ID: '+ id_usuario +'</p></div>';
-          var div = '<div class="row d-flex align-items-center">'+ divIcono + divDatos+'</div>';
-          return div;
-        }
-      },
-      {
-        
-        title: "Turno",
-        field: "turno",
-        align: "center",
-        formatter: function(value, row) {
-          var turno = row.turno;
-          var div = ""
-          if (turno == null){
-            var div = '<div class="text-secondary text-sm font-weight-bold"> Sin asignar </div>';
+          var fechaLimite = row.fecha_maxima_solicitud;
+          var fecha = "Sin fecha límite"
+          const meses = {
+            "01": "Enero",
+            "02": "Febrero",
+            "03": "Marzo",
+            "04": "Abril",
+            "05": "Mayo",
+            "06": "Junio",
+            "07": "Julio",
+            "08": "Agosto",
+            "09": "Septiembre",
+            "10": "Octubre",
+            "11": "Noviembre",
+            "12": "Diciembre",
+          };
+
+          if(fechaLimite != null){
+            // formatear la fecha para que tenga el formarto dd/mm/yyyy
+            var fecha = fechaLimite.split("-");
+
+            var fecha = fecha[2]+" de "+meses[fecha[1]]+" de "+fecha[0];
+          }          
+          // dias de duracion
+          var bonificacion15 = '<p class="text-xs text-secondary mb-0"> 15 años: +'+ row.bonificacion_por_15_years +" dias"+'</p>';
+          var bonificacion20 = '<p class="text-xs text-secondary mb-0"> 20 años: +'+ row.bonificacion_por_20_years +" dias"+'</p>';
+          var bonificacion25 = '<p class="text-xs text-secondary mb-0"> 25 años: +'+ row.bonificacion_por_25_years +" dias"+'</p>';
+          var bonificacion30 = '<p class="text-xs text-secondary mb-0"> 20 años: +'+ row.bonificacion_por_30_years +" dias"+'</p>';
+          
+          var divDias = '<div class="col-10"><p class="text-xs text-secondary mb-0"> Bonificación por antigüedad</p>'+bonificacion15+bonificacion20+bonificacion25+bonificacion30+'</div>'
+          var bonificaciones = "";
+
+          if(row.bonificable_por_antiguedad == 1){
+           bonificaciones = '<div class="col-10"><p class="text-xs text-secondary mb-0"> Bonificación por antigüedad:</p>'+bonificacion15+bonificacion20+bonificacion25+bonificacion30+'</div>';
           }else{
-            var div = '<div class="text-sm font-weight-bold">'+ turno +'</div>';
+            bonificaciones ="";
           }
+          var divDatos = '<div class="col-10"><h6 class="mb-0 text-sm">'+ nombre +'</h6><p class="text-xs text-secondary mb-0"> Fecha límite: '+ fecha +'</p></div>';
+          
+          var div = '<div class="row d-flex align-items-center">'+ divDatos+ bonificaciones+'</div>';
           return div;
         }
       },
       {
         
-        title: "Jornada máxima",
-        field: "horas_maxima_contrato",
-        align: "center",
+        title: "Dias",
+        field: "duracion",
+        align: "left",
+        halign: "left",
         formatter: function(value, row) {
-          var jornada = row.horas_maxima_contrato;
-          var div = '<div class="text-secondary text-sm font-weight-bold">'+jornada +' Horas / Semana</div>'
-          return div;
+          var duracion = row.duracion;
+          var tipo = row.naturales_o_habiles;
+          var dias = '<div class="col-10"><h6 class="mb-0 text-sm">'+ duracion +" " + tipo +'</h6></div>';
+          return dias;
         }
       },
       {
-        title: "Donde puede fichar",
+        title: "¿Quién se beneficia?",
         field: "",
-        align: "left",
+        align: "center",
         halign:"center",
         formatter: function(value, row) {
-          var maquinaA2 = row.maquina_alerta2;
-          var maquinaDep = row.maquina_departamento;
-          var maquinaLab = row.maquina_laboratorio;
+          var pas = row.pas;
+          var pdi = row.pdi;
 
-          var divA2 = ""
-          var divDep = ""
-          var divLab = ""
+          var divPAS = ""
+          var divPDI = ""
 
-          if (maquinaA2 == 1){
-            divA2 = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Alerta2</span></div>';
+          if (pas == 1){
+            divPAS = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PAS</span></div>';
           }else{
-            divA2 = '<div><i class="fa fa-check text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Alerta2</span></div>';
+            divPAS = '<div><i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PAS</span></div>';
           }
-          if (maquinaDep == 1){
-            divDep = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Departamento</span></div>';
+          if (pdi == 1){
+            divPDI = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PDI</span></div>';
           }else{
-            divDep = '<div><i class="fa fa-check text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Departamento</span></div>';
+            divPDI = '<div><i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PDI</span></div>';
           }
-          if (maquinaLab == 1){
-            divLab = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Laboratorio</span></div>';
-          }else{
-            divLab = '<div><i class="fa fa-check text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Laboratorio</span></div>';
-          }
-          var div = '<div class="ms-4">'+divA2+divDep+divLab+'</div>';
+          var div = '<div class="ms-4">'+divPAS+divPDI+'</div>';
           // var div = divA2+divDep+divLab;
 
           return div;
         }
       },
       {
-        title: "Tipo de empleado",
-        field: "en_practicas",
+        title: "¿Requiere justificante?",
+        field: "acreditar",
         align: "center",
         formatter: function(value, row) {
-          var tipo = row.en_practicas;
-          var div = ""
+          var acreditable = row.acreditar;
+          var documentacion = row.doc_necesaria;
+          var div = "";
+          var divDocumentacion = "";
          
-          if (tipo == 1){
-            div = '<div><span class="badge badge-xs bg-gradient-info">En prácticas</span></div>';
+          if (acreditable == 1){
+            div = '<div><span class="badge badge-xs bg-gradient-warning">Si</span></div>';
+            divDocumentacion = '<div class="mt-2"><h6 class="text-secondary text-sm font-weight-bold text-wrap ">'+documentacion +'</h6></div>';
           }else{
-            div = '<div><span class="badge badge-xs bg-gradient-dark">Empleado</span></div>';
+            div = '<div><span class="badge badge-xs bg-gradient-dark">No</span></div>';
           }
+          return div + divDocumentacion;
+        }
+      },
+      {        
+        title: "Legislación aplicable",
+        field: "legislacion_aplicable",
+        align: "center",
+        formatter: function(value, row) {
+          var legislacion = row.legislacion_aplicable;
+          var div = '<div  style="white-space: pre-line; overflow-wrap: break-word;" ><h6 class="text-secondary text-sm font-weight-bold ">'+ legislacion +'</h6></div>'
           return div;
         }
       },{
-        title: "Acciones",
-        field: "action",
+        title: "",
+        field: "",
         align: "center",
         formatter: function (value, row) {
+          // convertir a string el id para poder pasarlo como parametro en la url
+          var idPermiso = row.id.toString();
+          // construir la url 
+          var urlEditar = "{% url 'timetrackpro:ver-permiso' id='id' %}".replace('id', idPermiso);
 
-                  
-        // var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
-
+          var icono = '<a class="cursor-pointer" id="opcionesPermisos" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v text-secondary"></i></a>';
+          var verPermiso = '<li><a class="dropdown-item border-radius-md" href='+urlEditar+'>Editar Festivo</a></li>'; 
+          var eliminarPermiso = '<li><a class="dropdown-item border-radius-md" href="'+"{% url 'timetrackpro:solicitudes' %}"+'">Eliminar Permiso</a></li>'; 
+          var listaOpciones = '<ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="opcionesPermisos">'+verPermiso+eliminarPermiso+'</ul>';
+          var div = '<div class="dropdown">'+icono+listaOpciones+'</div>';
+          return div;
         },
       },
     ],

@@ -26774,7 +26774,6 @@ pre[class*="language-"] {
   .bootstrap-table .fixed-table-toolbar  {
     color: #cb0c9f !important;
   }
-  .bootstrap-table .fixed-table-toolbar .bs-bars,
   .bootstrap-table .fixed-table-toolbar .search,
   .bootstrap-table .fixed-table-toolbar .columns {
     position: relative;
@@ -26783,7 +26782,19 @@ pre[class*="language-"] {
     border: transparent !important;
     float: right !important;
   }
-  .bootstrap-table .fixed-table-toolbar #toolbar{
+
+
+  .bootstrap-table .fixed-table-toolbar .bs-bars {
+    position: relative;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: transparent !important;
+    float: left !important;
+
+  }
+  #toolbar{
+    margin-top: 10px;
+    margin-bottom: 10px;
     float: left !important;
   }
 
