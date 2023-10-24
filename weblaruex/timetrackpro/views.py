@@ -684,6 +684,25 @@ def verEmpleado(request, id):
 
 
 def asociarUsuario(request):
+    navBar = NavBar.objects.using("timetrackpro").values()
+    usuariosApp = Usuarios.objects.using("timetrackpro").values()
+    # datos de los empleados registrados en las máquinas de control de asistencia
+    empleados = Empleados.objects.using("timetrackpro").values()
+    # datos de los empleados registrados en django
+    usuariosDjango = AuthUser.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
+
+    tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").values()
+    iconoTarjeta = "<i class='fa-solid fa-file'></i>"
+
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "empleados":list(empleados),
+        "usuariosApp":list(usuariosApp),
+        "usuariosDjango":list(usuariosDjango),
+        "tarjetas":list(tarjetasAcceso),
+        "iconoTarjeta":iconoTarjeta
+    }
     if request.method == 'POST':
 
         # obtenemos el identificador del usuario, este contiene toda la info relevante del usuario
@@ -720,8 +739,7 @@ def asociarUsuario(request):
 
         return redirect('timetrackpro:ver-empleado', id=idUser)
     else:
-        return redirect('timetrackpro:empleados')
-
+        return render(request,"asociar-empleados.html",infoVista)
 
 '''-------------------------------------------
                                 Módulo: verEmpleado

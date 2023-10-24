@@ -1,0 +1,151 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block imports %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+  <div class="page-header min-vh-75">
+    <div class="container filaForm">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="card card-plain">
+            <div class="card-header pb-0 text-left bg-transparent">
+              <h3 class="font-weight-bolder text-info text-gradient">Relación de información de los empleados</h3>
+              <p class="mb-0">Selecciona la información del empleado en los diferentes campos</p>
+            </div>
+            <div class="card-body">
+              <form action="{% url 'timetrackpro:asociar-usuario' %}" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+
+                <div class="row">
+                  <div class="col-xl-6">
+                    <label class="text-sm"><i class="fa-solid fa-fingerprint fa-xl me-2"></i> Seleccione el empleado de la máquina </label>
+                    <div class="mb-3">
+                      
+                      <select class="form-control" aria-label="Nombre en el dispositivo" id="empleado_maquina"
+                      name="empleado_maquina" aria-describedby="text-addon">
+                      {% for empleado in empleados %}
+
+
+                        <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
+                      {% endfor %}
+                    </select>
+                    </div>
+                  </div>
+                  <div class="col-xl-6">
+                    <label class="text-sm"><i class="fa-solid fa-user fa-xl me-2"></i>Seleccione los datos personales del usuario</label>
+                    <div class="mb-3">
+                      
+                      <select class="form-control" aria-label="Nombre en el dispositivo" id="userApp"
+                      name="userApp" aria-describedby="text-addon">
+                      {% for userApp in usuariosApp %}
+                        <option value="{{ userApp.id }}">{{ userApp.nombre }} {{ userApp.apellidos }}</option>
+                      {% endfor %}
+                    </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xl-6">
+                    <label class="text-sm"><i class="fa-duotone fa-mobile fa-xl me-2"></i> Seleccione el usuario en Django</label>
+                    <div class="mb-3">
+                      
+                      <select class="form-control" aria-label="Nombre en el dispositivo" id="usuariosDjango"
+                      name="usuariosDjango" aria-describedby="text-addon">
+                      {% for userDjango in usuariosDjango %}
+                        <option value="{{ userDjango.id }}">{{ userDjango.first_name }} {{ userDjango.last_name }}</option>
+                      {% endfor %}
+                    </select>
+                    </div>
+                  </div>
+                  <div class="col-xl-6">
+                    <label class="text-sm"><i class="fa-duotone fa-credit-card fa-xl me-2"></i> Seleccione la tarjeta identificativa del empleado</label>
+                    <div class="mb-3">
+                      <select class="form-control" aria-label="Nombre en el dispositivo" id="tarjeta_empleado"
+                      name="tarjeta_empleado" aria-describedby="text-addon">
+                      {% for tarjeta in tarjetas %}
+                        <option value="{{ tarjeta.id }}">{{ tarjeta.nombre }} {{ tarjeta.apellidos }}</option>
+                      {% endfor %}
+                    </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-center">
+                  <button type="submit" value="submit" class="btn bg-gradient-info w-100 mt-4 mb-0">Guardar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4" >
+          <div class="oblique position-absolute top-0 h-100 d-lg-block d-none me-n8">
+            <div class="oblique-image bg-cover position-absolute fixed-top ms-auto h-100 z-index-0 ms-n6 background-timetrackpro-asociarEmpleados">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  
+<script>
+  // oculta y muestra el formulario de bonificaciones
+  $(document).ready(function(){
+    $("#bonificable").click(function(){
+      if ($("#bonificable").is(':checked')) {
+        $("#bonificacion_15_year").val(1);
+        $("#bonificacion_20_year").val(1);
+        $("#bonificacion_25_year").val(1);
+        $("#bonificacion_30_year").val(1);
+
+        $("#bonificacion_15_year").attr("required", true);
+        $("#bonificacion_20_year").attr("required", true);
+        $("#bonificacion_25_year").attr("required", true);
+        $("#bonificacion_30_year").attr("required", true);
+
+        $("#bonificaciones").removeAttr("hidden");
+
+      } else {
+        $("#bonificacion_15_year").val(0);
+        $("#bonificacion_20_year").val(0);
+        $("#bonificacion_25_year").val(0);
+        $("#bonificacion_30_year").val(0);
+
+        $("#bonificacion_15_year").attr("required", false);
+        $("#bonificacion_20_year").attr("required", false);
+        $("#bonificacion_25_year").attr("required", false);
+        $("#bonificacion_30_year").attr("required", false);
+
+        $("#bonificaciones").attr("hidden", true);
+
+      }
+    });
+  });
+
+  // actualizar el valor del año en el formulario por el año actual si la fecha límite esta vacia, de lo contrario poner el año de la fecha límite
+  $(document).ready(function(){
+    $("#fecha_limite_solicitud").change(function(){
+      if ($("#fecha_limite_solicitud").val() == "") {
+        var d = new Date();
+        var n = d.getFullYear();
+        $("#year_permiso").val(n);
+      } else {
+        var d = new Date($("#fecha_limite_solicitud").val());
+        var n = d.getFullYear();
+        $("#year_permiso").val(n);
+      }
+    });
+  });
+
+  
+
+</script>
+
+{% endblock %}
