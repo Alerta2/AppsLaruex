@@ -6,8 +6,6 @@
 
 {% endblock %}
 
-
-
 {% block content %}
 
   <div class="page-header min-vh-75">
@@ -27,13 +25,18 @@
                   <div class="col-xl-6">
                     <label class="text-sm"><i class="fa-solid fa-fingerprint fa-xl me-2"></i> Seleccione el empleado de la máquina*</label>
                     <div class="mb-3">
-                      
                       <select class="form-control" aria-label="Nombre en el dispositivo" id="empleado_maquina"
                       name="empleado_maquina" aria-describedby="text-addon">
+                      {% if relacionActual.id_empleado is not None %}
+
+                        <option value="{{ relacionActual.id_empleado__id }}" selected hidden>{{ relacionActual.id_empleado__nombre }}&emsp;ID: {{ relacionActual.id_empleado__id }}</option>
+                      {% else %}
+                        <option value="0" selected hidden>Sin información</option>
+                      {% endif %}
+
                       {% for empleado in empleados %}
-
-
-                        <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
+             
+                        <option value="{{ empleado.id }}">{{ empleado.nombre }}&emsp;ID: {{ empleado.id }}</option>
                       {% endfor %}
                     </select>
                     </div>
@@ -44,6 +47,12 @@
                       
                       <select class="form-control" aria-label="Nombre en el dispositivo" id="userApp"
                       name="userApp" aria-describedby="text-addon">
+                      {% if relacionActual.id_usuario is not None %}
+
+                        <option value="{{ relacionActual.id_usuario__id }}" selected hidden>{{ relacionActual.id_usuario__nombre }} {{ relacionActual.id_usuario__apellidos }}</option>
+                      {% else %}
+                        <option value="0" selected hidden>Sin información</option>
+                      {% endif %}
                       {% for userApp in usuariosApp %}
                         <option value="{{ userApp.id }}">{{ userApp.nombre }} {{ userApp.apellidos }}</option>
                       {% endfor %}
@@ -58,7 +67,14 @@
                       
                       <select class="form-control" aria-label="Nombre en el dispositivo" id="usuariosDjango"
                       name="usuariosDjango" aria-describedby="text-addon">
-                      <option value="0" selected>Sin información</option>
+                      {% if relacionActual.id_auth_user is not None %}
+
+                        <option value="{{ relacionActual.id_auth_user__id }}" selected hidden>{{ relacionActual.id_auth_user__first_name }} {{ relacionActual.id_auth_user__last_name }}</option>
+                      {% else %}
+                        <option value="0" selected hidden>Sin información</option>
+                      {% endif %}
+
+                      <option value="0">Sin información</option>
 
                       {% for userDjango in usuariosDjango %}
                         <option value="{{ userDjango.id }}">{{ userDjango.first_name }} {{ userDjango.last_name }}</option>
@@ -71,10 +87,17 @@
                     <div class="mb-3">
                       <select class="form-control" aria-label="Nombre en el dispositivo" id="tarjeta_empleado"
                       name="tarjeta_empleado" aria-describedby="text-addon">
-                      <option value="0" selected>Sin información</option>
+
+                      {% if relacionActual.id_tarjeta_acceso is not None %}
+
+                        <option value="{{ relacionActual.id_tarjeta_acceso__id }}" selected hidden>{{ relacionActual.id_tarjeta_acceso__nombre }} {{ relacionActual.id_tarjeta_acceso__apellidos }}&emsp;Tarjeta: {{ relacionActual.id_tarjeta_acceso__id_tarjeta }}</option>
+                      {% else %}
+                        <option value="0" selected hidden>Sin información</option>
+                      {% endif %}
+                      <option value="0">Sin información</option>
 
                       {% for tarjeta in tarjetas %}
-                        <option value="{{ tarjeta.id }}">{{ tarjeta.nombre }} {{ tarjeta.apellidos }}</option>
+                        <option value="{{ tarjeta.id }}">{{ tarjeta.nombre }} {{ tarjeta.apellidos }}&emsp;Tarjeta:{{ tarjeta.id_tarjeta }} </option>
                       {% endfor %}
                     </select>
                     </div>

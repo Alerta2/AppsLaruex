@@ -12,7 +12,7 @@ python manage.py startapp nombreApp # crear una app nueva
 python manage.py runserver #arrancar el servidor django
 python manage.py inspectdb --database=nombreDB > app/nombreFicheroModel.py # autogenerar los model desde bases de datos
 
-python manage.py inspectdb --database=time_track_pro > TimeTrackPro/modelPrueba.py # autogenerar los model desde bases de datos
+python manage.py inspectdb --database=timetrackpro > TimeTrackPro/models2.py # autogenerar los model desde bases de datos
 
 python manage.py migrate # Consolidar cambios en los model
 python manage.py collectstatic # cargar los archivos estaticos de la app nuevos

@@ -40,6 +40,7 @@ urlpatterns = [
 
     # información de los usuarios del sistema
     path('private/timetrackpro/asociar-usuario/', asociarUsuario , name='asociar-usuario'),
+    path('private/timetrackpro/editar-asociar-usuario/<slug:id>/', editarAsociarUsuario , name='editar-asociar-usuario'),
 
     # información de los usuarios del control de acceso 
     path('private/timetrackpro/agregar-usuario-maquina', agregarUsuarioMaquina , name='agregar-usuario-maquina'),

@@ -233,6 +233,43 @@ class RegistroAusenciasAceptadas(models.Model):
         managed = False
         db_table = 'registro_ausencias_aceptadas'
 
+class RegistrosManualesControlHorario(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    id_rel_emp_users = models.ForeignKey('RelEmpleadosUsuarios', models.DO_NOTHING, db_column='id_rel_emp_users')
+    mes = models.IntegerField()
+    year = models.IntegerField()
+    dia = models.IntegerField()
+    hora_1_entrada = models.TimeField()
+    hora_1_salida = models.TimeField()
+    hora_2_entrada = models.TimeField()
+    hora_2_salida = models.TimeField()
+    motivo = models.CharField(max_length=255, blank=True, null=True)
+    laborable = models.IntegerField()
+    registrador = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='registrador')
+
+    class Meta:
+        managed = False
+        db_table = 'registros_manuales_control_horario'
+
+
+class RegistrosManualesControlHorarioNoInsertados(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    id_rel_emp_users = models.ForeignKey('RelEmpleadosUsuarios', models.DO_NOTHING, db_column='id_rel_emp_users')
+    mes = models.IntegerField()
+    year = models.IntegerField()
+    dia = models.IntegerField()
+    hora_1_entrada = models.TimeField()
+    hora_1_salida = models.TimeField()
+    hora_2_entrada = models.TimeField()
+    hora_2_salida = models.TimeField()
+    motivo = models.CharField(max_length=255, blank=True, null=True)
+    laborable = models.IntegerField()
+    registrador = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='registrador')
+
+    class Meta:
+        managed = False
+        db_table = 'registros_manuales_control_horario_no_insertados'
+
 
 class Registros(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)

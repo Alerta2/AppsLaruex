@@ -682,7 +682,18 @@ def verEmpleado(request, id):
     }
     return render(request,"verEmpleado.html",infoVista)
 
+'''-------------------------------------------
+                                Módulo: asociarUsuario
 
+- Descripción: 
+Permite asociar las cuentas de los usuarios de la aplicación con los empleados registrados en las máquinas de control de asistencia, ademas de asociar la tarjeta de acceso y la información de la cuenta de django.
+
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+
+-------------------------------------------'''
 def asociarUsuario(request):
     navBar = NavBar.objects.using("timetrackpro").values()
     usuariosApp = Usuarios.objects.using("timetrackpro").values()
@@ -692,7 +703,6 @@ def asociarUsuario(request):
     usuariosDjango = AuthUser.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
 
     tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").values()
-    iconoTarjeta = "<i class='fa-solid fa-file'></i>"
 
     infoVista = {
         "navBar":navBar,
@@ -701,20 +711,19 @@ def asociarUsuario(request):
         "usuariosApp":list(usuariosApp),
         "usuariosDjango":list(usuariosDjango),
         "tarjetas":list(tarjetasAcceso),
-        "iconoTarjeta":iconoTarjeta
     }
     if request.method == 'POST':
 
-        # obtenemos el identificador del usuario, este contiene toda la info relevante del usuario
-        idUser = request.POST.get("idUsuario")
+        # obtenemos el identificador del usuario con la información que hay en la aplicación sobre el usuario, este contiene toda la info relevante del usuario
+        idUser = request.POST.get("userApp")
         usuario = Usuarios.objects.using("timetrackpro").filter(id=idUser)[0]
 
         # obtenemos el identificador del empleado, este contiene la información de la máquina de control de asistencia
-        idEmpleado = request.POST.get("idEmpleado")
+        idEmpleado = request.POST.get("empleado_maquina")
         empleado = Empleados.objects.using("timetrackpro").filter(id=idEmpleado)[0]
 
         # obtenemos el identificador del usuario de django
-        idUserDjango = request.POST.get("idUserApp")
+        idUserDjango = request.POST.get("usuariosDjango")
         userDjango = AuthUser.objects.using("timetrackpro").filter(id=idUserDjango)[0]
 
         # obtenemos el identificador de la tarjeta de acceso
@@ -740,6 +749,77 @@ def asociarUsuario(request):
         return redirect('timetrackpro:ver-empleado', id=idUser)
     else:
         return render(request,"asociar-empleados.html",infoVista)
+
+
+'''-------------------------------------------
+                                Módulo: editarAsociarUsuario
+
+- Descripción: 
+Permite editar las relacion de usario en maquinas de registro, tarjeta de acceso, usuario de django y usuario de la aplicación (datos de contacto del usuario). 
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+
+-------------------------------------------'''
+def editarAsociarUsuario(request, id):
+    navBar = NavBar.objects.using("timetrackpro").values()
+    relacionActual = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=id).values('id', 'id_usuario', 'id_usuario__id', 'id_usuario__nombre', 'id_usuario__apellidos','id_empleado', 'id_empleado__id','id_empleado__nombre','id_auth_user', 'id_auth_user__id','id_auth_user__first_name','id_auth_user__last_name', 'id_tarjeta_acceso', 'id_tarjeta_acceso__id', 'id_tarjeta_acceso__nombre', 'id_tarjeta_acceso__apellidos', 'id_tarjeta_acceso__id_tarjeta')[0]
+    usuariosApp = Usuarios.objects.using("timetrackpro").values()
+    # datos de los empleados registrados en las máquinas de control de asistencia
+    empleados = Empleados.objects.using("timetrackpro").values()
+    # datos de los empleados registrados en django
+    usuariosDjango = AuthUser.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
+
+    tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").values()
+
+    infoVista = {
+        "relacionActual":relacionActual,
+        "navBar":navBar,
+        "administrador":True,
+        "empleados":list(empleados),
+        "usuariosApp":list(usuariosApp),
+        "usuariosDjango":list(usuariosDjango),
+        "tarjetas":list(tarjetasAcceso),
+    }
+    if request.method == 'POST':
+
+        # obtenemos el identificador del usuario con la información que hay en la aplicación sobre el usuario, este contiene toda la info relevante del usuario
+        idUser = request.POST.get("userApp")
+        usuario = Usuarios.objects.using("timetrackpro").filter(id=idUser)[0]
+
+        # obtenemos el identificador del empleado, este contiene la información de la máquina de control de asistencia
+        idEmpleado = request.POST.get("empleado_maquina")
+        empleado = Empleados.objects.using("timetrackpro").filter(id=idEmpleado)[0]
+
+        # obtenemos el identificador del usuario de django
+        idUserDjango = request.POST.get("usuariosDjango")
+        userDjango = AuthUser.objects.using("timetrackpro").filter(id=idUserDjango)[0]
+
+        # obtenemos el identificador de la tarjeta de acceso
+        idTarjeta = request.POST.get("idTarjeta")
+        tarjeta = None
+        if idTarjeta != "0":
+            tarjeta = TarjetasAcceso.objects.using("timetrackpro").filter(id=idTarjeta)[0]
+        
+        #comprobamos si existe el registro en la tabla RelEmpleadosUsuarios
+        if not RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=usuario).exists():
+            # creamos el registro en la tabla RelEmpleadosUsuarios
+            nuevoRelEmpleadoUsuario = RelEmpleadosUsuarios(id_usuario=usuario, id_empleado=empleado, id_auth_user=userDjango, id_tarjeta_acceso=tarjeta)
+            nuevoRelEmpleadoUsuario.save(using='timetrackpro')
+        else:
+            # si existe, actualizamos el registro
+            relEmpleadoUsuario = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=usuario)[0]
+            relEmpleadoUsuario.id_empleado = empleado
+            relEmpleadoUsuario.id_auth_user = userDjango
+            relEmpleadoUsuario.id_tarjeta_acceso = tarjeta
+            relEmpleadoUsuario.save(using='timetrackpro')
+
+
+        return redirect('timetrackpro:ver-empleado', id=idUser)
+    else:
+        return render(request,"editar-asociar-empleados.html",infoVista)
+
 
 '''-------------------------------------------
                                 Módulo: verEmpleado
