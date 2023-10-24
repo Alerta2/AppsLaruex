@@ -138,7 +138,10 @@
 
         <script src="{% static 'js/cookiealert.js' %}"></script>
         <script type="text/javascript">
-
+            $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+            });
+            
             function crearAviso(id, comentario){
                 var divAlert = document.createElement("div");
                 divAlert.classList.add('alert','alert-success');

@@ -262,6 +262,17 @@
                 title: 'ESTADO',
                 field: 'estado_alicuota__descripcion',
                 sortable: "true"
+            },{
+                title: 'Acciones',
+                formatter: function (value, row) {
+                  // si usuario es administrador
+                  let botones = '<div class="btn-group">';
+                  {% if user.is_superuser %}
+                    botones += '<a class="btn" onclick="borrarAlicuota(' + row.identificador + ', '+"'#tableAlicuotas'"+')"><i class="fa-solid fa-trash"></i></a>';
+                  {% endif %}
+                  botones += '</div>';
+                  return botones;
+                }
             }],
         locale: "es-ES",
         search: true,

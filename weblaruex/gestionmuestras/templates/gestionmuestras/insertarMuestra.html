@@ -34,6 +34,15 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Insertar nueva muestra</h5>
+            <!-- div para botones de ayuda alineados a la derecha-->
+            <div class="d-flex flex-row-reverse">
+                <!-- boton de carga de últimos valores insertados -->
+                <button type="button" class="btn btn-primary mx-1" onclick="obtenerUltimaMuestra();" data-toggle="tooltip" data-placement="top" title="Carga de valores de la última muestra insertada"><i class="fa-sharp fa-solid fa-download"></i></button>
+                <!-- boton para insertar nueva memoria -->
+                <button type="button" class="btn btn-primary mx-1" data-toggle="tooltip" data-placement="top" title="Agregar nueva localización"><i class="fa-sharp fa-solid fa-location-dot"></i></button>
+            </div>
+            <!-- fin del div de botones de ayuda -->
+
             <!-- Multi Columns Form -->
             <form class="g-3" action="{% url 'gestionmuestras:gestmuesInsertarMuestra' %}" method="POST" enctype="multipart/form-data"> 
                 {% csrf_token %}
@@ -41,51 +50,57 @@
                     <div class="card-header my-4">Información muestra</div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputMemoria" class="form-label">Memoria</label>
-                        <select id="inputMemoria" name="memoria" class="form-select">
+                        <input id="inputMemoria" list="memorias" name="memoria" class="form-select">
+                        <datalist id="memorias">
                             {% for m in memorias %}
                                 <option>{{ m.memoria }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputCodigoCSN" class="form-label">Codigo CSN <i onclick="cargarParametros()" class="fa-solid fa-arrows-rotate"></i></label>
-                        <select id="inputCodigoCSN" onchange="cargarParametros()" name="codigoCSN" class="form-select">
+                        <input id="inputCodigoCSN" list="codigosCSN" onchange="cargarParametros()" name="codigoCSN" class="form-select">
+                        <datalist id="codigosCSN">
                             {% for c in codMuestras %}
                                 <option value="{{ c.tipo_id }}_{{ c.nombre }}">{{ c.nombre }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputFrecuencia" class="form-label">Frecuencia</label>
-                        <select id="inputFrecuencia" name="frecuencia" class="form-select">
+                        <input id="inputFrecuencia" list="frecuencias" name="frecuencia" class="form-select">
+                        <datalist id="frecuencias">
                             {% for f in frecuencias %}
                                 <option>{{ f.nombre }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputSuministrador" class="form-label">Suministrador</label>
-                        <select id="inputSuministrador" name="suministrador" class="form-select">
+                        <input id="inputSuministrador" list="suministradores" name="suministrador" class="form-select">
+                        <datalist id="suministradores">
                             {% for s in suministradores %}
                                 <option>{{ s.nombre }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputClientes" class="form-label">Clientes</label>
-                        <select id="inputClientes" name="cliente" class="form-select">
+                        <input id="inputClientes" list="clientes" name="cliente" class="form-select">
+                        <datalist id="clientes">
                             {% for c in clientes %}
                                 <option>{{ c.nombre }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputLocalizaciones" class="form-label">Localizacion</label>
-                        <select id="inputLocalizaciones" name="localizacion" class="form-select">
+                        <input id="inputLocalizaciones" list="localizaciones" name="localizacion" class="form-select" onchange="cargarComentarioRecogidaGeneral()">
+                        <datalist id="localizaciones">
                             {% for l in localizaciones %}
                                 <option>{{ l.nombre }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputReferencia" class="form-label">Referencia:</label>
@@ -174,11 +189,12 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <select id="inputParametroAdicional" name="inputParametroAdicional" class="form-select">
+                                <input list="parametrosAdicionales" name="inputParametroAdicional" class="form-select">
+                                <datalist id="parametrosAdicionales">
                                     {% for p in parametros %}
                                         <option>{{ p.nombre }}</option>
                                     {% endfor %}
-                                </select>
+                                </datalist>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -188,6 +204,7 @@
                         </div>
                     </div><!-- End Basic Modal-->
                 </div>
+                <!--
                 <div class="row">
                     <div class="card-header my-4">Fotografía</div>
                     <button type="button" class="col-lg-2 col-md-3 col-xs-6" onclick="activar_webcam()">
@@ -208,6 +225,7 @@
                         </div>
                     </div>
                 </div>
+                -->
                 <div class="text-center">
                     <div class="card-header my-4"></div>
                     <button type="submit" class="btn btn-primary">Insertar</button>
@@ -232,6 +250,8 @@
         const fechaCorrecta = formatoCorrecto.slice(6,10)+"-"+formatoCorrecto.slice(3,5)+"-"+formatoCorrecto.slice(0,2)+"T"+formatoCorrecto.slice(11,13)+":"+formatoCorrecto.slice(14,16)
         $("#fechaRecogidaReferencia").val(fechaCorrecta);
     });
+
+    // carga la fecha actual en el input de fecha de recepcion
     function cargarFechaActual(){
         const fechaActual = new Date();
 
@@ -254,11 +274,13 @@
 
         $("#fechaRecepcion").val(fechaCorrecta);
     }
+
+    // carga los parámetros cuando cambia el tipo de muestra medida
     function cargarParametros(){
         $.ajax({  
             type: "GET",
             dataType: "json",
-            url:"/private/gestionmuestras/insertarMuestra/consultarParametrosTipo/"+$("#inputCodigoCSN option:selected").val().split("_")[0]+"/",
+            url:"/private/gestionmuestras/insertarMuestra/consultarParametrosTipo/"+$("#inputCodigoCSN").val().split("_")[0]+"/",
             success: function(data)
             {
                 $("#placeHolderParametrosRequerido").html("");
@@ -272,6 +294,32 @@
 
         });
     }
+
+    
+    // carga los parámetros cuando cambia el tipo de muestra medida
+    function cargarComentarioRecogidaGeneral(){
+
+        datos = {
+            "memoria": $("#inputMemoria").val(),
+            "codigoCSN": $("#inputCodigoCSN").val().split("_")[1],
+            "localizacion": $("#inputLocalizaciones").val(), 
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        }
+
+        $.ajax({  
+            type: "POST",
+            dataType: "json",
+            data: datos,
+            url:"/private/gestionmuestras/obtenerComentarioRecogidaGeneral/",
+            success: function(data)
+            {
+                $("#inputComentarioGeneral").val(data.comentario);
+            }
+
+        });
+    }
+
+    // agrega un parametro adicional
     function agregarParametro(){
         // deberia consultar el parametro en una funcion de view y devolver o bien un input o bien un select en funcion del tipo de parametro con un switch case. Despues hacer el replace con el placeholder detras
         $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#inputParametroAdicional").val()+":</label><input type='text' id='"+$("#inputParametroAdicional").val()+"' name='"+$("#inputParametroAdicional").val()+"' class='form-control'></div><div id='placeHolderParametro' hidden></div>");
@@ -291,6 +339,26 @@
         image.src = canvasElement.toDataURL("image/png");
         console.log(image.src);
         webcam.stop();
+    }
+
+    // obtengo la información de la última muestra insertada en el sistema
+    function obtenerUltimaMuestra(){
+        $.ajax({  
+            type: "GET",
+            dataType: "json",
+            url:"/private/gestionmuestras/obtenerValoresUltimaMuestra/",
+            success: function(data)
+            {
+                $("#inputMemoria").val(data.muestra.codigo_recogida__codigo_memoria__memoria);
+                $("#inputCodigoCSN").val(data.muestra.codigo_recogida__codigo_csn__tipo_id+"_"+data.muestra.codigo_recogida__codigo_csn__nombre);
+                $("#inputFrecuencia").val(data.muestra.codigo_recogida__frecuencia_de_recogida__nombre);
+                $("#inputSuministrador").val(data.muestra.suministrador__nombre);
+                $("#inputClientes").val(data.muestra.cliente__nombre);
+                $("#inputLocalizaciones").val(data.muestra.codigo_recogida__codigo_procedencia__nombre);
+                $("#inputComentarioGeneral").val(data.muestra.codigo_recogida__observaciones);
+            }
+
+        });
     }
 </script>
 {% endblock %}

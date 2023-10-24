@@ -30,3 +30,20 @@ function consultarInfoAlicuota(id){
     });
     
 }
+
+// funcion que borra los datos asociados a una alicuota y refresca la tabla en caso de ser necesario
+function borrarAlicuota(id, tabla){
+    
+    // call url /private/gestionmuestras/infoAlicuota/id/ using ajax
+    $.ajax({
+        url: '/private/gestionmuestras/borrarAlicuota/'+id+'/',
+        type: 'GET',
+        success: function(response){
+            crearAviso(id, "Alicuota eliminada correctamente")
+            $(tabla).bootstrapTable('refresh');
+        },
+        error: function(error){
+            console.log(error);
+        }
+    });
+}

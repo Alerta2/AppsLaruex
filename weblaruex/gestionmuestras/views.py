@@ -47,6 +47,15 @@ def getInfoMuestra(request, id_muestra):
         }
     )
 
+
+@permission_required('auth.visualizacion_muestras')
+def borrarAlicuota(request, id_alicuota):
+    informe = None
+    RelacionAnaliticasTratamiento.objects.using('gestion_muestras').filter(id_muestra_analitica=id_alicuota).delete()
+    RelacionParametrosAnalitica.objects.using('gestion_muestras').filter(id_analitica_id=id_alicuota).delete()
+    RelacionHistoricoMuestraAnaliticas.objects.using('gestion_muestras').filter(identificador=id_alicuota).delete()
+    return JsonResponse({"resultado":True}, safe=False)
+
 @permission_required('auth.visualizacion_muestras')
 def getInfoMuestraForm(request):
     return getInfoMuestra(request, request.POST.get('id_muestra'))
@@ -168,6 +177,22 @@ def insertarTratamientos(request):
         "id_muestra": request.POST.get("id_muestra"),
         "tratamientos": tratamientos,
     })
+
+@permission_required('auth.insercion_muestras')
+def obtenerValoresUltimaMuestra(request):
+    # obtengo el ultimo valor del model historicoRecogida
+    historico = HistoricoRecogida.objects.using('gestion_muestras').order_by('-identificador').values('codigo_recogida__codigo_memoria__memoria', 'codigo_recogida__codigo_csn__tipo_id', 'codigo_recogida__codigo_csn__nombre', 'codigo_recogida__frecuencia_de_recogida__nombre', 'suministrador__nombre', 'cliente__nombre', 'codigo_recogida__codigo_procedencia__nombre', 'codigo_recogida__observaciones')[0]
+    print("LEO:", historico)
+    return JsonResponse({"muestra": historico}, safe=False)
+
+@permission_required('auth.insercion_muestras')
+def obtenerComentarioRecogidaGeneral(request):
+    if (RecogidaGeneral.objects.using('gestion_muestras').filter(codigo_memoria__memoria=request.POST["memoria"], codigo_csn__nombre=request.POST["codigoCSN"], codigo_procedencia__nombre=request.POST["localizacion"]).exists()):
+        # obtengo el valor del comentario de recogida general dada la memoria, el codigo de csn y la procedencia
+        recogida = RecogidaGeneral.objects.using('gestion_muestras').filter(codigo_memoria__memoria=request.POST["memoria"], codigo_csn__nombre=request.POST["codigoCSN"], codigo_procedencia__nombre=request.POST["localizacion"]).values('observaciones')[0]
+        return JsonResponse({"comentario":recogida["observaciones"]}, safe=False)
+    else:
+        return JsonResponse({"comentario":""}, safe=False)
 
 def generarCodigoBarras(idMuestra, idAlicuota):
     print(idMuestra, idAlicuota)
