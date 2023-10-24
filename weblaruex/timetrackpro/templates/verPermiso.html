@@ -228,7 +228,7 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioAsociarUsuario" action="{% url 'timetrackpro:asociar-usuario' %}" method="POST"
+        <form id="formularioEditarPermiso" action="{% url 'timetrackpro:editar-permiso' %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
 
@@ -236,13 +236,14 @@
             <div class="col-xl-4">
               <label>Nombre</label>
               <div class="mb-3">
-                <input type="text" class="form-control" placeholder="Nombre en el dispositivo" aria-label="Nombre en el dispositivo" id="nombre_permiso" name="nombre_permiso" aria-describedby="text-addon">
+                <input type="text" class="form-control"  value="{{permiso.id}}"  id="id_permiso" name="id_permiso" aria-describedby="text-addon" hidden>
+                <input type="text" class="form-control" placeholder="Nombre en el dispositivo" value="{{permiso.nombre}}" aria-label="Nombre en el dispositivo" id="nombre_permiso" name="nombre_permiso" aria-describedby="text-addon">
               </div>
             </div>
             <div class="col-xl-2">
               <label>Duración en días</label>
               <div class="mb-3">
-                <input type="number" class="form-control" placeholder="3" aria-label="Duración del permiso" id="duracion_permiso" name="duracion_permiso" min="1" aria-describedby="text-addon">
+                <input type="number" class="form-control" placeholder="3" aria-label="Duración del permiso" id="duracion_permiso" name="duracion_permiso" min="1" value="{{permiso.duracion|safe}}" aria-describedby="text-addon">
               </div>
             </div>
             <div class="col-xl-3">
@@ -250,8 +251,8 @@
               <div class="mb-3">
                 <select class="form-control" aria-label="Nombre en el dispositivo" id="tipo_dias"
                 name="tipo_dias" aria-describedby="text-addon">
-                <option value="Naturales">Naturales</option>
-                <option value="Hábiles" selected>Hábiles</option>
+                <option value="Naturales" {% if permiso.naturales_o_habiles  == "Naturales" %} selected {% endif %} >Naturales</option>
+                <option value="Hábiles" {% if permiso.naturales_o_habiles  == "Hábiles" %} selected {% endif %}>Hábiles</option>
               </select>
               </div>
             </div>
@@ -259,7 +260,7 @@
               <label>Fecha límite para la solicitud</label>
               <div class="mb-3">
                 <input type="date" class="form-control" aria-label="Nombre en el dispositivo"
-                  aria-describedby="text-addon" name="fecha_limite_solicitud" id="fecha_limite_solicitud">
+                  aria-describedby="text-addon" name="fecha_limite_solicitud" id="fecha_limite_solicitud" value="{{permiso.fecha_maxima_solicitud|safe}}"> 
               </div>
             </div>
           </div>
@@ -267,13 +268,13 @@
             <div class="col-xl-6">
               <label>Periodo de antelación</label>
               <div class="mb-3">
-                <textarea type="text" class="form-control" placeholder="Indique con palabras el perido con el que se puede solicitar" aria-label="Información sobre el periodo de antelación" id="periodo_antelacion" name="periodo_antelacion" aria-describedby="text-addon"></textarea>
+                <textarea type="text" class="form-control" placeholder="Indique con palabras el perido con el que se puede solicitar" aria-label="Información sobre el periodo de antelación" id="periodo_antelacion" name="periodo_antelacion" aria-describedby="text-addon">{{permiso.periodo_antelacion|safe}}</textarea>
               </div>
             </div>
-            <div class="col-xl-6">
+            <div class="col-xl-6" id="docNecesaria" {% if permiso.acreditar  != 1 %} hidden {% endif %}>
               <label>Documentación a aportar</label>
               <div class="mb-3">
-                <textarea type="text" class="form-control" placeholder="Documentación que debe aportar para justificar el permiso" aria-label="Documentación justificativa" id="documentacion_permiso" name="documentacion_permiso" aria-describedby="text-addon"></textarea>
+                <textarea type="text" class="form-control" placeholder="Documentación que debe aportar para justificar el permiso" aria-label="Documentación justificativa" id="documentacion_permiso" name="documentacion_permiso" aria-describedby="text-addon">{{permiso.doc_necesaria|safe}}</textarea>
               </div>
             </div>
           </div>
@@ -281,7 +282,7 @@
             <div class="col-xl-9">
               <label>Legislación aplicable</label>
               <div class="mb-3">
-                <textarea type="text" class="form-control" placeholder="Legislación en la que se recoge el derecho a este permiso" aria-label="Legislacion aplicable al permiso" id="legilacion_aplicable" name="legilacion_aplicable" aria-describedby="text-addon"></textarea>
+                <textarea type="text" class="form-control" placeholder="Legislación en la que se recoge el derecho a este permiso" aria-label="Legislacion aplicable al permiso" id="legilacion_aplicable" name="legilacion_aplicable" aria-describedby="text-addon">{{permiso.legislacion_aplicable|safe }}</textarea>
               </div>
             </div>
                           
@@ -291,12 +292,12 @@
                 <div class="form-switch ps-1 my-2">
                   <label >PAS</label>
 
-                  <input class="form-check-input ms-auto" type="checkbox" id="pas" name="pas">
+                  <input class="form-check-input ms-auto" type="checkbox" id="pas" name="pas" {% if permiso.pas  == 1 %} checked {% endif %}>
                   <label class="text-muted">Si</label>
                 </div>
                 <div class="form-switch ps-1 my-2">
                   <label >PDI</label>
-                  <input class="form-check-input ms-auto" type="checkbox" id="pdi" name="pdi">
+                  <input class="form-check-input ms-auto" type="checkbox" id="pdi" name="pdi" {% if permiso.pdi  == 1 %} checked {% endif %}>
                   <label class="text-muted">Si</label>
                 </div>
               </div>
@@ -309,7 +310,7 @@
               <div class="mb-3">
                 <div class="form-switch ps-1 my-2">
 
-                  <input class="form-check-input ms-auto" type="checkbox" id="bonificable" name="bonificable">
+                  <input class="form-check-input ms-auto" type="checkbox" id="bonificable" name="bonificable" {% if permiso.bonificable_por_antiguedad  == 1 %} checked {% endif %}>
                   <label class="text-muted">Si</label>
                 </div>
               </div>
@@ -319,7 +320,7 @@
               <div class="mb-3">
                 <div class="form-switch ps-1 my-2">
 
-                  <input class="form-check-input ms-auto" type="checkbox" id="retribuido" name="retribuido">
+                  <input class="form-check-input ms-auto" type="checkbox" id="retribuido" name="retribuido" {% if permiso.es_permiso_retribuido  == 1 %} checked {% endif %}>
                   <label class="text-muted">Si</label>
                 </div>
               </div>
@@ -329,41 +330,41 @@
               <div class="mb-3">
                 <div class="form-switch ps-1 my-2">
 
-                  <input class="form-check-input ms-auto" type="checkbox" id="acreditable" name="acreditable">
+                  <input class="form-check-input ms-auto" type="checkbox" id="acreditable" name="acreditable" {% if permiso.acreditar  == 1 %} checked {% endif %}>
                   <label class="text-muted">Si</label>
                 </div>
               </div>
             </div>
-            <div class="col-xl-4" hidden>
+            <div class="col-xl-4" hidden >
               <label>Año al que aplica</label>
               <div class="mb-3">
-                <input type="number" class="form-control" placeholder="2023" min="2022" max="2050" id="year_permiso" name="year_permiso" aria-label="Año al que aplica"  value="2023" aria-describedby="text-addon">
+                <input type="number" class="form-control" placeholder="2023" min="2022" max="2050" id="year_permiso" name="year_permiso" aria-label="Año al que aplica"  value="{{permiso.year|safe}}" aria-describedby="text-addon">
               </div>
             </div>    
           </div>
-          <div class="row" id="bonificaciones" hidden>
+          <div class="row" id="bonificaciones" {% if permiso.bonificable_por_antiguedad  != 1 %} hidden {% endif %}>
             <div class="col-xl-3">
               <label>Por 15 años</label>
               <div class="mb-3">
-                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_15_year" value="0" name="bonificacion_15_year" aria-label="Año al que aplica" aria-describedby="text-addon">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_15_year" value="{{permiso.bonificacion_por_15_years|safe}}" name="bonificacion_15_year" aria-label="Año al que aplica" aria-describedby="text-addon" >
               </div>
             </div>                  
             <div class="col-xl-3">
               <label>Por 20 años</label>
               <div class="mb-3">
-                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_20_year" value="0" name="bonificacion_20_year"  aria-label="Año al que aplica" aria-describedby="text-addon">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_20_year" value="{{permiso.bonificacion_por_20_years|safe}}" name="bonificacion_20_year"  aria-label="Año al que aplica" aria-describedby="text-addon">
               </div>
             </div>                
             <div class="col-xl-3">
               <label>Por 25 años</label>
               <div class="mb-3">
-                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_25_year" value="0" name="bonificacion_25_year" aria-label="Año al que aplica" aria-describedby="text-addon">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_25_year" value="{{permiso.bonificacion_por_25_years|safe}}" name="bonificacion_25_year" aria-label="Año al que aplica" aria-describedby="text-addon">
               </div>
             </div>                
             <div class="col-xl-3">
               <label>Por 30 años</label>
               <div class="mb-3">
-                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_30_year" value="0" name="bonificacion_30_year" aria-label="Año al que aplica" aria-describedby="text-addon">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_30_year" value="{{permiso.bonificacion_por_30_years|safe}}" name="bonificacion_30_year" aria-label="Año al que aplica" aria-describedby="text-addon">
               </div>
             </div>
           </div>
@@ -380,5 +381,63 @@
   </div>
 
 
+<script>
+  $(document).ready(function(){
+    $("#fecha_limite_solicitud").change(function(){
+      if ($("#fecha_limite_solicitud").val() == "") {
+        var d = new Date();
+        var n = d.getFullYear();
+        $("#year_permiso").val(n);
+      } else {
+        var d = new Date($("#fecha_limite_solicitud").val());
+        var n = d.getFullYear();
+        $("#year_permiso").val(n);
+      }
+    });
+  });
 
+  $(document).ready(function(){
+    $("#bonificable").click(function(){
+      if ($("#bonificable").is(':checked')) {
+        $("#bonificacion_15_year").val(1);
+        $("#bonificacion_20_year").val(1);
+        $("#bonificacion_25_year").val(1);
+        $("#bonificacion_30_year").val(1);
+
+        $("#bonificacion_15_year").attr("required", true);
+        $("#bonificacion_20_year").attr("required", true);
+        $("#bonificacion_25_year").attr("required", true);
+        $("#bonificacion_30_year").attr("required", true);
+
+        $("#bonificaciones").removeAttr("hidden");
+
+      } else {
+        $("#bonificacion_15_year").val(0);
+        $("#bonificacion_20_year").val(0);
+        $("#bonificacion_25_year").val(0);
+        $("#bonificacion_30_year").val(0);
+
+        $("#bonificacion_15_year").attr("required", false);
+        $("#bonificacion_20_year").attr("required", false);
+        $("#bonificacion_25_year").attr("required", false);
+        $("#bonificacion_30_year").attr("required", false);
+
+        $("#bonificaciones").attr("hidden", true);
+
+      }
+    });
+  });
+
+  $(document).ready(function(){
+    $("#acreditable").click(function(){
+      if ($("#acreditable").is(':checked')) {
+        $("#docNecesaria").removeAttr("hidden");
+        $("#documentacion_permiso").attr("required", true);
+      } else {
+        $("#docNecesaria").attr("hidden", true);
+        $("#documentacion_permiso").attr("required", false);
+      }
+    });
+  });
+</script>
 {% endblock %}
