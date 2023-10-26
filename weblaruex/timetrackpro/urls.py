@@ -25,6 +25,7 @@ urlpatterns = [
     path('private/timetrackpro/agregar-tarjeta', agregarTarjetaAcceso ,name='agregar-tarjeta'),
     path('private/timetrackpro/tarjeta/<slug:id>', verTarjetaAcceso ,name='ver-tarjeta-acceso'),
     path('private/timetrackpro/editar-tarjeta', editarTarjetaAcceso ,name='editar-tarjeta-acceso'),
+    path('private/timetrackpro/info-configuracion-tarjetas', infoConfigTarjetasAcceso ,name='info-configuracion-tarjetas'),
     # registros insertados en la base de datos  
     path('private/timetrackpro/agregar-registro', agregarRegistro , name='agregar-registro'),
     path('private/timetrackpro/registros-insertados', registrosInsertados , name='registros-insertados'),
@@ -78,6 +79,6 @@ urlpatterns = [
     path('private/timetrackpro/editar-permiso/', editarPermiso , name='editar-permiso'),
 
     #Registro control horario
-    #path('private/timetrackpro/registro-manual-control-horario/<slug:year>/<slug:mes>/', registroManualControlHorario , name='registro-manual-control-horario'),
+    path('private/timetrackpro/insertar-registro-manual-mensual/', insertarRegistroManualMensual , name='insertar-registro-manual-mensual'),
 
 ]

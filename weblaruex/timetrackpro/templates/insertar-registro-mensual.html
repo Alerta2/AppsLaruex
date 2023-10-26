@@ -1,0 +1,255 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+<h3 class="font-weight-bolder text-info text-gradient">Registro mensual de {{request.user.first_name}} {{request.user.last_name}}</h3>
+<p class="mb-4" id="textSeleccionado" hidden>Introduce los datos del mes <span id="mesSeleccionado"  ></span> de <span id="yearSeleccionado" ></span></p>  
+
+
+  <div class="page-header min-vh-75">
+       
+    <div class="container"> 
+  
+      <form action="{% url 'timetrackpro:agregar-usuario' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="row">
+          <div class="col-8 mx-auto">
+            <div class="card bg-gradient-dark" id="mesYearDiv">
+              <div class="card-body">
+                <div class="row">
+                  <label  class="col-form-label text-white">Año</label>
+                  <div class="mb-3">
+                    <input type="number" class="form-control" placeholder="2023" min="2022" max="2050" id="year" name="year" aria-label="Año al que aplica" aria-describedby="text-addon">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group">
+                    <label class="col-form-label text-white" for="mes">Mes</label>
+                    <select class="form-select" data-rule="required" id="mes" name="mes">
+                      <option value="01">Enero</option>
+                      <option value="02">Febrero</option>
+                      <option value="03">Marzo</option>
+                      <option value="04">Abril</option>
+                      <option value="05">Mayo</option>
+                      <option value="06">Junio</option>
+                      <option value="07">Julio</option>
+                      <option value="08">Agosto</option>
+                      <option value="09">Septiembre</option>
+                      <option value="10">Octubre</option>
+                      <option value="11">Noviembre</option>
+                      <option value="12">Diciembre</option>
+                    </select>
+                  </div>
+                </div>
+                <p class="text-white mb-0 text-center">Indique el mes y año para generar el formulario</p>
+              </div>
+              <div class="mx-auto pb-3">
+
+                <button class="btn btn-outline-white  p-2 mx-2 mb-0" type="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Generar Formulario" onclick="generarFormulario()">
+                  Generar formulario
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
+      <div class="row" id="cardFormulario" hidden>
+        <div class="col-lg-11">
+          <div class="card">
+            <div class="card-header pb-0 text-left">
+ 
+            </div>
+            <div class="card-body">
+              
+                  <input type="number" class="form-control" id="dias" name="dias" aria-label="Año al que aplica" aria-describedby="text-addon" hidden>
+
+              <div id="divFormGenerado"></div>
+
+                <div class="text-center">
+                  <button type="submit" value="submit" class="btn bg-gradient-info w-100 mt-4 mb-0">Guardar</button>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </form>
+    </div>
+  </div>
+
+<script>
+
+  function generarFormulario(){
+    var inputMes = $("#mes");
+    var inputYear = $("#year");
+    var mes = document.querySelector('#mes').value; 
+    var mesSeleccionado = document.querySelector('#mes');
+    var nombreMes = mesSeleccionado.options[mesSeleccionado.selectedIndex].text;
+    var year = document.querySelector('#year').value;
+    var inputDias = $("#dias");
+
+    var dias = 0;
+    var bisiesto = false;
+    var textSeleccionado = document.querySelector('#textSeleccionado');
+    var mesSeleccionado = document.querySelector('#mesSeleccionado');
+    var yearSeleccionado = document.querySelector('#yearSeleccionado');
+
+    // divs
+    mesYearDiv = document.querySelector('#mesYearDiv');
+    formularioDiv = document.querySelector('#cardFormulario');
+    divFormGenerado = document.querySelector('#divFormGenerado');
+
+    var diasMeses={
+          "01":31,
+          "02":28,
+          "03":31,
+          "04":30,  
+          "05":31,
+          "06":30,
+          "07":31,
+          "08":31,
+          "09":30,
+          "10":31,
+          "11":30,
+          "12":31,
+    };
+    dias = diasMeses[mes];   
+    if (inputYear.val() == "") {
+      alert("Introduce un año");
+    } else {
+      if (year % 4 == 0)
+        bisiesto = true;
+        if (bisiesto && mes == "02")
+          dias = 29;
+      mesYearDiv.hidden = true;
+      formularioDiv.hidden = false;
+      textSeleccionado.hidden = false;
+      mesSeleccionado.innerHTML = nombreMes;
+      yearSeleccionado.innerHTML = year;
+      inputDias.val(dias);
+
+      for (var i = 1; i <= dias; i++) {
+        var rowLabel = document.createElement('div');
+        rowLabel.className = 'row';
+        divFormGenerado.appendChild(rowLabel);
+
+        var colLabel = document.createElement('div');
+        colLabel.className = 'col-xl-12';
+        rowLabel.appendChild(colLabel);
+
+        var row = document.createElement('div');
+        row.className = 'row';
+        divFormGenerado.appendChild(row);
+
+        var label = document.createElement('label');
+        label.className = 'col-form-label text-sm';
+        label.innerHTML = 'Día ' + i + ' de ' + nombreMes + ' de ' + year;
+        colLabel.appendChild(label);
+
+        //obtener fecha para ese día
+        if (i < 10)
+          var fecha = year + '-' + mes + '-0' + i;
+        else
+          var fecha = year + '-' + mes + '-' + i;
+
+        var inputDia = document.createElement('input');
+        var inputHora1Entrada= document.createElement('input');
+        var inputHora1Salida = document.createElement('input');
+
+        var inputHora2Entrada = document.createElement('input');
+        var inputHora2Salida = document.createElement('input');
+
+        var inputMotivo = document.createElement('input');
+        var lineaSeparacion = document.createElement('div');
+
+        // creamos los imput de dia
+        var col = document.createElement('div');
+        col.className = 'col-xl-2';
+        row.appendChild(col);
+        inputDia.type = 'date';
+        inputDia.name = 'diaRegistro' + i;
+        inputDia.id = 'diaRegistro' + i;
+        inputDia.value = fecha;
+        inputDia.className = 'form-control';
+        inputDia.disabled = true;
+        col.appendChild(inputDia);
+        col.hidden = true;
+
+                
+        // creamos el input de la hora
+        var col = document.createElement('div');
+        col.className = 'col-xl-2';
+        row.appendChild(col);
+        inputHora1Entrada.type = 'time';
+        inputHora1Entrada.name = 'hora_entrada_1_' + i;
+        inputHora1Entrada.id = 'hora_entrada_1_' + i;
+        inputHora1Entrada.className = 'form-control';
+        col.appendChild(inputHora1Entrada);
+        
+        // creamos el input de la hora
+        // creamos el input de la hora
+        var col = document.createElement('div');
+        col.className = 'col-xl-2';
+        row.appendChild(col);
+        inputHora1Salida.type = 'time';
+        inputHora1Salida.name = 'hora_salida_1_' + i;
+        inputHora1Salida.id = 'hora_salida_1_' + i;
+        inputHora1Salida.className = 'form-control';
+        col.appendChild(inputHora1Salida);
+        
+        // creamos un separacion
+        var col = document.createElement('div');
+        col.className = 'col-mx-auto my-1';
+        row.appendChild(col);
+        lineaSeparacion.className = 'text-info font-weight-bolder';
+        lineaSeparacion.innerHTML = '';
+        col.appendChild(lineaSeparacion);
+
+
+        // creamos el input de la hora
+        var col = document.createElement('div');
+        col.className = 'col-xl-2';
+        row.appendChild(col);
+        inputHora2Entrada.type = 'time';
+        inputHora2Entrada.name = 'hora_entrada_2_' + i;
+        inputHora2Entrada.id = 'hora_entrada_2_' + i;
+        inputHora2Entrada.className = 'form-control';
+        col.appendChild(inputHora2Entrada);
+        
+        // creamos el input de la hora
+        // creamos el input de la hora
+        var col = document.createElement('div');
+        col.className = 'col-xl-2';
+        row.appendChild(col);
+        inputHora2Salida.type = 'time';
+        inputHora2Salida.name = 'hora_salida_2_' + i;
+        inputHora2Salida.id = 'hora_salida_2_' + i;
+        inputHora2Salida.className = 'form-control';
+        col.appendChild(inputHora2Salida);
+
+        // creamos el input de motivo 
+        var col = document.createElement('div');
+        col.className = 'col-xl-3';
+        row.appendChild(col);
+        inputMotivo.type = 'text';
+        inputMotivo.placeholder = 'Indique el motivo';
+        inputMotivo.name = 'motivo_' + i;
+        inputMotivo.id = 'motivo_' + i;
+        inputMotivo.className = 'form-control';
+        col.appendChild(inputMotivo);
+
+        }
+
+    }
+  };
+
+
+
+
+ </script>
+
+
+{% endblock %}

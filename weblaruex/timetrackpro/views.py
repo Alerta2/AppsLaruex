@@ -214,7 +214,27 @@ def editarTarjetaAcceso(request):
     tarjeta.save(using='timetrackpro')
     return redirect('timetrackpro:ver-tarjeta-acceso', id=id)
 
+'''-------------------------------------------
+                                Módulo: verPermiso
 
+- Descripción: 
+Muestra la información de cada uno de los permisos registrados en la base de datos
+
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+
+-------------------------------------------'''
+def infoConfigTarjetasAcceso(request):
+    navBar = NavBar.objects.using("timetrackpro").values()
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+    }
+    return render(request,"infoConfigTarjetasAcceso.html",infoVista)
 
 def registrosInsertados(request):
 
@@ -1535,6 +1555,30 @@ def editarPermiso(request):
 
 
     return redirect('timetrackpro:ver-permiso', id=permiso.id)
+
+
+'''-------------------------------------------
+                                Módulo: registroManualControlHorario
+
+- Descripción: 
+Permite agregar información necesaria para el registro manual de la jornada laboral de un empleado
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+
+-------------------------------------------'''
+def insertarRegistroManualMensual(request):
+    navBar = NavBar.objects.using("timetrackpro").values()
+    festivos = FestivosYVacaciones.objects.using("timetrackpro").values()
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "festivos":list(festivos)
+    }
+    return render(request,"insertar-registro-mensual.html",infoVista)
+
 
 '''-------------------------------------------
                                 Módulo: subirDocumento
