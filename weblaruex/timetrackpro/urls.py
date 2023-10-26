@@ -26,12 +26,25 @@ urlpatterns = [
     path('private/timetrackpro/tarjeta/<slug:id>', verTarjetaAcceso ,name='ver-tarjeta-acceso'),
     path('private/timetrackpro/editar-tarjeta', editarTarjetaAcceso ,name='editar-tarjeta-acceso'),
     path('private/timetrackpro/info-configuracion-tarjetas', infoConfigTarjetasAcceso ,name='info-configuracion-tarjetas'),
+
+
     # registros insertados en la base de datos  
     path('private/timetrackpro/agregar-registro', agregarRegistro , name='agregar-registro'),
     path('private/timetrackpro/registros-insertados', registrosInsertados , name='registros-insertados'),
     path('private/timetrackpro/datos-registros-insertados', datosRegistrosInsertados , name='registros-insertados'),
     path('private/timetrackpro/ver-registro/<slug:id>/', verRegistro , name='ver-registro'),
     path('private/timetrackpro/datos-registro/<slug:id>/', datosRegistro , name='datos-registro'),
+    path('private/timetrackpro/ver-linea-registro/<slug:id>/', verLineaRegistro , name='ver-linea-registro'),
+    path('private/timetrackpro/editar-linea-registro/<slug:id>/', editarLineaRegistro , name='editar-linea-registro'),
+    path('private/timetrackpro/obtener-registro/', obtenerRegistro , name='obtener-registro'),
+    path('private/timetrackpro/obtener-registro/<slug:year>', obtenerRegistro , name='obtener-registro'),
+    path('private/timetrackpro/obtener-registro/<slug:year>/<slug:mes>/', obtenerRegistro , name='obtener-registro'),
+    path('private/timetrackpro/obtener-registro/<slug:year>/<slug:mes>/<slug:semana>/', obtenerRegistro , name='obtener-registro'),
+    # información de los registros por cada empleado Laruex
+    path('private/timetrackpro/obtener-registro-empleados/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
+    path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>', obtenerRegistroUsuario , name='obtener-registro-empleados'),
+    path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>/<slug:mes>/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
+    path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>/<slug:mes>/<slug:semana>/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
     # información de los empleados del Laruex
     path('private/timetrackpro/agregar-usuario', agregarUsuario , name='agregar-usuario'),
     path('private/timetrackpro/datos-empleados/', datosEmpleados , name='datos-empleados'),
@@ -80,5 +93,7 @@ urlpatterns = [
 
     #Registro control horario
     path('private/timetrackpro/insertar-registro-manual-mensual/', insertarRegistroManualMensual , name='insertar-registro-manual-mensual'),
+
+
 
 ]

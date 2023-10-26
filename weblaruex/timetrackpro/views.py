@@ -256,6 +256,32 @@ def datosRegistrosInsertados(request):
     return JsonResponse(list(registros), safe=False)
 
 
+
+def obtenerRegistro(request, year=None, mes=None, semana=None):
+    #empleados de las máquinas de control de asistencia
+    empleados = Empleados.objects.using("timetrackpro").values()
+    # current_url = request.path[1:]
+    navBar = NavBar.objects.using("timetrackpro").values()
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+    }
+    return render(request,"informeRegistro.html",infoVista)
+
+def obtenerRegistroUsuario(request, id=None, year=None, mes=None, semana=None):
+    #empleados de las máquinas de control de asistencia
+    empleados = Empleados.objects.using("timetrackpro").values()
+
+    # current_url = request.path[1:]
+    navBar = NavBar.objects.using("timetrackpro").values()
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+    }
+    return render(request,"informeRegistroUsuario.html",infoVista)
+
+
+
 def quitarAcentos(cadena):
     return ''.join((c for c in unicodedata.normalize('NFD', cadena) if unicodedata.category(c) != 'Mn'))
 
@@ -326,7 +352,7 @@ def verRegistro(request, id):
     return render(request,"verRegistro.html",infoVista)
 
 def datosRegistro(request, id):
-    registros = Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).values('id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name')
+    registros = Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).values('id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
     empleados = AuthUser.objects.using("timetrackpro").values('id', 'first_name', 'last_name', 'is_active')
     
     
@@ -342,6 +368,30 @@ def datosRegistro(request, id):
     '''
     return JsonResponse(list(registros), safe=False)
 
+
+def verLineaRegistro(request, id):
+    registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
+    navBar = NavBar.objects.using("timetrackpro").values()
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "registro":registro,
+    }
+    return render(request,"verRegistro.html",infoVista)
+
+def editarLineaRegistro(request, id):
+    registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
+    navBar = NavBar.objects.using("timetrackpro").values()
+    
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "registro":registro,
+    }
+    return render(request,"verRegistro.html",infoVista)
 
 
 def agregarRegistro(request):
@@ -1028,6 +1078,7 @@ def solicitudes(request):
         "empleados":list(empleados)
     }
     return render(request,"solicitudes.html",infoVista)
+
 
 def festivos(request, year=None):
     festivos = None
