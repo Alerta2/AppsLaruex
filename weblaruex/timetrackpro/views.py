@@ -352,7 +352,7 @@ def verRegistro(request, id):
     return render(request,"verRegistro.html",infoVista)
 
 def datosRegistro(request, id):
-    registros = Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).values('id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
+    registros = Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
     empleados = AuthUser.objects.using("timetrackpro").values('id', 'first_name', 'last_name', 'is_active')
     
     
@@ -379,19 +379,25 @@ def verLineaRegistro(request, id):
         "administrador":True,
         "registro":registro,
     }
-    return render(request,"verRegistro.html",infoVista)
+    return render(request,"verLineaRegistro.html",infoVista)
 
 def editarLineaRegistro(request, id):
     registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
-    navBar = NavBar.objects.using("timetrackpro").values()
     
+    if request.method == 'POST':
+        registro.hora = request.POST.get("hora")
+        registro.modificado = 1
+        motivo = request.POST.get("motivo")
+        if motivo != "":
+            registro.motivo_modificacion = motivo
+        else :
+            registro.motivo_modificacion = None
+        registro.save(using='timetrackpro')
+
+
     # guardo los datos en un diccionario
-    infoVista = {
-        "navBar":navBar,
-        "administrador":True,
-        "registro":registro,
-    }
-    return render(request,"verRegistro.html",infoVista)
+
+    return redirect('timetrackpro:ver-linea-registro', id=id)
 
 
 def agregarRegistro(request):

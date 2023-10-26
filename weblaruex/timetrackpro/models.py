@@ -280,6 +280,9 @@ class Registros(models.Model):
     remoto = models.IntegerField(blank=True, null=True)
     #debe relacionarse con id de la tabla registros_jornada_insertados
     id_archivo_leido = models.ForeignKey('RegistrosJornadaInsertados', models.DO_NOTHING, db_column='id_archivo_leido', blank=True, null=True)
+    modificado = models.IntegerField(blank=True, null=True)
+    motivo_modificacion = models.CharField(max_length=255,blank=True, null=True)
+
 
 
     class Meta:
