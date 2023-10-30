@@ -1,0 +1,170 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+  <div class="row d-flex justify-content-center">
+    
+    <h3 class="text-primary text-gradient">Información registro {{registro.nombre_empleado}}</h3>
+    <h4 class="text-secondary">{{registro.hora|date:"d M Y"}}</h4>
+    <div class="col-12 col-xl-4">
+      {% if administrador %}
+        <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+          <div class="row">
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalEditarRegistro">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-pen fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Editar</div>
+            </button>
+            </div>
+            
+            <div class="col">
+              <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarRegistro">             
+               <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
+               <div class="text text-sm">Eliminar</div>
+             </button>
+             </div>
+          </div>
+        </div>
+        
+      {% endif %}
+        
+
+      <div class="card ">
+        <div class="card-header pb-0 p-3">
+        </div>
+        <div class="card-body pt-0 p-3">
+          
+          <ul class="list-group font-weight-bold">
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{registro.nombre_empleado}}</li>
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{registro.hora|date:"H:i:s"}}</li>
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{registro.hora|date:"d M Y"}}</li>
+            {% if registro.remoto != 1 %}
+            <li class="list-group-item border-0 ps-0 text-lg"><i class="fa-solid fa-fingerprint text-dark me-2"></i> {{registro.maquina.nombre}}</li>
+            {% else %}
+            <li class="list-group-item border-0 ps-0 text-lg text-primary"><i class="fa-solid fa-fingerprint  me-2"></i> Remoto</li>
+            {% endif %}
+
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalEditarRegistro" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEditarRegistro"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modificar registro de {{registro.nombre_empleado}}</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:editar-linea-registro' id=registro.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Fecha y Hora</label>
+              
+              <input class="form-control" type="datetime-local" id="hora" name="hora" value="{{registro.hora|date:'Y-m-d H:i' }}" required>
+            </div>
+            
+          </div>
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2">
+              <label class="text-sm">Motivo de la modificacion</label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Indique el motivo por el que se ha modificado el registro" id="motivo" name="motivo" aria-describedby="text-addon" required></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn btn-primary" id="botonModificar" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalEliminarRegistro" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEliminarRegistro"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar registro  de {{registro.nombre_empleado}}</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:eliminar-linea-registro' id=registro.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+
+            <div class="col-xl-8 mx-auto my-2" >
+              <h6>¿Está seguro/a de eliminar el registro?</h6>
+              <span>{{registro.nombre_empleado}} - {{registro.hora|date:'d' }} de {{registro.hora|date:'M' }} de {{registro.hora|date:'Y' }} a las {{registro.hora|date:'H:i'}}</span>
+              
+            </div>
+            <input class="form-control" type="text" id="registradorEliminacion" name="registradorEliminacion" value="{{request.user.id}}" required hidden>
+            
+          </div>
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2">
+              <label class="text-sm">Motivo de la modificacion</label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Indique el motivo por el que se ha modificado el registro" id="motivoEliminacion" name="motivoEliminacion" aria-describedby="text-addon" required></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn btn-primary" id="botonEliminar" disabled>Eliminar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+  // compruebo si en textarea de motivo hay algo escrito
+  // si hay algo escrito, habilito el boton de guardar
+  // si no hay nada escrito, deshabilito el boton de guardar
+  $(document).ready(function(){
+    $('#motivo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+  });
+
+
+
+    // compruebo si en textarea de motivoEliminación hay algo escrito
+  // si hay algo escrito, habilito el boton de guardar
+  // si no hay nada escrito, deshabilito el boton de guardar
+  $(document).ready(function(){
+    $('#motivoEliminacion').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonEliminar').attr('disabled', false);
+    })
+  });
+</script>
+{% endblock %}

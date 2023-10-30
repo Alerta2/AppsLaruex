@@ -439,6 +439,61 @@ def verErroresRegistrados(request, id=None):
     }
     return render(request,"errores-registrados.html",infoVista)
 
+
+
+
+def verErrorRegistroNotificado(request, id):
+    error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id).values('id','id_empleado','id_empleado__id','id_empleado_id', 'hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica')[0]
+    empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=error["id_empleado__id"])[0]
+    empleados = Empleados.objects.using("timetrackpro").values()
+    navBar = NavBar.objects.using("timetrackpro").values()
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "error":error,
+        "empleado":empleado,
+        "empleados":list(empleados),
+    }
+    return render(request,"verErrorNotificado.html",infoVista)
+
+def modificarEstadoErrorRegistroNotificado(request, id):
+    error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id)[0]
+    if request.method == 'POST':
+        motivo = None
+        estado = request.POST.get("estado")
+
+        if estado == "2":
+           motivo = request.POST.get("motivo")
+
+        error.estado = estado
+        error.motivo_rechazo = motivo
+
+        error.save(using='timetrackpro')
+
+    # guardo los datos en un diccionario
+
+    return redirect('timetrackpro:ver-error-registro-notificado', id=id)
+
+def editarErrorRegistroNotificado(request, id):
+    error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id)[0]
+    if request.method == 'POST':
+        error.hora = request.POST.get("hora")
+        if request.POST.get("empleadoModificado") != "":
+            empleado = Empleados.objects.using("timetrackpro").filter(id=request.POST.get("empleadoModificado"))[0]
+            error.id_empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=empleado)[0]
+        error.save(using='timetrackpro')
+
+    # guardo los datos en un diccionario
+
+    return redirect('timetrackpro:ver-error-registro-notificado', id=id)
+
+def eliminarErrorRegistroNotificado(request, id):
+    error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id)[0]
+    error.delete(using='timetrackpro')
+    # guardo los datos en un diccionario
+    return redirect('timetrackpro:ver-errores-registrados')
+
 def datosErroresRegistrados(request, id=None):
     # obtengo los festivos registrados en la base de datos
     errores = []

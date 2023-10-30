@@ -101,6 +101,10 @@ urlpatterns = [
     path('private/timetrackpro/ver-errores-registrados/<slug:id>/', verErroresRegistrados , name='ver-errores-registrados'),
     path('private/timetrackpro/datos-errores-registrados/', datosErroresRegistrados , name='datos-errores-registrados'),
     path('private/timetrackpro/datos-errores-registrados/<slug:id>/', datosErroresRegistrados , name='datos-errores-registrados'),
+    path('private/timetrackpro/ver-error-registro-notificado/<slug:id>/', verErrorRegistroNotificado , name='ver-error-registro-notificado'),
+    path('private/timetrackpro/editar-error-registro-notificado/<slug:id>/', editarErrorRegistroNotificado , name='editar-error-registro-notificado'),
+    path('private/timetrackpro/modificar-estado-error-registro-notificado/<slug:id>/', modificarEstadoErrorRegistroNotificado , name='modificar-estado-error-registro-notificado'),
+    path('private/timetrackpro/eliminar-error-registro-notificado/<slug:id>/', eliminarErrorRegistroNotificado ,  name='eliminar-error-registro-notificado')
 
 
 ]

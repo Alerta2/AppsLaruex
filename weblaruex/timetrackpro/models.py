@@ -311,6 +311,7 @@ class RegistrosEliminados(models.Model):
 
 
 class ErroresRegistroNotificados(models.Model):
+    id= models.AutoField(db_column='id', primary_key=True)
     id_empleado = models.ForeignKey('RelEmpleadosUsuarios', models.DO_NOTHING, db_column='id_empleado')
     hora = models.DateTimeField()
     motivo = models.CharField(max_length=255)
