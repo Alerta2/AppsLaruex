@@ -310,6 +310,18 @@ class RegistrosEliminados(models.Model):
         db_table = 'registros_eliminados'
 
 
+class ErroresRegistroNotificados(models.Model):
+    id_empleado = models.ForeignKey('RelEmpleadosUsuarios', models.DO_NOTHING, db_column='id_empleado')
+    hora = models.DateTimeField()
+    motivo = models.CharField(max_length=255)
+    estado = models.IntegerField()
+    motivo_rechazo = models.CharField(max_length=255, blank=True, null=True)
+    quien_notifica = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='quien_notifica')
+
+    class Meta:
+        managed = False
+        db_table = 'errores_registro_notificados'
+
 class RegitroSolicitudViajes(models.Model):
     id = models.IntegerField(primary_key=True)
     id_empleado = models.IntegerField(blank=True, null=True)

@@ -94,7 +94,13 @@ urlpatterns = [
 
     #Registro control horario
     path('private/timetrackpro/insertar-registro-manual-mensual/', insertarRegistroManualMensual , name='insertar-registro-manual-mensual'),
+    path('private/timetrackpro/insertar-registro-manual/', insertarRegistroManual , name='insertar-registro-manual'),
 
+    #Registro de errores
+    path('private/timetrackpro/ver-errores-registrados/', verErroresRegistrados , name='ver-errores-registrados'),
+    path('private/timetrackpro/ver-errores-registrados/<slug:id>/', verErroresRegistrados , name='ver-errores-registrados'),
+    path('private/timetrackpro/datos-errores-registrados/', datosErroresRegistrados , name='datos-errores-registrados'),
+    path('private/timetrackpro/datos-errores-registrados/<slug:id>/', datosErroresRegistrados , name='datos-errores-registrados'),
 
 
 ]

@@ -111,6 +111,19 @@ class Empleados(models.Model):
         db_table = 'empleados'
 
 
+class ErroresRegistroNotificados(models.Model):
+    id_empleado = models.ForeignKey('RelEmpleadosUsuarios', models.DO_NOTHING, db_column='id_empleado')
+    hora = models.DateTimeField()
+    motivo = models.CharField(max_length=255)
+    estado = models.IntegerField()
+    motivo_rechazo = models.CharField(max_length=255, blank=True, null=True)
+    quien_notifica = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='quien_notifica')
+
+    class Meta:
+        managed = False
+        db_table = 'errores_registro_notificados'
+
+
 class EstadosSolicitudes(models.Model):
     nombre = models.CharField(max_length=255)
 
@@ -206,25 +219,6 @@ class RegistroAusenciasAceptadas(models.Model):
         db_table = 'registro_ausencias_aceptadas'
 
 
-class RegistroManualControlHorario(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    id_rel_emp_users = models.ForeignKey('RelEmpleadosUsuarios', models.DO_NOTHING, db_column='id_rel_emp_users')
-    mes = models.IntegerField()
-    year = models.IntegerField()
-    dia = models.IntegerField()
-    hora_1_entrada = models.TimeField()
-    hora_1_salida = models.TimeField()
-    hora_2_entrada = models.TimeField()
-    hora_2_salida = models.TimeField()
-    motivo = models.CharField(max_length=255, blank=True, null=True)
-    laborable = models.IntegerField()
-    registrador = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='registrador')
-
-    class Meta:
-        managed = False
-        db_table = 'registro_manual_control_horario'
-
-
 class Registros(models.Model):
     id_empleado = models.ForeignKey(Empleados, models.DO_NOTHING, db_column='id_empleado')
     nombre_empleado = models.CharField(max_length=255)
@@ -232,10 +226,29 @@ class Registros(models.Model):
     maquina = models.ForeignKey(MaquinaControlAsistencia, models.DO_NOTHING, db_column='maquina', blank=True, null=True)
     remoto = models.IntegerField()
     id_archivo_leido = models.ForeignKey('RegistrosJornadaInsertados', models.DO_NOTHING, db_column='id_archivo_leido', blank=True, null=True)
+    modificado = models.IntegerField(blank=True, null=True)
+    motivo_modificacion = models.CharField(max_length=250, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'registros'
+
+
+class RegistrosEliminados(models.Model):
+    id_empleado = models.ForeignKey(Empleados, models.DO_NOTHING, db_column='id_empleado')
+    nombre_empleado = models.CharField(max_length=255)
+    hora = models.DateTimeField()
+    maquina = models.ForeignKey(MaquinaControlAsistencia, models.DO_NOTHING, db_column='maquina', blank=True, null=True)
+    remoto = models.IntegerField()
+    id_archivo_leido = models.ForeignKey('RegistrosJornadaInsertados', models.DO_NOTHING, db_column='id_archivo_leido', blank=True, null=True)
+    fecha_eliminacion = models.DateTimeField()
+    motivo = models.CharField(max_length=250)
+    eliminado_por = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='eliminado_por')
+    id_registro_eliminado = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'registros_eliminados'
 
 
 class RegistrosJornadaInsertados(models.Model):
@@ -251,6 +264,44 @@ class RegistrosJornadaInsertados(models.Model):
     class Meta:
         managed = False
         db_table = 'registros_jornada_insertados'
+
+
+class RegistrosManualesControlHorario(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    id_rel_emp_users = models.ForeignKey('RelEmpleadosUsuarios', models.DO_NOTHING, db_column='id_rel_emp_users')
+    mes = models.IntegerField()
+    year = models.IntegerField()
+    dia = models.IntegerField()
+    hora_1_entrada = models.TimeField()
+    hora_1_salida = models.TimeField()
+    hora_2_entrada = models.TimeField()
+    hora_2_salida = models.TimeField()
+    motivo = models.CharField(max_length=255, blank=True, null=True)
+    laborable = models.IntegerField()
+    registrador = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='registrador')
+
+    class Meta:
+        managed = False
+        db_table = 'registros_manuales_control_horario'
+
+
+class RegistrosManualesControlHorarioNoInsertados(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    id_rel_emp_users = models.ForeignKey('RelEmpleadosUsuarios', models.DO_NOTHING, db_column='id_rel_emp_users')
+    mes = models.IntegerField()
+    year = models.IntegerField()
+    dia = models.IntegerField()
+    hora_1_entrada = models.TimeField()
+    hora_1_salida = models.TimeField()
+    hora_2_entrada = models.TimeField()
+    hora_2_salida = models.TimeField()
+    motivo = models.CharField(max_length=255, blank=True, null=True)
+    laborable = models.IntegerField()
+    registrador = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='registrador')
+
+    class Meta:
+        managed = False
+        db_table = 'registros_manuales_control_horario_no_insertados'
 
 
 class RegitroSolicitudViajes(models.Model):
@@ -341,18 +392,18 @@ class RelacinDeEmpleados(models.Model):
     f6 = models.CharField(max_length=255, blank=True, null=True)
     turno = models.CharField(db_column='Turno', max_length=255, blank=True, null=True)  # Field name made lowercase.
     f8 = models.CharField(max_length=255, blank=True, null=True)
-    lï¿½mite_empleados_0_admin_1_field = models.CharField(db_column='Lï¿½mite(Empleados 0/Admin 1)', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+    límite_empleados_0_admin_1_field = models.CharField(db_column='Límite(Empleados 0/Admin 1)', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
     f10 = models.CharField(max_length=255, blank=True, null=True)
     dactil_field = models.CharField(db_column='Dactil.', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
     f12 = models.CharField(max_length=255, blank=True, null=True)
     pin = models.CharField(db_column='PIN', max_length=255, blank=True, null=True)  # Field name made lowercase.
     f14 = models.CharField(max_length=255, blank=True, null=True)
-    nï¿½mero_de_mï¿½quina = models.CharField(db_column='Nï¿½mero de mï¿½quina', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    número_de_máquina = models.CharField(db_column='Número de máquina', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     f16 = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'relaciï¿½n de empleados'
+        db_table = 'relación de empleados'
 
 
 class TarjetasAcceso(models.Model):

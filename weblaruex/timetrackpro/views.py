@@ -417,15 +417,64 @@ def eliminarLineaRegistro(request, id):
 
 
         nuevoRegistroEliminado = RegistrosEliminados(id_registro_eliminado=idRegistroEliminado, id_empleado=idEmpleado, nombre_empleado=nombreEmpleado, hora=hora, maquina=maquina, remoto=remoto, id_archivo_leido=idArchivoLeido, fecha_eliminacion=fechaEliminacion, motivo=motivo, eliminado_por=registrador)
-   
 
         nuevoRegistroEliminado.save(using='timetrackpro')
         registro.delete(using='timetrackpro')
-        
 
 
     # guardo los datos en un diccionario
     return redirect('timetrackpro:ver-registro', id=archivoModificado.id)
+
+def verErroresRegistrados(request, id=None):
+    navBar = NavBar.objects.using("timetrackpro").values()
+    if (id is None):
+        errores = ErroresRegistroNotificados.objects.using("timetrackpro").values()
+    else:
+        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=id).values()
+    
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "errores":list(errores)
+    }
+    return render(request,"errores-registrados.html",infoVista)
+
+def datosErroresRegistrados(request, id=None):
+    # obtengo los festivos registrados en la base de datos
+    errores = []
+    if id == None:
+        errores = ErroresRegistroNotificados.objects.using("timetrackpro").values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre')
+    else:
+        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=id).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre') 
+    # devuelvo la lista en formato json
+    return JsonResponse(list(errores), safe=False)
+
+
+def insertarRegistroManual(request):
+    navBar = NavBar.objects.using("timetrackpro").values()
+    empleados = Empleados.objects.using("timetrackpro").values('id', 'nombre')
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "empleados":list(empleados)
+    }
+    if request.method == 'POST':
+        idEmpleado = request.POST.get("idEmpleado")
+        hora = request.POST.get("hora")
+        maquina = None
+        remoto = 0
+        idArchivoLeido = None
+        fechaLectura = datetime.now()
+        insertador = AuthUser.objects.using("timetrackpro").filter(id=int(request.POST.get("registrador")))[0]
+
+        nuevoErrorRegistrado = ErroresRegistroNotificados
+        nuevoErrorRegistrado.save(using='timetrackpro')
+        return redirect('timetrackpro:errores-registrados', id=idEmpleado)   
+     
+    return render(request,"insertar-registro-diario.html", infoVista)
+
 
 
 def agregarRegistro(request):
