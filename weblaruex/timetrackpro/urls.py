@@ -36,6 +36,7 @@ urlpatterns = [
     path('private/timetrackpro/datos-registro/<slug:id>/', datosRegistro , name='datos-registro'),
     path('private/timetrackpro/ver-linea-registro/<slug:id>/', verLineaRegistro , name='ver-linea-registro'),
     path('private/timetrackpro/editar-linea-registro/<slug:id>/', editarLineaRegistro , name='editar-linea-registro'),
+    path('private/timetrackpro/eliminar-linea-registro/<slug:id>/', eliminarLineaRegistro , name='eliminar-linea-registro'),
     path('private/timetrackpro/obtener-registro/', obtenerRegistro , name='obtener-registro'),
     path('private/timetrackpro/obtener-registro/<slug:year>', obtenerRegistro , name='obtener-registro'),
     path('private/timetrackpro/obtener-registro/<slug:year>/<slug:mes>/', obtenerRegistro , name='obtener-registro'),

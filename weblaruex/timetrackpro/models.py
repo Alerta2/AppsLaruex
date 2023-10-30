@@ -290,6 +290,26 @@ class Registros(models.Model):
         db_table = 'registros'
 
 
+class RegistrosEliminados(models.Model):
+    id = models.AutoField(db_column='id', primary_key=True)
+    id_registro_eliminado = models.IntegerField()
+    id_empleado = models.ForeignKey(Empleados, models.DO_NOTHING, db_column='id_empleado', blank=True, null=True)
+    nombre_empleado = models.CharField(max_length=255, blank=True, null=True)
+    hora = models.DateTimeField()
+    maquina = models.ForeignKey(MaquinaControlAsistencia, models.DO_NOTHING, db_column='maquina', blank=True, null=True)
+    remoto = models.IntegerField(blank=True, null=True)
+    #debe relacionarse con id de la tabla registros_jornada_insertados
+    id_archivo_leido = models.ForeignKey('RegistrosJornadaInsertados', models.DO_NOTHING, db_column='id_archivo_leido', blank=True, null=True)
+    fecha_eliminacion =  models.DateTimeField()
+    motivo = models.CharField(max_length=255)
+    eliminado_por = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='eliminado_por', blank=True, null=True)
+    id_registro_eliminado = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'registros_eliminados'
+
+
 class RegitroSolicitudViajes(models.Model):
     id = models.IntegerField(primary_key=True)
     id_empleado = models.IntegerField(blank=True, null=True)

@@ -399,6 +399,34 @@ def editarLineaRegistro(request, id):
 
     return redirect('timetrackpro:ver-linea-registro', id=id)
 
+def eliminarLineaRegistro(request, id):
+    registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
+    archivoModificado = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=registro.id_archivo_leido.id)[0]
+
+    if request.method == 'POST':
+        idRegistroEliminado = registro.id
+        idEmpleado = registro.id_empleado
+        nombreEmpleado = registro.nombre_empleado
+        hora = registro.hora
+        maquina = registro.maquina
+        remoto = registro.remoto
+        idArchivoLeido = archivoModificado
+        fechaEliminacion = datetime.now()
+        motivo = request.POST.get("motivoEliminacion")
+        registrador = AuthUser.objects.using("timetrackpro").filter(id=int(request.POST.get("registradorEliminacion")))[0]
+
+
+        nuevoRegistroEliminado = RegistrosEliminados(id_registro_eliminado=idRegistroEliminado, id_empleado=idEmpleado, nombre_empleado=nombreEmpleado, hora=hora, maquina=maquina, remoto=remoto, id_archivo_leido=idArchivoLeido, fecha_eliminacion=fechaEliminacion, motivo=motivo, eliminado_por=registrador)
+   
+
+        nuevoRegistroEliminado.save(using='timetrackpro')
+        registro.delete(using='timetrackpro')
+        
+
+
+    # guardo los datos en un diccionario
+    return redirect('timetrackpro:ver-registro', id=archivoModificado.id)
+
 
 def agregarRegistro(request):
     navBar = NavBar.objects.using("timetrackpro").values()
