@@ -318,6 +318,9 @@ class ErroresRegistroNotificados(models.Model):
     estado = models.IntegerField()
     motivo_rechazo = models.CharField(max_length=255, blank=True, null=True)
     quien_notifica = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='quien_notifica')
+    hora_notificacion = models.DateTimeField()
+    hora_modificacion_o_rechazo = models.DateTimeField(blank=True, null=True)
+
 
     class Meta:
         managed = False

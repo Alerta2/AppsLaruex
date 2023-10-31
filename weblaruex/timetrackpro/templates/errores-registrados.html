@@ -22,11 +22,19 @@
 <script>
 
 
+idFilter = '{{idFilter}}';
 
+  url = '{% url "timetrackpro:datos-errores-notificados" %}';
+
+  if (idFilter != 'None') {
+    url = "{% url 'timetrackpro:datos-errores-notificados' %}" + idFilter ;
+  }
+
+console.log(url)
 $("#tabla_errores_insertados").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "/private/timetrackpro/datos-errores-registrados/",
+    url: url ,
     cache: false, 
     columns: [
       {
@@ -135,6 +143,8 @@ $("#tabla_errores_insertados").bootstrapTable({
     
   });
 
+
+
 function mostrarNombreRegistro() {
   var archivoInput = document.getElementById('archivoSeleccionado');
   var selector = document.getElementById('selectorDocumento');
@@ -153,6 +163,7 @@ function mostrarNombreRegistro() {
     lector.readAsDataURL(archivoInput.files[0]);
   } 
 }
+
 
 
 

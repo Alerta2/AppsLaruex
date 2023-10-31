@@ -12,6 +12,8 @@ urlpatterns = [
     path('private/timetrackpro/', home ,name='home'),
     path('private/timetrackpro/documentacion', documentacion ,name='documentacion'),
     path('private/timetrackpro/perfil', perfil ,name='perfil'),
+    path('private/timetrackpro/404', noEncontrado ,name='404'),
+    path('private/timetrackpro/sin-permiso', sinPermiso ,name='sin-permiso'),
 
     path('private/timetrackpro/dashboard', dashBoard ,name='dashBoard'),
     path('private/timetrackpro/tablas', tablas ,name='tablas'),
@@ -97,15 +99,18 @@ urlpatterns = [
     path('private/timetrackpro/insertar-registro-manual/', insertarRegistroManual , name='insertar-registro-manual'),
 
     #Registro de errores
-    path('private/timetrackpro/ver-errores-registrados/', verErroresRegistrados , name='ver-errores-registrados'),
-    path('private/timetrackpro/ver-errores-registrados-pendientes/', verErroresRegistrados , name='ver-errores-registrados-pendientes'),
-    path('private/timetrackpro/ver-errores-registrados/<slug:id>/', verErroresRegistrados , name='ver-errores-registrados'),
-    path('private/timetrackpro/datos-errores-registrados/', datosErroresRegistrados , name='datos-errores-registrados'),
-    path('private/timetrackpro/datos-errores-registrados/<slug:id>/', datosErroresRegistrados , name='datos-errores-registrados'),
+    path('private/timetrackpro/notificar-error-fichaje/', notificarErrorEnFichaje , name='notificar-error-fichaje'),
+    path('private/timetrackpro/ver-errores-notificados/', verErroresNotificados , name='ver-errores-notificados'),
+    path('private/timetrackpro/ver-errores-notificados-pendientes/', verErroresNotificadosPendientes , name='ver-errores-notificados-pendientes'),
+    path('private/timetrackpro/datos-errores-notificados-pendientes/', datosErroresNotificadosPendientes , name='datos-errores-notificados-pendientes'),
+    path('private/timetrackpro/ver-errores-notificados/<slug:id>/', verErroresNotificados , name='ver-errores-notificados'),
+    path('private/timetrackpro/datos-errores-notificados/', datosErroresNotificados , name='datos-errores-notificados'),
+    path('private/timetrackpro/datos-errores-notificados/<slug:id>/', datosErroresNotificados , name='datos-errores-notificados'),
     path('private/timetrackpro/ver-error-registro-notificado/<slug:id>/', verErrorRegistroNotificado , name='ver-error-registro-notificado'),
     path('private/timetrackpro/editar-error-registro-notificado/<slug:id>/', editarErrorRegistroNotificado , name='editar-error-registro-notificado'),
     path('private/timetrackpro/modificar-estado-error-registro-notificado/<slug:id>/', modificarEstadoErrorRegistroNotificado , name='modificar-estado-error-registro-notificado'),
-    path('private/timetrackpro/eliminar-error-registro-notificado/<slug:id>/', eliminarErrorRegistroNotificado ,  name='eliminar-error-registro-notificado')
-
+    path('private/timetrackpro/eliminar-error-registro-notificado/<slug:id>/', eliminarErrorRegistroNotificado ,  name='eliminar-error-registro-notificado'), 
+    path('private/timetrackpro/ver-mis-errores-notificados', verMisErroresNotificados , name='ver-mis-errores-notificados'),
+    path('private/timetrackpro/datos-mis-errores-notificados', datosMisErroresNotificados , name='datos-mis-errores-notificados'),
 
 ]

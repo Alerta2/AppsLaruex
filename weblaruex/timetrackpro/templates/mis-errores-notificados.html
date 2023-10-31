@@ -5,13 +5,13 @@
   <div class="col-12">
     <div class="card mb-4">
       <div class="card-header pb-0 d-flex align-items-center">
-            <h5>Errores Pendientes de accetar o Rechazar</h5>
+            <h5>Mis Errores</h5>
       </div>
       <div class="card-body px-0 pt-0 pb-2">
         <div class="table-responsive p-0">
           <div class="mx-4">
 
-            <table  id="tabla_errores_insertados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            <table  id="tabla_mis_errores" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
         </div>
       </div>
@@ -20,13 +20,10 @@
 </div>
 
 <script>
-
-
-
-$("#tabla_errores_insertados").bootstrapTable({
+$("#tabla_mis_errores").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "{% url 'timetrackpro:datos-errores-notificados-pendientes' %}",
+    url: '{% url "timetrackpro:datos-mis-errores-notificados" %}',
     cache: false, 
     columns: [
       {
@@ -135,6 +132,8 @@ $("#tabla_errores_insertados").bootstrapTable({
     
   });
 
+
+
 function mostrarNombreRegistro() {
   var archivoInput = document.getElementById('archivoSeleccionado');
   var selector = document.getElementById('selectorDocumento');
@@ -153,6 +152,7 @@ function mostrarNombreRegistro() {
     lector.readAsDataURL(archivoInput.files[0]);
   } 
 }
+
 
 
 

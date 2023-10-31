@@ -11,6 +11,8 @@ from datetime import date, datetime
 from django.core.exceptions import ObjectDoesNotExist
 import unicodedata
 from django.db.models import Q
+from timetrackpro.funciones.funcionesAuxiliares import *
+
 
 
 # ? Configuración de mensajes de 
@@ -37,15 +39,62 @@ infoContactoTarjeta = "Se ruega a quien encuentre este carné se ponga en contac
 
 excluidos = ["Prueba", "Pruebas", "prueba", "pruebas", "PRUEBA", "PRUEBAS", "Usuario Pruebas",  "test", "TEST", "Test" , " ", "", "root", "CSN", "PCivil Provisional", "Protección Civil", "JEx", "Admin", "admin"]
 
+# Defino la barra de navegación
+navBar = NavBar.objects.using("timetrackpro").values()
 
 
 def home(request):
-    navBar = NavBar.objects.using("timetrackpro").values()
-    return render(request,"home.html",{"navBar":navBar})
+    
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":esAdministrador(request.user.id),
+    }
+
+    return render(request,"home.html",infoVista)
+
+'''
+    Vista que indica que no se ha encontrado la página
+'''
+def noEncontrado(request):
+    
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":esAdministrador(request.user.id),
+    }
+
+    return render(request,"404.html",infoVista)
+
+'''
+    Vista que indica que no se tienen los permisos necesarios para acceder a la página
+'''
+def sinPermiso(request):
+    
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":esAdministrador(request.user.id),
+        "TimeTrackProTittle":"TimeTrackPro - Sin permiso",
+    }
+
+    return render(request,"sinPermiso.html",infoVista)
+
+def habilitaciones(request):
+    # guardo los datos en un diccionario
+    administrador = esAdministrador(request.user.id)
+
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+    }
+    if administrador:
+        return render(request,"habilitaciones.html",infoVista)
+    else:
+        return redirect('timetrackpro:home')
 
 def tarjetasAcceso(request):
     # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
     tarjetasActivas = TarjetasAcceso.objects.using("timetrackpro").filter(activo=1).order_by("nombre").values()
     tarjetasInactivas = TarjetasAcceso.objects.using("timetrackpro").filter(activo=0).order_by("nombre").values()
 
@@ -110,7 +159,6 @@ def agregarTarjetaAcceso(request):
 
 def verTarjetaAcceso(request, id):
     # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
     tarjeta = TarjetasAcceso.objects.using("timetrackpro").filter(id=id).values()[0]
 
     # guardo los datos en un diccionario
@@ -227,7 +275,7 @@ El usuario debe estar autenticado.
 
 -------------------------------------------'''
 def infoConfigTarjetasAcceso(request):
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
 
     # guardo los datos en un diccionario
     infoVista = {
@@ -239,7 +287,7 @@ def infoConfigTarjetasAcceso(request):
 def registrosInsertados(request):
 
     # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     archivos = RegistrosJornadaInsertados.objects.using("timetrackpro").order_by('year', 'mes').all()
 
     # guardo los datos en un diccionario
@@ -261,7 +309,7 @@ def obtenerRegistro(request, year=None, mes=None, semana=None):
     #empleados de las máquinas de control de asistencia
     empleados = Empleados.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     infoVista = {
         "navBar":navBar,
         "administrador":True,
@@ -273,7 +321,7 @@ def obtenerRegistroUsuario(request, id=None, year=None, mes=None, semana=None):
     empleados = Empleados.objects.using("timetrackpro").values()
 
     # current_url = request.path[1:]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     infoVista = {
         "navBar":navBar,
         "administrador":True,
@@ -305,7 +353,7 @@ def convertirFormatoDateTime(datoFecha):
 
 def verRegistro(request, id):
     registro = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=id)[0]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     maquina = MaquinaControlAsistencia.objects.using("timetrackpro").filter(nombre__icontains=registro.seccion)[0]
     # leemos el fichero que acabamos de insertar, linea a linea y comprobamos si ya existe en la base de datos
     ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_NUEVO + registro.ruta
@@ -371,7 +419,7 @@ def datosRegistro(request, id):
 
 def verLineaRegistro(request, id):
     registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
 
     # guardo los datos en un diccionario
     infoVista = {
@@ -425,32 +473,81 @@ def eliminarLineaRegistro(request, id):
     # guardo los datos en un diccionario
     return redirect('timetrackpro:ver-registro', id=archivoModificado.id)
 
-def verErroresRegistrados(request, id=None):
-    navBar = NavBar.objects.using("timetrackpro").values()
+def verMisErroresNotificados(request):
+        
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+    }
+    return render(request,"mis-errores-notificados.html",infoVista)
+
+
+def datosMisErroresNotificados(request):
+    # obtengo el id del usuario
+    idUsuario = request.user.id
+    # obtengo la relacion de ids del usuario con los empleados
+    idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=idUsuario)[0]
+    errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=idEmpleado).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre') 
+    return JsonResponse(list(errores), safe=False)
+
+def verErroresNotificados(request, id=None):
+    idFilter = None
+    
     if (id is None):
         errores = ErroresRegistroNotificados.objects.using("timetrackpro").values()
     else:
         errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=id).values()
+        idFilter = id
     
     infoVista = {
         "navBar":navBar,
         "administrador":True,
-        "errores":list(errores)
+        "errores":list(errores),
+        "idFilter":idFilter
     }
     return render(request,"errores-registrados.html",infoVista)
 
 
 
-def verErroresRegistradosPendientes(request):
-    navBar = NavBar.objects.using("timetrackpro").values()
-    errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(estado=1).values()
-
+def verErroresNotificadosPendientes(request):
+    
     infoVista = {
         "navBar":navBar,
         "administrador":True,
-        "errores":list(errores)
     }
     return render(request,"errores-registrados-pendientes.html",infoVista)
+
+def datosErroresNotificadosPendientes(request):
+    # obtengo los festivos registrados en la base de datos
+    errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(estado=1).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre') 
+    # devuelvo la lista en formato json
+    return JsonResponse(list(errores), safe=False)
+
+def notificarErrorEnFichaje(request):
+    
+    empleados = Empleados.objects.using("timetrackpro").values('id', 'nombre')
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "empleados":list(empleados)
+    }
+    if request.method == 'POST':
+        idEmpleadoMaquina = request.POST.get("idEmpleadoMaquina")
+        empleado = Empleados.objects.using("timetrackpro").filter(id=idEmpleadoMaquina)[0]
+        idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=empleado)[0]
+        motivo = request.POST.get("motivoError")
+        estado = 1 # indico que aún esta pendiente de revisar
+        hora = request.POST.get("hora")
+        registrador = AuthUser.objects.using("timetrackpro").filter(id=request.POST.get("idEmpleado"))[0]
+        horaNotificacion = datetime.now()
+
+        nuevoErrorRegistrado = ErroresRegistroNotificados(id_empleado=idEmpleado, hora=hora, motivo=motivo, estado=estado, quien_notifica=registrador, hora_notificacion=horaNotificacion)
+        nuevoErrorRegistrado.save(using='timetrackpro')
+        return redirect('timetrackpro:ver-errores-notificados', id=idEmpleadoMaquina)   
+     
+    return render(request,"notificar-error-registro.html", infoVista)
 
 
 
@@ -458,7 +555,7 @@ def verErrorRegistroNotificado(request, id):
     error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id).values('id','id_empleado','id_empleado__id','id_empleado_id', 'hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica')[0]
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=error["id_empleado__id"])[0]
     empleados = Empleados.objects.using("timetrackpro").values()
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
@@ -505,11 +602,12 @@ def eliminarErrorRegistroNotificado(request, id):
     # guardo los datos en un diccionario
     return redirect('timetrackpro:ver-errores-registrados')
 
-def datosErroresRegistrados(request, id=None):
+def datosErroresNotificados(request, id=None):
     # obtengo los festivos registrados en la base de datos
     errores = []
     if id == None:
         errores = ErroresRegistroNotificados.objects.using("timetrackpro").values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre')
+
     else:
         errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=id).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre') 
     # devuelvo la lista en formato json
@@ -517,7 +615,7 @@ def datosErroresRegistrados(request, id=None):
 
 
 def insertarRegistroManual(request):
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     empleados = Empleados.objects.using("timetrackpro").values('id', 'nombre')
 
     # guardo los datos en un diccionario
@@ -544,7 +642,7 @@ def insertarRegistroManual(request):
 
 
 def agregarRegistro(request):
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     if request.method == 'POST':
         
         seccion = request.POST.get("seccion")
@@ -576,7 +674,7 @@ def agregarRegistro(request):
 
 def empleados(request):
     # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     empleados = RelEmpleadosUsuarios.objects.using("timetrackpro").values('id_usuario__id', 'id_usuario__nombre', 'id_usuario__apellidos', 'id_usuario__img', 'id_usuario__dni', 'id_usuario__fecha_nacimiento', 'id_usuario__telefono', 'id_usuario__telefono2', 'id_usuario__email','id_usuario__email2', 'id_usuario__extension', 'id_usuario__puesto', 'id_usuario__direccion', 'id_usuario__info_adicional', 'id_usuario__fecha_alta_app', 'id_usuario__fecha_baja_app', 'id_empleado__id', 'id_empleado__nombre', 'id_empleado__turno', 'id_empleado__horas_maxima_contrato', 'id_empleado__en_practicas', 'id_empleado__maquina_laboratorio', 'id_empleado__maquina_alerta2', 'id_empleado__maquina_departamento', 'id_auth_user__id', 'id_auth_user__first_name', 'id_auth_user__last_name', 'id_auth_user__is_active', 'id_auth_user__is_superuser', 'id_auth_user__is_staff', 'id_auth_user__username', 'id_auth_user__password', 'id_auth_user__last_login', 'id_auth_user__date_joined')
 
 
@@ -612,7 +710,7 @@ def agregarUsuario(request):
     
     falta_tarjeta = True
     # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     usuariosApp = AuthUser.objects.using("timetrackpro").values()
     # guardo los datos en un diccionario
     infoVista = {
@@ -688,7 +786,7 @@ def agregarUsuario(request):
 
 def usuariosMaquina(request):
         # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     usuariosMaquina = Empleados.objects.using("timetrackpro").values('id', 'nombre', 'turno', 'horas_maxima_contrato', 'en_practicas', 'maquina_laboratorio', 'maquina_alerta2', 'maquina_departamento')
 
     # guardo los datos en un diccionario
@@ -770,7 +868,7 @@ def verUsuarioMaquina(request, id):
     pin, esAdmin, ficharRemoto = 0, 0, 0
 
     # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     usuarioMaquina = Empleados.objects.using("timetrackpro").filter(id=id)[0]
     relUser = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=usuarioMaquina)[0]
     
@@ -867,7 +965,7 @@ El usuario debe estar autenticado.
 def verEmpleado(request, id):
     
         # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     usuario = Usuarios.objects.using("timetrackpro").filter(id=id)[0]
     empleado = None 
     userDjango = None
@@ -914,7 +1012,7 @@ El usuario debe estar autenticado.
 
 -------------------------------------------'''
 def asociarUsuario(request):
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     usuariosApp = Usuarios.objects.using("timetrackpro").values()
     # datos de los empleados registrados en las máquinas de control de asistencia
     empleados = Empleados.objects.using("timetrackpro").values()
@@ -982,7 +1080,7 @@ El usuario debe estar autenticado.
 
 -------------------------------------------'''
 def editarAsociarUsuario(request, id):
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     relacionActual = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=id).values('id', 'id_usuario', 'id_usuario__id', 'id_usuario__nombre', 'id_usuario__apellidos','id_empleado', 'id_empleado__id','id_empleado__nombre','id_auth_user', 'id_auth_user__id','id_auth_user__first_name','id_auth_user__last_name', 'id_tarjeta_acceso', 'id_tarjeta_acceso__id', 'id_tarjeta_acceso__nombre', 'id_tarjeta_acceso__apellidos', 'id_tarjeta_acceso__id_tarjeta')[0]
     usuariosApp = Usuarios.objects.using("timetrackpro").values()
     # datos de los empleados registrados en las máquinas de control de asistencia
@@ -1053,7 +1151,7 @@ El usuario debe estar autenticado.
 
 -------------------------------------------'''
 def editarEmpleado(request, id):
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     usuario = Usuarios.objects.using("timetrackpro").filter(id=id)[0]
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=usuario)[0]
     # guardo los datos en un diccionario
@@ -1216,7 +1314,7 @@ def editarEmpleado(request, id):
 def solicitudes(request):
 
         # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     empleados = RelEmpleadosUsuarios.objects.using("timetrackpro").values('id_usuario__id', 'id_usuario__nombre', 'id_usuario__apellidos', 'id_usuario__img', 'id_usuario__dni', 'id_usuario__fecha_nacimiento', 'id_usuario__telefono', 'id_usuario__telefono2', 'id_usuario__email','id_usuario__email2', 'id_usuario__extension', 'id_usuario__puesto', 'id_usuario__direccion', 'id_usuario__info_adicional', 'id_usuario__fecha_alta_app', 'id_usuario__fecha_baja_app', 'id_empleado__id', 'id_empleado__nombre', 'id_empleado__turno', 'id_empleado__horas_maxima_contrato', 'id_empleado__en_practicas', 'id_empleado__maquina_laboratorio', 'id_empleado__maquina_alerta2', 'id_empleado__maquina_departamento', 'id_auth_user__id', 'id_auth_user__first_name', 'id_auth_user__last_name', 'id_auth_user__is_active', 'id_auth_user__is_superuser', 'id_auth_user__is_staff', 'id_auth_user__username', 'id_auth_user__password', 'id_auth_user__last_login', 'id_auth_user__date_joined')
 
 
@@ -1237,7 +1335,7 @@ def festivos(request, year=None):
     else:
         festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(year=year).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     # current_url = request.path[1:]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     infoVista = {
         "navBar":navBar,
         "administrador":True,
@@ -1286,7 +1384,7 @@ Devuelve un listado festivos para ese año y mes concretros
 def calendarioFestivos(request,mes, year=None):
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     
     mesInicial = str(mes)
     if len(mes) == 1:
@@ -1337,7 +1435,7 @@ def agregarFestivo(request):
         return festivos(request)
     
     # current_url = request.path[1:]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
 
     infoVista = {
@@ -1370,7 +1468,7 @@ def agregarFestivoCalendario(request):
 def editarFestivo(request, id):
     festivo = FestivosYVacaciones.objects.using("timetrackpro").filter(id=id)[0]
     # current_url = request.path[1:]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
 
     infoVista = {
@@ -1396,7 +1494,7 @@ def editarFestivo(request, id):
 
 def eliminarFestivo(request, id):
     # current_url = request.path[1:]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
 
     infoVista = {
@@ -1414,7 +1512,7 @@ def erroresRegistro(request, mes=None):
     else:
         festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(year=mes).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     # current_url = request.path[1:]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     infoVista = {
         "navBar":navBar,
         "administrador":True,
@@ -1448,7 +1546,7 @@ def erroresRegistroEmpleado(request, idEmpleado, year=None, mes=None):
     else:
         festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(year=mes).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     # current_url = request.path[1:]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     infoVista = {
         "navBar":navBar,
         "administrador":True,
@@ -1463,16 +1561,16 @@ def documentacion(request):
 
 def perfil(request):
     # current_url = request.path[1:]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     return render(request,"profile.html",{"navBar":navBar, })
 
 def dashBoard(request):
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     return render(request,"dashboard.html",{"navBar":navBar})
 
 def tablas(request):        
     # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
 
     # guardo los datos en un diccionario
     infoVista = {
@@ -1483,11 +1581,11 @@ def tablas(request):
 
 
 def facturacion(request):
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     return render(request,"billing.html",{"navBar":navBar})
 
 def realidadVirtual(request):
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     return render(request,"virtual-reality.html",{"navBar":navBar})
 
 def signIn(request):
@@ -1536,7 +1634,7 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 def permisos(request, year=None):
     # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     
 
     # guardo los datos en un diccionario
@@ -1565,7 +1663,7 @@ Agregar un permiso a la base de datos y redirigir a la vista de permisos
 -------------------------------------------'''
 def agregarPermiso(request, year=None):
     # obtengo los datos necesarios para la vista
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
 
     # guardo los datos en un diccionario
     infoVista = {
@@ -1663,7 +1761,7 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 def verPermiso(request, id):
     permiso = Permisos.objects.using("timetrackpro").filter(id=id)[0]
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
 
     # guardo los datos en un diccionario
     infoVista = {
@@ -1769,7 +1867,7 @@ El usuario debe estar autenticado.
 
 -------------------------------------------'''
 def insertarRegistroManualMensual(request):
-    navBar = NavBar.objects.using("timetrackpro").values()
+    
     festivos = FestivosYVacaciones.objects.using("timetrackpro").values()
     # guardo los datos en un diccionario
     infoVista = {
