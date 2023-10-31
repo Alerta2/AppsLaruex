@@ -98,6 +98,7 @@ urlpatterns = [
 
     #Registro de errores
     path('private/timetrackpro/ver-errores-registrados/', verErroresRegistrados , name='ver-errores-registrados'),
+    path('private/timetrackpro/ver-errores-registrados-pendientes/', verErroresRegistrados , name='ver-errores-registrados-pendientes'),
     path('private/timetrackpro/ver-errores-registrados/<slug:id>/', verErroresRegistrados , name='ver-errores-registrados'),
     path('private/timetrackpro/datos-errores-registrados/', datosErroresRegistrados , name='datos-errores-registrados'),
     path('private/timetrackpro/datos-errores-registrados/<slug:id>/', datosErroresRegistrados , name='datos-errores-registrados'),

@@ -16,7 +16,6 @@
               <div class="text text-sm">Editar</div>
             </button>
             </div>
-            
             <div class="col">
               <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarRegistro">             
                <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
@@ -27,26 +26,20 @@
         </div>
         
       {% endif %}
-        
 
       <div class="card ">
         <div class="card-header pb-0 p-3">
         </div>
         <div class="card-body pt-0 p-3">
-          
           <ul class="list-group font-weight-bold">
-            
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{registro.nombre_empleado}}</li>
-            
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{registro.hora|date:"H:i:s"}}</li>
-            
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{registro.hora|date:"d M Y"}}</li>
             {% if registro.remoto != 1 %}
             <li class="list-group-item border-0 ps-0 text-lg"><i class="fa-solid fa-fingerprint text-dark me-2"></i> {{registro.maquina.nombre}}</li>
             {% else %}
             <li class="list-group-item border-0 ps-0 text-lg text-primary"><i class="fa-solid fa-fingerprint  me-2"></i> Remoto</li>
             {% endif %}
-
           </ul>
         </div>
       </div>
@@ -81,9 +74,7 @@
             <div class="col-xl-8 mx-auto my-2">
               <label class="text-sm">Motivo de la modificacion</label>
               <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Indique el motivo por el que se ha modificado el registro" id="motivo" name="motivo" aria-describedby="text-addon" required></textarea>
-
             </div>
-            
           </div>
         </div>
         <div class="modal-footer">
@@ -96,7 +87,6 @@
       </div>
     </div>
   </div>
-
 
   <div id="modalEliminarRegistro" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEliminarRegistro"
   aria-hidden="true">
@@ -155,9 +145,7 @@
     })
   });
 
-
-
-    // compruebo si en textarea de motivoEliminación hay algo escrito
+  // compruebo si en textarea de motivoEliminación hay algo escrito
   // si hay algo escrito, habilito el boton de guardar
   // si no hay nada escrito, deshabilito el boton de guardar
   $(document).ready(function(){

@@ -441,6 +441,18 @@ def verErroresRegistrados(request, id=None):
 
 
 
+def verErroresRegistradosPendientes(request):
+    navBar = NavBar.objects.using("timetrackpro").values()
+    errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(estado=1).values()
+
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "errores":list(errores)
+    }
+    return render(request,"errores-registrados-pendientes.html",infoVista)
+
+
 
 def verErrorRegistroNotificado(request, id):
     error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id).values('id','id_empleado','id_empleado__id','id_empleado_id', 'hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica')[0]
@@ -485,7 +497,6 @@ def editarErrorRegistroNotificado(request, id):
         error.save(using='timetrackpro')
 
     # guardo los datos en un diccionario
-
     return redirect('timetrackpro:ver-error-registro-notificado', id=id)
 
 def eliminarErrorRegistroNotificado(request, id):

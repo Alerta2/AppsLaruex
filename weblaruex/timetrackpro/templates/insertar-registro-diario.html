@@ -11,7 +11,7 @@
        
     <div class="container"> 
   
-      <form action="{% url 'timetrackpro:agregar-usuario' %}" method="POST" enctype="multipart/form-data">
+      <form action="{% url 'timetrackpro:insertar-registro-manual' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         
         <div class="row">
@@ -29,7 +29,7 @@
                     <label class="col-form-label text-white">Empleado</label>
   
                     <select class="form-control" aria-label="Nombre en el dispositivo" id="empleado_maquina"
-                    name="empleado_maquina" aria-describedby="text-addon" {% if administrador %} disabled {% endif %}
+                    name="empleado_maquina" aria-describedby="text-addon" {% if not administrador %} disabled {% endif %}
                     >
                     {% for empleado in empleados %}
                       <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
@@ -43,7 +43,6 @@
                   <input class="form-control" type="datetime-local" id="hora" name="hora" value="{{registro.hora|date:'Y-m-d H:i' }}" required>
                   </div>
                   
-
 
 
                 </div>
