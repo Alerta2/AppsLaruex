@@ -1,48 +1,15 @@
-
+{% extends "base/base_timetrackpro.html" %}
 {% load static %}
-
-
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-<link rel="apple-touch-icon" sizes="76x76" href="{% static 'img/apple-icon.png' %}">
-<link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
-
-<title>
-  
-  dashboard
-  
-
-</title>
-
-
-
-<!--     Fonts and icons     -->
-<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-
-<!-- Nucleo Icons -->
-<link href="{% static 'css/nucleo-icons.css'%}" rel="stylesheet" />
-<link href="{% static 'css/nucleo-svg.css'%}" rel="stylesheet" />
-
-
-<!-- CSS Files -->
-<link id="pagestyle" href="{% static 'css/soft-ui-dashboard.css'%}" rel="stylesheet" />
-
-  </head>
-     
-
-<body class="vh-100">
-  <div class="container h-100">
-    <div class="row h-100">
-      <div class="col-10 m-auto text-center">
-        <h6>If you are not redirected automatically, follow <a href="https://demos.creative-tim.com/soft-ui-dashboard/pages/dashboard.html">this link</a>.</h6>
+{% block content %}
+    <div class="row">
+      <div class="col-xl-6 d-flex justify-content-end">
+        <img class="w-50 img-fluid img-blur-shadow" src="{% static 'img/sin permiso.jpeg' %}" alt="sinPermiso" style="box-shadow: 0px 0px 15px #ccc; border-radius: 20%;
+        ">
+      </div>
+      <div class="col-xl-4 my-auto me-0">
+        <h2>Ups! No hemos encontrado lo que buscas</h2>
+       
+        <a class="btn btn-primary btn-sm mb-0 me-3" href="{% url 'timetrackpro:home' %}">Volver al inicio</a>
       </div>
     </div>
-  </div>
-</body>
-
-</html>
+{% endblock %}
