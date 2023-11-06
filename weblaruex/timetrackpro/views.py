@@ -31,6 +31,7 @@ alerta = {
 
 }
 
+
 # ? información tarjeta acceso reverso
 infoGeneralTarjeta ="Este carné es propiedad del LARUEX y deberá devuelto al departamento de administración una vez acabada la relación contractual con el mismo."
 infoPersonalTarjeta = "El carné es personal e intransferible, por lo que cederlo a cualquier otra persona supondrá una grave violación de las normas del laboratorio."
@@ -80,18 +81,108 @@ def sinPermiso(request):
 
     return render(request,"sinPermiso.html",infoVista)
 
-def habilitaciones(request):
+def habilitaciones(request):     
+    alerta = request.session.pop('alerta', None)
+   
     # guardo los datos en un diccionario
     administrador = esAdministrador(request.user.id)
+
+    habilitaciones = HabilitacionesTimeTrackPro.objects.using("timetrackpro").values('id', 'nombre')
+    empleadosHabilitados = RelHabilitacionesUsuarioTimeTrackPro.objects.using("timetrackpro").values('id', 'id_auth_user', 'id_habilitacion', 'id_habilitacion__nombre', 'id_auth_user__first_name', 'id_auth_user__last_name')
 
     infoVista = {
         "navBar":navBar,
         "administrador":administrador,
+        "habilitaciones":list(habilitaciones),
+        "empleadosHabilitados":list(empleadosHabilitados),
+        "alerta":alerta
     }
     if administrador:
         return render(request,"habilitaciones.html",infoVista)
+    
     else:
-        return redirect('timetrackpro:home')
+        return redirect('timetrackpro:sin-permiso')
+    
+def agregarHabilitacion(request):
+    administrador = esAdministrador(request.user.id)
+    if administrador:
+        if request.method == 'POST':
+            print ("---- jola jola")
+            nombre = request.POST.get("nombreHabilitacion")
+            if nombre in HabilitacionesTimeTrackPro.objects.using("timetrackpro").values_list('nombre', flat=True):
+                alerta["activa"] = True
+                alerta["icono"] = iconosAviso["danger"]
+                alerta["tipo"] = "danger"
+                alerta["mensaje"] = "La habilitación ya existe."
+            else:
+                nuevaHabilitacion = HabilitacionesTimeTrackPro(nombre=nombre)
+                alerta["activa"] = True
+                alerta["icono"] = iconosAviso["success"]
+                alerta["tipo"] = "success"
+                alerta["mensaje"] = "Habilitación agregada correctamente."
+                nuevaHabilitacion.save(using='timetrackpro')
+
+        request.session['alerta'] = alerta
+        return redirect('timetrackpro:habilitaciones')
+    else:
+        return redirect('timetrackpro:sin-permiso')
+    
+def asociarHabilitacion(request):
+    print ("---- jola jola")
+    administrador = esAdministrador(request.user.id)
+    if administrador:
+        if request.method == 'POST':
+            listEmpleados = []
+            empleados = request.POST.get("idEmpleadoSeleccionado")
+            empleados = empleados.split("#")
+            for empleado in empleados:
+                if empleado != "":
+                    listEmpleados.append(empleado)
+                
+            print (listEmpleados)
+            # elimina los elementos duplicados de  la lista de empleados
+            listEmpleados = list(dict.fromkeys(listEmpleados))
+
+            idHabilitacion = request.POST.get("habilitacionSeleccionada")
+            habilitacion = HabilitacionesTimeTrackPro.objects.using("timetrackpro").filter(id=idHabilitacion)[0]
+            for empleado in listEmpleados:
+                empleado = AuthUser.objects.using("timetrackpro").filter(id=empleado)[0]
+                if not RelHabilitacionesUsuarioTimeTrackPro.objects.using("timetrackpro").filter(id_auth_user=empleado, id_habilitacion=habilitacion).exists():
+                    nuevaRelacion = RelHabilitacionesUsuarioTimeTrackPro(id_auth_user=empleado, id_habilitacion=habilitacion)
+                    nuevaRelacion.save(using='timetrackpro')
+
+            alerta["activa"] = True
+            alerta["icono"] = iconosAviso["success"]
+            alerta["tipo"] = "success"
+            alerta["mensaje"] = "Usuarios asociados correctamente."
+            request.session['alerta'] = alerta
+            return redirect('timetrackpro:habilitaciones')
+    else:
+        return redirect('timetrackpro:sin-permiso')
+
+def modificarHabilitacion(request):
+    administrador = esAdministrador(request.user.id)
+    if administrador:
+        if request.method == 'POST':
+            idHabilitacion = request.POST.get("idHabilitacion")
+            habilitacion = Habilitaciones.objects.using("timetrackpro").filter(id=idHabilitacion)[0]
+            nombreHabilitacion = request.POST.get("nombreHabilitacion")
+            habilitacion.nombre = nombreHabilitacion
+            habilitacion.save(using='timetrackpro')
+        return redirect('timetrackpro:habilitaciones')
+    else:
+        return redirect('timetrackpro:sin-permiso')
+    
+def eliminarHabilitacion(request):
+    administrador = esAdministrador(request.user.id)
+    if administrador:
+        if request.method == 'POST':
+            idHabilitacion = request.POST.get("idHabilitacion")
+            habilitacion = Habilitaciones.objects.using("timetrackpro").filter(id=idHabilitacion)[0]
+            habilitacion.delete(using='timetrackpro')
+        return redirect('timetrackpro:habilitaciones')
+    else:
+        return redirect('timetrackpro:sin-permiso')
 
 def tarjetasAcceso(request):
     # obtengo los datos necesarios para la vista
@@ -120,6 +211,24 @@ def tarjetasAcceso(request):
     }
 
     return render(request,"tarjetasAcceso.html", infoVista)
+
+
+'''-------------------------------------------
+                                Módulo: datosDjangoUsers
+
+- Descripción: 
+Obtener los datos de cada uno de los empleados de Laruex, tanto los registrados en la maquina de control de asistencia como los que no.
+
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+
+-------------------------------------------'''
+def datosDjangoUsers(request):
+    empleados = AuthUser.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
+
+    return JsonResponse(list(empleados), safe=False)
 
 
 def agregarTarjetaAcceso(request):

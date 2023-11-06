@@ -118,6 +118,8 @@ class ErroresRegistroNotificados(models.Model):
     estado = models.IntegerField()
     motivo_rechazo = models.CharField(max_length=255, blank=True, null=True)
     quien_notifica = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='quien_notifica')
+    hora_notificacion = models.DateTimeField()
+    hora_modificacion_o_rechazo = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -143,6 +145,15 @@ class FestivosYVacaciones(models.Model):
     class Meta:
         managed = False
         db_table = 'festivos_y_vacaciones'
+
+
+class Habilitaciones(models.Model):
+    id = models.IntegerField(primary_key=True)
+    nombre = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'habilitaciones'
 
 
 class MaquinaControlAsistencia(models.Model):
@@ -358,6 +369,16 @@ class RelEmpleadosUsuarios(models.Model):
     class Meta:
         managed = False
         db_table = 'rel_empleados_usuarios'
+
+
+class RelHabilitacionesUsuario(models.Model):
+    id = models.IntegerField(primary_key=True)
+    id_auth_user = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='id_auth_user')
+    id_habilitacion = models.ForeignKey(Habilitaciones, models.DO_NOTHING, db_column='id_habilitacion')
+
+    class Meta:
+        managed = False
+        db_table = 'rel_habilitaciones_usuario'
 
 
 class RelJornadaEmpleados(models.Model):

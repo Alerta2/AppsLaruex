@@ -15,6 +15,14 @@ urlpatterns = [
     path('private/timetrackpro/404', noEncontrado ,name='404'),
     path('private/timetrackpro/sin-permiso', sinPermiso ,name='sin-permiso'),
 
+    # permisos de la aplicación
+    path('private/timetrackpro/habilitaciones', habilitaciones ,name='habilitaciones'),
+    path('private/timetrackpro/agregar-habilitacion', agregarHabilitacion ,name='agregar-habilitacion'),
+    path('private/timetrackpro/modificar-habilitacion', modificarHabilitacion ,name='modificar-habilitacion'),
+    path('private/timetrackpro/eliminar-habilitacion', eliminarHabilitacion ,name='eliminar-habilitacion'),
+    path('private/timetrackpro/asociar-habilitacion', asociarHabilitacion ,name='asociar-habilitacion'),
+    path('private/timetrackpro/datos-django-users', datosDjangoUsers ,name='datos-django-users'),
+
     path('private/timetrackpro/dashboard', dashBoard ,name='dashBoard'),
     path('private/timetrackpro/tablas', tablas ,name='tablas'),
     path('private/timetrackpro/facturacion', facturacion ,name='facturacion'),

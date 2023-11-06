@@ -178,6 +178,14 @@ class EstadosSolicitudes(models.Model):
         db_table = 'estados_solicitudes'
 
 
+class HabilitacionesTimeTrackPro(models.Model):
+    id = models.AutoField(db_column='id', primary_key=True)
+    nombre = models.CharField(db_column='nombre', max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'habilitaciones'
+
 class MaquinaControlAsistencia(models.Model):
     id = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=255, blank=True, null=True)
@@ -380,6 +388,15 @@ class RelEmpleadosUsuarios(models.Model):
     class Meta:
         managed = False
         db_table = 'rel_empleados_usuarios'
+
+class RelHabilitacionesUsuarioTimeTrackPro(models.Model):
+    id = models.IntegerField(primary_key=True)
+    id_auth_user = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='id_auth_user')
+    id_habilitacion = models.ForeignKey(HabilitacionesTimeTrackPro, models.DO_NOTHING, db_column='id_habilitacion')
+
+    class Meta:
+        managed = False
+        db_table = 'rel_habilitaciones_usuario'
 
 class RelJornadaEmpleados(models.Model):
     id = models.IntegerField(primary_key=True)

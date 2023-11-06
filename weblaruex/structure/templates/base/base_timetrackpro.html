@@ -125,8 +125,18 @@
   {% include "base/aside_timetrackPro.html" %}
   <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
     {% include "base/navBar_timetrackPro.html" %}
+
     <div class="container-fluid py-4">
+      {% if  alerta.activa == True %}
+      <div class="alert alert-{{alerta.tipo}} alert-dismissible fade show" role="alert">
+        <i class="{{ alerta.icono }}"></i> {{ alerta.mensaje }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">&times;</span>
+        </button>
+      </div>
+    {% endif %}
+
       {% block content %}
+
       {% endblock %}
       {% include "base/footer_timetrackPro.html" %}
     </div>
