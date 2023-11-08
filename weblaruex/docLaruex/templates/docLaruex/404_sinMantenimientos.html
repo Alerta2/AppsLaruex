@@ -1,0 +1,42 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
+{% block content %}
+
+<div class="row">
+
+  <div class="col">
+    <div class="align-middle">
+        <img class="mx-auto d-block" src="{% static 'niceAdminAssets' %}/img/404.svg" alt="Página no encontrada"
+        style="max-width: 30em; max-height: 30em;  margin: 0 auto;" >
+    </div>
+  </div>
+
+
+</div>
+<div class="row mx-auto my-2">  
+  <div class="col">
+      <h3 class="display-3 font-weight-bold text-center " style="color: #087B6C;">No existen mantenimientos asociados</h3>
+  </div>
+</div>
+<div class="row">
+  <button  id="volverMantenimientos" class="col-2 cta" title="Ver los Mantenimientos" onclick="volver()">
+    <span>Ver los mantenimientos</span>
+  </button>    
+</div>
+
+<script>
+  function volver(){
+    location.href="{% url 'docLaruex:docLaruexEventos' %}";
+    }
+    
+  
+
+</script>
+
+{% endblock %}

@@ -801,6 +801,7 @@ class RelStockProveedores(models.Model):
 class TiposEventos(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=20)  # Field name made lowercase.
+    color = models.CharField(db_column='Color', max_length=10)  # Field name made lowercase.
 
     class Meta:
         managed = False

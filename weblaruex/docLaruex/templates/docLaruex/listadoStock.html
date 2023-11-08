@@ -1,128 +1,12 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+{% endblock %}
 
 {% block content %}
-<style>
 
-  /* ===============================
-  *  Estilo del los botones
-  =================================*/
-  
-  .agregarFormacion:hover {
-    color: #032031;
-  }
-  
-  .descargaPDF:hover {
-    color: #c36d0b;
-  }
-  .retirarStock:hover{
-    color: #492160;
-  }
-  .retirarStockUbicacion:hover{
-    color: #042e37;
-  }
-  .entrar:hover{
-    color: #195746;
-  }
-
-  
-
-
-    /* ===============================
-  *  Estilo del las tablas
-  =================================*/
-    ul.pagination li .page-link {
-      background-color: rgb(255, 255, 255) !important;
-      color: rgb(41, 68, 87);
-  
-    }
-  
-    ul.pagination li.active .page-link {
-      background-color: rgb(41, 68, 87) !important;
-      border-color: rgb(41, 68, 87) !important;
-    }
-  
-    ul.pagination li .page-link:hover {
-      filter: brightness(85%);
-  
-    }
-  
-    ul.pagination li.active .page-link:hover {
-      filter: brightness(120%);
-  
-    }
-  
-    .btn-light {
-      color: rgb(41, 68, 87);
-    }
-  
-    th {
-      color: rgb(41, 68, 87);
-    }
-     /* estilo añadirFichero PDF*/
-     .addFicheroPDF {
-        color: rgb(161, 16, 32);
-    }
-
-    .addFicheroPDF:hover {
-        color: rgb(99, 10, 20);
-    }
-    .add:hover {
-    color: #ce8312;
-  }
-
-    .file-upload {
-        border: 1px solid #ccc;
-        display: inline-block;
-        padding: 6px 12px;
-        cursor: pointer;
-    }
-
-    /*--------------------------------------------------------------
-    # Botón agregar proveedor
-    --------------------------------------------------------------*/
-    .cta {
-    position: relative;
-    margin: auto;
-    padding: 12px 18px;
-    transition: all 0.2s ease;
-    border: none;
-    background: none;
-    }
-
-    .cta:before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    border-radius: 50px;
-    background: #d4e4e2;
-    width: 45px;
-    height: 45px;
-    transition: all 0.3s ease;
-    }
-
-    .cta span {
-    position: relative;
-    font-family: "Ubuntu", sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    color: #087B6C;
-    }
-
-
-
-    .cta:hover:before {
-    width: 100%;
-    background: #d4e4e2;
-    }
-
-    .cta:active {
-    transform: scale(0.95);
-    }
-  </style>
 
 <!-- breadcrumb   -->
 <div class="card-body">
@@ -205,7 +89,7 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
               <div class="form-group">
                 <label for="cantidad">Cantidad</label>
                 <input type="number" step="0.25" class="form-control" id="cantidad" placeholder="4,25" name="cantidad"
-                  data-rule="required" />
+                  data-rule="required"  min="0"/>
               </div>
             </div>
             <div class="col-3">
@@ -223,7 +107,7 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
             <div class="col">
               <div class="form-group">
                 <label for="minCantidad">Cantidad Mínima</label>
-                <input type="number" step="0.25" class="form-control" id="minCantidad" placeholder="4,25" name="minCantidad"
+                <input type="number" step="0.25" min="0" class="form-control" id="minCantidad" placeholder="4,25" name="minCantidad"
                   data-rule="required" />
               </div>
             </div>
@@ -292,7 +176,7 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
               <div class="col-4">
                 <div class="form-group">
                   <label for="costeProveedor">Precio</label>
-                  <input type="number" step="0.01" id="costeProveedor" name="costeProveedor" class="form-control" placeholder="12.20"/>
+                  <input type="number" step="0.01" min="0" id="costeProveedor" name="costeProveedor" class="form-control" placeholder="12.20"/>
                 </div>
               </div>
             </div>
@@ -337,7 +221,7 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
               <div class="form-group">
                 <label for="cantidadAgregada">Cantidad</label>
                 <input type="number" step="0.01" class="form-control" id="cantidadAgregada" name="cantidadAgregada"
-                  data-rule="required" placeholder="0" required/>
+                  data-rule="required" placeholder="0" min="0" required/>
               </div>
             </div>
           </div>
@@ -454,7 +338,7 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
                 <div class="form-group">
                   <label for="cantidadRetirada">Cantidad</label>
                   <input type="number" step="0.5" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
-                    data-rule="required" placeholder="0" required/>
+                    data-rule="required" placeholder="0" min="0" required/>
                 </div>
               </div>
               <div class="col-3">
@@ -528,8 +412,8 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
               <div class="col-3">
                 <div class="form-group">
                   <label for="cantidadRetirada">Cantidad</label>
-                  <input type="number" step="0.5" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
-                    data-rule="required" placeholder="0" required/>
+                  <input type="number" step="0.5" class="form-control" id="cantidadRetiradaUbicacion" name="cantidadRetirada"
+                    data-rule="required" placeholder="0" min="0" required/>
                 </div>
               </div>
               <div class="col-3">
@@ -572,6 +456,7 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
 
 
 <script type="text/javascript">
+  
     $('#tabla_stock').bootstrapTable({
         method: 'get',
         url: "/private/docLaruex/listadoStockDatos",
@@ -641,6 +526,11 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
               field: "action",
               align: "center",
               formatter: function (value, row) {
+                
+              var cantidadRetirada = document.getElementById("cantidadRetirada");
+              cantidadRetirada.max = row.cantidad;
+              var cantidadRetiradaUbicacion = document.getElementById("cantidadRetiradaUbicacion");
+              cantidadRetiradaUbicacion.max = row.cantidad;
                 var admin = '{{administrador}}';
 
                 var id_usuario = '{{id_usuario}}';
@@ -653,9 +543,10 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
 
                 var agregarStockProveedor = '<a href="" title="Agregar Stock nuevo Proveedor" data-toggle="modal" data-target="#modalAgregarStockProveedor" onclick="$('+"'#formularioModalAgregarStockProveedor').attr('action', '/private/docLaruex/agregarUnidadesStockProveedor/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-lg agregarFormacion"></i></a>';
 
-                var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/');"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
+                var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/'); document.getElementById('cantidadRetirada').max ="+ row.cantidad +";"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
 
-                var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
+                
+                var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/'); document.getElementById('cantidadRetiradaUbicacion').max ="+ row.cantidad +";"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
 
 
                 if (admin == 'True'){
