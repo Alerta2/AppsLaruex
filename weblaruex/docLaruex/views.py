@@ -5699,19 +5699,22 @@ def DarBajaEquipo(request,id):
     fecha_baja=datetime.now()
     if 'fechaBaja' in request.POST:
         fecha_baja=request.POST.get("fechaBaja")
-    fecha_fin_mantenimiento=datetime.now()
-    
-    tarea = TareasProgramadas.objects.using('docLaruex').filter(id_objeto=id)[0]
-    estadoCancelado = EstadoTareas.objects.using("docLaruex").filter(id=5)[0]
-    estados = [1,2,4]
 
-    registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea, estado__id__in=estados)[0]
+    fecha_fin_mantenimiento=datetime.now()
+
+    if TareasProgramadas.objects.using('docLaruex').filter(id_objeto=id).exists():
+        tarea = TareasProgramadas.objects.using('docLaruex').filter(id_objeto=id)[0]
+        estadoCancelado = EstadoTareas.objects.using("docLaruex").filter(id=5)[0]
+        estados = [1,2,4]
+
+        registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea, estado__id__in=estados)[0]
     
-    registro.fecha=fecha_fin_mantenimiento
-    registro.estado = estadoCancelado
-    registro.observaciones = "Mantenimiento cancelado por baja del equipo. \nMotivo: " + request.POST.get("motivoBaja")
-    registro.empleado = AuthUser.objects.using("docLaruex").filter(id=request.user.id)[0]
-    registro.save(using='docLaruex')
+        registro.fecha=fecha_fin_mantenimiento
+        registro.estado = estadoCancelado
+        registro.observaciones = "Mantenimiento cancelado por baja del equipo. \nMotivo: " + request.POST.get("motivoBaja")
+        registro.empleado = AuthUser.objects.using("docLaruex").filter(id=request.user.id)[0]
+        registro.save(using='docLaruex')
+
     Equipo.objects.using('docLaruex').filter(id=id).update(fecha_baja=fecha_baja, motivo_baja=request.POST.get("motivoBaja"))
     
     return ListadoObjetosPorTipo(request,"Equipo")
