@@ -64,7 +64,7 @@ class AuthPermission(models.Model):
 
 
 
-class AuthUser(models.Model):
+class AuthUserTimeTrackPro(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
     password = models.CharField(max_length=128)
     last_login = models.DateTimeField(blank=True, null=True)
@@ -82,8 +82,8 @@ class AuthUser(models.Model):
         db_table = 'auth_user'
 
 
-class AuthUserGroups(models.Model):
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+class AuthUserTimeTrackProGroups(models.Model):
+    user = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING)
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
 
     class Meta:
@@ -110,7 +110,7 @@ class RegistrosJornadaInsertados(models.Model):
     seccion = models.CharField(max_length=15)
     ruta = models.CharField(max_length=300, blank=True, null=True)
     fecha_lectura = models.DateTimeField()
-    insertador = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='insertador')
+    insertador = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='insertador')
     remoto = models.IntegerField(db_column='remoto')
 
     class Meta:
@@ -184,7 +184,7 @@ class HabilitacionesTimeTrackPro(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'habilitaciones'
+        db_table = 'habilitaciones_timetrackpro'
 
 class MaquinaControlAsistencia(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -253,7 +253,7 @@ class RegistrosManualesControlHorario(models.Model):
     hora_2_salida = models.TimeField()
     motivo = models.CharField(max_length=255, blank=True, null=True)
     laborable = models.IntegerField()
-    registrador = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='registrador')
+    registrador = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='registrador')
 
     class Meta:
         managed = False
@@ -272,7 +272,7 @@ class RegistrosManualesControlHorarioNoInsertados(models.Model):
     hora_2_salida = models.TimeField()
     motivo = models.CharField(max_length=255, blank=True, null=True)
     laborable = models.IntegerField()
-    registrador = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='registrador')
+    registrador = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='registrador')
 
     class Meta:
         managed = False
@@ -310,7 +310,7 @@ class RegistrosEliminados(models.Model):
     id_archivo_leido = models.ForeignKey('RegistrosJornadaInsertados', models.DO_NOTHING, db_column='id_archivo_leido', blank=True, null=True)
     fecha_eliminacion =  models.DateTimeField()
     motivo = models.CharField(max_length=255)
-    eliminado_por = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='eliminado_por', blank=True, null=True)
+    eliminado_por = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='eliminado_por', blank=True, null=True)
     id_registro_eliminado = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -325,7 +325,7 @@ class ErroresRegistroNotificados(models.Model):
     motivo = models.CharField(max_length=255)
     estado = models.IntegerField()
     motivo_rechazo = models.CharField(max_length=255, blank=True, null=True)
-    quien_notifica = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='quien_notifica')
+    quien_notifica = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='quien_notifica')
     hora_notificacion = models.DateTimeField()
     hora_modificacion_o_rechazo = models.DateTimeField(blank=True, null=True)
 
@@ -382,7 +382,7 @@ class RelEmpleadosUsuarios(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     id_usuario = models.ForeignKey('Usuarios', models.DO_NOTHING, db_column='id_usuario')
     id_empleado = models.ForeignKey(Empleados, models.DO_NOTHING, db_column='id_empleado')
-    id_auth_user = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='id_auth_user', blank=True, null=True)
+    id_auth_user = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='id_auth_user', blank=True, null=True)
     id_tarjeta_acceso = models.ForeignKey('TarjetasAcceso', models.DO_NOTHING, db_column='id_tarjeta_acceso', blank=True, null=True)
     
     class Meta:
@@ -390,13 +390,13 @@ class RelEmpleadosUsuarios(models.Model):
         db_table = 'rel_empleados_usuarios'
 
 class RelHabilitacionesUsuarioTimeTrackPro(models.Model):
-    id = models.IntegerField(primary_key=True)
-    id_auth_user = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='id_auth_user')
+    id = models.AutoField(db_column='id',primary_key=True)
+    id_auth_user = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='id_auth_user')
     id_habilitacion = models.ForeignKey(HabilitacionesTimeTrackPro, models.DO_NOTHING, db_column='id_habilitacion')
 
     class Meta:
         managed = False
-        db_table = 'rel_habilitaciones_usuario'
+        db_table = 'rel_habilitaciones_usuario_timetrackpro'
 
 class RelJornadaEmpleados(models.Model):
     id = models.IntegerField(primary_key=True)

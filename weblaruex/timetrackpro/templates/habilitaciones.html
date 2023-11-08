@@ -176,15 +176,12 @@
               
               <label class="text-sm">Habilitación</label>
               <input id="inputHabilitacion" list="habilitaciones"  class="form-select">
-              <input id="habilitacionSeleccionada" name="habilitacionSeleccionada"  class="form-control" hidden>
+              <input type="number" id="habilitacionSeleccionada" name="habilitacionSeleccionada"  class="form-control"  >
               <datalist id="habilitaciones" >
                   {% for h in habilitaciones %}
                       <option data-id="{{ h.id }}">{{ h.nombre }}</option>
                   {% endfor %}
               </datalist>
-            
-
-  
 
             </div>
           </div>
@@ -196,8 +193,7 @@
           </div>
           <div class="row">
             <div class="col">
-              <input type="text" id="idEmpleadoSeleccionado" name="idEmpleadoSeleccionado" hidden>
-
+              <input type="text" id="idEmpleadoSeleccionado" name="idEmpleadoSeleccionado" >
             </div>
           </div>
         </div>
@@ -212,8 +208,6 @@
     </div>
   </div>
 
- 
-  
   <div id="modalAgregarHabilitacion" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAgregarHabilitacion"
   aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -295,7 +289,6 @@ $("#tabla_empleados").bootstrapTable({
     console.log('El ID seleccionado es :', id);
     $('#idEmpleadoSeleccionado').val(empleadosSeleccionados);
   });
-
 
   document.getElementById('inputHabilitacion').addEventListener('input', function() {
         const inputText = this.value;

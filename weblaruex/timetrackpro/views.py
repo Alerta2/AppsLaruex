@@ -67,10 +67,13 @@ def noEncontrado(request):
 
     return render(request,"404.html",infoVista)
 
-'''
-    Vista que indica que no se tienen los permisos necesarios para acceder a la página
-'''
+
 def sinPermiso(request):
+    """
+    Vista que se encarga de mostrar la página de "Sin permiso" cuando un usuario intenta acceder a una funcionalidad que no tiene permitida.
+    :param request: HttpRequest que representa la solicitud HTTP que se está procesando.
+    :return: HttpResponse que representa la respuesta HTTP resultante.
+    """
     
     # guardo los datos en un diccionario
     infoVista = {
@@ -127,38 +130,39 @@ def agregarHabilitacion(request):
     else:
         return redirect('timetrackpro:sin-permiso')
     
+
 def asociarHabilitacion(request):
-    print ("---- jola jola")
     administrador = esAdministrador(request.user.id)
     if administrador:
         if request.method == 'POST':
             listEmpleados = []
-            empleados = request.POST.get("idEmpleadoSeleccionado")
-            empleados = empleados.split("#")
-            for empleado in empleados:
-                if empleado != "":
-                    listEmpleados.append(empleado)
-                
-            print (listEmpleados)
-            # elimina los elementos duplicados de  la lista de empleados
-            listEmpleados = list(dict.fromkeys(listEmpleados))
-
+            empleadosSeleccionados = request.POST.get("idEmpleadoSeleccionado")
+            print("--------------........-------------")
+            print(empleadosSeleccionados)
+            print("--------------........--------------")
+            empleadosSeleccionados = empleadosSeleccionados.split("#")
+            for e in empleadosSeleccionados:
+                if e != "":
+                    listEmpleados.append(e)   
             idHabilitacion = request.POST.get("habilitacionSeleccionada")
+
             habilitacion = HabilitacionesTimeTrackPro.objects.using("timetrackpro").filter(id=idHabilitacion)[0]
             for empleado in listEmpleados:
-                empleado = AuthUser.objects.using("timetrackpro").filter(id=empleado)[0]
-                if not RelHabilitacionesUsuarioTimeTrackPro.objects.using("timetrackpro").filter(id_auth_user=empleado, id_habilitacion=habilitacion).exists():
-                    nuevaRelacion = RelHabilitacionesUsuarioTimeTrackPro(id_auth_user=empleado, id_habilitacion=habilitacion)
+                empleado_obj = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=empleado)[0]  # Obtener el objeto 
+                if empleado_obj and not RelHabilitacionesUsuarioTimeTrackPro.objects.using("timetrackpro").filter(id_habilitacion=habilitacion, id_auth_user=empleado_obj).exists():
+                    print("no se que está pasando")
+                    nuevaRelacion = RelHabilitacionesUsuarioTimeTrackPro(id_auth_user=empleado_obj, id_habilitacion=habilitacion)
                     nuevaRelacion.save(using='timetrackpro')
 
-            alerta["activa"] = True
-            alerta["icono"] = iconosAviso["success"]
-            alerta["tipo"] = "success"
-            alerta["mensaje"] = "Usuarios asociados correctamente."
-            request.session['alerta'] = alerta
-            return redirect('timetrackpro:habilitaciones')
+                    alerta["activa"] = True
+                    alerta["icono"] = iconosAviso["success"]
+                    alerta["tipo"] = "success"
+                    alerta["mensaje"] = "Usuarios asociados correctamente."
+                    request.session['alerta'] = alerta
+        return redirect('timetrackpro:habilitaciones')
     else:
         return redirect('timetrackpro:sin-permiso')
+
 
 def modificarHabilitacion(request):
     administrador = esAdministrador(request.user.id)
@@ -226,7 +230,7 @@ El usuario debe estar autenticado.
 
 -------------------------------------------'''
 def datosDjangoUsers(request):
-    empleados = AuthUser.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
+    empleados = AuthUserTimeTrackPro.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
 
     return JsonResponse(list(empleados), safe=False)
 
@@ -510,7 +514,7 @@ def verRegistro(request, id):
 
 def datosRegistro(request, id):
     registros = Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
-    empleados = AuthUser.objects.using("timetrackpro").values('id', 'first_name', 'last_name', 'is_active')
+    empleados = AuthUserTimeTrackPro.objects.using("timetrackpro").values('id', 'first_name', 'last_name', 'is_active')
     
     
     '''
@@ -570,7 +574,7 @@ def eliminarLineaRegistro(request, id):
         idArchivoLeido = archivoModificado
         fechaEliminacion = datetime.now()
         motivo = request.POST.get("motivoEliminacion")
-        registrador = AuthUser.objects.using("timetrackpro").filter(id=int(request.POST.get("registradorEliminacion")))[0]
+        registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=int(request.POST.get("registradorEliminacion")))[0]
 
 
         nuevoRegistroEliminado = RegistrosEliminados(id_registro_eliminado=idRegistroEliminado, id_empleado=idEmpleado, nombre_empleado=nombreEmpleado, hora=hora, maquina=maquina, remoto=remoto, id_archivo_leido=idArchivoLeido, fecha_eliminacion=fechaEliminacion, motivo=motivo, eliminado_por=registrador)
@@ -649,7 +653,7 @@ def notificarErrorEnFichaje(request):
         motivo = request.POST.get("motivoError")
         estado = 1 # indico que aún esta pendiente de revisar
         hora = request.POST.get("hora")
-        registrador = AuthUser.objects.using("timetrackpro").filter(id=request.POST.get("idEmpleado"))[0]
+        registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.POST.get("idEmpleado"))[0]
         horaNotificacion = datetime.now()
 
         nuevoErrorRegistrado = ErroresRegistroNotificados(id_empleado=idEmpleado, hora=hora, motivo=motivo, estado=estado, quien_notifica=registrador, hora_notificacion=horaNotificacion)
@@ -740,7 +744,7 @@ def insertarRegistroManual(request):
         remoto = 0
         idArchivoLeido = None
         fechaLectura = datetime.now()
-        insertador = AuthUser.objects.using("timetrackpro").filter(id=int(request.POST.get("registrador")))[0]
+        insertador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=int(request.POST.get("registrador")))[0]
 
         nuevoErrorRegistrado = ErroresRegistroNotificados
         nuevoErrorRegistrado.save(using='timetrackpro')
@@ -759,7 +763,7 @@ def agregarRegistro(request):
         year = request.POST.get("year")
         fecha = datetime.now()
         fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
-        nuevoRegistro = RegistrosJornadaInsertados(seccion=seccion, mes=mes, year=year, fecha_lectura=fecha, insertador=AuthUser.objects.using("timetrackpro").filter(id=int(request.POST.get("registrador")))[0], remoto=0)
+        nuevoRegistro = RegistrosJornadaInsertados(seccion=seccion, mes=mes, year=year, fecha_lectura=fecha, insertador=AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=int(request.POST.get("registrador")))[0], remoto=0)
         nuevoRegistro.save(using='timetrackpro')
 
         if request.FILES['archivoSeleccionado']:
@@ -820,7 +824,7 @@ def agregarUsuario(request):
     falta_tarjeta = True
     # obtengo los datos necesarios para la vista
     
-    usuariosApp = AuthUser.objects.using("timetrackpro").values()
+    usuariosApp = AuthUserTimeTrackPro.objects.using("timetrackpro").values()
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
@@ -1079,15 +1083,15 @@ def verEmpleado(request, id):
     empleado = None 
     userDjango = None
 
-    usuariosApp = AuthUser.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
+    usuariosApp = AuthUserTimeTrackPro.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
 
     tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").values()
 
 
     if RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=usuario).exists():
         empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=usuario)[0]
-        if AuthUser.objects.using("timetrackpro").filter(id=empleado.id_auth_user.id).exists():
-            userDjango = AuthUser.objects.using("timetrackpro").filter(id=empleado.id_auth_user.id)[0]
+        if AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=empleado.id_auth_user.id).exists():
+            userDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=empleado.id_auth_user.id)[0]
 
     tarjeta = None
     if TarjetasAcceso.objects.using("timetrackpro").filter(dni=usuario.dni).exists():
@@ -1126,7 +1130,7 @@ def asociarUsuario(request):
     # datos de los empleados registrados en las máquinas de control de asistencia
     empleados = Empleados.objects.using("timetrackpro").values()
     # datos de los empleados registrados en django
-    usuariosDjango = AuthUser.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
+    usuariosDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
 
     tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").values()
 
@@ -1150,7 +1154,7 @@ def asociarUsuario(request):
 
         # obtenemos el identificador del usuario de django
         idUserDjango = request.POST.get("usuariosDjango")
-        userDjango = AuthUser.objects.using("timetrackpro").filter(id=idUserDjango)[0]
+        userDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=idUserDjango)[0]
 
         # obtenemos el identificador de la tarjeta de acceso
         idTarjeta = request.POST.get("idTarjeta")
@@ -1195,7 +1199,7 @@ def editarAsociarUsuario(request, id):
     # datos de los empleados registrados en las máquinas de control de asistencia
     empleados = Empleados.objects.using("timetrackpro").values()
     # datos de los empleados registrados en django
-    usuariosDjango = AuthUser.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
+    usuariosDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
 
     tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").values()
 
@@ -1220,7 +1224,7 @@ def editarAsociarUsuario(request, id):
 
         # obtenemos el identificador del usuario de django
         idUserDjango = request.POST.get("usuariosDjango")
-        userDjango = AuthUser.objects.using("timetrackpro").filter(id=idUserDjango)[0]
+        userDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=idUserDjango)[0]
 
         # obtenemos el identificador de la tarjeta de acceso
         idTarjeta = request.POST.get("idTarjeta")
