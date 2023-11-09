@@ -121,4 +121,11 @@ urlpatterns = [
     path('private/timetrackpro/ver-mis-errores-notificados', verMisErroresNotificados , name='ver-mis-errores-notificados'),
     path('private/timetrackpro/datos-mis-errores-notificados', datosMisErroresNotificados , name='datos-mis-errores-notificados'),
 
+
+    #Solicitud de vacaciones
+    path('private/timetrackpro/solicitar-dias/', accesoDirectoPermisos , name='solicitar-dias'),
+    path('private/timetrackpro/solicitar-vacaciones/', solicitarVacaciones , name='solicitar-vacaciones'),
+    path('private/timetrackpro/ver-solicitudes-vacaciones/', verSolicitudesVacaciones , name='ver-solicitudes-vacaciones'),
+    path('private/timetrackpro/ver-solicitudes-vacaciones/<slug:id>/', verSolicitudesVacaciones , name='ver-solicitudes-vacaciones'),
+
 ]

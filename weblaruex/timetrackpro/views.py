@@ -1987,6 +1987,73 @@ def insertarRegistroManualMensual(request):
     return render(request,"insertar-registro-mensual.html",infoVista)
 
 
+
+
+def solicitarVacaciones(request):
+    
+    empleados = Empleados.objects.using("timetrackpro").values('id', 'nombre')
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "empleados":list(empleados)
+    }
+
+    if request.method == 'POST':
+        idEmpleadoMaquina = request.POST.get("idEmpleadoMaquina")
+        empleado = Empleados.objects.using("timetrackpro").filter(id=idEmpleadoMaquina)[0]
+        idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=empleado)[0]
+        motivo = request.POST.get("motivoError")
+        estado = 1 # indico que aún esta pendiente de revisar
+        hora = request.POST.get("hora")
+        registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.POST.get("idEmpleado"))[0]
+        horaNotificacion = datetime.now()
+        nuevoErrorRegistrado = ErroresRegistroNotificados(id_empleado=idEmpleado, hora=hora, motivo=motivo, estado=estado, quien_notifica=registrador, hora_notificacion=horaNotificacion)
+        nuevoErrorRegistrado.save(using='timetrackpro')
+        return redirect('timetrackpro:ver-errores-notificados', id=idEmpleadoMaquina)   
+    
+    return render(request,"notificar-error-registro.html", infoVista)
+
+
+def accesoDirectoPermisos(request):
+    
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+    }
+
+    return render(request,"acceso-directo-permisos.html", infoVista)
+
+
+def verSolicitudesVacaciones(request):
+    
+    empleados = Empleados.objects.using("timetrackpro").values('id', 'nombre')
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "empleados":list(empleados)
+    }
+
+    return render(request,"notificar-error-registro.html", infoVista)
+
+def verSolicitudesVacaciones(request, idSolicitud):
+    
+    empleados = Empleados.objects.using("timetrackpro").values('id', 'nombre')
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "empleados":list(empleados)
+    }
+
+    return render(request,"notificar-error-registro.html", infoVista)
+
+
 '''-------------------------------------------
                                 Módulo: subirDocumento
 
