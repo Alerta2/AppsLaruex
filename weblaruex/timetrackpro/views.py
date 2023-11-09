@@ -137,9 +137,6 @@ def asociarHabilitacion(request):
         if request.method == 'POST':
             listEmpleados = []
             empleadosSeleccionados = request.POST.get("idEmpleadoSeleccionado")
-            print("--------------........-------------")
-            print(empleadosSeleccionados)
-            print("--------------........--------------")
             empleadosSeleccionados = empleadosSeleccionados.split("#")
             for e in empleadosSeleccionados:
                 if e != "":
@@ -150,7 +147,6 @@ def asociarHabilitacion(request):
             for empleado in listEmpleados:
                 empleado_obj = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=empleado)[0]  # Obtener el objeto 
                 if empleado_obj and not RelHabilitacionesUsuarioTimeTrackPro.objects.using("timetrackpro").filter(id_habilitacion=habilitacion, id_auth_user=empleado_obj).exists():
-                    print("no se que está pasando")
                     nuevaRelacion = RelHabilitacionesUsuarioTimeTrackPro(id_auth_user=empleado_obj, id_habilitacion=habilitacion)
                     nuevaRelacion.save(using='timetrackpro')
 
