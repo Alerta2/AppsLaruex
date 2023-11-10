@@ -156,26 +156,28 @@ class TipoFestivos(models.Model):
         managed = False
         db_table = 'tipo_festivos'
 
+class TipoVacaciones(models.Model):
+    id = models.IntegerField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
+    color = models.CharField(db_column='Color', max_length=50)  # Field name made lowercase.
+    color_calendario = models.CharField(db_column='Color_calendario', max_length=20)  # Field name made lowercase.
 
-class FestivosYVacaciones(models.Model):
+    class Meta:
+        managed = False
+        db_table = 'tipo_vacaciones'
+
+class FestivosTimetrackPro(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=100)  # Field name made lowercase.
     tipo_festividad = models.ForeignKey('TipoFestivos', models.DO_NOTHING, db_column='Tipo_festividad')  # Field name made lowercase.
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     year = models.IntegerField()
-
     class Meta:
         managed = False
-        db_table = 'festivos_y_vacaciones'
+        db_table = 'festivos'
 
-class EstadosSolicitudes(models.Model):
-    id = models.AutoField(db_column='id',primary_key=True)
-    nombre = models.CharField(db_column='nombre', max_length=255)
 
-    class Meta:
-        managed = False
-        db_table = 'estados_solicitudes'
 
 
 class HabilitacionesTimeTrackPro(models.Model):
@@ -334,6 +336,16 @@ class ErroresRegistroNotificados(models.Model):
         managed = False
         db_table = 'errores_registro_notificados'
 
+class EstadosSolicitudes(models.Model):
+    id = models.AutoField(db_column='id', primary_key=True)
+    nombre = models.CharField(max_length=255)
+    vacaciones = models.IntegerField()
+    solicitudes = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'estados_solicitudes'
+
 class RegitroSolicitudViajes(models.Model):
     id = models.IntegerField(primary_key=True)
     id_empleado = models.IntegerField(blank=True, null=True)
@@ -472,3 +484,20 @@ class TarjetasAcceso(models.Model):
     class Meta:
         managed = False
         db_table = 'tarjetas_acceso'
+
+
+
+class VacacionesTimetrackpro(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    tipo_vacaciones = models.ForeignKey(TipoVacaciones, models.DO_NOTHING, db_column='Tipo_vacaciones')  # Field name made lowercase.
+    year = models.IntegerField(db_column='Year')  # Field name made lowercase.
+    empleado = models.ForeignKey(Usuarios, models.DO_NOTHING, db_column='Empleado')  # Field name made lowercase.
+    fecha_inicio = models.DateField(db_column='Fecha_inicio')  # Field name made lowercase.
+    fecha_fin = models.DateField(db_column='Fecha_fin')  # Field name made lowercase.
+    dias_consumidos = models.IntegerField(db_column='Dias_consumidos')  # Field name made lowercase.
+    estado = models.ForeignKey(EstadosSolicitudes, models.DO_NOTHING, db_column='Estado')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'vacaciones'
+

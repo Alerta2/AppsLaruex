@@ -1440,9 +1440,9 @@ def festivos(request, year=None):
     festivos = None
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     if year == None:
-        festivos = FestivosYVacaciones.objects.using("timetrackpro").order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     else:
-        festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(year=year).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=year).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     # current_url = request.path[1:]
     
     infoVista = {
@@ -1458,9 +1458,9 @@ def datosFestivosCalendario(request, year=None):
     # obtengo los festivos registrados en la base de datos
     festivos = []
     if year == None:
-        festivos = FestivosYVacaciones.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
     else:
-        festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(year=year).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=year).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
     # creo una lista vacía para guardar los datos de los festivos
     salida = []
 
@@ -1506,8 +1506,8 @@ def calendarioFestivos(request,mes, year=None):
     diaInicial = "01"
 
     festivos = []
-    if FestivosYVacaciones.objects.using("timetrackpro").filter(fecha_inicio__month=mes).exists():
-        festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(fecha_inicio__month=mes).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+    if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__month=mes).exists():
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__month=mes).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     
     initialDate = yearInicial + "-" + mesInicial + "-" + diaInicial
     
@@ -1537,7 +1537,7 @@ def agregarFestivo(request):
         else:
             fechaFin = fecha
         
-        nuevoFestivo = FestivosYVacaciones(nombre=nombre, tipo_festividad=tipo, fecha_inicio=fecha, fecha_fin=fechaFin, year=year)
+        nuevoFestivo = FestivosTimetrackPro(nombre=nombre, tipo_festividad=tipo, fecha_inicio=fecha, fecha_fin=fechaFin, year=year)
         nuevoFestivo.save(using='timetrackpro')
         return redirect('timetrackpro:festivos-year', year=year)
 
@@ -1565,7 +1565,7 @@ def agregarFestivoCalendario(request):
         year = request.POST.get("year_actual")
 
         
-        nuevoFestivo = FestivosYVacaciones(nombre=nombre, tipo_festividad=tipo, fecha_inicio=fecha, fecha_fin=fecha, year=year)
+        nuevoFestivo = FestivosTimetrackPro(nombre=nombre, tipo_festividad=tipo, fecha_inicio=fecha, fecha_fin=fecha, year=year)
         nuevoFestivo.save(using='timetrackpro')
         return redirect('timetrackpro:calendario-festivos', mes=mes)    
     
@@ -1575,7 +1575,7 @@ def agregarFestivoCalendario(request):
 
 
 def editarFestivo(request, id):
-    festivo = FestivosYVacaciones.objects.using("timetrackpro").filter(id=id)[0]
+    festivo = FestivosTimetrackPro.objects.using("timetrackpro").filter(id=id)[0]
     # current_url = request.path[1:]
     
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
@@ -1617,9 +1617,9 @@ def erroresRegistro(request, mes=None):
     festivos = None
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     if mes == None:
-        festivos = FestivosYVacaciones.objects.using("timetrackpro").order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     else:
-        festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(year=mes).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=mes).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     # current_url = request.path[1:]
     
     infoVista = {
@@ -1651,9 +1651,9 @@ def erroresRegistroEmpleado(request, idEmpleado, year=None, mes=None):
     festivos = None
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     if mes == None:
-        festivos = FestivosYVacaciones.objects.using("timetrackpro").order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     else:
-        festivos = FestivosYVacaciones.objects.using("timetrackpro").filter(year=mes).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=mes).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     # current_url = request.path[1:]
     
     infoVista = {
@@ -1977,7 +1977,7 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 def insertarRegistroManualMensual(request):
     
-    festivos = FestivosYVacaciones.objects.using("timetrackpro").values()
+    festivos = FestivosTimetrackPro.objects.using("timetrackpro").values()
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
@@ -1990,14 +1990,44 @@ def insertarRegistroManualMensual(request):
 
 
 def solicitarVacaciones(request):
+    estados = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1).values()
+    periodosVacaciones = TipoVacaciones.objects.using("timetrackpro").values()
+    # obtengo los datos necesarios para la vista
+    authUser = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
+    usuario = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=authUser)[0]
     
-    empleados = Empleados.objects.using("timetrackpro").values('id', 'nombre')
+    tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
+    # current_url = request.path[1:]
+    mes = str(datetime.now().month)
+    if len(mes) == 1:
+        mes = "0" + mes
+    # The above code is not doing anything. It appears to be incomplete or missing some code.
+    year = str(datetime.now().year)
+    diaInicial = "01"
+    
+    vacaciones = []
+    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=request.user.id, year=int(datetime.now().year)).exists():
+        vacacionesEncontradas = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=request.user.id, year=int(datetime.now().year)).values()
+        for v in vacacionesEncontradas:
+            vacaciones.append(v)
 
-    # guardo los datos en un diccionario
+    festivos = []
+    if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__month=mes).exists():
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__month=mes).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+    
+    initialDate = year + "-" + mes + "-" + diaInicial
+    
+    
     infoVista = {
         "navBar":navBar,
         "administrador":True,
-        "empleados":list(empleados)
+        "festivos":list(festivos),
+        "initialDate":initialDate,
+        "tipoFestivos":list(tipoFestivos),
+        "usuario":usuario,
+        "estados":list(estados),
+        "periodosVacaciones":list(periodosVacaciones),
+        "vacaciones":vacaciones
     }
 
     if request.method == 'POST':
@@ -2013,11 +2043,20 @@ def solicitarVacaciones(request):
         nuevoErrorRegistrado.save(using='timetrackpro')
         return redirect('timetrackpro:ver-errores-notificados', id=idEmpleadoMaquina)   
     
-    return render(request,"notificar-error-registro.html", infoVista)
+    return render(request,"solicitarVacaciones.html", infoVista)
+
+
+def solicitarModificarVacaciones(request):
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+    }
+
+    return render(request,"acceso-directo-permisos.html", infoVista)
 
 
 def accesoDirectoPermisos(request):
-    
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,

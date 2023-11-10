@@ -128,13 +128,15 @@ class ErroresRegistroNotificados(models.Model):
 
 class EstadosSolicitudes(models.Model):
     nombre = models.CharField(max_length=255)
+    vacaciones = models.IntegerField()
+    solicitudes = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'estados_solicitudes'
 
 
-class FestivosYVacaciones(models.Model):
+class Festivos(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=100)  # Field name made lowercase.
     tipo_festividad = models.ForeignKey('TipoFestivos', models.DO_NOTHING, db_column='Tipo_festividad')  # Field name made lowercase.
@@ -144,16 +146,15 @@ class FestivosYVacaciones(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'festivos_y_vacaciones'
+        db_table = 'festivos'
 
 
-class Habilitaciones(models.Model):
-    id = models.IntegerField(primary_key=True)
+class HabilitacionesTimetrackpro(models.Model):
     nombre = models.CharField(max_length=100)
 
     class Meta:
         managed = False
-        db_table = 'habilitaciones'
+        db_table = 'habilitaciones_timetrackpro'
 
 
 class MaquinaControlAsistencia(models.Model):
@@ -371,14 +372,13 @@ class RelEmpleadosUsuarios(models.Model):
         db_table = 'rel_empleados_usuarios'
 
 
-class RelHabilitacionesUsuario(models.Model):
-    id = models.IntegerField(primary_key=True)
+class RelHabilitacionesUsuarioTimetrackpro(models.Model):
     id_auth_user = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='id_auth_user')
-    id_habilitacion = models.ForeignKey(Habilitaciones, models.DO_NOTHING, db_column='id_habilitacion')
+    id_habilitacion = models.ForeignKey(HabilitacionesTimetrackpro, models.DO_NOTHING, db_column='id_habilitacion')
 
     class Meta:
         managed = False
-        db_table = 'rel_habilitaciones_usuario'
+        db_table = 'rel_habilitaciones_usuario_timetrackpro'
 
 
 class RelJornadaEmpleados(models.Model):
@@ -413,18 +413,18 @@ class RelacinDeEmpleados(models.Model):
     f6 = models.CharField(max_length=255, blank=True, null=True)
     turno = models.CharField(db_column='Turno', max_length=255, blank=True, null=True)  # Field name made lowercase.
     f8 = models.CharField(max_length=255, blank=True, null=True)
-    límite_empleados_0_admin_1_field = models.CharField(db_column='Límite(Empleados 0/Admin 1)', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+    lï¿½mite_empleados_0_admin_1_field = models.CharField(db_column='Lï¿½mite(Empleados 0/Admin 1)', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
     f10 = models.CharField(max_length=255, blank=True, null=True)
     dactil_field = models.CharField(db_column='Dactil.', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
     f12 = models.CharField(max_length=255, blank=True, null=True)
     pin = models.CharField(db_column='PIN', max_length=255, blank=True, null=True)  # Field name made lowercase.
     f14 = models.CharField(max_length=255, blank=True, null=True)
-    número_de_máquina = models.CharField(db_column='Número de máquina', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    nï¿½mero_de_mï¿½quina = models.CharField(db_column='Nï¿½mero de mï¿½quina', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     f16 = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'relación de empleados'
+        db_table = 'relaciï¿½n de empleados'
 
 
 class TarjetasAcceso(models.Model):
@@ -458,6 +458,17 @@ class TipoFestivos(models.Model):
         db_table = 'tipo_festivos'
 
 
+class TipoVacaciones(models.Model):
+    id = models.IntegerField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
+    color = models.CharField(db_column='Color', max_length=50)  # Field name made lowercase.
+    color_calendario = models.CharField(db_column='Color_calendario', max_length=20)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'tipo_vacaciones'
+
+
 class Usuarios(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=255)  # Field name made lowercase.
@@ -479,3 +490,18 @@ class Usuarios(models.Model):
     class Meta:
         managed = False
         db_table = 'usuarios'
+
+
+class Vacaciones(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    tipo_vacaciones = models.ForeignKey(TipoVacaciones, models.DO_NOTHING, db_column='Tipo_vacaciones')  # Field name made lowercase.
+    year = models.IntegerField(db_column='Year')  # Field name made lowercase.
+    empleado = models.ForeignKey(Usuarios, models.DO_NOTHING, db_column='Empleado')  # Field name made lowercase.
+    fecha_inicio = models.DateField(db_column='Fecha_inicio')  # Field name made lowercase.
+    fecha_fin = models.DateField(db_column='Fecha_fin')  # Field name made lowercase.
+    dias_consumidos = models.IntegerField(db_column='Dias_consumidos')  # Field name made lowercase.
+    estado = models.ForeignKey(EstadosSolicitudes, models.DO_NOTHING, db_column='Estado')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'vacaciones'
