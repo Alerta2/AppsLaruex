@@ -1477,6 +1477,45 @@ def datosFestivosCalendario(request, year=None):
     # devuelvo la lista en formato json
     return JsonResponse(salida, safe=False)
 
+
+
+
+def datosFestivosVacacionesEmpleado(request):
+    year = datetime.now().year
+    empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+    usuario = Usuarios.objects.using("timetrackpro").filter(id=empleado.id_usuario.id)[0]
+    # obtengo los festivos registrados en la base de datos
+    festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=year).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
+
+    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario, year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
+    # creo una lista vacía para guardar los datos de los festivos
+    salidaFestivos = []
+
+    # recorro los festivos y los guardo en la lista
+    for festivo in festivos:
+        # inserto los datos en la lista siguiendo la estructura que requiere el calendario
+        salidaFestivos.append({
+            'id':festivo['id'],
+            'title':festivo['nombre'],
+            'start':festivo['fecha_inicio'],
+            'end':festivo['fecha_fin'],
+            'color':festivo['tipo_festividad__color_calendario']
+        })
+    salidaVacaciones = [] 
+    for vacacion in vacaciones:
+        salidaVacaciones.append({
+            'id':vacacion['id'],
+            'title':vacacion['tipo_vacaciones__nombre'],
+            'start':vacacion['fecha_inicio'],
+            'end':vacacion['fecha_fin'],
+            'color':vacacion['tipo_vacaciones__color_calendario']
+        })
+
+    salida = salidaFestivos + salidaVacaciones
+    # devuelvo la lista en formato json
+    return JsonResponse(salida, safe=False)
+
+
 '''-------------------------------------------
                                 Módulo: calendarioFestivos
 
@@ -2004,15 +2043,23 @@ def solicitarVacaciones(request):
     # The above code is not doing anything. It appears to be incomplete or missing some code.
     year = str(datetime.now().year)
     diaInicial = "01"
-    
+
+    cambios = []
     vacaciones = []
     if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario.id_usuario, year=int(datetime.now().year)).exists():
 
-        print("existe")
-        vacacionesEncontradas = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario.id_usuario, year=int(datetime.now().year)).values('tipo_vacaciones__nombre', 'year', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado__nombre', 'estado__id','fecha_solicitud', 'id', 'tipo_vacaciones__color')
+        vacacionesEncontradas = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario.id_usuario, year=int(datetime.now().year)).values('id','tipo_vacaciones__nombre', 'year', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado__nombre', 'estado__id','fecha_solicitud', 'tipo_vacaciones__color')
         for v in vacacionesEncontradas:
             print(v)
             vacaciones.append(v)
+
+
+    if CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(solicitante=usuario.id_usuario,estado__in=EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1, id__in=(9, 10))).exists():
+
+        cambiosEncontrados = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(solicitante=usuario.id_usuario,estado__in=EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1, id__in=(9, 10))).values('id', 'solicitante', 'id_periodo_cambio__tipo_vacaciones__nombre', 'id_periodo_cambio__year', 'id_periodo_cambio__fecha_inicio', 'id_periodo_cambio__fecha_fin', 'id_periodo_cambio__dias_consumidos', 'id_periodo_cambio__estado__nombre', 'id_periodo_cambio__estado__id', 'id_periodo_cambio__fecha_solicitud', 'id_periodo_cambio__tipo_vacaciones__color', 'fecha_inicio_actual', 'fecha_fin_actual', 'dias_actuales_consumidos', 'fecha_inicio_nueva', 'fecha_fin_nueva', 'dias_nuevos_consumidos', 'motivo_solicitud', 'estado__nombre', 'estado__id', 'motivo_rechazo', 'fecha_solicitud', 'id_periodo_cambio__id')
+        for c in cambiosEncontrados:
+            cambios.append(c)
+
 
     festivos = []
     if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__month=mes).exists():
@@ -2030,7 +2077,8 @@ def solicitarVacaciones(request):
         "usuario":usuario,
         "estados":list(estados),
         "periodosVacaciones":list(periodosVacaciones),
-        "vacaciones":vacaciones
+        "vacaciones":vacaciones, 
+        "cambios":cambios
     }
 
     if request.method == 'POST':
@@ -2055,13 +2103,34 @@ def solicitarVacaciones(request):
 
 def solicitarModificarVacaciones(request):
     # guardo los datos en un diccionario
-    infoVista = {
-        "navBar":navBar,
-        "administrador":True,
-    }
+    if request.method == 'POST':
+        
+        # obtenemos los datos del empleado
+        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        idEmpleado = user.id_empleado.id
+        solicitante = Usuarios.objects.using("timetrackpro").filter(id=idEmpleado)[0]
+        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
 
-    return render(request,"acceso-directo-permisos.html", infoVista)
+        # obtenemos los datos del formulario
+        idVacaciones = request.POST.get("vacaciones_modificar")
+        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=idVacaciones)[0]
+        estadoPendiente = EstadosSolicitudes.objects.using("timetrackpro").filter(id=12)[0]
+        vacaciones.estado = estadoPendiente
+        vacaciones.save(using='timetrackpro')
 
+        fechaInicioActual = request.POST.get("fechaActualInicio")
+        fechaFinActual = request.POST.get("fechaActualFin")
+        diasConsumidosActual = request.POST.get("dias_actuales_consumidos")
+        fechaSolicitud = datetime.now()
+        fechaNuevaInicio = request.POST.get("fechaInicioNueva")
+        fechaNuevaFin = request.POST.get("fechaFinNueva")
+        diasConsumidosNuevos = request.POST.get("dias_nuevos_consumidos")
+        motivoCambio = request.POST.get("motivo_cambio")
+
+        solicitudModificacionVacaciones = CambiosVacacionesTimetrackpro(id_periodo_cambio=vacaciones, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
+        solicitudModificacionVacaciones.save(using='timetrackpro')
+
+    return redirect('timetrackpro:solicitar-vacaciones')
 
 def accesoDirectoPermisos(request):
     # guardo los datos en un diccionario

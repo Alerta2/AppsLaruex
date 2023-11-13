@@ -120,7 +120,7 @@ class RegistrosJornadaInsertados(models.Model):
 
 class CambiosVacacionesTimetrackpro(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    solicitante = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='Solicitante')  # Field name made lowercase.
+    solicitante = models.ForeignKey('Usuarios', models.DO_NOTHING, db_column='Solicitante')  # Field name made lowercase.
     id_periodo_cambio = models.ForeignKey('VacacionesTimetrackpro', models.DO_NOTHING, db_column='ID_periodo_cambio')  # Field name made lowercase.
     fecha_inicio_actual = models.DateField(db_column='Fecha_inicio_actual')  # Field name made lowercase.
     fecha_fin_actual = models.DateField(db_column='Fecha_fin_actual')  # Field name made lowercase.

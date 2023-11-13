@@ -64,7 +64,7 @@
               <div class="row">
                 
                 <h5 class="mb-2">
-                  Vacaciones elegidas por {{usuario.id_usuario.nombre}} {{usuario.id_usuario.apellidos}}
+                  Vacaciones Solicitadas
                 </h5>
               </div>
             </div>
@@ -114,11 +114,13 @@
                   <td>
                     <div class="d-flex justify-content-center" data-toggle="tooltip" data-placement="top" title="{{v.estado__nombre}}">
                     {% if v.estado__id == 9 %}
-                      <i class="fa-solid fa-circle-pause fa-lg me-3" style="color: #32325d;"></i>
+                      <i class="fa-solid fa-circle-info fa-lg me-3" style="color: #32325d;"></i>
                     {% elif v.estado__id == 10 %}
                     <i class="fa-solid fa-circle-xmark fa-lg me-3" style="color: #ea0606;"></i>
                     {% elif v.estado__id == 11 %}
                       <i class="fa-solid fa-circle-check fa-lg me-3" style="color: #82d616;"></i>
+                    {% elif v.estado__id == 12 %}
+                      <i class="fa-solid fa-circle-exclamation fa-lg me-3" style="color: #ee660b;"></i>
                     {% endif  %}
                   </div>
   
@@ -134,6 +136,82 @@
 
       
         </div>
+      </div>
+
+      {% if cambios %}
+ 
+      <div class="card mt-4">
+        <div class="card-header pb-0 p-3">
+          <div class="row">
+            <div class="col-md-8 d-flex align-items-center">
+              <div class="row">
+                
+                <h5 class="mb-2">
+                  Cambio Solicitados
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-body pt-0 p-3" >
+          <div class="table-responsive ms-3 me-3">
+            <table class="table align-items-center mb-0 ">
+              <thead>
+                <tr>
+                                  <!-- <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th> -->
+
+                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th>
+                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Inicio</th>
+                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Fin</th>
+                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Días</th>
+                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in cambios %}   
+                
+                <tr>
+                  <td>
+  
+                    <div>
+                      <span class="text-md font-weight-bold ">{{c.id_periodo_cambio__tipo_vacaciones__nombre}} </span>
+                    </div>
+                  </td>
+                  <td>
+                        <div class="d-flex justify-content-start">
+                          <span class="text-md font-weight-bold">{{c.fecha_inicio_nueva|date:"d M Y"}}</span>
+                        </div>
+                  </td>
+                  <td>
+                        <div class="d-flex justify-content-start">
+                          <span class="text-md font-weight-bold">{{c.fecha_fin_nueva|date:"d M Y"}}</span>
+                        </div>
+                  </td>
+                  <td class="text-center">
+                    <span class="text-md font-weight-bold"> {{c.dias_nuevos_consumidos|safe}}</span>
+                  </td>
+                  <td>
+                    <div class="d-flex justify-content-center" data-toggle="tooltip" data-placement="top" title="{{c.estado__nombre}}">
+                    {% if c.estado__id == 9 %}
+                      <i class="fa-solid fa-circle-info fa-lg me-3" style="color: #32325d;"></i>
+                    {% elif c.estado__id == 10 %}
+                    <i class="fa-solid fa-circle-xmark fa-lg me-3" style="color: #ea0606;"></i>
+                    {% elif c.estado__id == 11 %}
+                      <i class="fa-solid fa-circle-check fa-lg me-3" style="color: #82d616;"></i>
+                    {% elif c.estado__id == 12 %}
+                      <i class="fa-solid fa-circle-exclamation fa-lg me-3" style="color: #ee660b;"></i>
+                    {% endif  %}
+                  </div>
+  
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>     
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -151,7 +229,7 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioAsociarHabilitacion" action="{% url 'timetrackpro:solicitar-vacaciones' %}" method="POST"
+        <form id="formularioSolicitarVacaciones" action="{% url 'timetrackpro:solicitar-vacaciones' %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
 
@@ -174,25 +252,24 @@
               <label class="col-form-label">Fecha de inicio</label>
               <div class="">
                 <input type="date" class="form-control" aria-label="Fecha inicial de las vacaciones"
-                  aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" onchange="calcularDias()">
+                  aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio">
               </div>
             </div>
             <div class="col-xl-6" >
               <label class="col-form-label">Fecha de fin</label>
               <div class="">
                 <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
-                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias()">
+                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
                 <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos"  min="1" hidden >
-                <input type="number" class="form-control" name="year" id="year" value="{% now 'Y' %}" hidden>
               </div>  
             </div>
           </div>
         </div>
         <div class="modal-footer">
           {% if user.is_authenticated  %}
-          <button type="submit" value="submit"  class="btn btn-primary">Guardar</button>
+          <button type="submit" value="submit"  class="btn btn-primary" id="guardarSolicitarVacaciones" disabled>Guardar</button>
           {% endif %}
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cerrar</button>
         </div>
       </form>
       </div>
@@ -211,20 +288,20 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioAgregarHabilitacion" action="{% url 'timetrackpro:solicitar-modificar-vacaciones' %}" method="POST"
+        <form id="formularioModificarVacaciones" action="{% url 'timetrackpro:solicitar-modificar-vacaciones' %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row  d-flex justify-content-center">
             <div class="col-xl-10">
               <label class="col-form-label">Seleccione las vacaciones</label>
-
+              {{ vacaciones|json_script:"listaVacaciones" }}
               
-              <div class="mb-3">
+              <div class=" mb-2">
                 <select class="form-control" aria-label="Nombre en el dispositivo" id="vacaciones_modificar"
-                name="vacaciones_modificar" aria-describedby="text-addon" >
+                name="vacaciones_modificar" aria-describedby="text-addon" onchange="mostrarInfo()" >
                 {% for v in vacaciones %} 
 
-                <option value="{{v.id}}">{{v.tipo_vacaciones__nombre}} {{v.id}}</option>
+                <option value="{{v.id}}">{{v.tipo_vacaciones__nombre}}</option>
                 
                 {% endfor %}
 
@@ -234,24 +311,55 @@
 
             </div>
           </div>
+          
+          <div class="row d-flex justify-content-center mb-2">
+            <div class="col-xl-4"  id="divFechaInicioActual" hidden>
+              <label class="col-form-label text-muted">Fecha inicio actual</label>
 
-          <div class="row d-flex justify-content-center">
+              <input type="date" class="form-control" name="fechaActualInicio" id="fechaActualInicio"  style="background-color: #dbdbdf;">
+            </div>
+            <div class="col-xl-4"  id="divFechaFinActual" hidden>
+              <label class="col-form-label text-muted">Fecha fin actual</label>
+              <input type="date" class="form-control" name="fechaActualFin" id="fechaActualFin" style="background-color: #dbdbdf;" >
+            </div>
+            
+            <div class="col-xl-2"  id="divDiasActualesConsumidos" hidden>
+              <label class="col-form-label text-muted">Dias</label>
+
+              <input type="number" class="form-control" name="dias_actuales_consumidos" id="dias_actuales_consumidos"  min="1"  style="background-color: #dbdbdf;">
+
+            </div>
+
+          </div>
+
+          <div class="row d-flex justify-content-center mb-2">
             <div class="col-xl-5">
               <label class="col-form-label">Nueva fecha de inicio</label>
 
-              <input type="date" class="form-control" name="fechaInicioActual" id="fechaInicioActual" >
+              <input type="date" class="form-control" name="fechaInicioNueva" id="fechaInicioNueva" >
             </div>
             <div class="col-xl-5">
               <label class="col-form-label">Nueva fecha de fin</label>
 
-              <input type="date" class="form-control" name="fechaFinActual" id="fechaFinActual" >
+              <input type="date" class="form-control" name="fechaFinNueva" id="fechaFinNueva"  onchange="calcularDias('fechaInicioNueva','fechaFinNueva', 'dias_nuevos_consumidos')">
+              <input type="number" class="form-control" name="dias_nuevos_consumidos" id="dias_nuevos_consumidos"  min="1" hidden>
+
             </div>
+          </div>
+          <div class="row d-flex justify-content-center">
+            <div class="col-xl-10">
+              <label class="col-form-label">Motivo de la solicitud</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique cual es el motivo por el que desea solicitar un cambio en sus vacaciones" id="motivo_cambio" name="motivo_cambio" aria-describedby="text-addon" required></textarea>
+              </div>
+            </div>
+
           </div>
 
         </div>
         <div class="modal-footer">
           {% if user.is_authenticated  %}
-          <button type="submit" value="submit" class="btn btn-primary">Guardar</button>
+          <button type="submit" value="submit" class="btn btn-primary" id="guardarModificarVacaciones" disabled>Guardar</button>
           {% endif %}
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
         </div>
@@ -268,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendar = new FullCalendar.Calendar(calendarDiv, {
       initialDate: initialDate, // will be parsed as local
       themeSystem: 'bootstrap5',
-      events: "{% url 'timetrackpro:datos-festivos-calendario' %}",
+      events: "{% url 'timetrackpro:datos-festivos-vacaiones-empleado' %}",
       //eventColor: '#20c997', // color de los eventos
       height: 650, // indico el maximo de alto que puede tener el calendario
       locale: 'es', // el idioma del calendario
@@ -330,10 +438,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   });
+  
 
-  function calcularDias(){
-    fecha_inicio = document.getElementById("fecha_inicio").value;
-    fecha_fin = document.getElementById("fecha_fin").value;
+
+
+  function calcularDias(inicio, fin, dias_consumidos){
+    fecha_inicio = document.getElementById(inicio).value;
+    fecha_fin = document.getElementById(fin).value;
+    dias_consumidos = document.getElementById(dias_consumidos);
+    botonGuardarSolicitar = document.getElementById("guardarSolicitarVacaciones");
+    botonGuardarModificar = document.getElementById("guardarModificarVacaciones");
+
+    // comparo si la fecha de inicio es mayor a la fecha de fin
+    if (fecha_inicio > fecha_fin){
+      alert("La fecha de inicio no puede ser mayor a la fecha de fin");
+      document.getElementById(inicio).value = "";
+      document.getElementById(fin).value = "";
+    }
+    else{
+      botonGuardarSolicitar.removeAttribute("disabled");
+      botonGuardarModificar.removeAttribute("disabled");
+    }
 
     // obtener la diferencia en dias entre las dos fechas
     var fecha1 = new Date(fecha_inicio);
@@ -341,12 +466,42 @@ document.addEventListener('DOMContentLoaded', function() {
     var diff = fecha2.getTime() - fecha1.getTime();
     var dias = diff / (1000 * 60 * 60 * 24);
     dias = dias + 1;
-    if (dias < 0){
-      alert("La fecha de inicio no puede ser mayor a la fecha de fin");
-      document.getElementById("fecha_inicio").value = "";
-    }
-      document.getElementById("dias_consumidos").value = dias;
+    dias_consumidos.value = dias;
   }
+
+  function mostrarInfo(){ 
+    // obtengo el id de las vacaciones que desea modificar
+    var idSelect = document.getElementById("vacaciones_modificar").value;
+
+    // obtengo los campos de fecha inicio y fin actual
+    var fechaInicioActual = document.getElementById("fechaActualInicio");
+    var fechaFinActual = document.getElementById("fechaActualFin");
+    var divFechaInicioActual = document.getElementById("divFechaInicioActual");
+    divFechaInicioActual.removeAttribute("hidden");
+    var divFechaFinActual = document.getElementById("divFechaFinActual");
+    divFechaFinActual.removeAttribute("hidden");
+
+    var diasActualesConsumidos = document.getElementById("divDiasActualesConsumidos");
+    divDiasActualesConsumidos.removeAttribute("hidden");
+    var diasConsumidosActuales = document.getElementById("dias_actuales_consumidos");
+
+    // se obtiene la lista de vacaciones
+    var mylist = JSON.parse(document.getElementById('listaVacaciones').textContent);
+
+    for (var i = 0; i < mylist.length; i++) {
+      if ( mylist[i].id == parseInt(idSelect)) {
+        fechaInicioActual.value = mylist[i].fecha_inicio;
+        fechaInicioActual.setAttribute("readonly", true);
+        fechaFinActual.value = mylist[i].fecha_fin;
+        fechaFinActual.setAttribute("readonly", true);
+        diasConsumidosActuales.value = mylist[i].dias_consumidos;
+        diasConsumidosActuales.setAttribute("readonly", true);
+        
+        console.log(mylist[i]);
+      }
+    }
+  }
+
 </script>
 
 {% endblock %}
