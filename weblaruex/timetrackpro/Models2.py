@@ -92,6 +92,24 @@ class AuthUserUserPermissions(models.Model):
         unique_together = (('user', 'permission'),)
 
 
+class CambiosVacaciones(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    solicitante = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='Solicitante')  # Field name made lowercase.
+    id_periodo_cambio = models.ForeignKey('Vacaciones', models.DO_NOTHING, db_column='ID_periodo_cambio')  # Field name made lowercase.
+    fecha_inicio_actual = models.DateField(db_column='Fecha_inicio_actual')  # Field name made lowercase.
+    fecha_fin_actual = models.DateField(db_column='Fecha_fin_actual')  # Field name made lowercase.
+    dias_actuales_consumidos = models.IntegerField(db_column='Dias_actuales_consumidos')  # Field name made lowercase.
+    fecha_inicio_nueva = models.DateField(db_column='Fecha_inicio_nueva')  # Field name made lowercase.
+    fecha_fin_nueva = models.DateField(db_column='Fecha_fin_nueva')  # Field name made lowercase.
+    motivo_solicitud = models.CharField(db_column='Motivo_solicitud', max_length=255)  # Field name made lowercase.
+    estado = models.ForeignKey('EstadosSolicitudes', models.DO_NOTHING, db_column='Estado')  # Field name made lowercase.
+    motivo_rechazo = models.CharField(db_column='Motivo_rechazo', max_length=255, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'cambios_vacaciones'
+
+
 class Empleados(models.Model):
     id = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=255, blank=True, null=True)
@@ -413,18 +431,18 @@ class RelacinDeEmpleados(models.Model):
     f6 = models.CharField(max_length=255, blank=True, null=True)
     turno = models.CharField(db_column='Turno', max_length=255, blank=True, null=True)  # Field name made lowercase.
     f8 = models.CharField(max_length=255, blank=True, null=True)
-    lï¿½mite_empleados_0_admin_1_field = models.CharField(db_column='Lï¿½mite(Empleados 0/Admin 1)', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
+    límite_empleados_0_admin_1_field = models.CharField(db_column='Límite(Empleados 0/Admin 1)', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
     f10 = models.CharField(max_length=255, blank=True, null=True)
     dactil_field = models.CharField(db_column='Dactil.', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
     f12 = models.CharField(max_length=255, blank=True, null=True)
     pin = models.CharField(db_column='PIN', max_length=255, blank=True, null=True)  # Field name made lowercase.
     f14 = models.CharField(max_length=255, blank=True, null=True)
-    nï¿½mero_de_mï¿½quina = models.CharField(db_column='Nï¿½mero de mï¿½quina', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    número_de_máquina = models.CharField(db_column='Número de máquina', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     f16 = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'relaciï¿½n de empleados'
+        db_table = 'relación de empleados'
 
 
 class TarjetasAcceso(models.Model):

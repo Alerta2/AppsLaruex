@@ -78,7 +78,7 @@
         <div class="card-body position-relative z-index-1 d-flex flex-column h-100 p-3" >
           <h5 class="text-white font-weight-bolder mb-4 pt-2">Vacaciones</h5>
           <p class="text-white">Solicitud de Vacaciones</p>
-          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="{% url 'timetrackpro:solicitar-vacaciones' %}">
             Solicitar
             <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
           </a>
@@ -86,6 +86,7 @@
       </div>
     </div>
   </div>
+  
   <div class="col-lg-3 col-md-6 mb-lg-0 mb-4">
     <div class="card h-100 ">
       <div class="overflow-hidden position-relative border-radius-lg bg-cover  background-timetrackpro-permisos h-100">
@@ -101,6 +102,7 @@
       </div>
     </div>
   </div>
+
   <div class="col-lg-3 col-md-6 mb-lg-0 mb-4">
     <div class="card h-100" >
       <div class="overflow-hidden position-relative border-radius-lg bg-cover  background-timetrackpro-closed h-100">
