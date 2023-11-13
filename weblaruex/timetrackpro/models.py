@@ -118,18 +118,20 @@ class RegistrosJornadaInsertados(models.Model):
         db_table = 'registros_jornada_insertados'
 
 
-class CambiosVacaciones(models.Model):
+class CambiosVacacionesTimetrackpro(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    solicitante = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='Solicitante')  # Field name made lowercase.
-    id_periodo_cambio = models.ForeignKey('Vacaciones', models.DO_NOTHING, db_column='ID_periodo_cambio')  # Field name made lowercase.
+    solicitante = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='Solicitante')  # Field name made lowercase.
+    id_periodo_cambio = models.ForeignKey('VacacionesTimetrackpro', models.DO_NOTHING, db_column='ID_periodo_cambio')  # Field name made lowercase.
     fecha_inicio_actual = models.DateField(db_column='Fecha_inicio_actual')  # Field name made lowercase.
     fecha_fin_actual = models.DateField(db_column='Fecha_fin_actual')  # Field name made lowercase.
     dias_actuales_consumidos = models.IntegerField(db_column='Dias_actuales_consumidos')  # Field name made lowercase.
     fecha_inicio_nueva = models.DateField(db_column='Fecha_inicio_nueva')  # Field name made lowercase.
     fecha_fin_nueva = models.DateField(db_column='Fecha_fin_nueva')  # Field name made lowercase.
+    dias_nuevos_consumidos = models.IntegerField(db_column='Dias_nuevos_consumidos')  # Field name made lowercase.
     motivo_solicitud = models.CharField(db_column='Motivo_solicitud', max_length=255)  # Field name made lowercase.
     estado = models.ForeignKey('EstadosSolicitudes', models.DO_NOTHING, db_column='Estado')  # Field name made lowercase.
     motivo_rechazo = models.CharField(db_column='Motivo_rechazo', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    fecha_solicitud = models.DateTimeField(db_column='Fecha_solicitud')  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -503,8 +505,6 @@ class TarjetasAcceso(models.Model):
         managed = False
         db_table = 'tarjetas_acceso'
 
-
-
 class VacacionesTimetrackpro(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     tipo_vacaciones = models.ForeignKey(TipoVacaciones, models.DO_NOTHING, db_column='Tipo_vacaciones')  # Field name made lowercase.
@@ -514,6 +514,7 @@ class VacacionesTimetrackpro(models.Model):
     fecha_fin = models.DateField(db_column='Fecha_fin')  # Field name made lowercase.
     dias_consumidos = models.IntegerField(db_column='Dias_consumidos')  # Field name made lowercase.
     estado = models.ForeignKey(EstadosSolicitudes, models.DO_NOTHING, db_column='Estado')  # Field name made lowercase.
+    fecha_solicitud = models.DateTimeField(db_column='Fecha_solicitud')  # Field name made lowercase.
 
     class Meta:
         managed = False

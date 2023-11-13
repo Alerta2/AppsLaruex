@@ -29,15 +29,15 @@
           </div>
       </div>
     </div>
-    <div class="col-12 col-xl-4">
+    <div class="col-12 col-xl-6">
       {% if not userDjango%}
       <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
         <div class="row">
-          {% if not vacaciones %}
+          {% if vacaciones %}
 
           <div class="col">
 
-           <button class="botonLinkFestivos" data-toggle="modal" data-target="#modalAgregarHabilitacion">             
+           <button class="botonLinkFestivos" data-toggle="modal" data-target="#modalSolicitarModificacionVacaciones">             
             <div class="sign-Btn-link">
               <i class="fa-kit fa-solid-calendar-days-pen fa-lg ms-2" style="color: #ffffff;"></i></div>
             <div class="text text-sm">Solicitar cambio</div>
@@ -63,25 +63,75 @@
             <div class="col-md-8 d-flex align-items-center">
               <div class="row">
                 
-                <h6 class="mb-2">
+                <h5 class="mb-2">
                   Vacaciones elegidas por {{usuario.id_usuario.nombre}} {{usuario.id_usuario.apellidos}}
-                </h6>
+                </h5>
               </div>
             </div>
           </div>
         </div>
         
         <div class="card-body pt-0 p-3" >
-            
           {% if not vacaciones %}
           <p class="text-sm"><strong class="text-info">Aún no ha seleccionado vacaciones</strong></p>
           {% else %}
-            {% for v in vacaciones %}
-            <p class="text-sm"><strong class="text-info">{{e.tipo_vacaciones.nombre}}</strong></p>
+          <div class="table-responsive ms-3 me-3">
+            <table class="table align-items-center mb-0 ">
+              <thead>
+                <tr>
+                                  <!-- <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th> -->
 
-            <p class="text-sm">{{v.dias_consumidos|safe}} días <strong class="text-dark"></strong> del {{v.fecha_inicio|safe}} a {{v.fecha_fin|safe}}</p>
-            {% endfor %}
+                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th>
+                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Inicio</th>
+                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Fin</th>
+                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Días</th>
+                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for v in vacaciones %}   
+                
+                <tr>
+                  <td>
+  
+                    <div>
+                      <span class="text-md font-weight-bold ">{{v.tipo_vacaciones__nombre}} </span>
+                    </div>
+                  </td>
+                  <td>
+                        <div class="d-flex justify-content-start">
+                          <span class="text-md font-weight-bold">{{v.fecha_inicio|date:"d M Y"}}</span>
+                        </div>
+                  </td>
+                  <td>
+                        <div class="d-flex justify-content-start">
+                          <span class="text-md font-weight-bold">{{v.fecha_fin|date:"d M Y"}}</span>
+                        </div>
+                  </td>
+                  <td class="text-center">
+                    <span class="text-md font-weight-bold"> {{v.dias_consumidos|safe}}</span>
+                  </td>
+                  <td>
+                    <div class="d-flex justify-content-center" data-toggle="tooltip" data-placement="top" title="{{v.estado__nombre}}">
+                    {% if v.estado__id == 9 %}
+                      <i class="fa-solid fa-circle-pause fa-lg me-3" style="color: #32325d;"></i>
+                    {% elif v.estado__id == 10 %}
+                    <i class="fa-solid fa-circle-xmark fa-lg me-3" style="color: #ea0606;"></i>
+                    {% elif v.estado__id == 11 %}
+                      <i class="fa-solid fa-circle-check fa-lg me-3" style="color: #82d616;"></i>
+                    {% endif  %}
+                  </div>
+  
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
           {% endif %}
+          
+
+
       
         </div>
       </div>
@@ -132,7 +182,7 @@
               <div class="">
                 <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
                   aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias()">
-                <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos" hidden >
+                <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos"  min="1" hidden >
                 <input type="number" class="form-control" name="year" id="year" value="{% now 'Y' %}" hidden>
               </div>  
             </div>
@@ -149,7 +199,7 @@
     </div>
   </div>
 
-  <div id="modalAgregarHabilitacion" tabindex="-2" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAgregarHabilitacion"
+  <div id="modalSolicitarModificacionVacaciones" tabindex="-2" role="dialog" class="modal fade modal-lg" aria-labelledby="modalSolicitarModificacionVacaciones"
   aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -159,15 +209,42 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        
+
         <div class="modal-body">
-        <form id="formularioAgregarHabilitacion" action="{% url 'timetrackpro:agregar-habilitacion' %}" method="POST"
+        <form id="formularioAgregarHabilitacion" action="{% url 'timetrackpro:solicitar-modificar-vacaciones' %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row  d-flex justify-content-center">
             <div class="col-xl-10">
-              <label class="text-sm">Nombre de la habilitación</label>
-              <input type="text" class="form-control" name="nombreHabilitacion" id="nombreHabilitacion" >
+              <label class="col-form-label">Seleccione las vacaciones</label>
+
+              
+              <div class="mb-3">
+                <select class="form-control" aria-label="Nombre en el dispositivo" id="vacaciones_modificar"
+                name="vacaciones_modificar" aria-describedby="text-addon" >
+                {% for v in vacaciones %} 
+
+                <option value="{{v.id}}">{{v.tipo_vacaciones__nombre}} {{v.id}}</option>
+                
+                {% endfor %}
+
+              </select>
+              
+              </div>
+
+            </div>
+          </div>
+
+          <div class="row d-flex justify-content-center">
+            <div class="col-xl-5">
+              <label class="col-form-label">Nueva fecha de inicio</label>
+
+              <input type="date" class="form-control" name="fechaInicioActual" id="fechaInicioActual" >
+            </div>
+            <div class="col-xl-5">
+              <label class="col-form-label">Nueva fecha de fin</label>
+
+              <input type="date" class="form-control" name="fechaFinActual" id="fechaFinActual" >
             </div>
           </div>
 
@@ -264,7 +341,11 @@ document.addEventListener('DOMContentLoaded', function() {
     var diff = fecha2.getTime() - fecha1.getTime();
     var dias = diff / (1000 * 60 * 60 * 24);
     dias = dias + 1;
-    document.getElementById("dias_consumidos").value = dias;
+    if (dias < 0){
+      alert("La fecha de inicio no puede ser mayor a la fecha de fin");
+      document.getElementById("fecha_inicio").value = "";
+    }
+      document.getElementById("dias_consumidos").value = dias;
   }
 </script>
 

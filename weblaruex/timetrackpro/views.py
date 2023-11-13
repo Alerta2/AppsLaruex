@@ -2006,9 +2006,12 @@ def solicitarVacaciones(request):
     diaInicial = "01"
     
     vacaciones = []
-    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=request.user.id, year=int(datetime.now().year)).exists():
-        vacacionesEncontradas = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=request.user.id, year=int(datetime.now().year)).values()
+    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario.id_usuario, year=int(datetime.now().year)).exists():
+
+        print("existe")
+        vacacionesEncontradas = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario.id_usuario, year=int(datetime.now().year)).values('tipo_vacaciones__nombre', 'year', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado__nombre', 'estado__id','fecha_solicitud', 'id', 'tipo_vacaciones__color')
         for v in vacacionesEncontradas:
+            print(v)
             vacaciones.append(v)
 
     festivos = []
@@ -2031,17 +2034,21 @@ def solicitarVacaciones(request):
     }
 
     if request.method == 'POST':
-        idEmpleadoMaquina = request.POST.get("idEmpleadoMaquina")
-        empleado = Empleados.objects.using("timetrackpro").filter(id=idEmpleadoMaquina)[0]
-        idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=empleado)[0]
-        motivo = request.POST.get("motivoError")
-        estado = 1 # indico que aún esta pendiente de revisar
-        hora = request.POST.get("hora")
-        registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.POST.get("idEmpleado"))[0]
-        horaNotificacion = datetime.now()
-        nuevoErrorRegistrado = ErroresRegistroNotificados(id_empleado=idEmpleado, hora=hora, motivo=motivo, estado=estado, quien_notifica=registrador, hora_notificacion=horaNotificacion)
-        nuevoErrorRegistrado.save(using='timetrackpro')
-        return redirect('timetrackpro:ver-errores-notificados', id=idEmpleadoMaquina)   
+        # obtenemos los datos del empleado
+        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        idEmpleado = user.id_empleado.id
+        empleado = Usuarios.objects.using("timetrackpro").filter(id=idEmpleado)[0]
+        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+        # obtenemos los datos del formulario
+        tipoVacaciones = TipoVacaciones.objects.using("timetrackpro").filter(id=request.POST.get("tipo_dias"))[0]
+        fechaInicio = request.POST.get("fecha_inicio")
+        fechaFin = request.POST.get("fecha_fin")
+        diasConsumidos = request.POST.get("dias_consumidos")
+        fechaSolicitud = datetime.now()
+        year = request.POST.get("year")
+        nuevoRegistroVacaciones = VacacionesTimetrackpro(empleado=empleado, tipo_vacaciones=tipoVacaciones, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, fecha_solicitud=fechaSolicitud, year=year, estado=estado)
+        nuevoRegistroVacaciones.save(using='timetrackpro')
+        return redirect('timetrackpro:solicitar-vacaciones')   
     
     return render(request,"solicitarVacaciones.html", infoVista)
 
