@@ -1,39 +1,14 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
 
+{% block imports %}
+  <link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+
+{% endblock %}
+
 {% block content %}
-<style>
-  /*--------------------------------------------------------------
-  # Añadir Imagen
-  --------------------------------------------------------------*/
-  .addImagen {
-    color: rgb(16, 108, 161);
-  }
-
-  .addImagen:hover {
-    color: rgb(10, 59, 99);
-  }
-
-  .imagen-upload {
-    border: 1px solid #ccc;
-    display: inline-block;
-    padding: 6px 12px;
-    cursor: pointer;
-  }
-  .form-check-input:checked {
-    background-color: #087B6C;
-    border-color: #087B6C;
-  }
-
-  .form-check-input:focus {
-    outline: 0;
-    box-shadow: 0 0 0 0.25rem rgba(16, 223, 161, 0.432);
-  }
-
-</style>
 
   <div>
-
     <nav>
       <ol class="breadcrumb" style="background-color:#fff !important">
         <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
