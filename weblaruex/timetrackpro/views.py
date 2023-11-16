@@ -1778,6 +1778,29 @@ def erroresRegistroEmpleado(request, idEmpleado, year=None, mes=None):
     }
     return render(request,"festivos.html",infoVista)
 
+
+def verVacacionesSeleccionadas(request, id):
+    
+    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'empleado__id','fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos')[0]
+    empleado = Usuarios.objects.using("timetrackpro").filter(id=vacaciones["empleado__id"])[0]
+
+    admin = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    
+    if not admin and not director and empleado.id != request.user.id:
+        return redirect('timetrackpro:sin-permiso')
+    
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "admin":admin,
+        "director":director,
+        "vacaciones":vacaciones,
+        "empleado":empleado,
+    }
+    return render(request,"verVacacionesSeleccionadas.html", infoVista)
+
+
 def documentacion(request):
     return render(request,"documentation.html",{})
 

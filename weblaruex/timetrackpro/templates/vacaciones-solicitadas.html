@@ -236,25 +236,6 @@ document.addEventListener('DOMContentLoaded', function() {
           return div;
         }
       },
-      // {
-      //   title: "Motivo",
-      //   align: "center",
-      //   formatter: function(value, row) {
-      //     var motivo = row.motivo;      
-      //     var div = '<span class="text-sm font-weight-bold mb-0">'+ motivo +'</span>';
-      //     return div;
-      //   }
-      // },{
-      //   title: "Notificado por",
-      //   align: "center",
-      //   width:"40",
-      //   formatter: function(value, row) {
-      //     var insertador = row.quien_notifica__first_name + " " + row.quien_notifica__last_name;      
-      //     var div = '<span class="text-sm font-weight-bold mb-0">'+ insertador +'</span>';
-      //     return div;
-      //   }
-
-      // },
       {
         title: "Estado",
         align: "center",
@@ -278,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
         align: "center",
         formatter: function (value, row) {
 
-          var botonVer = '<a href="/private/timetrackpro/ver-error-registro-notificado/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          var botonVer = '<a href="/private/timetrackpro/ver-vacaciones-seleccionadas/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
 
 
           return botonVer;

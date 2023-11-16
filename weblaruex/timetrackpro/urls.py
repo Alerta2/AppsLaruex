@@ -133,5 +133,6 @@ urlpatterns = [
     path('private/timetrackpro/vacaciones-solicitadas/', vacacionesSolicitadas , name='vacaciones-solicitadas'),
     path('private/timetrackpro/datos-vacaciones-solicitadas/', datosVacacionesSolicitadas , name='datos-vacaciones-solicitadas'),
     path('private/timetrackpro/datos-calendario-vacaciones-solicitadas/', datosCalendarioVacacionesSolicitadas , name='datos-calendario-vacaciones-solicitadas'),
+    path('private/timetrackpro/ver-vacaciones-seleccionadas/<slug:id>/', verVacacionesSeleccionadas , name='ver-vacaciones-seleccionadas'),
 
 ]
