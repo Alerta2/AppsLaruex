@@ -2554,7 +2554,7 @@ def getSemanasRojas(year):
     ).filter(fecha_local__year=year, fecha_local__month=12, fecha_local__day=6
     ).annotate(week=ExtractWeek('fecha_local')).values('week')
     navidad = CalendarioFestivos.objects.using("guardias"
-    ).filter(fecha_local__year=year, fecha_local__month=12, fecha_local__day=24
+    ).filter(fecha_local__year=year, fecha_local__month=12, fecha_local__day=25
     ).annotate(week=ExtractWeek('fecha_local')).values('week')
 
     if semana_santa.count()>0 and puente_diciembre.count()>0 and navidad.count()>0:
