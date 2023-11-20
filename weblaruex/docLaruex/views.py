@@ -2598,7 +2598,8 @@ def editarObjeto(request, id):
                 else:
                     equipo.alta_uex = 0
 
-                if request.POST.get('nuevaImagenEquipo') is None:
+                #if request.FILES['nuevaImagenEquipo'] is not None:
+                if request.post.get('nuevaImagenEquipo') is None:
                     if objeto.ruta is not None:
                         # find file name matches with *
                         imagenOld = glob.glob(settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) +  '.*')
@@ -5124,7 +5125,6 @@ def agregarUnidadesStockProveedor (request, item):
                                 Módulo: DatosRetiradasStock
 
 - Descripción: 
-
 
 - Precondiciones:
 El usuario debe estar autenticado.
