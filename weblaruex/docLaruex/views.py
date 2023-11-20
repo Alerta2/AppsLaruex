@@ -5176,16 +5176,16 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 @login_required
 def editarStock(request, id):
-
     itemsMenu = MenuBar.objects.using("docLaruex").values()
     itemStock = Stock.objects.using('docLaruex').filter(id=id)[0]
+    print('\033[91m'+'itemStock: ' + '\033[92m', itemStock)
     ubicaciones = Ubicaciones.objects.using('docLaruex').order_by('-id__padre').values('id','tipo_ubicacion', 'tipo_ubicacion__nombre','id__nombre', 'id__padre__nombre', 'id__padre__id', 'id__padre')
     categorias = CategoriasStock.objects.using('docLaruex').order_by('categoria').values()
     unidades = UnidadesStock.objects.using('docLaruex').order_by('nombre').values()
 
     if request.method == 'POST':
         print("POST", request.POST)
-        itemStock.nombre = request.POST['nuevoNombre']
+        itemStock.item = request.POST['nuevoNombre']
         itemStock.id_ubicacion =  Ubicaciones.objects.using("docLaruex").filter(id=request.POST['nuevaUbicacion'])[0]
         itemStock.categoria = CategoriasStock.objects.using("docLaruex").filter(id=request.POST['nuevaCategoria'])[0]
         
