@@ -47,9 +47,22 @@
             
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_consumidos}} días</li>
 
-           
-            <li class="list-group-item border-0 ps-0 text-lg text-success"><i class="fa-duotone fa-sign-hanging"></i> Aceptado</li>
+           {% if vacaciones.estado__id == 9 %}
+            <li class="list-group-item border-0 ps-0 text-lg text-info"><i class="fa-duotone fa-sign-hanging"></i> Pendiente</li>
+            {% endif %}
 
+            {% if vacaciones.estado__id == 10 %}
+            <li class="list-group-item border-0 ps-0 text-lg text-danger"><i class="fa-duotone fa-sign-hanging"></i> Rechazado</li>
+
+            {% endif %}
+
+            {% if vacaciones.estado__id == 11 %}
+            <li class="list-group-item border-0 ps-0 text-lg text-success"><i class="fa-duotone fa-sign-hanging"></i> Aceptado</li>
+            {% endif %}
+              
+              {% if vacaciones.estado__id == 12 %}
+            <li class="list-group-item border-0 ps-0 text-lg text-warning"><i class="fa-duotone fa-sign-hanging"></i> Cambio solicitado</li>
+              {% endif %}
           </ul>
         </div>
       </div>
@@ -69,7 +82,7 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioEditarLineaRegistro" action="xxxxx" method="POST"
+        <form id="formularioEditarVacacionesSolicitadas" action="{% url 'timetrackpro:modificar-vacaciones' id=vacaciones.id %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
 
@@ -85,10 +98,10 @@
             </div>
           </div>
 
-          <div class="row">
+          <div class="row" hidden>
             <div class="col-xl-6 mx-auto my-2">
               <label class="text-sm" id="labelMotivo">Días</label>
-              <input class="form-control" type="number" id="dias_consumidos" name="dias_consumidos" value="{{vacaciones.dias_consumidos|safe}}" required>
+              <input class="form-control" type="number" id="dias_consumidos" name="dias_consumidos" value="{{vacaciones.dias_consumidos|safe}}" required >
             </div>
             
           </div>
@@ -116,7 +129,7 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:modificar-estado-error-registro-notificado' id=1 %}" method="POST"
+        <form id="formularioEditarEstadoVacaciones" action="{% url 'timetrackpro:cambiar-estado-vacaciones' id=vacaciones.id %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
@@ -124,9 +137,10 @@
               <label class="text-sm">Nuevo estado</label>
               <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
                 
-                <option value="1" {% if error.estado == 1 %} selected {% endif %}>Pendiente</option>
-                <option value="2" {% if error.estado == 2 %} selected {% endif %}>Rechazado</option>
-                <option value="3" {% if error.estado == 3 %} selected {% endif %}>Aceptado</option>
+                <option value="9" {% if vacaciones.estado__id == 9 %} selected {% endif %}>Pendiente</option>
+                <option value="10" {% if vacaciones.estado__id == 10 %} selected {% endif %}>Rechazado</option>
+                <option value="11" {% if vacaciones.estado__id == 11 %} selected {% endif %}>Aceptado</option>
+                <option value="12" {% if vacaciones.estado__id == 12 %} selected {% endif %}>Cambio Solicitado</option>
               </select>
             </div>
             
@@ -164,7 +178,7 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioEliminarSolicitudVacaciones" action="" method="POST"
+        <form id="formularioEliminarSolicitudVacaciones" action="{% url 'timetrackpro:eliminar-vacaciones'%}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">

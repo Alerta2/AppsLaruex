@@ -1781,7 +1781,7 @@ def erroresRegistroEmpleado(request, idEmpleado, year=None, mes=None):
 
 def verVacacionesSeleccionadas(request, id):
     
-    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'empleado__id','fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos')[0]
+    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'empleado__id','fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos', 'estado__id','estado__nombre','estado')[0]
     empleado = Empleados.objects.using("timetrackpro").filter(id=vacaciones["empleado__id"])[0]
 
     admin = esAdministrador(request.user.id)
@@ -1800,7 +1800,32 @@ def verVacacionesSeleccionadas(request, id):
     }
     return render(request,"verVacacionesSeleccionadas.html", infoVista)
 
+def modificarVacaciones(request, id):
+    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+    admin = esAdministrador(request.user.id)
+    
+    if request.method == 'POST' and admin:
+        vacaciones.fecha_inicio = request.POST.get("fecha_inicio")
+        vacaciones.fecha_fin = request.POST.get("fecha_fin")
+        vacaciones.dias_consumidos = request.POST.get("dias_consumidos")
+        vacaciones.save(using='timetrackpro')
 
+        return redirect('timetrackpro:vacaciones-solicitadas')
+    else:
+        return redirect('timetrackpro:sin-permiso')
+    
+def cambiarEstadoVacaciones(request, id):
+    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+    admin = esAdministrador(request.user.id)
+    
+    if request.method == 'POST' and admin:
+        estado = request.POST.get("estado")
+        nuevoEstado = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1,id=estado)[0]
+        vacaciones.estado = nuevoEstado
+        vacaciones.save(using='timetrackpro')
+        return redirect('timetrackpro:vacaciones-solicitadas')
+    else:
+        return redirect('timetrackpro:sin-permiso')
 
 def eliminarVacaciones(request):
     if request.method == 'POST':
