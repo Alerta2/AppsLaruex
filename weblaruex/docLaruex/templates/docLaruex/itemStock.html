@@ -305,12 +305,11 @@
                   <div class="col-md-2 col-lg-2 ">
                     <input name="nuevoContenedor" type="text" class="form-control" id="nuevoContenedor" value="{{itemStock.num_contenedor}}" >
                   </div>
-                </div>            
-                
+                </div>        
                 <div class="row mb-3">
                   <label for="nuevaCantidad" class="col-md-4 col-lg-3 col-form-label">Cantidad</label>
                   <div class="col-md-2 col-lg-2">
-                    <input type="number" step="0.01" placeholder="{{itemStock.cantidad}}"class="form-control" name="nuevaCantidad" id="nuevaCantidad" value="{{itemStock.cantidad|safe}}">
+                    <input type="number" step="0.01" min="0" placeholder="{{itemStock.cantidad}}"class="form-control" name="nuevaCantidad" id="nuevaCantidad" value="{{itemStock.cantidad|safe}}">
                   </div>
                 </div>
 
@@ -489,7 +488,7 @@
           <div id="formularioAgregarUnidadesStockProveedorDiv" class="divFormularios">
             
             <div class="row d-flex justify-content-center">
-              <div class="col-4">
+              <div class="col-6">
                 <div class="form-group">
                   <label for="fechaAgregarStockProveedor">Fecha de Compra</label>
                   <input type="date" class="form-control" id="fechaAgregarStockProveedor" name="fechaAgregarStockProveedor" data-rule="required" required/>
@@ -509,13 +508,19 @@
               </div>
             </div>
             <div class="row d-flex justify-content-center">
-              <div class="col-5">
+              <div class="col-4">
                 <div class="form-group">
                   <label for="cantidadAgregadaProveedor">Cantidad</label>
                   <input type="number" step="0.01" min="0" class="form-control" id="cantidadAgregadaProveedor" name="cantidadAgregadaProveedor" data-rule="required" placeholder="0,01" required/>
                 </div>
               </div>
-              <div class="col-5">
+              <div class="col-4">
+                <div class="form-group">
+                  <label for="costeUnitarioAgregarStockProveedor">Precio unitario</label>
+                  <input type="number" step="0.01" min="0" class="form-control" id="costeUnitarioAgregarStockProveedor" name="costeUnitarioAgregarStockProveedor" data-rule="required" placeholder="0,01" required/>
+                </div>
+              </div>
+              <div class="col-4">
                 <div class="form-group">
                   <label for="costeAgregarStockProveedor">Precio</label>
                   <input type="number" step="0.01" min="0" class="form-control" id="costeAgregarStockProveedor" name="costeAgregarStockProveedor" data-rule="required" placeholder="0,01" required/>
@@ -806,6 +811,15 @@
             title: 'Unidades',
             field: 'unidad__nombre',
             align: "center",
+        },{
+            title: 'Precio unitario',
+            field: 'coste unitario',
+            align: "center",
+            sortable: "true",
+            formatter: function (value, row) {
+              var precio = row.coste_unitario + " €";
+              return (precio);
+            },
         },{
             title: 'Precio',
             field: 'coste',
