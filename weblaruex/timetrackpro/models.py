@@ -120,7 +120,7 @@ class RegistrosJornadaInsertados(models.Model):
 
 class CambiosVacacionesTimetrackpro(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    solicitante = models.ForeignKey('Usuarios', models.DO_NOTHING, db_column='Solicitante')  # Field name made lowercase.
+    solicitante = models.ForeignKey('Empleados', models.DO_NOTHING, db_column='Solicitante')  # Field name made lowercase.
     id_periodo_cambio = models.ForeignKey('VacacionesTimetrackpro', models.DO_NOTHING, db_column='ID_periodo_cambio')  # Field name made lowercase.
     fecha_inicio_actual = models.DateField(db_column='Fecha_inicio_actual')  # Field name made lowercase.
     fecha_fin_actual = models.DateField(db_column='Fecha_fin_actual')  # Field name made lowercase.
@@ -137,7 +137,7 @@ class CambiosVacacionesTimetrackpro(models.Model):
         managed = False
         db_table = 'cambios_vacaciones'
         
-class Empleados(models.Model):
+class EmpleadosMaquina(models.Model):
     id = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=255, blank=True, null=True)
     turno = models.CharField(max_length=255, blank=True, null=True)
@@ -153,7 +153,7 @@ class Empleados(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'empleados'
+        db_table = 'empleados_maquina'
 
 class Mensajes(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -303,7 +303,7 @@ class RegistrosManualesControlHorarioNoInsertados(models.Model):
 
 class Registros(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
-    id_empleado = models.ForeignKey(Empleados, models.DO_NOTHING, db_column='id_empleado', blank=True, null=True)
+    id_empleado = models.ForeignKey(EmpleadosMaquina, models.DO_NOTHING, db_column='id_empleado', blank=True, null=True)
     nombre_empleado = models.CharField(max_length=255, blank=True, null=True)
     hora = models.DateTimeField()
     maquina = models.ForeignKey(MaquinaControlAsistencia, models.DO_NOTHING, db_column='maquina', blank=True, null=True)
@@ -323,7 +323,7 @@ class Registros(models.Model):
 class RegistrosEliminados(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     id_registro_eliminado = models.IntegerField()
-    id_empleado = models.ForeignKey(Empleados, models.DO_NOTHING, db_column='id_empleado', blank=True, null=True)
+    id_empleado = models.ForeignKey(EmpleadosMaquina, models.DO_NOTHING, db_column='id_empleado', blank=True, null=True)
     nombre_empleado = models.CharField(max_length=255, blank=True, null=True)
     hora = models.DateTimeField()
     maquina = models.ForeignKey(MaquinaControlAsistencia, models.DO_NOTHING, db_column='maquina', blank=True, null=True)
@@ -412,8 +412,8 @@ class RegitroViajesAceptados(models.Model):
 
 class RelEmpleadosUsuarios(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    id_usuario = models.ForeignKey('Usuarios', models.DO_NOTHING, db_column='id_usuario')
-    id_empleado = models.ForeignKey(Empleados, models.DO_NOTHING, db_column='id_empleado')
+    id_usuario = models.ForeignKey('Empleados', models.DO_NOTHING, db_column='id_usuario')
+    id_empleado = models.ForeignKey(EmpleadosMaquina, models.DO_NOTHING, db_column='id_empleado')
     id_auth_user = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='id_auth_user', blank=True, null=True)
     id_tarjeta_acceso = models.ForeignKey('TarjetasAcceso', models.DO_NOTHING, db_column='id_tarjeta_acceso', blank=True, null=True)
     
@@ -453,7 +453,7 @@ class RelJustificantesEmpleados(models.Model):
         db_table = 'rel_justificantes_empleados'
 
 
-class Usuarios(models.Model):
+class Empleados(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=255)  # Field name made lowercase.
     apellidos = models.CharField(db_column='Apellidos', max_length=255, blank=True, null=True)  # Field name made lowercase.
@@ -473,7 +473,7 @@ class Usuarios(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'usuarios'
+        db_table = 'empleados'
 
 class NavBar(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -509,7 +509,7 @@ class VacacionesTimetrackpro(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     tipo_vacaciones = models.ForeignKey(TipoVacaciones, models.DO_NOTHING, db_column='Tipo_vacaciones')  # Field name made lowercase.
     year = models.IntegerField(db_column='Year')  # Field name made lowercase.
-    empleado = models.ForeignKey(Usuarios, models.DO_NOTHING, db_column='Empleado')  # Field name made lowercase.
+    empleado = models.ForeignKey(Empleados, models.DO_NOTHING, db_column='Empleado')  # Field name made lowercase.
     fecha_inicio = models.DateField(db_column='Fecha_inicio')  # Field name made lowercase.
     fecha_fin = models.DateField(db_column='Fecha_fin')  # Field name made lowercase.
     dias_consumidos = models.IntegerField(db_column='Dias_consumidos')  # Field name made lowercase.
