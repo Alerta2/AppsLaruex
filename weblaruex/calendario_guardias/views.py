@@ -1680,7 +1680,7 @@ def createCalendarRarex(request):
         UltimoUsuarioRojo= CalendarioGuardiasGuardias.objects.using("guardias").filter(id_turno__id_area__id_area = int(area), year=int(year)-1, tipo_semana=2).order_by('-semana','id_guardia').values('id_user_analista').first() 
 
         #Obtengo al personal implicado en las guardias del area seleccionada
-        personal = CalendarioPersonal.objects.using("guardias").filter(id_area__id_area = int(area), operativo = 1).exclude(supervisor=1).values('id_usuario').order_by('id_usuario')
+        personal = CalendarioPersonal.objects.using("guardias").filter(id_area__id_area = int(area), operativo = 1).values('id_usuario').order_by('id_usuario')
 
         #Obtengo el orden del personal para realizar las semanas verdes o de tipo 0
         personal_verde = ListadoPersonal(personal, UltimoUsuarioVerde, area)
