@@ -233,10 +233,45 @@
         </div>
       </div>
       <div class="card-body pt-4 p-3">
-        <div class="table-responsive mx-3">
+          <ul class="list-group">
+            {% for t in tarjetasAccesoActivas %}
+            <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+              <div class="d-flex align-items-center">
+                <button class="btn btn-icon-only btn-rounded btn-outline-success mb-0 me-3 btn-sm d-flex align-items-center justify-content-center"disabled><i class="fa-solid fa-user"></i></button>
+                <div class="d-flex flex-column">
+                  <h6 class="mb-1 text-dark text-sm">{{t.nombre}}  {{t.apellidos}}</h6>
+                  <span class="text-sm"><i class="fa-duotone fa-credit-card"></i> {{t.id_tarjeta}}</span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center text-success text-gradient text-sm font-weight-bold">
+                {{t.fecha_alta}}
+              </div>
+            </li>
+  
+            
+  
+            {% endfor %}
+          
+          </ul>
+          <div class="pagination">
+            <span class="step-links mx-auto">
+              {% if tarjetasAccesoActivas.has_previous %}
+              <a href="?page=1"><i class="fa-solid fa-forward fa-rotate-180"></i>&nbsp;</a>
+              <a href="?page={{ tarjetasAccesoActivas.previous_page_number }}"><i class="fa-solid fa-forward-step fa-rotate-180"></i></a>
+              {% endif %}
+              <span class="current">
+                &nbsp;Página {{ tarjetasAccesoActivas.number }} de {{ tarjetasAccesoActivas.paginator.num_pages }}&nbsp;
+              </span>
 
-          <table  id="tarjetas_activas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
-        </div>
+
+      
+      
+              {% if tarjetasAccesoActivas.has_next %}
+                  <a href="?page={{ tarjetasAccesoActivas.next_page_number }}"><i class="fa-solid fa-forward-step"></i>&nbsp;</a>
+                  <a href="?page={{ tarjetasAccesoActivas.paginatorActivas.numeroPaginaActiva }}"><i class="fa-solid fa-forward"></i></a>
+              {% endif %}
+            </span>
+          </div>
       </div>
     </div>
   </div>
@@ -255,8 +290,42 @@
 
       
       <div class="card-body pt-4 p-3">
+        <ul class="list-group">
+          {% for t in tarjetasAccesoInactivas %}
+          <li class="list-group-item border-0 d-flex justify-content-between ps-0 mb-2 border-radius-lg">
+            <div class="d-flex align-items-center">
+              <button class="btn btn-icon-only btn-rounded btn-outline-danger mb-0 me-3 btn-sm d-flex align-items-center justify-content-center" disabled><i class="fa-solid fa-user"></i></button>
+              <div class="d-flex flex-column">
+                <h6 class="mb-1 text-dark text-sm">{{t.nombre}} {{t.apellidos}}</h6>
+                <span class="text-sm"><i class="fa-duotone fa-credit-card"></i> {{t.id_tarjeta}}</span>
+              </div>
+            </div>
+            <div class="d-flex align-items-center text-danger text-gradient text-sm font-weight-bold">
+              {{t.fecha_alta}}
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
         
-        <table  id="tarjetas_inactivas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
+
+        <div class="pagination">
+          <span class="step-links mx-auto">
+            {% if tarjetasAccesoInactivas.has_previous %}
+            <a href="?page=1"><i class="fa-solid fa-forward fa-rotate-180"></i>&nbsp;</a>
+            <a href="?page={{ tarjetasAccesoInactivas.previous_page_number }}"><i class="fa-solid fa-forward-step fa-rotate-180"></i></a>
+            {% endif %}
+              <span class="current">
+                &nbsp;Página {{ tarjetasAccesoInactivas.number }} de {{ tarjetasAccesoInactivas.paginator.num_pages }}&nbsp;
+              </span>
+    
+            {% if tarjetasAccesoInactivas.has_next %}
+                <a href="?page={{ tarjetasAccesoInactivas.next_page_number }}"><i class="fa-solid fa-forward-step"></i>&nbsp;</a>
+                <a href="?page={{ tarjetasAccesoInactivas.paginator.num_pages }}"><i class="fa-solid fa-forward"></i></a>
+            {% endif %}
+              </span>
+          </span>
+          
+      </div>
       </div>
     </div>
   </div>
@@ -347,193 +416,6 @@ camposDeEntrada.forEach(function (campo) {
 
 document.getElementById("fechaActual").valueAsDate = new Date();
 
-
-admin = '{{admin}}';
-director = '{{director}}';
-$("#tarjetas_activas").bootstrapTable({
-  
-
-    method: "get",
-    locale: navigator.language,
-    url: "{% url 'timetrackpro:datos-tarjetas-de-acceso-activas' %}",
-    cache: false, 
-
-    columns: [
-      {
-        title: "Nombre",
-        field: "nombre",
-        halign:"left",
-        sortable: true,
-        align: "left",
-        width:"20",
-        formatter: function(value, row) {
-          var nombre = row.nombre;
-          var apellidos = row.apellidos;
-          var tarjeta = row.id_tarjeta;
-          var divNombre = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-success fa-xl me-2" aria-hidden="true"></i>'+nombre +" "+ apellidos+'</h6></div>';
-          var divTarjeta = '<div class="ms-1 mt-1"><h6 class="text-sm mb-0 text-secondary "><i class="fa fa-credit-card me-1 ms-4" aria-hidden="true"></i>'+tarjeta+'</h6></div>';
-          return divNombre + divTarjeta;
-        }
-      },{
-        title: "Accesos",
-        halign:"left",
-        align: "left",
-        width:"30",
-        formatter: function(value, row) {
-          var laboratorio = row.acceso_laboratorios;
-          divLaboratorio = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> Laboratorios</span></div>';
-          divCpd = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> CPD</span></div>';
-          divAlerta2 = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> Alerta2</span></div>';
-          var cpd = row.acceso_cpd;
-          var alerta2 = row.acceso_alerta2;
-            if (laboratorio == 0){
-              divLaboratorio = '<div><i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> Laboratorios</span></div>';
-            }
-            if (cpd == 0){
-              divCpd = '<div><i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> CPD</span></div>';
-            }
-            if (alerta2 == 0){
-              divAlerta2 = '<div><i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> Alerta2</span></div>';
-            }
-
-          var div = '<div>'+divLaboratorio+divAlerta2+divCpd+'</div>';
-          return div;
-        }
-      },
-
-      {
-        title: "Alta",
-        field: "fecha_alta",
-        align: "center",
-        width:"40",
-        formatter: function(value, row) {
-          const mes = {
-            "01": "Ene",
-            "02": "Feb",
-            "03": "Mar",
-            "04": "Abr",
-            "05": "May",
-            "06": "Jun",
-            "07": "Jul",
-            "08": "Ago",
-            "09": "Sep",
-            "10": "Oct",
-            "11": "Nov",
-            "12": "Dic",
-          };
-          // obtengo la fecha de lectura
-          var fechaLectura = row.fecha_alta;
-
-          // obtengo la fecha
-          var fecha = fechaLectura.split("T")[0];
-          mesFecha = fecha.split("-")[1];
-          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
-
-          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
-          return div;
-        }
-      },
-      {
-        title: "",
-        field: "Acciones",
-        align: "center",
-        visible:(admin == "True" || director == "True" ),
-        formatter: function (value, row) {
-
-          var botonVer = '<a href="/private/timetrackpro/tarjeta/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
-
-          return botonVer;
-
-        },
-      },
-    ],
-    search: true,
-    
-
-    
-  });
-
-
-  
-$("#tarjetas_inactivas").bootstrapTable({
-  
-
-  method: "get",
-  locale: navigator.language,
-  url: "{% url 'timetrackpro:datos-tarjetas-de-acceso-inactivas' %}",
-  cache: false, 
-
-  columns: [
-    {
-      title: "Nombre",
-      field: "nombre",
-      halign:"left",
-      sortable: true,
-      align: "left",
-      width:"20",
-      formatter: function(value, row) {
-        var nombre = row.nombre;
-        var apellidos = row.apellidos;
-        var tarjeta = row.id_tarjeta;
-        var divNombre = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-danger fa-xl me-2" aria-hidden="true"></i>'+nombre +" "+ apellidos+'</h6></div>';
-        var divTarjeta = '<div class="ms-1 mt-1"><h6 class="text-sm mb-0 text-secondary "><i class="fa fa-credit-card me-1 ms-4" aria-hidden="true"></i>'+tarjeta+'</h6></div>';
-        return divNombre + divTarjeta;
-      }
-    },
-    {
-      title: "Fecha de Baja",
-      field: "fecha_baja",
-      align: "center",
-      width:"40",
-      formatter: function(value, row) {
-        const mes = {
-          "01": "Ene",
-          "02": "Feb",
-          "03": "Mar",
-          "04": "Abr",
-          "05": "May",
-          "06": "Jun",
-          "07": "Jul",
-          "08": "Ago",
-          "09": "Sep",
-          "10": "Oct",
-          "11": "Nov",
-          "12": "Dic",
-        };
-        // obtengo la fecha de lectura
-        var fechaLectura = row.fecha_baja;
-        var divSinFecha = '<span class="text-xs font-weight-bold">Sin fecha</span>';
-        if (fechaLectura == null){
-          return divSinFecha;
-        }else{
-          // obtengo la fecha
-          var fecha = fechaLectura.split("T")[0];
-          mesFecha = fecha.split("-")[1];
-          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
-          var div = '<span class="text-xs font-weight-bold">'+ fecha +'</span>';
-          return div;
-        }
-      }
-    },
-    {
-      title: "",
-      field: "Acciones",
-      align: "center",
-      visible:(admin == "True" || director == "True" ),
-      formatter: function (value, row) {
-
-        var botonVer = '<a href="/private/timetrackpro/tarjeta/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
-
-        return botonVer;
-
-      },
-    },
-  ],
-  search: true,
-  
-
-  
-});
 </script>
 {% endblock %}
 

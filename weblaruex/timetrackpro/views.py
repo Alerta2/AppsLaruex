@@ -185,15 +185,10 @@ def eliminarHabilitacion(request):
         return redirect('timetrackpro:sin-permiso')
 
 def tarjetasAcceso(request):
+    admin = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
     # obtengo los datos necesarios para la vista
-    tarjetasActivas = TarjetasAcceso.objects.using("timetrackpro").filter(activo=1).order_by("nombre").values()
     tarjetasInactivas = TarjetasAcceso.objects.using("timetrackpro").filter(activo=0).order_by("nombre").values()
-
-    # paginación tarjetas activas
-    paginatorActivas = Paginator(tarjetasActivas, 5)  # Divide en páginas de 10 elementos
-    numeroPaginaActivas = request.GET.get('page')
-    tarjetasAccesoActivas = paginatorActivas.get_page(numeroPaginaActivas)
-
     # paginación tarjetas inactivas
     paginatorInactivas = Paginator(tarjetasInactivas, 5)  # Divide en páginas de 10 elementos
     numeroPaginaInactivas = request.GET.get('page')
@@ -202,8 +197,8 @@ def tarjetasAcceso(request):
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
-        "administrador":True,
-        "tarjetasAccesoActivas":tarjetasAccesoActivas,
+        "admin":admin,
+        "director":director,
         "tarjetasAccesoInactivas":tarjetasAccesoInactivas, 
         "infoGeneralTarjeta":infoGeneralTarjeta,
         "infoPersonalTarjeta":infoPersonalTarjeta,
@@ -212,6 +207,14 @@ def tarjetasAcceso(request):
 
     return render(request,"tarjetasAcceso.html", infoVista)
 
+
+def datosTarjetasAccesoActivas(request):
+    tarjetasActivas = TarjetasAcceso.objects.using("timetrackpro").filter(activo=1).order_by("nombre").values()
+    return JsonResponse(list(tarjetasActivas), safe=False)
+
+def datosTarjetasAccesoInactivas(request):
+    tarjetasInactivas = TarjetasAcceso.objects.using("timetrackpro").filter(activo=0).order_by("nombre").values()
+    return JsonResponse(list(tarjetasInactivas), safe=False)
 
 '''-------------------------------------------
                                 Módulo: datosDjangoUsers
@@ -273,7 +276,7 @@ def verTarjetaAcceso(request, id):
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
-        "administrador":True,
+        "admin":esAdministrador(request.user.id),
         "tarjeta":tarjeta,
         "infoGeneralTarjeta":infoGeneralTarjeta,
         "infoPersonalTarjeta":infoPersonalTarjeta,
@@ -284,92 +287,95 @@ def verTarjetaAcceso(request, id):
  
 
 def editarTarjetaAcceso(request):
-    id = request.POST.get("idTarjeta")
-    # obtengo los datos necesarios para la vista
-    tarjeta = TarjetasAcceso.objects.using("timetrackpro").filter(id=id)[0]
+    if request.method == 'POST':
+        id = request.POST.get("idTarjeta")
+        # obtengo los datos necesarios para la vista
+        tarjeta = TarjetasAcceso.objects.using("timetrackpro").filter(id=id)[0]
 
-    nombre = str(request.POST.get("nombre"))
-    nombre = nombre.replace("  ", "")
-    nombre = nombre.replace("-", "")
-    nombre = nombre.upper()
-    tarjeta.nombre = nombre
+        nombre = str(request.POST.get("nombre"))
+        nombre = nombre.replace("  ", "")
+        nombre = nombre.replace("-", "")
+        nombre = nombre.upper()
+        tarjeta.nombre = nombre
 
-    apellidos = str(request.POST.get("apellidos"))
-    apellidos = apellidos.replace("  ", "")
-    apellidos = apellidos.replace("-", "")
-    apellidos = apellidos.upper()
-    tarjeta.apellidos = apellidos
+        apellidos = str(request.POST.get("apellidos"))
+        apellidos = apellidos.replace("  ", "")
+        apellidos = apellidos.replace("-", "")
+        apellidos = apellidos.upper()
+        tarjeta.apellidos = apellidos
 
-    dni = str(request.POST.get("dni"))
-    dni = dni.replace(" ", "")
-    dni = dni.replace("-", "")
-    dni = dni.upper()
-    tarjeta.dni = dni
+        dni = str(request.POST.get("dni"))
+        dni = dni.replace(" ", "")
+        dni = dni.replace("-", "")
+        dni = dni.upper()
+        tarjeta.dni = dni
 
-    idTarjeta = str(request.POST.get("numeroTarjeta"))
-    idTarjeta.replace(" ", "").replace("-", "")
-    tarjeta.id_tarjeta = idTarjeta
+        idTarjeta = str(request.POST.get("numeroTarjeta"))
+        idTarjeta.replace(" ", "").replace("-", "")
+        tarjeta.id_tarjeta = idTarjeta
 
-    
-    fechaAlta = request.POST.get("fechaAlta")
-    tarjeta.fecha_alta = fechaAlta
+        
+        fechaAlta = request.POST.get("fechaAlta")
+        tarjeta.fecha_alta = fechaAlta
 
-    fechaExpiracion = None
-    if "fechaExpiracion" in request.POST and request.POST.get("fechaExpiracion") != "":
-        fecha_expiracion = request.POST.get("fechaExpiracion")
-        tarjeta.fecha_baja = fecha_expiracion
+        fechaExpiracion = None
+        if "fechaExpiracion" in request.POST and request.POST.get("fechaExpiracion") != "":
+            fecha_expiracion = request.POST.get("fechaExpiracion")
+            tarjeta.fecha_baja = fecha_expiracion
 
-    tarjetaActiva = request.POST.get('tarjeta_activa')
-    if tarjetaActiva == "on":
-        tarjeta.activo = 1
-    else:
-        tarjeta.activo = 0
-
-    accesoAlerta2 = request.POST.get('acceso_alerta2')
-    if accesoAlerta2 == "on":
-        tarjeta.acceso_alerta2 = 1
-    else:
-        tarjeta.acceso_alerta2 = 0
-
-    accesoLaboratorios = request.POST.get('acceso_laboratorio')
-    if accesoLaboratorios == "on":
-        tarjeta.acceso_laboratorios = 1
-    else:
-        tarjeta.acceso_laboratorios = 0
-
-    accesoCPD = request.POST.get('acceso_cpd')
-    if accesoCPD == "on":
-        tarjeta.acceso_cpd = 1
-    else:
-        tarjeta.acceso_cpd = 0
-    
-    alerta["activa"] = True
-    alerta["tipo"] = "success"
-    alerta["mensaje"] = "Tarjeta editada correctamente."
-    alerta["icono"] = iconosAviso["success"]
-
-    try: 
-        if request.FILES['imagenTarjeta'] and request.FILES['imagenTarjeta'] is not None:
-            if tarjeta.imagen is not None:
-                rutaActual = settings.STATIC_ROOT + settings.RUTA_TARJETAS_TIMETRACKPRO + tarjeta.imagen
-                if os.path.isfile(rutaActual):
-                    os.remove(rutaActual)         
-
-            nombreImagen = str(tarjeta.id) + '_tarjeta.' + request.FILES['imagenTarjeta'].name.split('.')[-1]
-            ruta = settings.STATIC_ROOT + settings.RUTA_TARJETAS_TIMETRACKPRO + nombreImagen
-            subirDocumento(request.FILES['imagenTarjeta'], ruta)
-            tarjeta.imagen = nombreImagen
+        tarjetaActiva = request.POST.get('tarjeta_activa')
+        if tarjetaActiva == "on":
+            tarjeta.activo = 1
         else:
-            alerta["tipo"] = "danger"   
-            alerta["mensaje"] = "Error al subir la foto"
-            alerta["icono"] = iconosAviso["danger"]
-    except:
-        #cambiar
-        print("Error al subir la foto")
- 
+            tarjeta.activo = 0
 
-    tarjeta.save(using='timetrackpro')
-    return redirect('timetrackpro:ver-tarjeta-acceso', id=id)
+        accesoAlerta2 = request.POST.get('acceso_alerta2')
+        if accesoAlerta2 == "on":
+            tarjeta.acceso_alerta2 = 1
+        else:
+            tarjeta.acceso_alerta2 = 0
+
+        accesoLaboratorios = request.POST.get('acceso_laboratorio')
+        if accesoLaboratorios == "on":
+            tarjeta.acceso_laboratorios = 1
+        else:
+            tarjeta.acceso_laboratorios = 0
+
+        accesoCPD = request.POST.get('acceso_cpd')
+        if accesoCPD == "on":
+            tarjeta.acceso_cpd = 1
+        else:
+            tarjeta.acceso_cpd = 0
+        
+        alerta["activa"] = True
+        alerta["tipo"] = "success"
+        alerta["mensaje"] = "Tarjeta editada correctamente."
+        alerta["icono"] = iconosAviso["success"]
+
+        try: 
+            if request.FILES['imagenTarjeta'] and request.FILES['imagenTarjeta'] is not None:
+                if tarjeta.imagen is not None:
+                    rutaActual = settings.STATIC_ROOT + settings.RUTA_TARJETAS_TIMETRACKPRO + tarjeta.imagen
+                    if os.path.isfile(rutaActual):
+                        os.remove(rutaActual)         
+
+                nombreImagen = str(tarjeta.id) + '_tarjeta.' + request.FILES['imagenTarjeta'].name.split('.')[-1]
+                ruta = settings.STATIC_ROOT + settings.RUTA_TARJETAS_TIMETRACKPRO + nombreImagen
+                subirDocumento(request.FILES['imagenTarjeta'], ruta)
+                tarjeta.imagen = nombreImagen
+            else:
+                alerta["tipo"] = "danger"   
+                alerta["mensaje"] = "Error al subir la foto"
+                alerta["icono"] = iconosAviso["danger"]
+        except:
+            #cambiar
+            print("Error al subir la foto")
+    
+
+        tarjeta.save(using='timetrackpro')
+        return redirect('timetrackpro:ver-tarjeta-acceso', id=id)
+    else:
+        return redirect('timetrackpro:tarjetas-de-acceso')
 
 '''-------------------------------------------
                                 Módulo: verPermiso
