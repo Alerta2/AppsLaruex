@@ -2274,12 +2274,15 @@ def accesoDirectoPermisos(request):
     return render(request,"acceso-directo-permisos.html", infoVista)
 
 def verSolicitudesVacaciones(request):
-    
+    admin = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
         "administrador":True,
+        "admin":admin,
+        "director":director,
         "empleados":list(empleados)
     }
 

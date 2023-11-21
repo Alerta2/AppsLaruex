@@ -43,7 +43,52 @@
     </div>
   </div>
 
+  <div id="modalCambiarEstado" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalCambiarEstado"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Aceptar o rechazar el registro</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
 
+        <div class="modal-body">
+        <form id="formularioEditarEstadoVacaciones" action="/private/timetrackpro/cambiar-estado-vacaciones/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Nuevo estado</label>
+              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
+                
+                <option value="9" {% if vacaciones.estado__id == 9 %} selected {% endif %}>Pendiente</option>
+                <option value="10" {% if vacaciones.estado__id == 10 %} selected {% endif %}>Rechazado</option>
+                <option value="11" {% if vacaciones.estado__id == 11 %} selected {% endif %}>Aceptado</option>
+              </select>
+            </div>
+            
+          </div>
+          <div class="row" id="rowMotivo" >
+            <div class="col-xl-8 mx-auto my-2"  >
+              <label class="text-sm" id="labelMotivo">Motivo del cambio de estado </label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el error" aria-label="Indique el motivo por el que se ha modificado el error" id="motivo" name="motivo" aria-describedby="text-addon"></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn btn-primary" id="botonModificar" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
   <script>
       
 document.addEventListener('DOMContentLoaded', function() {
@@ -115,6 +160,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
   });
   
+
+  
+  function mostrarTextArea (){
+    if($('#estado').val() == 10){
+      
+      $('#botonModificar').attr('disabled', true);
+      $('#rowMotivo').show();
+      $('#motivo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+    }else{
+      
+      $('#botonModificar').attr('disabled', false);
+      
+      $('#rowMotivo').hide();
+    }
+  }
 
   $("#tabla_vacaciones").bootstrapTable({
     method: "get",
@@ -258,11 +321,17 @@ document.addEventListener('DOMContentLoaded', function() {
         field: "",
         align: "center",
         formatter: function (value, row) {
+          admin = '{{admin}}';
+          director = '{{admin}}';
 
           var botonVer = '<a href="/private/timetrackpro/ver-vacaciones-seleccionadas/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
 
 
-          return botonVer;
+          var botonCambiarEstado = '<a href="" title="Agregar Stock" data-toggle="modal" data-target="#modalCambiarEstado" onclick="$('+"'#formularioCambiarEstado').attr('action', '/private/timetrackpro/cambiar-estado-vacaciones/"+ row.id +"/');"+'" class="mx-1"><i class="fa-solid fa-flag"></i></a>';
+          if (admin == "True" || director == "True" )
+            return botonVer + botonCambiarEstado;
+          else
+            return botonVer;
                   
 
         },
