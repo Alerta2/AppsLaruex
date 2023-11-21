@@ -1816,9 +1816,8 @@ def modificarVacaciones(request, id):
     
 def cambiarEstadoVacaciones(request, id):
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
-    admin = esAdministrador(request.user.id)
-    
-    if request.method == 'POST' and admin:
+
+    if request.method == 'POST':
         estado = request.POST.get("estado")
         nuevoEstado = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1,id=estado)[0]
         vacaciones.estado = nuevoEstado

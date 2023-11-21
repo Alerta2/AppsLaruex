@@ -10,6 +10,8 @@
   <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar.js' %}"></script>
   <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar_es.js' %}"></script>
   <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_mesual.css' %}" />
+
+
     <!-- disponible para configuración servidor-->
     <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
 {% endblock %}
@@ -22,9 +24,10 @@
           <h5>Vacaciones solicitadas</h5>
         </div>
         <div class="card-body px-0 pt-0 pb-2">
+          
           <div class="table-responsive mx-3">
 
-            <table  id="tabla_vacaciones" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            <table  id="tabla_vacaciones" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
           </div>
         </div>
       </div>
@@ -48,14 +51,14 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Aceptar o rechazar el registro</h5>
+          <h5 class="modal-title">Modificar el estado de la solicitud</h5>
           <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
 
         <div class="modal-body">
-        <form id="formularioEditarEstadoVacaciones" action="/private/timetrackpro/cambiar-estado-vacaciones/0/" method="POST"
+        <form id="formularioCambiarEstado" action="/private/timetrackpro/cambiar-estado-vacaciones/0/" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
@@ -184,6 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
     locale: navigator.language,
     url: "{% url 'timetrackpro:datos-vacaciones-solicitadas' %}",
     cache: false, 
+
     columns: [
       {
         title: "Empleado",
@@ -303,16 +307,21 @@ document.addEventListener('DOMContentLoaded', function() {
         title: "Estado",
         align: "center",
         width:"40",
+        sortable: true,
+        field: "estado",
         formatter: function(value, row) {
           var estado = row.estado;
           var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
           
-          if (estado == 2)
-            var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
-          
-          if (estado == 3)
+          if (estado == 10)
+          var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+
+          if (estado == 11)
           var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
 
+          if (estado == 12)
+            var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
+          
           return div;
         }
       },
@@ -338,6 +347,8 @@ document.addEventListener('DOMContentLoaded', function() {
       },
     ],
     search: true,
+    filterControl: true,
+
     
   });
   </script>
