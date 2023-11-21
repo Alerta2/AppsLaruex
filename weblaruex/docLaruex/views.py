@@ -2598,7 +2598,8 @@ def editarObjeto(request, id):
                 else:
                     equipo.alta_uex = 0
 
-                if request.POST.get('nuevaImagenEquipo') is None:
+                #if request.FILES['nuevaImagenEquipo'] is not None:
+                if request.post.get('nuevaImagenEquipo') is None:
                     if objeto.ruta is not None:
                         # find file name matches with *
                         imagenOld = glob.glob(settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) +  '.*')
@@ -4960,7 +4961,7 @@ def verItemStock (request, id):
     datas = []
     fechas = []
 
-    datos = RelStockProveedores.objects.using("docLaruex").filter(item=id).values('proveedor__nombre', 'coste', 'cantidad', 'unidad__nombre', 'fecha')
+    datos = RelStockProveedores.objects.using("docLaruex").filter(item=id).values('proveedor__nombre', 'coste', 'cantidad', 'unidad__nombre', 'fecha', 'coste_unitario')
     for dato in datos:
         labels.append(dato["proveedor__nombre"])
         datas.append("Precio: " + str(dato["coste"]) +" \n"+ "Cantidad: " + str(dato["cantidad"]) + " \n"+ "Formato: " + str(dato["unidad__nombre"]))
@@ -4968,9 +4969,9 @@ def verItemStock (request, id):
 
 
     itemStock = Stock.objects.using("docLaruex").filter(id=id).values('id','item','descripcion','num_contenedor','num_estanteria','id_ubicacion','id_ubicacion__id__nombre','id_ubicacion__id','unidad__id','unidad__nombre','cantidad', 'min_cantidad', 'categoria','categoria__categoria','avisado','urgente').first()
-    infoProveedor = RelStockProveedores.objects.using("docLaruex").filter(item=id).values('id','fecha','coste','proveedor','proveedor__id','proveedor__nombre', 'proveedor__telefono','cantidad','unidad')
+    infoProveedor = RelStockProveedores.objects.using("docLaruex").filter(item=id).values('id','fecha','coste','proveedor','proveedor__id','proveedor__nombre', 'proveedor__telefono','cantidad','unidad', 'coste_unitario')
     proveedores = Proveedor.objects.using("docLaruex").order_by('nombre').values('id','nombre')
-    ultimoProveedor = RelStockProveedores.objects.using("docLaruex").filter(item=id).order_by('-fecha').values('id','fecha','coste','proveedor','proveedor__id','proveedor__nombre', 'proveedor__telefono','cantidad','unidad').first()
+    ultimoProveedor = RelStockProveedores.objects.using("docLaruex").filter(item=id).order_by('-fecha').values('id','fecha','coste','proveedor','proveedor__id','proveedor__nombre', 'proveedor__telefono','cantidad','unidad', 'coste_unitario').first()
     
 
     habilitacionesUsuario = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=request.user.id).values('id','tipo','fecha','id_habilitacion','id_habilitacion__id', 'id_habilitacion__titulo')
@@ -5004,7 +5005,7 @@ def agregarStock(request):
     nuevoStock.save(using='docLaruex')
 
     if request.POST.get("informacionProveedor") == "1":
-        nuevoProveedor = RelStockProveedores(item=nuevoStock, fecha=request.POST.get("fechaCompraProveedor"), coste=request.POST.get("costeProveedor"), proveedor=Proveedor.objects.using('docLaruex').get(id=request.POST.get("proveedor")), cantidad=cantidad, unidad=unidad)
+        nuevoProveedor = RelStockProveedores(item=nuevoStock, fecha=request.POST.get("fechaCompraProveedor"), coste=request.POST.get("costeProveedor"), proveedor=Proveedor.objects.using('docLaruex').get(id=request.POST.get("proveedor")), cantidad=cantidad, unidad=unidad, coste_unitario=request.POST.get("costeUnitarioProveedor"))
         nuevoProveedor.save(using='docLaruex')
     return listadoStock(request)
 
@@ -5115,7 +5116,7 @@ def agregarUnidadesStockProveedor (request, item):
     stock.cantidad += float(request.POST['cantidadAgregadaProveedor'])
     stock.save(using="docLaruex")
     
-    nuevoProveedor =  RelStockProveedores(item=stock, fecha=request.POST.get("fechaAgregarStockProveedor"), coste=request.POST.get("costeAgregarStockProveedor"), proveedor=Proveedor.objects.using('docLaruex').get(id=request.POST.get("proveedorAgregarStock")), cantidad=request.POST['cantidadAgregadaProveedor'], unidad=stock.unidad)
+    nuevoProveedor =  RelStockProveedores(item=stock, fecha=request.POST.get("fechaAgregarStockProveedor"), coste=request.POST.get("costeAgregarStockProveedor"), proveedor=Proveedor.objects.using('docLaruex').get(id=request.POST.get("proveedorAgregarStock")), cantidad=request.POST['cantidadAgregadaProveedor'], unidad=stock.unidad, coste_unitario=request.POST.get("costeUnitarioAgregarStockProveedor"))
     nuevoProveedor.save(using='docLaruex')
 
     return HttpResponseRedirect('/private/docLaruex/verItemStock/'+item+'/')
@@ -5124,7 +5125,6 @@ def agregarUnidadesStockProveedor (request, item):
                                 Módulo: DatosRetiradasStock
 
 - Descripción: 
-
 
 - Precondiciones:
 El usuario debe estar autenticado.
@@ -5176,7 +5176,6 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 @login_required
 def editarStock(request, id):
-
     itemsMenu = MenuBar.objects.using("docLaruex").values()
     itemStock = Stock.objects.using('docLaruex').filter(id=id)[0]
     ubicaciones = Ubicaciones.objects.using('docLaruex').order_by('-id__padre').values('id','tipo_ubicacion', 'tipo_ubicacion__nombre','id__nombre', 'id__padre__nombre', 'id__padre__id', 'id__padre')
@@ -5184,8 +5183,7 @@ def editarStock(request, id):
     unidades = UnidadesStock.objects.using('docLaruex').order_by('nombre').values()
 
     if request.method == 'POST':
-        print("POST", request.POST)
-        itemStock.nombre = request.POST['nuevoNombre']
+        itemStock.item = request.POST['nuevoNombre']
         itemStock.id_ubicacion =  Ubicaciones.objects.using("docLaruex").filter(id=request.POST['nuevaUbicacion'])[0]
         itemStock.categoria = CategoriasStock.objects.using("docLaruex").filter(id=request.POST['nuevaCategoria'])[0]
         
@@ -5229,7 +5227,7 @@ El usuario debe estar autenticado.
 @login_required
 def DatosHistoricoProveedores(request, id):
     itemStock = Stock.objects.using("docLaruex").filter(id=id)[0]
-    historicoProveedores =RelStockProveedores.objects.using("docLaruex").filter(item=itemStock).values('fecha', 'coste', 'proveedor__id', 'proveedor__nombre', 'cantidad', 'unidad__nombre')
+    historicoProveedores =RelStockProveedores.objects.using("docLaruex").filter(item=itemStock).values('fecha', 'coste', 'proveedor__id', 'proveedor__nombre', 'cantidad', 'unidad__nombre', 'coste_unitario')
     return JsonResponse(list(historicoProveedores), safe=False)
             
 '''-------------------------------------------

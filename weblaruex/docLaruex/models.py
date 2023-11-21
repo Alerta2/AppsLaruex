@@ -793,6 +793,7 @@ class RelStockProveedores(models.Model):
     item = models.ForeignKey('Stock', models.DO_NOTHING, db_column='Item')  # Field name made lowercase.  
     unidad = models.ForeignKey('UnidadesStock', models.DO_NOTHING, db_column='Unidad')  # Field name made lowercase.
     cantidad = models.FloatField(db_column='Cantidad')  # Field name made lowercase.
+    coste_unitario= models.FloatField(db_column='Coste_unitario', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False

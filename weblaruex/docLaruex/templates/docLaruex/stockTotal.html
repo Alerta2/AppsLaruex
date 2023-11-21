@@ -279,7 +279,8 @@
         </button>
       </div>
       <div class="modal-body">
-        <form id="formularioAddStock" action="/private/docLaruex/agregarStock" method="POST"
+        <form id="formularioAddStock" action="{% url 'docLaruex:docLaruexAgregarStock' %}
+        " method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
