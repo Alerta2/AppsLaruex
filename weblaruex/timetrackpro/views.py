@@ -10,8 +10,10 @@ from django.contrib.auth.decorators import *
 from datetime import date, datetime
 from django.core.exceptions import ObjectDoesNotExist
 import unicodedata
-from django.db.models import Q
+from django.db.models import Q, F, Max, Min, Count, Sum, Avg
 from timetrackpro.funciones.funcionesAuxiliares import *
+from django.db.models.functions import TruncDate
+
 
 
 
@@ -250,9 +252,9 @@ def agregarTarjetaAcceso(request):
         fecha_expiracion = None
         if "fechaExpiracion" in request.POST and request.POST.get("fechaExpiracion") != "":
             fecha_expiracion = request.POST.get("fechaExpiracion")
-            nuevaTarjeta= TarjetasAcceso(nombre=nombre, apellidos=apellidos, dni=dni, imagen=imagen,acceso_laboratorios=acceso_laboratorios, acceso_cpd=acceso_cpd, acceso_alerta2=acceso_alerta2, id_tarjeta=id_tarjeta,fecha_alta=fechaActual, fecha_baja=fecha_expiracion, activo=0)
+            nuevaTarjeta= TarjetasAcceso(nombre=nombre, apellidos=apellidos, dni=dni, imagen=imagen,acceso_laboratorios=acceso_laboratorios, acceso_cpd=acceso_cpd, acceso_alerta2=acceso_alerta2, id_tarjeta=id_tarjeta,fecha_alta=fechaActual, fecha_expiracion=fecha_expiracion, activo=1)
         else:
-            nuevaTarjeta = TarjetasAcceso(nombre=nombre, apellidos=apellidos, dni=dni, imagen=imagen,acceso_laboratorios=acceso_laboratorios, acceso_cpd=acceso_cpd, acceso_alerta2=acceso_alerta2, id_tarjeta=id_tarjeta,fecha_alta=fechaActual, activo=0)
+            nuevaTarjeta = TarjetasAcceso(nombre=nombre, apellidos=apellidos, dni=dni, imagen=imagen,acceso_laboratorios=acceso_laboratorios, acceso_cpd=acceso_cpd, acceso_alerta2=acceso_alerta2, id_tarjeta=id_tarjeta,fecha_alta=fechaActual, activo=1)
         nuevaTarjeta.save(using='timetrackpro')
 
     try: 
@@ -267,7 +269,7 @@ def agregarTarjetaAcceso(request):
         #cambiar
         print("Error al subir la foto del equipo")
 
-    return tarjetasAcceso(request)  
+    return redirect('timetrackpro:tarjetas-de-acceso') 
 
 def verTarjetaAcceso(request, id):
     # obtengo los datos necesarios para la vista
@@ -436,12 +438,32 @@ def obtenerRegistroUsuario(request, id=None, year=None, mes=None, semana=None):
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
 
     # current_url = request.path[1:]
-    
     infoVista = {
         "navBar":navBar,
         "administrador":True,
     }
     return render(request,"informeRegistroUsuario.html",infoVista)
+
+
+def datosRegistroUsuario(request, id=None, year=None, mes=None, semana=None):
+    #empleados de las máquinas de control de asistencia
+    salida = []
+
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
+    #filter=models.Q(hora__date__gte=datetime.strptime(year + "-" + mes + "-01", '%Y-%m-%d').date()), distinct=True)
+    if id is not  None:
+        empleados = EmpleadosMaquina.objects.using("timetrackpro").filter(id__in=id).values()
+    for e in empleados:
+        #registros = Registros.objects.using("timetrackpro").filter(id_empleado=e["id"]).annotate(fecha=TruncDate('hora')).values('hora__date','hora__time','id_empleado','nombre_empleado', 'fecha').annotate(hora_entrada=Min('hora__time'), hora_salida=Max('hora__time')).order_by('fecha')
+        registros= Registros.objects.using("timetrackpro").filter(id_empleado=e["id"]).annotate(fecha=TruncDate('hora')).values('fecha', 'id_empleado', 'nombre_empleado', 'hora__time').order_by('-fecha','hora__time')
+
+        #.annotate(hora_entrada=Min('hora__time'), hora_salida=Max('hora__time'))
+        for r in registros:
+
+
+            salida.append(r)
+    # current_url = request.path[1:]
+    return JsonResponse(list(salida), safe=False)
 
 
 
@@ -1426,22 +1448,6 @@ def editarEmpleado(request, id):
 
 
 
-def solicitudes(request):
-
-        # obtengo los datos necesarios para la vista
-    
-    empleados = RelEmpleadosUsuarios.objects.using("timetrackpro").values('id_usuario__id', 'id_usuario__nombre', 'id_usuario__apellidos', 'id_usuario__img', 'id_usuario__dni', 'id_usuario__fecha_nacimiento', 'id_usuario__telefono', 'id_usuario__telefono2', 'id_usuario__email','id_usuario__email2', 'id_usuario__extension', 'id_usuario__puesto', 'id_usuario__direccion', 'id_usuario__info_adicional', 'id_usuario__fecha_alta_app', 'id_usuario__fecha_baja_app', 'id_empleado__id', 'id_empleado__nombre', 'id_empleado__turno', 'id_empleado__horas_maxima_contrato', 'id_empleado__en_practicas', 'id_empleado__maquina_laboratorio', 'id_empleado__maquina_alerta2', 'id_empleado__maquina_departamento', 'id_auth_user__id', 'id_auth_user__first_name', 'id_auth_user__last_name', 'id_auth_user__is_active', 'id_auth_user__is_superuser', 'id_auth_user__is_staff', 'id_auth_user__username', 'id_auth_user__password', 'id_auth_user__last_login', 'id_auth_user__date_joined')
-
-
-    # guardo los datos en un diccionario
-    infoVista = {
-        "navBar":navBar,
-        "administrador":True,
-        "empleados":list(empleados)
-    }
-    return render(request,"solicitudes.html",infoVista)
-
-
 def festivos(request, year=None):
     festivos = None
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
@@ -1615,8 +1621,6 @@ Devuelve un listado festivos para ese año y mes concretros
 def calendarioFestivos(request, mes, year=None):
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
-    
-    
     mesInicial = str(mes)
     if len(mes) == 1:
         mesInicial = "0" + mesInicial
@@ -1682,8 +1686,6 @@ def agregarFestivoCalendario(request):
         fecha = request.POST.get("fecha_inicio_seleccionada")
         mes = fecha.split("-")[1]
         year = request.POST.get("year_actual")
-
-        
         nuevoFestivo = FestivosTimetrackPro(nombre=nombre, tipo_festividad=tipo, fecha_inicio=fecha, fecha_fin=fecha, year=year)
         nuevoFestivo.save(using='timetrackpro')
         return redirect('timetrackpro:calendario-festivos', mes=mes)    
@@ -1920,8 +1922,6 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 def permisos(request, year=None):
     # obtengo los datos necesarios para la vista
-    
-    
 
     # guardo los datos en un diccionario
     infoVista = {
@@ -1929,7 +1929,6 @@ def permisos(request, year=None):
         "administrador":True,
         "alerta":alerta,
     }
-
     return render(request,"permisos.html", infoVista)
 
 
@@ -1942,7 +1941,6 @@ vista que permite agregar un permiso a la base de datos
 - Precondiciones:
 El usuario debe estar autenticado.
 
-
 - Postcondiciones:
 Agregar un permiso a la base de datos y redirigir a la vista de permisos
 
@@ -1950,7 +1948,6 @@ Agregar un permiso a la base de datos y redirigir a la vista de permisos
 def agregarPermiso(request, year=None):
     # obtengo los datos necesarios para la vista
     
-
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
@@ -1999,7 +1996,6 @@ def agregarPermiso(request, year=None):
         else:
             pas = 0
         
-        
         pdi = request.POST.get("pdi")
         if pdi == "on":
             pdi = 1
@@ -2018,8 +2014,6 @@ def agregarPermiso(request, year=None):
             bonificacion_20 = request.POST.get("bonificacion_20_year")
             bonificacion_25 = request.POST.get("bonificacion_25_year")
             bonificacion_30 = request.POST.get("bonificacion_30_year")
-        
-
 
         # registramos el permiso en la base de datos
         nuevoPermiso = Permisos(nombre=nombre, duracion=duracion, naturales_o_habiles=tipoDias, periodo_antelacion=periodoAntelacion, fecha_maxima_solicitud=fechaLimite, acreditar=acreditable, doc_necesaria=documentacionJustificativa, legislacion_aplicable=legislacionAplicable, bonificable_por_antiguedad=bonificable, bonificacion_por_15_years=bonificacion_15, bonificacion_por_20_years=bonificacion_20, bonificacion_por_25_years=bonificacion_25, bonificacion_por_30_years=bonificacion_30, year=year, es_permiso_retribuido=retribuido, pdi=pdi, pas=pas)
@@ -2047,8 +2041,6 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 def verPermiso(request, id):
     permiso = Permisos.objects.using("timetrackpro").filter(id=id)[0]
-    
-
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
@@ -2136,8 +2128,6 @@ def editarPermiso(request):
         permiso.pdi = 0
 
     permiso.save(using='timetrackpro')
-
-
     return redirect('timetrackpro:ver-permiso', id=permiso.id)
 
 
@@ -2153,16 +2143,46 @@ El usuario debe estar autenticado.
 
 -------------------------------------------'''
 def insertarRegistroManualMensual(request):
-    
     festivos = FestivosTimetrackPro.objects.using("timetrackpro").values()
+    admin = esAdministrador(request.user.id)
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
-        "administrador":True,
+        "admin":admin,
         "festivos":list(festivos)
     }
     return render(request,"insertar-registro-mensual.html",infoVista)
 
+def solicitarAsuntosPropios(request):
+    admin = esAdministrador(request.user.id)
+    empleados = Empleados.objects.using("timetrackpro").values()
+    year = str(datetime.now().year)
+    mes = str(datetime.now().month)
+    if len(mes) == 1:
+        mesInicial = "0" + mesInicial
+    initialDate = year + "-" + mes + "-01"
+    ausencias = RegistroAusencias.objects.using("timetrackpro").values()
+    infoVista = {
+        "navBar":navBar,
+        "admin":admin,
+        "empleados":list(empleados),
+        "ausencias":list(ausencias),
+        "initialDate":initialDate,
+    }
+    return render(request,"solicitarAusencias.html",infoVista)
+
+def datosAsuntosPropios(request):
+    admin = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+
+    diasSolicitados = []
+    if admin or director:
+        diasSolicitados = RegistroAusencias.objects.using("timetrackpro").values('id', 'id_empleado', 'id_empleado__nombre','id_empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'id_estado', 'id_estado__nombre', 'fecha_solicitud', 'id_permiso', 'id_permiso__nombre', 'id_permiso__duracion', 'id_permiso__naturales_o_habiles', 'id_permiso__periodo_antelacion', 'id_permiso__fecha_maxima_solicitud', 'id_permiso__acreditar', 'id_permiso__doc_necesaria', 'id_permiso__legislacion_aplicable', 'id_permiso__bonificable_por_antiguedad', 'id_permiso__bonificacion_por_15_years', 'id_permiso__bonificacion_por_20_years', 'id_permiso__bonificacion_por_25_years', 'id_permiso__bonificacion_por_30_years', 'id_permiso__year', 'id_permiso__es_permiso_retribuido', 'id_permiso__pas', 'id_permiso__pdi')
+    else:
+        authUser = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        usuario = Empleados.objects.using("timetrackpro").filter(id=authUser.id_usuario.id)[0]
+        diasSolicitados = RegistroAusencias.objects.using("timetrackpro").filter(empleado=usuario).values('id', 'id_empleado', 'id_empleado__nombre','id_empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'id_estado', 'id_estado__nombre', 'fecha_solicitud', 'id_permiso', 'id_permiso__nombre', 'id_permiso__duracion', 'id_permiso__naturales_o_habiles', 'id_permiso__periodo_antelacion', 'id_permiso__fecha_maxima_solicitud', 'id_permiso__acreditar', 'id_permiso__doc_necesaria', 'id_permiso__legislacion_aplicable', 'id_permiso__bonificable_por_antiguedad', 'id_permiso__bonificacion_por_15_years', 'id_permiso__bonificacion_por_20_years', 'id_permiso__bonificacion_por_25_years', 'id_permiso__bonificacion_por_30_years', 'id_permiso__year', 'id_permiso__es_permiso_retribuido', 'id_permiso__pas', 'id_permiso__pdi')
+    return JsonResponse(list(diasSolicitados), safe=False)
 
 
 
@@ -2172,7 +2192,6 @@ def solicitarVacaciones(request):
     # obtengo los datos necesarios para la vista
     authUser = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
     usuario = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=authUser)[0]
-    
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
     mes = str(datetime.now().month)
@@ -2248,14 +2267,12 @@ def solicitarModificarVacaciones(request):
         idEmpleado = user.id_empleado.id
         solicitante = Empleados.objects.using("timetrackpro").filter(id=idEmpleado)[0]
         estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
-
         # obtenemos los datos del formulario
         idVacaciones = request.POST.get("vacaciones_modificar")
         vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=idVacaciones)[0]
         estadoPendiente = EstadosSolicitudes.objects.using("timetrackpro").filter(id=12)[0]
         vacaciones.estado = estadoPendiente
         vacaciones.save(using='timetrackpro')
-
         fechaInicioActual = request.POST.get("fechaActualInicio")
         fechaFinActual = request.POST.get("fechaActualFin")
         diasConsumidosActual = request.POST.get("dias_actuales_consumidos")
@@ -2264,19 +2281,18 @@ def solicitarModificarVacaciones(request):
         fechaNuevaFin = request.POST.get("fechaFinNueva")
         diasConsumidosNuevos = request.POST.get("dias_nuevos_consumidos")
         motivoCambio = request.POST.get("motivo_cambio")
-
         solicitudModificacionVacaciones = CambiosVacacionesTimetrackpro(id_periodo_cambio=vacaciones, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
         solicitudModificacionVacaciones.save(using='timetrackpro')
     return redirect('timetrackpro:solicitar-vacaciones')
 
-def accesoDirectoPermisos(request):
+def solicitudes(request):
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
         "administrador":esAdministrador(request.user.id),
         "director":esDirector(request.user.id),
     }
-    return render(request,"acceso-directo-permisos.html", infoVista)
+    return render(request,"solicitudes.html", infoVista)
 
 def verSolicitudesVacaciones(request):
     admin = esAdministrador(request.user.id)
@@ -2305,6 +2321,8 @@ def verSolicitudesVacaciones(request, idSolicitud):
     }
 
     return render(request,"notificar-error-registro.html", infoVista)
+
+
 
 
 '''-------------------------------------------

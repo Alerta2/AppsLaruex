@@ -2,15 +2,12 @@
 {% load static %}
 
 {% block imports %}
-
     <!-- fullcalendar-->
   <!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.9/index.global.min.js'></script> -->
   <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" />
   <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar.js' %}"></script>
   <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar_es.js' %}"></script>
   <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_mesual.css' %}" />
-
-
     <!-- disponible para configuración servidor-->
     <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
 {% endblock %}
@@ -46,7 +43,6 @@
               </h2>
                 <div>                  
                   <div class="row">
-
                     <div class="col-xl-3">
                       <label>ID Tarjeta</label>
                       <div class="mb-3">
@@ -54,8 +50,7 @@
                           id="id_tarjeta" name="id_tarjeta" aria-describedby="text-addon"
                           value="{{tarjeta.id_tarjeta}}">
                       </div>
-                    </div>
-                    
+                    </div>                    
                     <div class="col-xl-3">
                       <label>Fecha de Alta</label>
                       <div class="mb-3">
@@ -64,7 +59,6 @@
                           value="{{tarjeta.fecha_alta|safe}}">
                       </div>
                     </div>
-                    
                     <div class="col-xl-3">
                       <label>Fecha validez</label>
                       <div class="mb-3">
@@ -73,16 +67,13 @@
                           {% if tarjeta.fecha_baja %} value="{{tarjeta.fecha_baja|safe}}" {% endif %}>
                       </div>
                     </div>
-                    
                     <div class="col-xl-3">
                       <label>¿La tarjeta está activa?</label>
                       <div class="form-switch ps-1 my-2">
                         <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.activo %} checked {% endif %} name="tarjeta_activa" id="tarjeta_activa">
                       </div>
                     </div>
-
-                  </div>
-                                   
+                  </div>                  
                   <div class="row">
                     <div class="col-xl-3">
                       <label>DNI</label>
@@ -90,7 +81,6 @@
                         <input type="text" class="form-control" aria-label="DNI del empleado" aria-describedby="text-addon" value="{{tarjeta.dni}}" id="dni" name="dni">
                       </div>
                     </div>
-
                     <div class="col-xl-4">
                       <label>Nombre</label>
                       <div class="mb-3">

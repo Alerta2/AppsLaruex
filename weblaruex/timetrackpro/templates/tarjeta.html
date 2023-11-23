@@ -127,34 +127,30 @@
           </div>
           <a class="modificarImagen" href="" title="subir-imagen" data-toggle="modal" data-target="#modalFormulario"><i
             class="fa-kit fa-solid-image-pen fa-2x" style="position: relative; bottom: 1rem; right: -22rem;"></i></a>
-  
-  
+
         <input type="file" id="imagenTarjeta" name="imagenTarjeta" accept="image/*" onchange="previsualizarImagen()"
           style="display:none">
         </div>
-
         <!-- END Tarjeta flip -->
         </div>
-
-
       </div>
       <div class="col col-xl-8 col-lg-8 col-md-12">
-
+        {% if tarjeta.activo == 0 %}
           <h3 class="font-weight-bolder text-danger text-gradient">Editar Datos Tarjeta de acceso</h3>
-
-
-
-
+          {% if tarjeta.fecha_baja %}
+          <h4 class="font-weight-bolder text-danger text-gradient">Baja: {{tarjeta.fecha_baja}}</h4>
+          {% endif %}
+        {% else %}
+        <h3 class="font-weight-bolder text-success text-gradient">Editar Datos Tarjeta de acceso</h3>
+        {% endif %}
           <!-- DATOS DE LA TARJETA DE ACCESO -->
           <div class="row">
-
             <div class="col-xl-3">
               <label>ID Tarjeta</label>
               <div class="mb-3">
                 <input type="text" class="form-control" aria-label="DNI del empleado" id="numeroTarjeta"
                   name="numeroTarjeta" aria-describedby="text-addon" value="{{tarjeta.id_tarjeta}}">
                 <input type="text" id="idTarjeta" name="idTarjeta" class="form-control" value="{{tarjeta.id}}" hidden />
-
               </div>
             </div>
 
@@ -228,13 +224,14 @@
               </div>
             </div>
           </div>
-
           <div class="text-center">
+            {% if tarjeta.activo == 0 %}
             <button type="submit" value="submit" class="btn bg-gradient-danger mt-4 mb-0">Guardar</button>
+            {% else %}
+            <button type="submit" value="submit" class="btn bg-gradient-success mt-4 mb-0">Guardar</button>
+            {% endif %}
           </div>
       </div>
-
-
     </div>
   </form>
 

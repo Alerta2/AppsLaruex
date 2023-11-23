@@ -165,12 +165,9 @@
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
           </div>
       </div>
-    
     </form>
   </div>
 </div>
-
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -235,25 +232,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // modifico el index del calendario
        // se muestra el modal
         $('#modalAgregarFestivoDesdeCalendario').modal('show');
-      
         },
     });
     calendar.render(); // renderizo el calendario
     calendar.updateSize(); // actualizo el tamaño del calendario
-
-
-
-
   });
-
-
-
-
-  function mostrarFormularioOculto() {
-    // get value of selected  element in select box
-    
-  }
-
 
   document.getElementById("varios_dias").addEventListener(
   "change",
@@ -273,7 +256,6 @@ document.addEventListener('DOMContentLoaded', function() {
       // se oculta el input de fecha fin
       inputFechaFin.style.display = "none";   
     }
-     
     colMultiple.style.display = "none"; 
     rowMultiple.style.display = "none"; 
   },
@@ -285,7 +267,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var fecha_fin = document.getElementById("fecha_fin");
     var inputYear = document.getElementById("year");
     var year = fecha.substring(0, 4);
-
     fecha_fin.value = fecha;
     inputYear.value = year;
   }

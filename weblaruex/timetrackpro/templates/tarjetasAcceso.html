@@ -109,7 +109,7 @@
     <div class="row">
     <div class="col-md-12 mb-lg-0 mb-4">
       <div class="card mt-4">
-                    <!-- Edit Form -->
+      <!-- Edit Form -->
       <form id="formularioAgregarTarjetaAcceso"  action="/private/timetrackpro/agregar-tarjeta" method="POST" enctype="multipart/form-data">
       {% csrf_token %}
         <div class="card-header pb-0 p-3">
@@ -213,7 +213,8 @@
           </div>
 
         </div>
-      </form><!-- End Profile Edit Form -->
+      </form>
+      <!-- End Profile Edit Form -->
 
       </div>
     </div>
@@ -500,6 +501,7 @@ $("#tarjetas_inactivas").bootstrapTable({
           "11": "Nov",
           "12": "Dic",
         };
+
         // obtengo la fecha de lectura
         var fechaLectura = row.fecha_baja;
         var divSinFecha = '<span class="text-xs font-weight-bold">Sin fecha</span>';

@@ -1,0 +1,126 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h5>Informe empleados 
+
+            <a href="{% url 'timetrackpro:agregar-usuario' %}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Dar de alta un empleado en la aplicación">
+              <i class="fa-solid fa-user-plus ps-2"></i>
+            </a>
+          </h5>
+        </div>
+        <div class="card-body mx-4 pt-0 pb-2">
+          <div class="table-responsive p-0">
+            <table  id="informe_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+      
+$("#informe_empleados").bootstrapTable({
+  method: "get",
+  locale: navigator.language,
+  url: "{% url 'timetrackpro:datos-registro-empleados' %}",
+  cache: false, 
+
+  columns: [
+    {
+      title: "Nombre",
+      field: "nombre_empleado",
+      halign:"left",
+      sortable: true,
+      align: "left",
+      width:"5",
+      // formatter: function(value, row) {
+      //   var nombre = row.nombre_empleado;
+      //   var divNombre = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+nombre +'</h6></div>';
+      //   return divNombre ;
+      // }
+    },{
+      title: "Fecha",
+      field: "hora",
+      align: "center",
+      width:"10",
+      formatter: function(value, row) {
+        const mes = {
+          "01": "Ene",
+          "02": "Feb",
+          "03": "Mar",
+          "04": "Abr",
+          "05": "May",
+          "06": "Jun",
+          "07": "Jul",
+          "08": "Ago",
+          "09": "Sep",
+          "10": "Oct",
+          "11": "Nov",
+          "12": "Dic",
+        };
+        // obtengo la fecha de lectura
+        var fechaLectura = row.fecha;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+          var div = '<span class="text-xs font-weight-bold">'+ fecha +'</span>';
+          return div;
+      }
+    },
+    {
+      title: "Entrada",
+      field: "hora",
+      halign:"left",
+      sortable: true,
+      align: "left",
+      width:"20",
+      formatter: function(value, row) {
+        var hora = row.hora_entrada;
+        var divHora = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+hora +'</h6></div>';
+        return divHora ;
+      }
+    },
+    {
+      title: "Salida",
+      field: "hora",
+      halign:"left",
+      sortable: true,
+      align: "left",
+      width:"20",
+      formatter: function(value, row) {
+        var hora = row.hora_salida;
+        var divHora = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+hora +'</h6></div>';
+        return divHora ;
+      }
+    },
+    // {
+    //   title: "",
+    //   field: "Acciones",
+    //   align: "center",
+    //   visible:(admin == "True" || director == "True" ),
+    //   formatter: function (value, row) {
+
+    //     var botonVer = '<a href="/private/timetrackpro/tarjeta/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+    //     return botonVer;
+
+    //   },
+    // },
+  ],
+  search: true,
+  
+
+  
+});
+  </script>
+{% endblock %}

@@ -2,19 +2,15 @@
 {% extends "base/base_timetrackpro.html" %}
 {% load static %}
 {% block imports %}
-
-    <!-- fullcalendar-->
-  <!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.9/index.global.min.js'></script> -->
-
-  <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" />
-  <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar.js' %}"></script>
-  <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar_es.js' %}"></script>
-  <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_mesual.css' %}" />
-    <!-- disponible para configuración servidor-->
-
-    <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
-
-  {% endblock %}
+  <!-- fullcalendar-->
+<!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.9/index.global.min.js'></script> -->
+<link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" />
+<script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar.js' %}"></script>
+<script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar_es.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_mesual.css' %}" />
+  <!-- disponible para configuración servidor-->
+  <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
+{% endblock %}
 {% block content %}
   <div class="row d-flex justify-content-center">
     <div class="col-12 col-xl-6 ">
@@ -33,10 +29,9 @@
       {% if not userDjango%}
       <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
         <div class="row">
-          {% if vacaciones %}
+          {% if ausencias %}
 
           <div class="col">
-
            <button class="botonLinkFestivos" data-toggle="modal" data-target="#modalSolicitarModificacionVacaciones">             
             <div class="sign-Btn-link">
               <i class="fa-kit fa-solid-calendar-days-pen fa-lg ms-2" style="color: #ffffff;"></i></div>
@@ -62,9 +57,8 @@
           <div class="row">
             <div class="col-md-8 d-flex align-items-center">
               <div class="row">
-                
                 <h5 class="mb-2">
-                  Vacaciones Solicitadas
+                  Días solicitados
                 </h5>
               </div>
             </div>
@@ -72,69 +66,11 @@
         </div>
         
         <div class="card-body pt-0 p-3" >
-          {% if not vacaciones %}
-          <p class="text-sm"><strong class="text-info">Aún no ha seleccionado vacaciones</strong></p>
-          {% else %}
           <div class="table-responsive ms-3 me-3">
-            <table class="table align-items-center mb-0 ">
-              <thead>
-                <tr>
-                                  <!-- <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th> -->
+            <table  id="ausencias_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
 
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Inicio</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Fin</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Días</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for v in vacaciones %}   
-                
-                <tr>
-                  <td>
-  
-                    <div>
-                      <span class="text-md font-weight-bold ">{{v.tipo_vacaciones__nombre}} </span>
-                    </div>
-                  </td>
-                  <td>
-                        <div class="d-flex justify-content-start">
-                          <span class="text-md font-weight-bold">{{v.fecha_inicio|date:"d M Y"}}</span>
-                        </div>
-                  </td>
-                  <td>
-                        <div class="d-flex justify-content-start">
-                          <span class="text-md font-weight-bold">{{v.fecha_fin|date:"d M Y"}}</span>
-                        </div>
-                  </td>
-                  <td class="text-center">
-                    <span class="text-md font-weight-bold"> {{v.dias_consumidos|safe}}</span>
-                  </td>
-                  <td>
-                    <div class="d-flex justify-content-center" data-toggle="tooltip" data-placement="top" title="{{v.estado__nombre}}">
-                    {% if v.estado__id == 9 %}
-                      <i class="fa-solid fa-circle-info fa-lg me-3" style="color: #32325d;"></i>
-                    {% elif v.estado__id == 10 %}
-                    <i class="fa-solid fa-circle-xmark fa-lg me-3" style="color: #ea0606;"></i>
-                    {% elif v.estado__id == 11 %}
-                      <i class="fa-solid fa-circle-check fa-lg me-3" style="color: #82d616;"></i>
-                    {% elif v.estado__id == 12 %}
-                      <i class="fa-solid fa-circle-exclamation fa-lg me-3" style="color: #ee660b;"></i>
-                    {% endif  %}
-                  </div>
-  
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
           </div>
-          {% endif %}
           
-
-
-      
         </div>
       </div>
 
@@ -153,69 +89,16 @@
             </div>
           </div>
         </div>
-        
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
-            <table class="table align-items-center mb-0 ">
-              <thead>
-                <tr>
-                                  <!-- <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th> -->
 
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Inicio</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Fin</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Días</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for c in cambios %}   
-                
-                <tr>
-                  <td>
-  
-                    <div>
-                      <span class="text-md font-weight-bold ">{{c.id_periodo_cambio__tipo_vacaciones__nombre}} </span>
-                    </div>
-                  </td>
-                  <td>
-                        <div class="d-flex justify-content-start">
-                          <span class="text-md font-weight-bold">{{c.fecha_inicio_nueva|date:"d M Y"}}</span>
-                        </div>
-                  </td>
-                  <td>
-                        <div class="d-flex justify-content-start">
-                          <span class="text-md font-weight-bold">{{c.fecha_fin_nueva|date:"d M Y"}}</span>
-                        </div>
-                  </td>
-                  <td class="text-center">
-                    <span class="text-md font-weight-bold"> {{c.dias_nuevos_consumidos|safe}}</span>
-                  </td>
-                  <td>
-                    <div class="d-flex justify-content-center" data-toggle="tooltip" data-placement="top" title="{{c.estado__nombre}}">
-                    {% if c.estado__id == 9 %}
-                      <i class="fa-solid fa-circle-info fa-lg me-3" style="color: #32325d;"></i>
-                    {% elif c.estado__id == 10 %}
-                    <i class="fa-solid fa-circle-xmark fa-lg me-3" style="color: #ea0606;"></i>
-                    {% elif c.estado__id == 11 %}
-                      <i class="fa-solid fa-circle-check fa-lg me-3" style="color: #82d616;"></i>
-                    {% elif c.estado__id == 12 %}
-                      <i class="fa-solid fa-circle-exclamation fa-lg me-3" style="color: #ee660b;"></i>
-                    {% endif  %}
-                  </div>
-  
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+            <table  id="ausencias_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
           </div>     
         </div>
         {% endif %}
       </div>
     </div>
   </div>
-
 
   <div id="modalSolicitarVacaciones" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalSolicitarVacaciones"
   aria-hidden="true">
@@ -354,7 +237,6 @@
               </div>
             </div>
           </div>
-
         </div>
         <div class="modal-footer">
           {% if user.is_authenticated  %}
@@ -367,8 +249,63 @@
     </div>
   </div>
 
-
+  <! -- Modal Agregar Festivo -->
+  <div id="modalAgregarAusenciasDesdeCalendario" tabindex="-1" role="dialog" class="modal fade modal-lg"
+    aria-labelledby="modalAgregarAusenciasDesdeCalendario" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:agregar-festivo-desde-calendario' %}" method="POST"
+      enctype="multipart/form-data">
+      {% csrf_token %}
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="tituloModalAgregarDesdeCalendario"></h5>
+              <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <input class="form-control" type="text" id="year_actual" name="year_actual" hidden>
+                <div class="col-xl-6">
+                  <label>Inicio</label>
+                  <div class="">
+                    <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                      aria-describedby="text-addon" name="fecha_inicio_seleccionada" id="fecha_inicio_seleccionada">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xl-6">
+                  <label>Festividad</label>
+                  <input type="text" class="form-control" placeholder="Nombre de la festividad"
+                    aria-label="Nombre de la festividad" id="nombre_festividad_seleccionada" name="nombre_festividad_seleccionada"
+                    aria-describedby="text-addon">
+                </div>
+                <div class="col-xl-6">
+                  <label>Tipo de festividad</label>
+                  <select class="form-control" aria-label="Tipo de la festividad" id="tipo_festividad_seleccionada" name="tipo_festividad_seleccionada"
+                    aria-describedby="text-addon">
+                    <option selected hidden>Seleccione el tipo</option>
+                    {% for t in tipoFestivos %}
+                    <option value="{{t.id}}">{{t.nombre}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              {% if user.is_authenticated %}
+              <button type="submit" value="submit" class="btn btn-primary">Guardar</button>
+              {% endif %}
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
+            </div>
+        </div>
+      
+      </form>
+    </div>
+  </div>
 <script>
+
 document.addEventListener('DOMContentLoaded', function() {
     var calendarDiv = document.getElementById('calendarioMensual');
     var initialDate = '{{initialDate}}';
@@ -417,6 +354,41 @@ document.addEventListener('DOMContentLoaded', function() {
         // se muestra el modal para agregar el festivo
         var label = document.getElementById("tituloModalAgregarDesdeCalendario");
         label.innerHTML = "Agregar festivo el día " + dia + " de " + mes + " del " + year;
+        // se obtiene el año actual
+        var yearActual = document.getElementById("year_actual");
+        yearActual.value = year;
+        var fechaInicio = document.getElementById("fecha_inicio_seleccionada");
+        fechaInicio.value = info.dateStr;
+        // modifico el index del calendario
+       // se muestra el modal
+        $('#modalAgregarAusenciasDesdeCalendario').modal('show');
+        },
+        // Esta función se ejecutará cuando se haga clic en un día en el calendario         
+      dateClick: function(info) {
+        // se obtiene la fecha seleccionada
+        const meses = {
+            "01": "Enero",
+            "02": "Febrero",
+            "03": "Marzo",
+            "04": "Abril",
+            "05": "Mayo",
+            "06": "Junio",
+            "07": "Julio",
+            "08": "Agosto",
+            "09": "Septiembre",
+            "10": "Octubre",
+            "11": "Noviembre",
+            "12": "Diciembre",
+          };
+        // se obtiene la fecha seleccionada
+        var dia = info.dateStr.substring(8, 10);
+        dia = dia.replace(/^0+/, '');
+        var mes = meses[info.dateStr.substring(5, 7)];
+        var year = info.dateStr.substring(0, 4);
+        
+        // se muestra el modal para agregar el festivo
+        var label = document.getElementById("tituloModalAgregarDesdeCalendario");
+        label.innerHTML = "Agregar festivo el día " + dia + " de " + mes + " del " + year;
 
         // se obtiene el año actual
         var yearActual = document.getElementById("year_actual");
@@ -426,19 +398,12 @@ document.addEventListener('DOMContentLoaded', function() {
         fechaInicio.value = info.dateStr;
         // modifico el index del calendario
        // se muestra el modal
-        $('#modalAgregarFestivoDesdeCalendario').modal('show');
-      
+        $('#modalAgregarAusenciasDesdeCalendario').modal('show');
         },
     });
     calendar.render(); // renderizo el calendario
     calendar.updateSize(); // actualizo el tamaño del calendario
-
-
-
-
   });
-  
-
 
 
   function calcularDias(inicio, fin, dias_consumidos){
@@ -501,6 +466,99 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  function forzarCierre(){
+    $('#modalAgregarAusenciasDesdeCalendario').modal('hide');
+  }
+
+
+  $("#ausencias_solicitadas").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/timetrackpro/datos-asuntos-propios",
+    cache: false, 
+    columns: [
+      {
+        title: "Archivo",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombreArchivo = row.mes +" "+ row.year;
+          var ruta = row.ruta;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombreArchivo+'</h6><p class="text-xs text-secondary mb-0">'+ ruta +'</p></div>';
+          return div;
+        }
+      },
+      {
+        title: "Sección",
+        sortable: true,
+        align: "center",
+        width:"20",
+        formatter: function(value, row) {
+          var seccion = row.seccion;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ seccion +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "FECHA DE SUBIDA",
+        field: "fecha_lectura",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_lectura;
+
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+          // obtengo la hora
+          var hora = fechaLectura.split("T")[1].split("Z")[0];
+          hora = hora.split(":")[0] + ":" + hora.split(":")[1];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha + ' '+ hora+'</span>';
+          return div;
+        }
+      },
+      {
+        title: "SUBIDO POR",
+        align: "center",
+        formatter: function(value, row) {
+          var insertador = row.insertador__first_name + " " + row.insertador__last_name;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ insertador +'</span>';
+          return div;
+        }
+
+      },{
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          var botonVer = '<a href="/private/timetrackpro/ver-registro/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          return botonVer;
+                  
+
+        },
+      },
+    ],
+    search: true,
+    
+  });
 </script>
 
 {% endblock %}

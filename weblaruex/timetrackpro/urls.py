@@ -55,6 +55,7 @@ urlpatterns = [
     path('private/timetrackpro/obtener-registro/<slug:year>/<slug:mes>/<slug:semana>/', obtenerRegistro , name='obtener-registro'),
     # información de los registros por cada empleado Laruex
     path('private/timetrackpro/obtener-registro-empleados/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
+    path('private/timetrackpro/datos-registro-empleados/', datosRegistroUsuario , name='datos-registro-empleados'),
     path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>', obtenerRegistroUsuario , name='obtener-registro-empleados'),
     path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>/<slug:mes>/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
     path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>/<slug:mes>/<slug:semana>/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
@@ -74,9 +75,6 @@ urlpatterns = [
     path('private/timetrackpro/usuarios-maquina/', usuariosMaquina , name='usuarios-maquina'),
     path('private/timetrackpro/datos-usuarios-maquina/', datosUsuariosMaquina , name='datos-usuarios-maquina'),
     path('private/timetrackpro/ver-usuario-maquina/<slug:id>/', verUsuarioMaquina , name='ver-usuario-maquina'),
-
-    #solicitudes de vacaciones
-    path('private/timetrackpro/solicitudes/', solicitudes , name='solicitudes'),
 
     # festivos
     path('private/timetrackpro/datos-festivos-calendario/<slug:year>/', datosFestivosCalendario , name='datos-festivos-calendario'),
@@ -123,15 +121,14 @@ urlpatterns = [
     path('private/timetrackpro/ver-mis-errores-notificados', verMisErroresNotificados , name='ver-mis-errores-notificados'),
     path('private/timetrackpro/datos-mis-errores-notificados', datosMisErroresNotificados , name='datos-mis-errores-notificados'),
 
-
     #Solicitud de vacaciones
-    path('private/timetrackpro/solicitar-dias/', accesoDirectoPermisos , name='solicitar-dias'),
+    path('private/timetrackpro/solicitudes/', solicitudes , name='solicitudes'),
     path('private/timetrackpro/solicitar-vacaciones/', solicitarVacaciones , name='solicitar-vacaciones'),
     path('private/timetrackpro/solicitar-modificar-vacaciones/', solicitarModificarVacaciones , name='solicitar-modificar-vacaciones'),
     path('private/timetrackpro/ver-solicitudes-vacaciones/', verSolicitudesVacaciones , name='ver-solicitudes-vacaciones'),
     path('private/timetrackpro/ver-solicitudes-vacaciones/<slug:id>/', verSolicitudesVacaciones , name='ver-solicitudes-vacaciones'),
-
-    path('private/timetrackpro/datos-festivos-vacaciones-empleado/', datosFestivosVacacionesEmpleado , name='datos-festivos-vacaiones-empleado'),
+    #Solicitud de vacaciones
+    path('private/timetrackpro/datos-festivos-vacaciones-empleado/', datosFestivosVacacionesEmpleado , name='datos-festivos-vacaciones-empleado'),
     path('private/timetrackpro/vacaciones-solicitadas/', vacacionesSolicitadas , name='vacaciones-solicitadas'),
     path('private/timetrackpro/datos-vacaciones-solicitadas/', datosVacacionesSolicitadas , name='datos-vacaciones-solicitadas'),
     path('private/timetrackpro/datos-calendario-vacaciones-solicitadas/', datosCalendarioVacacionesSolicitadas , name='datos-calendario-vacaciones-solicitadas'),
@@ -139,4 +136,9 @@ urlpatterns = [
     path('private/timetrackpro/modifcar-vacaciones/<slug:id>/', modificarVacaciones , name='modificar-vacaciones'),
     path('private/timetrackpro/cambiar-estado-vacaciones/<slug:id>/', cambiarEstadoVacaciones , name='cambiar-estado-vacaciones'),
     path('private/timetrackpro/eliminar-vacaciones/', eliminarVacaciones , name='eliminar-vacaciones'),
+    
+    #Solicitud de asuntos propios
+    path('private/timetrackpro/solicitar-asuntos-propios/', solicitarAsuntosPropios , name='solicitar-asuntos-propios'),
+    path('private/timetrackpro/solicitar-asuntos-propios/', datosAsuntosPropios , name='datos-asuntos-propios'),
 ]
+ 
