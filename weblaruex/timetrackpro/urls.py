@@ -139,6 +139,12 @@ urlpatterns = [
     
     #Solicitud de asuntos propios
     path('private/timetrackpro/solicitar-asuntos-propios/', solicitarAsuntosPropios , name='solicitar-asuntos-propios'),
-    path('private/timetrackpro/solicitar-asuntos-propios/', datosAsuntosPropios , name='datos-asuntos-propios'),
+    path('private/timetrackpro/solicitar-asuntos-propios/<slug:year>/', solicitarAsuntosPropios , name='solicitar-asuntos-propios'),
+    path('private/timetrackpro/datos-asuntos-propios/', datosAsuntosPropios , name='datos-asuntos-propios'),
+    path('private/timetrackpro/datos-asuntos-propios/<slug:year>/', datosAsuntosPropios , name='datos-asuntos-propios'),
+    path('private/timetrackpro/datos-asuntos-propios-admin/', datosAsuntosPropiosAdmin , name='datos-asuntos-propios-admin'),
+    path('private/timetrackpro/datos-asuntos-propios-admin/<slug:year>/', datosAsuntosPropiosAdmin , name='datos-asuntos-propios-admin'),    
+    path('private/timetrackpro/ver-solicitudes-asuntos-propios/', verSolicitudAsuntosPropios , name='ver-solicitudes-asuntos-propios'),
+    path('private/timetrackpro/ver-solicitud-asuntos-propios/<slug:id>/', verSolicitudAsuntosPropios , name='ver-solicitud-asuntos-propios'),
 ]
  

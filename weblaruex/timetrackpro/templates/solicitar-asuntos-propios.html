@@ -40,41 +40,61 @@
           </div>
           {% endif %}
           <div class="col">
-          <button class="botonLink" data-toggle="modal" data-target="#modalSolicitarVacaciones">    
+          <button class="botonLink" data-toggle="modal" data-target="#modalSolicitarAsuntosPropios">    
             
             <div class="sign-Btn-link">
               <i class="fa-solid fa-plus fa-lg " style="color: #ffffff;"></i>
           </div>
-            <div class="text text-sm">Solicitar Vacaciones</div>
+            <div class="text text-sm">Solicitar días</div>
           </button>
           </div>
         </div>
       </div>
     {% endif %}
 
+    {% if administrador or director %}
       <div class="card">
         <div class="card-header pb-0 p-3">
           <div class="row">
             <div class="col-md-8 d-flex align-items-center">
               <div class="row">
                 <h5 class="mb-2">
-                  Días solicitados
+                  Días asuntos propios solicitados 2
                 </h5>
               </div>
             </div>
           </div>
         </div>
+        <div class="card-body pt-0 p-3" >
+          <div class="table-responsive ms-3 me-3">
+            <table  id="asuntos_propios_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+          </div>
+        </div>
+      </div>
         
+    {% endif %}
+      
+
+      <div class="card mt-2">
+        <div class="card-header pb-0 p-3">
+          <div class="row">
+            <div class="col-md-8 d-flex align-items-center">
+              <div class="row">
+                <h5 class="mb-2">
+                  Días asuntos propios solicitados
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
             <table  id="ausencias_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
-
           </div>
-          
         </div>
       </div>
 
-      {% if cambios %}
+      {% if cambios %} 
  
       <div class="card mt-4">
         <div class="card-header pb-0 p-3">
@@ -100,7 +120,7 @@
     </div>
   </div>
 
-  <div id="modalSolicitarVacaciones" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalSolicitarVacaciones"
+  <div id="modalSolicitarAsuntosPropios" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalSolicitarAsuntosPropios"
   aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -112,24 +132,9 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioSolicitarVacaciones" action="{% url 'timetrackpro:solicitar-vacaciones' %}" method="POST"
+        <form id="formularioSolicitarVacaciones" action="{% url 'timetrackpro:solicitar-asuntos-propios' %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
-
-          <div class="row">
-            <div class="col-xl-12 mb-2">
-              <label class="col-form-label">Seleccione un periodo vacacional</label>
-              <div class="">
-                <select class="form-control" aria-label="Nombre en el dispositivo" id="tipo_dias"
-                name="tipo_dias" aria-describedby="text-addon" required>
-                <option value="0" selected hidden>Seleccione el periodo de vacaciones</option>
-                {% for periodo in periodosVacaciones %}
-                <option value="{{periodo.id}}">{{periodo.nombre}}</option>
-                {% endfor %}
-                </select>
-              </div>
-            </div>
-          </div>
           <div class="row">
             <div class="col-xl-6">
               <label class="col-form-label">Fecha de inicio</label>
@@ -143,7 +148,8 @@
               <div class="">
                 <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
                   aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
-                <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos"  min="1" hidden >
+                <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos"  min="1" 
+                 >
               </div>  
             </div>
           </div>
@@ -267,7 +273,7 @@
               <div class="row">
                 <input class="form-control" type="text" id="year_actual" name="year_actual" hidden>
                 <div class="col-xl-6">
-                  <label>Inicio</label>
+                  <label class="col-form-label">Fecha de inicio</label>                  
                   <div class="">
                     <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
                       aria-describedby="text-addon" name="fecha_inicio_seleccionada" id="fecha_inicio_seleccionada">
@@ -276,20 +282,13 @@
               </div>
               <div class="row">
                 <div class="col-xl-6">
-                  <label>Festividad</label>
-                  <input type="text" class="form-control" placeholder="Nombre de la festividad"
-                    aria-label="Nombre de la festividad" id="nombre_festividad_seleccionada" name="nombre_festividad_seleccionada"
-                    aria-describedby="text-addon">
-                </div>
-                <div class="col-xl-6">
-                  <label>Tipo de festividad</label>
-                  <select class="form-control" aria-label="Tipo de la festividad" id="tipo_festividad_seleccionada" name="tipo_festividad_seleccionada"
-                    aria-describedby="text-addon">
-                    <option selected hidden>Seleccione el tipo</option>
-                    {% for t in tipoFestivos %}
-                    <option value="{{t.id}}">{{t.nombre}}</option>
-                    {% endfor %}
-                  </select>
+                  <label class="col-form-label">Fecha de Fin</label>                  
+                  <div class="">
+                    <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                      aria-describedby="text-addon" name="fecha_fin_seleccionada" id="fecha_fin_seleccionada"  onchange="calcularDias('fecha_inicio_seleccionada','fecha_fin_seleccionada', 'dias_seleccionados_consumidos')">
+                      <input type="number" class="form-control" name="dias_seleccionados_consumidos" id="dias_seleccionados_consumidos"  min="1">
+
+                  </div>
                 </div>
               </div>
             </div>
@@ -430,7 +429,13 @@ document.addEventListener('DOMContentLoaded', function() {
     var diff = fecha2.getTime() - fecha1.getTime();
     var dias = diff / (1000 * 60 * 60 * 24);
     dias = dias + 1;
-    dias_consumidos.value = dias;
+    if (dias > 6){
+      alert("No se pueden solicitar más de 6 días de asuntos propios");
+      document.getElementById(inicio).value = "";
+      document.getElementById(fin).value = "";
+    }else{
+      dias_consumidos.value = dias;
+    }
   }
 
   function mostrarInfo(){ 
@@ -471,38 +476,26 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
 
-  $("#ausencias_solicitadas").bootstrapTable({
+  $("#asuntos_propios_empleados").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "/private/timetrackpro/datos-asuntos-propios",
+    url: "{% url 'timetrackpro:datos-asuntos-propios' %}",
     cache: false, 
     columns: [
       {
-        title: "Archivo",
+        title: "Empleado",
         halign:"left",
         sortable: true,
         align: "left",
         formatter: function(value, row) {
-          var nombreArchivo = row.mes +" "+ row.year;
-          var ruta = row.ruta;
-          var div = '<div><h6 class="mb-0 text-sm">'+nombreArchivo+'</h6><p class="text-xs text-secondary mb-0">'+ ruta +'</p></div>';
+          var nombre = row.empleado__nombre +" "+ row.empleado__apellidos;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombre+'</h6></div>';
           return div;
         }
-      },
+      },    
       {
-        title: "Sección",
-        sortable: true,
-        align: "center",
-        width:"20",
-        formatter: function(value, row) {
-          var seccion = row.seccion;      
-          var div = '<span class="text-sm font-weight-bold mb-0">'+ seccion +'</span>';
-          return div;
-        }
-      },
-      {
-        title: "FECHA DE SUBIDA",
-        field: "fecha_lectura",
+        title: "Fecha inicio",
+        field: "fecha_inicio",
         align: "center",
         formatter: function(value, row) {
           const mes = {
@@ -520,36 +513,63 @@ document.addEventListener('DOMContentLoaded', function() {
             "12": "Dic",
           };
           // obtengo la fecha de lectura
-          var fechaLectura = row.fecha_lectura;
+          var fechaLectura = row.fecha_inicio;
 
           // obtengo la fecha
           var fecha = fechaLectura.split("T")[0];
           mesFecha = fecha.split("-")[1];
           fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
 
-          // obtengo la hora
-          var hora = fechaLectura.split("T")[1].split("Z")[0];
-          hora = hora.split(":")[0] + ":" + hora.split(":")[1];
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },      {
+        title: "Fecha fin",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_fin;
 
-          var div = '<span class="text-xs font-weight-bold">'+fecha + ' '+ hora+'</span>';
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
           return div;
         }
       },
       {
-        title: "SUBIDO POR",
+        title: "Días",
         align: "center",
         formatter: function(value, row) {
-          var insertador = row.insertador__first_name + " " + row.insertador__last_name;      
-          var div = '<span class="text-sm font-weight-bold mb-0">'+ insertador +'</span>';
+          var dias = row.dias_consumidos;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
           return div;
         }
-
-      },{
+      },
+      {
         title: "",
         field: "",
         align: "center",
         formatter: function (value, row) {
-          var botonVer = '<a href="/private/timetrackpro/ver-registro/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          var botonVer = '<a href="/private/timetrackpro/ver-solicitud-asuntos-propios/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
           return botonVer;
                   
 

@@ -13,24 +13,21 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import Permission
 
 
-class Archivos(models.Model):
-    id = models.IntegerField(primary_key=True)
-    nombre = models.CharField(max_length=255, blank=True, null=True)
-    justificantes_adicionales = models.IntegerField(blank=True, null=True)
+
+class AsuntosPropios(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    year = models.IntegerField(db_column='Year')  # Field name made lowercase.
+    empleado = models.ForeignKey('Empleados', models.DO_NOTHING, db_column='Empleado')  # Field name made lowercase.
+    fecha_inicio = models.DateField(db_column='Fecha_inicio')  # Field name made lowercase.
+    fecha_fin = models.DateField(db_column='Fecha_fin')  # Field name made lowercase.
+    dias_consumidos = models.IntegerField(db_column='Dias_consumidos')  # Field name made lowercase.
+    estado = models.ForeignKey('EstadosSolicitudes', models.DO_NOTHING, db_column='Estado')  # Field name made lowercase.
+    fecha_solicitud = models.DateTimeField(db_column='Fecha_solicitud')  # Field name made lowercase.
 
     class Meta:
         managed = False
-        db_table = 'archivos'
+        db_table = 'asuntos_propios'
 
-
-class ArchivosLeidos(models.Model):
-    id = models.IntegerField(primary_key=True)
-    nombre = models.CharField(max_length=255, blank=True, null=True)
-    ruta = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'archivos_leidos'
 
 
 class AuthGroup(models.Model):
@@ -176,6 +173,16 @@ class TipoFestivos(models.Model):
         managed = False
         db_table = 'tipo_festivos'
 
+        
+class TipoPermisosYAusencias(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
+    documentacion = models.CharField(db_column='Documentacion', max_length=150, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'tipo_permisos_y_ausencias'
+
 class TipoVacaciones(models.Model):
     id = models.IntegerField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
@@ -244,6 +251,21 @@ class Permisos(models.Model):
     class Meta:
         managed = False
         db_table = 'permisos'
+
+class PermisosYAusencias(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    tipo = models.IntegerField()
+    estado = models.IntegerField()
+    empleado = models.IntegerField()
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    dias_solicitados = models.IntegerField()
+    fecha_solicitud = models.DateTimeField()
+    justificante = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'permisos_y_ausencias'
 
 
 

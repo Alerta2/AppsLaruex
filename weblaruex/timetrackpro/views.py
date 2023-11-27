@@ -2153,37 +2153,79 @@ def insertarRegistroManualMensual(request):
     }
     return render(request,"insertar-registro-mensual.html",infoVista)
 
-def solicitarAsuntosPropios(request):
-    admin = esAdministrador(request.user.id)
+def solicitarAsuntosPropios(request, year=None):
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
     empleados = Empleados.objects.using("timetrackpro").values()
-    year = str(datetime.now().year)
+
+    asuntosPropiosEmpleados = []
+    diasConsumidos = 0
+    if administrador or director:
+        if year is None:
+            asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").values()
+        else:
+            asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values()
+
+    if not director:
+        if year is None:
+            asuntos = AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado).values()
+        else:
+            asuntos = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).values()
+        
+        for a in asuntos:
+            diasConsumidos += a['dias_consumidos']
+
+    if year is None:
+        year = str(datetime.now().year)
     mes = str(datetime.now().month)
     if len(mes) == 1:
         mesInicial = "0" + mesInicial
     initialDate = year + "-" + mes + "-01"
-    ausencias = RegistroAusencias.objects.using("timetrackpro").values()
+
     infoVista = {
         "navBar":navBar,
-        "admin":admin,
+        "administrador":administrador,
+        "director":director,
         "empleados":list(empleados),
-        "ausencias":list(ausencias),
+        "asuntosPropiosEmpleados":list(asuntosPropiosEmpleados),
+        "asuntos":list(asuntos),
+        "diasConsumidos":diasConsumidos,
         "initialDate":initialDate,
     }
-    return render(request,"solicitarAusencias.html",infoVista)
+    return render(request,"solicitar-asuntos-propios.html",infoVista)
 
-def datosAsuntosPropios(request):
+def datosAsuntosPropios(request, year=None):
     admin = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
-
     diasSolicitados = []
+
     if admin or director:
-        diasSolicitados = RegistroAusencias.objects.using("timetrackpro").values('id', 'id_empleado', 'id_empleado__nombre','id_empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'id_estado', 'id_estado__nombre', 'fecha_solicitud', 'id_permiso', 'id_permiso__nombre', 'id_permiso__duracion', 'id_permiso__naturales_o_habiles', 'id_permiso__periodo_antelacion', 'id_permiso__fecha_maxima_solicitud', 'id_permiso__acreditar', 'id_permiso__doc_necesaria', 'id_permiso__legislacion_aplicable', 'id_permiso__bonificable_por_antiguedad', 'id_permiso__bonificacion_por_15_years', 'id_permiso__bonificacion_por_20_years', 'id_permiso__bonificacion_por_25_years', 'id_permiso__bonificacion_por_30_years', 'id_permiso__year', 'id_permiso__es_permiso_retribuido', 'id_permiso__pas', 'id_permiso__pdi')
+        if year is None:
+            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
+        else:
+            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
     else:
-        authUser = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        usuario = Empleados.objects.using("timetrackpro").filter(id=authUser.id_usuario.id)[0]
-        diasSolicitados = RegistroAusencias.objects.using("timetrackpro").filter(empleado=usuario).values('id', 'id_empleado', 'id_empleado__nombre','id_empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'id_estado', 'id_estado__nombre', 'fecha_solicitud', 'id_permiso', 'id_permiso__nombre', 'id_permiso__duracion', 'id_permiso__naturales_o_habiles', 'id_permiso__periodo_antelacion', 'id_permiso__fecha_maxima_solicitud', 'id_permiso__acreditar', 'id_permiso__doc_necesaria', 'id_permiso__legislacion_aplicable', 'id_permiso__bonificable_por_antiguedad', 'id_permiso__bonificacion_por_15_years', 'id_permiso__bonificacion_por_20_years', 'id_permiso__bonificacion_por_25_years', 'id_permiso__bonificacion_por_30_years', 'id_permiso__year', 'id_permiso__es_permiso_retribuido', 'id_permiso__pas', 'id_permiso__pdi')
+        if year is None:
+            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=request.user.id).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
+        else:
+            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=request.user.id).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
+
     return JsonResponse(list(diasSolicitados), safe=False)
 
+def datosAsuntosPropiosAdmin(request, year=None):
+    admin = esAdministrador(request.user.id)
+    if admin:
+        diasSolicitados = []
+        if year is None:
+            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=request.user.id).values()
+        else:
+            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=request.user.id).values()
+        
+        return JsonResponse(list(diasSolicitados), safe=False)
+    else:
+        return JsonResponse([], safe=False)
 
 
 def solicitarVacaciones(request):
@@ -2309,7 +2351,7 @@ def verSolicitudesVacaciones(request):
 
     return render(request,"notificar-error-registro.html", infoVista)
 
-def verSolicitudesVacaciones(request, idSolicitud):
+def verSolicitudesVacaciones(request, id=None):
     
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
 
@@ -2321,6 +2363,22 @@ def verSolicitudesVacaciones(request, idSolicitud):
     }
 
     return render(request,"notificar-error-registro.html", infoVista)
+
+def verSolicitudAsuntosPropios(request, id=None):
+    solicitud = AsuntosPropios.objects.using("timetrackpro").filter(id=id)[0]
+
+    
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "empleados":list(empleados),
+        "solicitud":solicitud
+    }
+
+    return render(request,"ver-solicitud-asuntos-propios.html", infoVista)
 
 
 
