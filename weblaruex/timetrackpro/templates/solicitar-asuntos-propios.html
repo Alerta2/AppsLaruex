@@ -59,7 +59,7 @@
             <div class="col-md-8 d-flex align-items-center">
               <div class="row">
                 <h5 class="mb-2">
-                  Días asuntos propios solicitados 2
+                  Días asuntos propios solicitados por los empleados
                 </h5>
               </div>
             </div>
@@ -81,7 +81,7 @@
             <div class="col-md-8 d-flex align-items-center">
               <div class="row">
                 <h5 class="mb-2">
-                  Días asuntos propios solicitados
+                  Días asuntos propios solicitados 
                 </h5>
               </div>
             </div>
@@ -89,7 +89,7 @@
         </div>
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
-            <table  id="ausencias_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            <table  id="asuntos_propios_solicitados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
         </div>
       </div>
@@ -140,16 +140,19 @@
               <label class="col-form-label">Fecha de inicio</label>
               <div class="">
                 <input type="date" class="form-control" aria-label="Fecha inicial de las vacaciones"
-                  aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio">
+                  aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
               </div>
             </div>
-            <div class="col-xl-6" >
-              <label class="col-form-label">Fecha de fin</label>
-              <div class="">
+            <div class="col-xl-6"   >
+              <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos"  min="1" required hidden>
+
+              <button type="button" class="btn btn-primary" id="botonMostarColumnaOculta" onclick="mostrarColumnaOculta(this.id, 'colFechaFin' )">Varios dias</button>
+              <div class="" id="colFechaFin" hidden>
+                <label class="col-form-label">Fecha de fin</label>
+
                 <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
                   aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
-                <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos"  min="1" 
-                 >
+                
               </div>  
             </div>
           </div>
@@ -305,14 +308,28 @@
   </div>
 <script>
 
+  function mostrarColumnaOculta(id, columna){
+    console.log(id)
+    console.log(columna)
+
+
+    // Ocultar el botón
+    document.getElementById(id).hidden = true;
+
+    // Mostrar la columna específica
+    document.getElementById(columna).hidden = false;
+
+  }
+
 document.addEventListener('DOMContentLoaded', function() {
     var calendarDiv = document.getElementById('calendarioMensual');
     var initialDate = '{{initialDate}}';
     var calendar = new FullCalendar.Calendar(calendarDiv, {
       initialDate: initialDate, // will be parsed as local
       themeSystem: 'bootstrap5',
-      events: "{% url 'timetrackpro:datos-festivos-vacaciones-empleado' %}",
-      //eventColor: '#20c997', // color de los eventos
+      events: "{% url 'timetrackpro:datos-calendario-asuntos-propios' %}",      
+      eventTextColor: '#2f5d6e', // color del texto de los eventos
+      
       height: 650, // indico el maximo de alto que puede tener el calendario
       locale: 'es', // el idioma del calendario
       handleWindowResize: true, // si se puede redimensionar el calendario
@@ -408,12 +425,18 @@ document.addEventListener('DOMContentLoaded', function() {
   function calcularDias(inicio, fin, dias_consumidos){
     fecha_inicio = document.getElementById(inicio).value;
     fecha_fin = document.getElementById(fin).value;
+    // comparo si la fecha de inicio es mayor a la fecha de fin
+    if (fecha_fin == ""){
+      fecha_fin = fecha_inicio;
+      document.getElementById(fin).value = fecha_inicio;
+    }
     dias_consumidos = document.getElementById(dias_consumidos);
+
     botonGuardarSolicitar = document.getElementById("guardarSolicitarVacaciones");
     botonGuardarModificar = document.getElementById("guardarModificarVacaciones");
 
-    // comparo si la fecha de inicio es mayor a la fecha de fin
-    if (fecha_inicio > fecha_fin){
+
+    if (fecha_inicio > fecha_fin && fecha_fin != ""){
       alert("La fecha de inicio no puede ser mayor a la fecha de fin");
       document.getElementById(inicio).value = "";
       document.getElementById(fin).value = "";
@@ -436,6 +459,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }else{
       dias_consumidos.value = dias;
     }
+      
+
   }
 
   function mostrarInfo(){ 
@@ -475,11 +500,10 @@ document.addEventListener('DOMContentLoaded', function() {
     $('#modalAgregarAusenciasDesdeCalendario').modal('hide');
   }
 
-
   $("#asuntos_propios_empleados").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "{% url 'timetrackpro:datos-asuntos-propios' %}",
+    url: "{% url 'timetrackpro:datos-asuntos-propios-empleados' %}",
     cache: false, 
     columns: [
       {
@@ -578,6 +602,108 @@ document.addEventListener('DOMContentLoaded', function() {
     ],
     search: true,
     
+  });
+  $("#asuntos_propios_solicitados").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-asuntos-propios-solicitados' %}",
+    cache: false, 
+    columns: [
+      {
+        title: "Empleado",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombre = row.empleado__nombre +" "+ row.empleado__apellidos;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombre+'</h6></div>';
+          return div;
+        }
+      },    
+      {
+        title: "Fecha inicio",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_inicio;
+
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },      {
+        title: "Fecha fin",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_fin;
+
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Días",
+        align: "center",
+        formatter: function(value, row) {
+          var dias = row.dias_consumidos;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          var botonVer = '<a href="/private/timetrackpro/ver-solicitud-asuntos-propios/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          return botonVer;
+                  
+
+        },
+      },
+    ],
+    search: true,
   });
 </script>
 

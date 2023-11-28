@@ -8,22 +8,19 @@
 from django.db import models
 
 
-class Archivos(models.Model):
-    nombre = models.CharField(max_length=255, blank=True, null=True)
-    justificantes_adicionales = models.IntegerField(blank=True, null=True)
+class AsuntosPropio(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    year = models.IntegerField(db_column='Year')  # Field name made lowercase.
+    empleado = models.ForeignKey('Empleados', models.DO_NOTHING, db_column='Empleado')  # Field name made lowercase.
+    fecha_inicio = models.DateField(db_column='Fecha_inicio')  # Field name made lowercase.
+    fecha_fin = models.DateField(db_column='Fecha_fin')  # Field name made lowercase.
+    dias_consumidos = models.IntegerField(db_column='Dias_consumidos')  # Field name made lowercase.
+    estado = models.ForeignKey('EstadosSolicitudes', models.DO_NOTHING, db_column='Estado')  # Field name made lowercase.
+    fecha_solicitud = models.DateTimeField(db_column='Fecha_solicitud')  # Field name made lowercase.
 
     class Meta:
         managed = False
-        db_table = 'archivos'
-
-
-class ArchivosLeidos(models.Model):
-    nombre = models.CharField(max_length=255, blank=True, null=True)
-    ruta = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'archivos_leidos'
+        db_table = 'asuntos_propio'
 
 
 class AuthGroup(models.Model):
@@ -257,21 +254,20 @@ class Permisos(models.Model):
         db_table = 'permisos'
 
 
-class RegistroAusencias(models.Model):
-    id = models.IntegerField(primary_key=True)
-    id_permiso = models.ForeignKey(Permisos, models.DO_NOTHING, db_column='id_permiso', blank=True, null=True)
-    id_empleado = models.ForeignKey(Empleados, models.DO_NOTHING, db_column='id_empleado', blank=True, null=True)
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
-    id_estado = models.ForeignKey(EstadosSolicitudes, models.DO_NOTHING, db_column='id_estado', blank=True, null=True)
-    archivo_solicitud = models.CharField(max_length=255, blank=True, null=True)
-    archivo_justificante = models.CharField(max_length=255, blank=True, null=True)
-    funciones_a_cubrir = models.CharField(max_length=255, blank=True, null=True)
-    id_empleado_sustituto = models.IntegerField(blank=True, null=True)
+class PermisosYAusencias(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    tipo = models.IntegerField()
+    estado = models.IntegerField()
+    empleado = models.IntegerField()
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    dias_solicitados = models.IntegerField()
+    fecha_solicitud = models.DateTimeField()
+    justificante = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'registro_ausencias'
+        db_table = 'permisos_y_ausencias'
 
 
 class Registros(models.Model):
@@ -359,50 +355,6 @@ class RegistrosManualesControlHorarioNoInsertados(models.Model):
         db_table = 'registros_manuales_control_horario_no_insertados'
 
 
-class RegitroSolicitudViajes(models.Model):
-    id = models.IntegerField(primary_key=True)
-    id_empleado = models.IntegerField(blank=True, null=True)
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
-    id_estado = models.IntegerField(blank=True, null=True)
-    motivo_solicitud_rechazo = models.CharField(max_length=255, blank=True, null=True)
-    archivo_solicitud = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'regitro_solicitud_viajes'
-
-
-class RegitroSolicitudesPermisos(models.Model):
-    id = models.IntegerField(primary_key=True)
-    id_empleado = models.IntegerField(blank=True, null=True)
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
-    id_permisos = models.IntegerField(blank=True, null=True)
-    id_estado = models.IntegerField(blank=True, null=True)
-    motivo_solicitud_rechazo = models.CharField(max_length=255, blank=True, null=True)
-    archivo_solicitud = models.CharField(max_length=255, blank=True, null=True)
-    funciones_a_cubrir = models.CharField(max_length=255, blank=True, null=True)
-    id_empleado_sustituto = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'regitro_solicitudes_permisos'
-
-
-class RegitroViajesAceptados(models.Model):
-    id = models.IntegerField(primary_key=True)
-    id_registro_solicitud = models.IntegerField(blank=True, null=True)
-    id_empleado = models.IntegerField(blank=True, null=True)
-    dieta = models.IntegerField(blank=True, null=True)
-    ruta_solicitud = models.CharField(max_length=255, blank=True, null=True)
-    ruta_dieta = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'regitro_viajes_aceptados'
-
-
 class RelEmpleadosUsuarios(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     id_usuario = models.ForeignKey(Empleados, models.DO_NOTHING, db_column='id_usuario')
@@ -436,40 +388,6 @@ class RelJornadaEmpleados(models.Model):
         db_table = 'rel_jornada_empleados'
 
 
-class RelJustificantesEmpleados(models.Model):
-    id = models.IntegerField(primary_key=True)
-    id_ausencia = models.IntegerField(blank=True, null=True)
-    id_empleado = models.IntegerField(blank=True, null=True)
-    justificante = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'rel_justificantes_empleados'
-
-
-class RelacinDeEmpleados(models.Model):
-    id = models.CharField(db_column='ID', max_length=255, blank=True, null=True)  # Field name made lowercase.
-    f2 = models.CharField(max_length=255, blank=True, null=True)
-    nombre = models.CharField(db_column='Nombre', max_length=255, blank=True, null=True)  # Field name made lowercase.
-    f4 = models.CharField(max_length=255, blank=True, null=True)
-    dept_field = models.CharField(db_column='Dept.', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-    f6 = models.CharField(max_length=255, blank=True, null=True)
-    turno = models.CharField(db_column='Turno', max_length=255, blank=True, null=True)  # Field name made lowercase.
-    f8 = models.CharField(max_length=255, blank=True, null=True)
-    límite_empleados_0_admin_1_field = models.CharField(db_column='Límite(Empleados 0/Admin 1)', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-    f10 = models.CharField(max_length=255, blank=True, null=True)
-    dactil_field = models.CharField(db_column='Dactil.', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters. Field renamed because it ended with '_'.
-    f12 = models.CharField(max_length=255, blank=True, null=True)
-    pin = models.CharField(db_column='PIN', max_length=255, blank=True, null=True)  # Field name made lowercase.
-    f14 = models.CharField(max_length=255, blank=True, null=True)
-    número_de_máquina = models.CharField(db_column='Número de máquina', max_length=255, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    f16 = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'relación de empleados'
-
-
 class TarjetasAcceso(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(max_length=255)
@@ -499,6 +417,16 @@ class TipoFestivos(models.Model):
     class Meta:
         managed = False
         db_table = 'tipo_festivos'
+
+
+class TipoPermisosYAusencias(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
+    documentacion = models.CharField(db_column='Documentacion', max_length=150, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'tipo_permisos_y_ausencias'
 
 
 class TipoVacaciones(models.Model):

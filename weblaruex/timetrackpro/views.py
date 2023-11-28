@@ -2196,7 +2196,7 @@ def solicitarAsuntosPropios(request, year=None):
     }
     return render(request,"solicitar-asuntos-propios.html",infoVista)
 
-def datosAsuntosPropios(request, year=None):
+def datosAsuntosPropiosEmpleados(request, year=None):
     admin = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     diasSolicitados = []
@@ -2206,22 +2206,21 @@ def datosAsuntosPropios(request, year=None):
             diasSolicitados = AsuntosPropios.objects.using("timetrackpro").values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
         else:
             diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
+
+        return JsonResponse(list(diasSolicitados), safe=False)
     else:
-        if year is None:
-            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=request.user.id).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
-        else:
-            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=request.user.id).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
+        return JsonResponse([], safe=False)
 
-    return JsonResponse(list(diasSolicitados), safe=False)
-
-def datosAsuntosPropiosAdmin(request, year=None):
+def datosAsuntosPropiosSolicitados(request, year=None):
     admin = esAdministrador(request.user.id)
     if admin:
+        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
         diasSolicitados = []
         if year is None:
-            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=request.user.id).values()
+            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
         else:
-            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=request.user.id).values()
+            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
         
         return JsonResponse(list(diasSolicitados), safe=False)
     else:
@@ -2381,7 +2380,69 @@ def verSolicitudAsuntosPropios(request, id=None):
     return render(request,"ver-solicitud-asuntos-propios.html", infoVista)
 
 
-
+def datosCalendarioAsuntosPropios(request, year=None):
+    admin = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    # obtengo los festivos registrados en la base de datos
+    festivos = []
+    salidaFestivos = []
+    if year == None:
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
+    else:
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=year).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
+    # recorro los festivos y los guardo en la lista
+    for festivo in festivos:
+        # inserto los datos en la lista siguiendo la estructura que requiere el calendario
+        salidaFestivos.append({
+            'id':festivo['id'],
+            'title':festivo['nombre'],
+            'start':festivo['fecha_inicio'],
+            'end':festivo['fecha_fin'],
+            'color':festivo['tipo_festividad__color_calendario']
+        })
+    asuntosPropios = []
+    salidaAsuntosPropios = []
+    if not admin and not director:
+        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+        if year == None:
+            asuntosPropios = AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
+        else:
+            asuntosPropios = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
+        # recorro los festivos y los guardo en la lista
+        for asunto in asuntosPropios:
+            # inserto los datos en la lista siguiendo la estructura que requiere el calendario
+            salidaAsuntosPropios.append({
+                'id':asunto['id'],
+                'title':asunto['empleado__nombre'] + " " + asunto['empleado__apellidos'],
+                'start':asunto['fecha_inicio'],
+                'end':asunto['fecha_fin'],
+                'color':'#555555',
+                'textColor':'#fff', 
+                'borderColor':'#555555'
+            })
+    else:
+        if year == None:
+            asuntosPropios = AsuntosPropios.objects.using("timetrackpro").values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
+        else:
+            asuntosPropios = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin')
+        # recorro los festivos y los guardo en la lista
+        for asunto in asuntosPropios:
+            # inserto los datos en la lista siguiendo la estructura que requiere el calendario
+            salidaAsuntosPropios.append({
+                'id':asunto['id'],
+                'title':asunto['empleado__nombre'] + " " + asunto['empleado__apellidos'],
+                'start':asunto['fecha_inicio'],
+                'end':asunto['fecha_fin'],
+                'color':'#555555',
+                'textColor':'#fff', 
+                'borderColor':'#555555'
+            })
+    
+    # creo una lista vacía para guardar los datos de los festivos
+    salida = salidaFestivos + salidaAsuntosPropios
+    # devuelvo la lista en formato json
+    return JsonResponse(salida, safe=False)
 
 '''-------------------------------------------
                                 Módulo: subirDocumento

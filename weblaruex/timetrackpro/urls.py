@@ -53,12 +53,14 @@ urlpatterns = [
     path('private/timetrackpro/obtener-registro/<slug:year>', obtenerRegistro , name='obtener-registro'),
     path('private/timetrackpro/obtener-registro/<slug:year>/<slug:mes>/', obtenerRegistro , name='obtener-registro'),
     path('private/timetrackpro/obtener-registro/<slug:year>/<slug:mes>/<slug:semana>/', obtenerRegistro , name='obtener-registro'),
+
     # información de los registros por cada empleado Laruex
     path('private/timetrackpro/obtener-registro-empleados/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
     path('private/timetrackpro/datos-registro-empleados/', datosRegistroUsuario , name='datos-registro-empleados'),
     path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>', obtenerRegistroUsuario , name='obtener-registro-empleados'),
     path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>/<slug:mes>/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
     path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>/<slug:mes>/<slug:semana>/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
+
     # información de los empleados del Laruex
     path('private/timetrackpro/agregar-usuario', agregarUsuario , name='agregar-usuario'),
     path('private/timetrackpro/datos-empleados/', datosEmpleados , name='datos-empleados'),
@@ -127,6 +129,7 @@ urlpatterns = [
     path('private/timetrackpro/solicitar-modificar-vacaciones/', solicitarModificarVacaciones , name='solicitar-modificar-vacaciones'),
     path('private/timetrackpro/ver-solicitudes-vacaciones/', verSolicitudesVacaciones , name='ver-solicitudes-vacaciones'),
     path('private/timetrackpro/ver-solicitudes-vacaciones/<slug:id>/', verSolicitudesVacaciones , name='ver-solicitudes-vacaciones'),
+
     #Solicitud de vacaciones
     path('private/timetrackpro/datos-festivos-vacaciones-empleado/', datosFestivosVacacionesEmpleado , name='datos-festivos-vacaciones-empleado'),
     path('private/timetrackpro/vacaciones-solicitadas/', vacacionesSolicitadas , name='vacaciones-solicitadas'),
@@ -140,11 +143,13 @@ urlpatterns = [
     #Solicitud de asuntos propios
     path('private/timetrackpro/solicitar-asuntos-propios/', solicitarAsuntosPropios , name='solicitar-asuntos-propios'),
     path('private/timetrackpro/solicitar-asuntos-propios/<slug:year>/', solicitarAsuntosPropios , name='solicitar-asuntos-propios'),
-    path('private/timetrackpro/datos-asuntos-propios/', datosAsuntosPropios , name='datos-asuntos-propios'),
-    path('private/timetrackpro/datos-asuntos-propios/<slug:year>/', datosAsuntosPropios , name='datos-asuntos-propios'),
-    path('private/timetrackpro/datos-asuntos-propios-admin/', datosAsuntosPropiosAdmin , name='datos-asuntos-propios-admin'),
-    path('private/timetrackpro/datos-asuntos-propios-admin/<slug:year>/', datosAsuntosPropiosAdmin , name='datos-asuntos-propios-admin'),    
+    path('private/timetrackpro/datos-asuntos-propios/', datosAsuntosPropiosEmpleados , name='datos-asuntos-propios-empleados'),
+    path('private/timetrackpro/datos-asuntos-propios/<slug:year>/', datosAsuntosPropiosEmpleados , name='datos-asuntos-propios-empleados'),
+    path('private/timetrackpro/datos-asuntos-propios-admin/', datosAsuntosPropiosSolicitados , name='datos-asuntos-propios-solicitados'),
+    path('private/timetrackpro/datos-asuntos-propios-admin/<slug:year>/', datosAsuntosPropiosSolicitados , name='datos-asuntos-propios-solicitados'),    
     path('private/timetrackpro/ver-solicitudes-asuntos-propios/', verSolicitudAsuntosPropios , name='ver-solicitudes-asuntos-propios'),
     path('private/timetrackpro/ver-solicitud-asuntos-propios/<slug:id>/', verSolicitudAsuntosPropios , name='ver-solicitud-asuntos-propios'),
+    path('private/timetrackpro/datos-calendario-asuntos-propios/', datosCalendarioAsuntosPropios , name='datos-calendario-asuntos-propios'), 
+    path('private/timetrackpro/datos-calendario-asuntos-propios/<slug:year>/', datosCalendarioAsuntosPropios , name='datos-calendario-asuntos-propios'), 
 ]
  
