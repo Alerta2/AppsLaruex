@@ -45,7 +45,7 @@ def comprobarHabilitacion(id_user, id_hab):
         habilitaciones = Habilitaciones.objects.using("docLaruex").values_list('id', flat=True)
         cargoEncontrado = "Responsable"
         return list(habilitaciones),cargoEncontrado,"Administrador"
-    elif RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id_user,id_habilitacion__titulo__in=['Director Técnico', 'Subdirector Técnico']).exists():
+    elif RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id_user,id_habilitacion__titulo__in=['Director Técnico', 'Subdirector Técnico', 'Auditor']).exists():
         habilitaciones = Habilitaciones.objects.using("docLaruex").values_list('id', flat=True)
         cargoEncontrado = "Técnico"
         if RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id_user, id_habilitacion=id_hab).exists():
