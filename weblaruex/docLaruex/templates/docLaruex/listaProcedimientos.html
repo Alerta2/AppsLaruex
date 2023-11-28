@@ -1,67 +1,15 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
 
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
+
 {% block content %}
 
 
-<style>
-    ul.pagination li .page-link {
-        background-color: rgb(255, 255, 255) !important;
-        color: rgb(41, 68, 87);
-
-    }
-
-    ul.pagination li.active .page-link {
-        background-color: rgb(41, 68, 87) !important;
-        border-color: rgb(41, 68, 87) !important;
-    }
-
-    ul.pagination li .page-link:hover {
-        filter: brightness(85%);
-
-    }
-
-    ul.pagination li.active .page-link:hover {
-        filter: brightness(120%);
-
-    }
-
-    .btn-light {
-        color: rgb(41, 68, 87);
-    }
-
-    th {
-        color: rgb(41, 68, 87);
-    }
-
-    .addFicheroEditable {
-        color: rgb(9, 58, 65);
-    }
-
-    .addFicheroEditable:hover {
-        color: rgb(133, 198, 228);
-    }
-
-    /* estilo añadirFichero PDF*/
-    .addFicheroPDF {
-        color: rgb(161, 16, 32);
-    }
-
-    .addFicheroPDF:hover {
-        color: rgb(99, 10, 20);
-    }
-
-    .file-upload {
-        border: 1px solid #ccc;
-        display: inline-block;
-        padding: 6px 12px;
-        cursor: pointer;
-    }
-
-    .add:hover {
-        color: #ce8312;
-    }
-</style>
 
 <!-- breadcrumb   -->
 <div class="card-body">
@@ -114,13 +62,13 @@
                         <div class="col">
                             <div class="form-group">
                                 <label for="habilitacion">Habilitación</label>
-                                <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
-                                    {% for habilitacion in habilitaciones %}
-                                    <option value="{{habilitacion.id}}">
-                                        {{habilitacion.titulo}}
-                                    </option>
+                                <input id="inputHabilitacion" list="habilitaciones"  class="form-select">
+                                <input type="number" id="habilitacion" name="habilitacion"  class="form-control" hidden >
+                                <datalist id="habilitaciones" >
+                                    {% for h in habilitaciones %}
+                                        <option data-id="{{ h.id }}">{{ h.titulo }}</option>
                                     {% endfor %}
-                                </select>
+                                </datalist>
                             </div>
                         </div>
                     </div>
@@ -182,31 +130,28 @@
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label for="responsable">Responsable</label>
-                                        <select class="form-select" data-rule="required" id="responsable"
-                                            name="responsable">
-                                            {% for responsable in responsables %}
-                                            <option value="{{responsable.id}}">
-                                                {{responsable.first_name}} {{responsable.last_name}}
-                                            </option>
+                                        <input id="inputResponsable" list="responsables" class="form-select">
+                                        <input type="number" id="responsable" name="responsable"  class="form-control"  hidden>
+                                        <datalist id="responsables" >
+                                            {% for r in responsables %}
+                                                <option data-id="{{ r.id }}">{{r.first_name}} {{r.last_name}}</option>
                                             {% endfor %}
-                                        </select>
+                                        </datalist>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label for="revisor">Revisor</label>
-                                        <select class="form-select" data-rule="required" id="revisor" name="revisor">
-                                            {% for revisor in revisores %}
-                                            <option value="{{revisor.id}}">
-                                                {{revisor.first_name}} {{revisor.last_name}}
-                                            </option>
+                                        <input id="inputRevisor" list="revisores" class="form-select">
+                                        <input type="number" id="revisor" name="revisor"  class="form-control"  hidden>
+                                        <datalist id="revisores" >
+                                            {% for r in revisores %}
+                                                <option data-id="{{ r.id }}">{{r.first_name}} {{r.last_name}}</option>
                                             {% endfor %}
-                                        </select>
+                                        </datalist>
                                     </div>
                                 </div>
                             </div>
-
-
                             <div class="row">
                                 <div class="form-group">
                                     <textarea class="form-control" name="modificaciones" rows="5" data-rule="required"
@@ -365,10 +310,10 @@
             formatter: function (value, row) {
                 
                 var admin = '{{administrador}}';
-                var botonVerObjeto = '<a href="/private/docLaruex/verObjeto/' + row.id_doc + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
-                var botonDescargarObjeto = '<a href="/private/docLaruex/consultarArchivo/' + row.id_doc + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-lg" style="color:#A11020"></i></a>';
-                var botonDescargarObjetoEditable = '<a href="/private/docLaruex/consultarArchivoEditable/' + row.id_doc + '/' + '" class="mx-1" title="Descargar" download><i class="fa-duotone fa-file-signature fa-lg" style="color:#266353"></i></a>';
-                var botonEditarProcedimiento = '<a href="/private/docLaruex/editarProcedimiento/' + row.id_doc + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#4F5775"></i></a>';
+                var botonVerObjeto = '<a href="/private/docLaruex/verObjeto/' + row.id_doc + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-xl verObjeto"></i></a>';
+                var botonDescargarObjeto = '<a href="/private/docLaruex/consultarArchivo/' + row.id_doc + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-xl addFicheroPDF"></i></a>';
+                var botonDescargarObjetoEditable = '<a href="/private/docLaruex/consultarArchivoEditable/' + row.id_doc + '/' + '" class="mx-1" title="Descargar" download><i class="fa-duotone fa-file-signature fa-xl" style="color:#266353"></i></a>';
+                var botonEditarProcedimiento = '<a href="/private/docLaruex/editarProcedimiento/' + row.id_doc + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen fa-xl modificarObjeto"></i></a>';
 
                 if (admin == 'True') {
                     if (row.id_doc__ruta_editable) {
@@ -459,6 +404,56 @@
         return i;
     }
 
+
+    document.getElementById('inputHabilitacion').addEventListener('input', function() {
+        const inputText = this.value;
+        const datalist = document.getElementById('habilitaciones');
+        const options = datalist.getElementsByTagName('option');
+        const habilitacionSeleccionada = document.getElementById('habilitacion');
+
+        for (const option of options) {
+            if (option.textContent === inputText) {
+                const selectedOptionId = option.getAttribute('data-id');
+                habilitacionSeleccionada.value = selectedOptionId;
+
+                console.log('ID de la opción seleccionada:', selectedOptionId);
+                break;
+            }
+        }
+    });
+    document.getElementById('inputResponsable').addEventListener('input', function() {
+        const inputText = this.value;
+        const datalist = document.getElementById('responsables');
+        const options = datalist.getElementsByTagName('option');
+        const responsableSeleccionado = document.getElementById('responsable');
+
+        for (const option of options) {
+            if (option.textContent === inputText) {
+                const selectedOptionId = option.getAttribute('data-id');
+                responsableSeleccionado.value = selectedOptionId;
+
+                console.log('ID de la opción seleccionada:', selectedOptionId);
+                break;
+            }
+        }
+    });
+
+    document.getElementById('inputRevisor').addEventListener('input', function() {
+        const inputText = this.value;
+        const datalist = document.getElementById('revisores');
+        const options = datalist.getElementsByTagName('option');
+        const revisorSeleccionado = document.getElementById('revisor');
+
+        for (const option of options) {
+            if (option.textContent === inputText) {
+                const selectedOptionId = option.getAttribute('data-id');
+                revisorSeleccionado.value = selectedOptionId;
+
+                console.log('ID de la opción seleccionada:', selectedOptionId);
+                break;
+            }
+        }
+    });
 
 </script>
 {% endblock %}
