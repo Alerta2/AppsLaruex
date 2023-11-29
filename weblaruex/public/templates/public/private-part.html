@@ -70,8 +70,9 @@
 
     {% include "public/parts/external-service-section.html" %}
 
-    {% include "public/parts/maintenance-webPublic-service-section.html" %}
-  
+    {% if perms.auth.editor_web %}
+      {% include "public/parts/maintenance-webPublic-service-section.html" %}
+    {% endif %}
 
 
 
