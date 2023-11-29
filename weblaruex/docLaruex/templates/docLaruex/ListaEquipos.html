@@ -1,161 +1,14 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
+
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
+
 {% block content %}
 
-
-<style>
-  ul.pagination li .page-link {
-    background-color: rgb(255, 255, 255) !important;
-    color: rgb(41, 68, 87);
-
-  }
-
-  ul.pagination li.active .page-link {
-    background-color: rgb(41, 68, 87) !important;
-    border-color: rgb(41, 68, 87) !important;
-  }
-
-  ul.pagination li .page-link:hover {
-    filter: brightness(85%);
-
-  }
-
-  ul.pagination li.active .page-link:hover {
-    filter: brightness(120%);
-
-  }
-
-  .btn-light {
-    color: rgb(41, 68, 87);
-  }
-
-  th {
-    color: rgb(41, 68, 87);
-  }
-
-    /*--------------------------------------------------------------
-    # Añadir Imagen
-    --------------------------------------------------------------*/
-    .addImagen {
-      color: rgb(16, 108, 161);
-    }
-
-    .addImagen:hover {
-      color: rgb(10, 59, 99);
-    }
-
-    .imagen-upload {
-      border: 1px solid #ccc;
-      display: inline-block;
-      padding: 6px 12px;
-      cursor: pointer;
-    }     
-    
-
-    /*--------------------------------------------------------------
-    # Añadir Fichero PDF
-    --------------------------------------------------------------*/
-  .addFicheroPDF {
-    color: rgb(161, 16, 32);
-  }
-
-  .addFicheroPDF:hover {
-    color: rgb(99, 10, 20);
-  }
-    .add:hover {
-    color: #ce8312;
-  }
-
-  .file-upload {
-    border: 1px solid #ccc;
-    display: inline-block;
-    padding: 6px 12px;
-    cursor: pointer;
-  }
-
-    /* ===============================
-  *  Estilo del los botones
-  =================================*/
-  
-  .agregarFormacion:hover {
-    color: #032031;
-  }
-  
-  .descargaPDF:hover {
-    color: #c36d0b;
-  }
-  .retirarStock:hover{
-    color: #492160;
-  }
-  .retirarStockUbicacion:hover{
-    color: #042e37;
-  }
-  .entrar:hover{
-    color: #195746;
-  }
-
-
-  
-  /*--------------------------------------------------------------
-# Ir a Eventos
---------------------------------------------------------------*/
-.cta {
-position: relative;
-margin: auto;
-padding: 12px 18px;
-transition: all 0.2s ease;
-border: none;
-background: none;
-}
-
-.cta:before {
-content: "";
-position: absolute;
-top: 0;
-left: 0;
-display: block;
-border-radius: 50px;
-background: #d4e4e2;
-width: 45px;
-height: 45px;
-transition: all 0.3s ease;
-}
-
-.cta span {
-position: relative;
-font-family: "Ubuntu", sans-serif;
-font-size: 18px;
-font-weight: 700;
-letter-spacing: 0.05em;
-color: #087B6C;
-}
-
-
-
-.cta:hover:before {
-width: 100%;
-background: #d4e4e2;
-}
-
-.cta:active {
-transform: scale(0.95);
-}
-
-
-.form-check-input:checked {
-    background-color: #087B6C;
-    border-color: #087B6C;
-}
-
-.form-check-input:focus {
-    outline: 0;
-    box-shadow: 0 0 0 0.25rem rgba(16, 223, 161, 0.432);
-}
-.select:hover{
-  color: #94d2bd;
-}
-
-</style>
 
 
 
@@ -436,13 +289,13 @@ transform: scale(0.95);
             <div class="col">
               <div class="form-group">
                 <label for="nuevaUbicacion">Nueva Ubicación</label>
-                <select class="form-select"  id="nuevaUbicacion" name="nuevaUbicacion">
-                  {% for ubicacion in ubicaciones %}
-                  <option data-tokens="{{ubicacion.id__nombre}}" value="{{ubicacion.id}}">
-                    {% if ubicacion.id__padre %} [{{ ubicacion.id__padre__nombre}}] {% endif %} {{ubicacion.id__nombre}}
-                  </option>
-                  {% endfor %}
-                </select>
+                <input id="inputCambiarUbicacion" list="nuevasUbicaciones"  class="form-select">
+                <input type="number" id="nuevaUbicacion" name="nuevaUbicacion"  class="form-control" hidden>
+                <datalist id="nuevasUbicaciones">
+                    {% for u in ubicaciones %}
+                        <option data-id="{{ u.id }}">{% if u.id__padre %}[{{ u.id__padre__nombre}}]{% endif %} {{ u.id__nombre }}</option>
+                    {% endfor %}
+                </datalist>
               </div>
             </div>
           </div>
@@ -565,11 +418,6 @@ aria-hidden="true">
 
 <script type="text/javascript">
 
-  $(function() {
-    $('.selectpicker').selectpicker();
-  });
-
-
   $("#tabla_equipos").bootstrapTable({
     method: "get",
     locale: navigator.language,
@@ -636,25 +484,31 @@ aria-hidden="true">
         formatter: function (value, row) {
 
                   
-        var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
-        var botonEditar = '<a href="/private/docLaruex/editarObjeto/' + row.id + '/' + '" class="mx-1" title="Editar" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen agregarFormacion" ></i></a>';
+        var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-xl entrar" ></i></a>';
+        var botonEditar = '<a href="/private/docLaruex/editarObjeto/' + row.id + '/' + '" class="mx-1" title="Editar" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen agregarFormacion fa-xl" ></i></a>';
 
-        var botonCambiarUbicacion = '<a href="" title="Cambiar Ubicacion" data-toggle="modal" data-target="#modalCambiarUbicacion" onclick="$('+"'#formularioModalCambiarUbicacion').attr('action', '/private/docLaruex/cambiarUbicacionEquipo/"+ row.id +"/');"+'" class="mx-1" style="color: #eba43d"><i class="fa-duotone fa-cart-flatbed-boxes descargaPDF"></i></a>';
+        var botonCambiarUbicacion = '<a href="" title="Cambiar Ubicacion" data-toggle="modal" data-target="#modalCambiarUbicacion" onclick="$('+"'#formularioModalCambiarUbicacion').attr('action', '/private/docLaruex/cambiarUbicacionEquipo/"+ row.id +"/');"+'" class="mx-1" style="color: #eba43d"><i class="fa-duotone fa-cart-flatbed-boxes descargaPDF fa-xl"></i></a>';
 
-        var botonReportEquipo = '<a href="/private/docLaruex/reportEquipo/' + row.id + '/" class="mx-1" title="report Equipo"  style="color: #405BDE;" ><i class="fa-duotone fa-file-chart-column fa-lg agregarFormacion"></i></a>';
+        var botonReportEquipo = '<a href="/private/docLaruex/reportEquipo/' + row.id + '/" class="mx-1" title="report Equipo"  style="color: #405BDE;" ><i class="fa-duotone fa-file-chart-column fa-xl agregarFormacion"></i></a>';
 
-        var botonEliminar = '<a href="/private/docLaruex/eliminarObjeto/' + row.id + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarObjeto" onclick="$('+"'#formularioModalEliminarObjeto').attr('action', '/private/docLaruex/eliminarObjeto/"+ row.id +"/');"+'"style="color:#AE2012" ><i class="fa-solid fa-x" ></i></a>';
+        var botonEliminar = '<a href="/private/docLaruex/eliminarObjeto/' + row.id + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarObjeto" onclick="$('+"'#formularioModalEliminarObjeto').attr('action', '/private/docLaruex/eliminarObjeto/"+ row.id +"/');"+'"style="color:#AE2012" ><i class="fa-solid fa-x fa-xl" ></i></a>';
+        
+        var divAdmin = '<div class="row"><div class="col-2 my-2 mx-1">'+botonVer+'</div><div class="col-2 my-2 mx-1">'+botonCambiarUbicacion+'</div><div class="col-2 my-2 mx-1">'+botonReportEquipo+'</div><div class="col-2 my-2 mx-1">'+botonEditar+'</div><div class="col-2 my-2 mx-1">'+botonEliminar+'</div></div>';
+        
+        var divDirector = '<div class="row"><div class="col-2 my-2 mx-1">'+botonVer+'</div><div class="col-2 my-2 mx-1">'+botonCambiarUbicacion+'</div><div class="col-2 my-2 mx-1">'+botonReportEquipo+'</div></div>';
+
+        var divEmpleados = '<div class="row"><div class="col-2 my-2 mx-1">'+botonVer+'</div><div class="col-2 my-2 mx-1">'+botonCambiarUbicacion+'</div><div class="col-2 my-2 mx-1">'+botonReportEquipo+'</div></div>';
 
         var admin = '{{administrador}}';
         var secretaria = '{{secretaria}}';
         var direccion = '{{direccion}}';
       
         if (admin == 'True') {
-          return(botonVer + botonCambiarUbicacion + botonReportEquipo+ botonEditar + botonEliminar)
-        }else if (direccion == 'True'){
-          return(botonVer + botonCambiarUbicacion + botonReportEquipo)
+          return divAdmin;
+        } else if (direccion == 'True'){
+          return divDirector;
         }else{
-          return(botonVer + botonReportEquipo)
+          return divEmpleados;
         }
         },
       },
@@ -717,7 +571,7 @@ aria-hidden="true">
         formatter: function (value, row) {
 
         var agregarCodUex = '<a href="" title="Agregar Codigo Uex" data-toggle="modal" data-target="#modalAgregarCodUex" onclick="$('+"'#formularioModalAgregarCodUex').attr('action', '/private/docLaruex/agregarCodUex/"+ row.id +"/');"+'" class="mx-1" style="color: #eba43d"><i class="fa-kit fa-solid-barcode-circle-plus descargaPDF"></i></a>';
-        var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+        var botonVer = '<a href="/private/docLaruex/verObjeto/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-xl entrar" ></i></a>';
         var botonEditar = '<a href="/private/docLaruex/editarObjeto/' + row.id + '/' + '" class="mx-1" title="Editar" style="color:#4F5775"><i class="fa-duotone fa-money-check-pen agregarFormacion" ></i></a>';
         var admin = '{{administrador}}';
         var secretaria = '{{secretaria}}';
@@ -850,6 +704,23 @@ aria-hidden="true">
     
   });
 
+
+    document.getElementById('inputCambiarUbicacion').addEventListener('input', function() {
+        const inputText = this.value;
+        const datalist = document.getElementById('nuevasUbicaciones');
+        const options = datalist.querySelectorAll('option');
+        const ubicacionElegida = document.getElementById('nuevaUbicacion');
+
+        for (const option of options) {
+
+            if (option.textContent == inputText) {
+                const selectedOptionId = option.getAttribute('data-id');
+                ubicacionElegida.value = selectedOptionId;
+                console.log('ID de la opción seleccionada:', selectedOptionId);
+                break;
+            }
+        }
+    });
   
 
 

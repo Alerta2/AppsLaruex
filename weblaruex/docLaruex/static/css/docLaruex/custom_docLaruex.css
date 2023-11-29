@@ -1,0 +1,262 @@
+  /*--------------------------------------------------------------
+# Botones de Accion
+--------------------------------------------------------------*/
+.cta {
+  position: relative;
+  margin: auto;
+  padding: 12px 18px;
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  }
+  
+  .cta:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border-radius: 50px;
+  background: #d4e4e2;
+  width: 45px;
+  height: 45px;
+  transition: all 0.3s ease;
+  }
+  
+  .cta span {
+  position: relative;
+  font-family: "Ubuntu", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #087B6C;
+  }
+  
+  .cta:hover:before {
+  width: 100%;
+  background: #d4e4e2;
+  }
+  
+  .cta:active {
+  transform: scale(0.95);
+  }
+/*--------------------------------------------------------------
+    # Checkbox
+--------------------------------------------------------------*/
+.form-check-input:checked {
+  background-color: #087B6C;
+  border-color: #087B6C;
+}
+
+.form-check-input:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(16, 223, 161, 0.432);
+}
+.select:hover{
+color: #94d2bd;
+}
+  
+/*--------------------------------------------------------------
+    # Checkbox
+--------------------------------------------------------------*/
+.form-check-input:checked {
+  background-color: #087B6C;
+  border-color: #087B6C;
+}
+
+.form-check-input:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(16, 223, 161, 0.432);
+}
+
+.select:hover{
+color: #94d2bd;
+}
+
+/*--------------------------------------------------------------
+    # Botones de Accion
+--------------------------------------------------------------*/
+.agregarFormacion {
+  color: #234a61;
+}
+
+.agregarFormacion:hover {
+  color: #032031;
+}
+.duplicarEquipo:hover {
+  color: #005f73;
+}
+
+.descargaPDF:hover {
+  color: #c36d0b;
+}
+
+.eliminar:hover {
+  color: #4f0208;
+}
+
+.retirarStockUbicacion:hover {
+  color: #042e37;
+}
+
+.retirarStock:hover{
+  color: #492160;
+}
+
+.entrar:hover {
+  color: #195746;
+}
+.modificarObjeto{
+  color: #f3773e
+}
+.modificarObjeto:hover {
+  color: #bb3e03;
+}
+
+.agregarStockProveedor:hover {
+  color: #051925;
+}
+
+
+
+.generarQR {
+  --fa-primary-color: #6a3c90;
+  --fa-secondary-color: #6a3c90;
+}
+
+.generarQR:hover {
+  --fa-primary-color: #c7a9e0;
+  --fa-secondary-color: #9875b5;
+  ;
+}
+
+
+
+.add:hover {
+  color: #ce8312;
+}
+
+
+.mover:hover {
+  color: #001219;
+}
+
+.print:hover {
+  color: #001219;
+}
+
+/*  3 estilo del campo añadir archivo*/
+.addFichero {
+  color: rgb(9, 58, 65);
+}
+
+.addFichero:hover {
+  color: rgb(133, 198, 228);
+}
+
+
+.editarObjeto:hover {
+  color: #ca6702;
+}
+
+/* estilo añadirFichero PDF*/
+.addFicheroPDF {
+  color: rgb(161, 16, 32);
+}
+
+.addFicheroPDF:hover {
+  color: rgb(99, 10, 20);
+}
+
+.enviarNotificacion:hover {
+  color: #064061;
+}
+
+/* estilo añadirFichero PDF*/
+.addFoto {
+  color: #064061;
+}
+
+.addFoto:hover {
+  color: #397fa7;
+}
+
+.okFoto {
+  color: #25bd71;
+}
+
+.verObjeto{
+  color: #68B29E;
+
+}
+.verObjeto:hover{
+  color: #184136;
+}
+
+.file-upload {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+       /*--------------------------------------------------------------
+    # Añadir Imagen
+    --------------------------------------------------------------*/
+    .addImagen {
+      color: rgb(16, 108, 161);
+    }
+
+    .addImagen:hover {
+      color: rgb(10, 59, 99);
+    }
+
+
+    
+  /* Estilos para el campo de entrada de archivos personalizado */
+  .custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(10deg, #1d536e, #ebedee); /* Degradado diagonal */
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease; /* Efecto de transición en el fondo */
+  }
+  
+  /* Cambia el fondo del botón personalizado al pasar el cursor */
+  .custom-file-upload:hover {
+    background: linear-gradient(10deg, #ebedee, #1d536e); /* Cambia los colores del degradado */
+  }
+  
+  /* Oculta el botón de selección de archivo por defecto */
+  .custom-file-upload input[type="file"] {
+    display: none;
+  }
+
+  /* ===============================
+  *  Estilo del las pestañas
+  =================================*/
+  
+  .nav-tabs-bordered .nav-link {
+    margin-bottom: -2px;
+    border: none;
+    color: #2c384e;
+}
+  .nav-tabs-bordered .nav-link.active {
+    background-color: #fff;
+    color: #4154f1;
+    border-bottom: 2px solid #4154f1;
+  
+}
+.nav-tabs {
+    --bs-nav-tabs-border-color: #dee2e6;
+    --bs-nav-tabs-border-radius: 0.375rem;
+    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
+    --bs-nav-tabs-link-active-color: #495057;
+    --bs-nav-tabs-link-active-bg: #fff;
+    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
+    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
+}
