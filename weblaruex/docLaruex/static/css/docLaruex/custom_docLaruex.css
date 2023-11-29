@@ -68,6 +68,7 @@ color: #94d2bd;
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgba(16, 223, 161, 0.432);
 }
+
 .select:hover{
 color: #94d2bd;
 }
@@ -75,10 +76,13 @@ color: #94d2bd;
 /*--------------------------------------------------------------
     # Botones de Accion
 --------------------------------------------------------------*/
-.agregarFormacion:hover{
-  color: #ca6702;
+.agregarFormacion {
+  color: #234a61;
 }
 
+.agregarFormacion:hover {
+  color: #032031;
+}
 .duplicarEquipo:hover {
   color: #005f73;
 }
@@ -102,8 +106,6 @@ color: #94d2bd;
 .entrar:hover {
   color: #195746;
 }
-
-
 .modificarObjeto{
   color: #f3773e
 }
@@ -209,6 +211,30 @@ color: #94d2bd;
       color: rgb(10, 59, 99);
     }
 
+
+    
+  /* Estilos para el campo de entrada de archivos personalizado */
+  .custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(10deg, #1d536e, #ebedee); /* Degradado diagonal */
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s ease; /* Efecto de transición en el fondo */
+  }
+  
+  /* Cambia el fondo del botón personalizado al pasar el cursor */
+  .custom-file-upload:hover {
+    background: linear-gradient(10deg, #ebedee, #1d536e); /* Cambia los colores del degradado */
+  }
+  
+  /* Oculta el botón de selección de archivo por defecto */
+  .custom-file-upload input[type="file"] {
+    display: none;
+  }
 
   /* ===============================
   *  Estilo del las pestañas

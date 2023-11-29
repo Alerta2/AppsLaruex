@@ -78,7 +78,7 @@ table {
   font-size: 13px;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   font-weight: bold;
-  color: #171e22b0;
+  color: #171e22b0 !important;
 }
 
 .bootstrap-table .pagination{

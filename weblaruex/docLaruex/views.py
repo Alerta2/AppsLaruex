@@ -2597,16 +2597,15 @@ def editarObjeto(request, id):
                         equipo.alta_uex = 1
                 else:
                     equipo.alta_uex = 0
-
-                #if request.FILES['nuevaImagenEquipo'] is not None:
-                if request.post.get('nuevaImagenEquipo') is None:
+                
+                if request.FILES['nuevaImagenEquipo']:
                     if objeto.ruta is not None:
                         # find file name matches with *
+                        rutaImagen = settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
                         imagenOld = glob.glob(settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) +  '.*')
+
                         if imagenOld:
                             os.remove(imagenOld[0])
-                            rutaImagen = settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
-                            imagen = str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
                         subirDocumento(request.FILES['nuevaImagenEquipo'], rutaImagen)
 
                     else:
@@ -2616,6 +2615,7 @@ def editarObjeto(request, id):
                         
                         subirDocumento(request.FILES['nuevaImagenEquipo'], rutaImagen)
                         objeto.ruta = imagen
+                
                 objeto.save(using="docLaruex")
                 equipo.save(using="docLaruex")
                 return HttpResponseRedirect('/private/docLaruex/verObjeto/'+id+'/') 
