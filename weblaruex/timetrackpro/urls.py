@@ -151,5 +151,5 @@ urlpatterns = [
     path('private/timetrackpro/ver-solicitud-asuntos-propios/<slug:id>/', verSolicitudAsuntosPropios , name='ver-solicitud-asuntos-propios'),
     path('private/timetrackpro/datos-calendario-asuntos-propios/', datosCalendarioAsuntosPropios , name='datos-calendario-asuntos-propios'), 
     path('private/timetrackpro/datos-calendario-asuntos-propios/<slug:year>/', datosCalendarioAsuntosPropios , name='datos-calendario-asuntos-propios'), 
+    path('private/timetrackpro/agregar-asuntos-propios-desde-calendario/', agregarAsuntosPropiosCalendario , name='agregar-asuntos-propios-desde-calendario'),
 ]
- 

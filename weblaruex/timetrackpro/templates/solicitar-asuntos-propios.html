@@ -67,7 +67,7 @@
         </div>
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
-            <table  id="asuntos_propios_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            <table id="asuntos_propios_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
         </div>
       </div>
@@ -125,7 +125,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Solicitar periodo de vacaciones</h5>
+          <h5 class="modal-title">Solicitar días de asuntos propios</h5>
           <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -143,10 +143,13 @@
                   aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
               </div>
             </div>
-            <div class="col-xl-6"   >
+          </div>
+          <div class="row">
+            
+            <div class="col-xl-6 mt-2"   >
               <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos"  min="1" required hidden>
 
-              <button type="button" class="btn btn-primary" id="botonMostarColumnaOculta" onclick="mostrarColumnaOculta(this.id, 'colFechaFin' )">Varios dias</button>
+              <button type="button" class="btn btn-primary " id="botonMostarColumnaOculta" onclick="mostrarColumnaOculta(this.id, 'colFechaFin' )">Solicitar varios dias</button>
               <div class="" id="colFechaFin" hidden>
                 <label class="col-form-label">Fecha de fin</label>
 
@@ -259,10 +262,10 @@
   </div>
 
   <! -- Modal Agregar Festivo -->
-  <div id="modalAgregarAusenciasDesdeCalendario" tabindex="-1" role="dialog" class="modal fade modal-lg"
-    aria-labelledby="modalAgregarAusenciasDesdeCalendario" aria-hidden="true">
+  <div id="modalAgregarAsuntosPropiosDesdeCalendario" tabindex="-1" role="dialog" class="modal fade modal-lg"
+    aria-labelledby="modalAgregarAsuntosPropiosDesdeCalendario" aria-hidden="true">
     <div class="modal-dialog" role="document">
-      <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:agregar-festivo-desde-calendario' %}" method="POST"
+      <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:agregar-asuntos-propios-desde-calendario' %}" method="POST"
       enctype="multipart/form-data">
       {% csrf_token %}
         <div class="modal-content">
@@ -279,7 +282,7 @@
                   <label class="col-form-label">Fecha de inicio</label>                  
                   <div class="">
                     <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
-                      aria-describedby="text-addon" name="fecha_inicio_seleccionada" id="fecha_inicio_seleccionada">
+                      aria-describedby="text-addon" name="fecha_inicio_seleccionada" id="fecha_inicio_seleccionada" onchange="calcularDias('fecha_inicio_seleccionada','fecha_fin_seleccionada', 'dias_seleccionados_consumidos')">
                   </div>
                 </div>
               </div>
@@ -289,8 +292,7 @@
                   <div class="">
                     <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
                       aria-describedby="text-addon" name="fecha_fin_seleccionada" id="fecha_fin_seleccionada"  onchange="calcularDias('fecha_inicio_seleccionada','fecha_fin_seleccionada', 'dias_seleccionados_consumidos')">
-                      <input type="number" class="form-control" name="dias_seleccionados_consumidos" id="dias_seleccionados_consumidos"  min="1">
-
+                      <input type="number" class="form-control" name="dias_seleccionados_consumidos" id="dias_seleccionados_consumidos"  min="1" hidden>
                   </div>
                 </div>
               </div>
@@ -321,6 +323,7 @@
 
   }
 
+  // ppopopo
 document.addEventListener('DOMContentLoaded', function() {
     var calendarDiv = document.getElementById('calendarioMensual');
     var initialDate = '{{initialDate}}';
@@ -329,7 +332,6 @@ document.addEventListener('DOMContentLoaded', function() {
       themeSystem: 'bootstrap5',
       events: "{% url 'timetrackpro:datos-calendario-asuntos-propios' %}",      
       eventTextColor: '#2f5d6e', // color del texto de los eventos
-      
       height: 650, // indico el maximo de alto que puede tener el calendario
       locale: 'es', // el idioma del calendario
       handleWindowResize: true, // si se puede redimensionar el calendario
@@ -344,41 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
         center: 'title',
         right:'today',
       },
-      // Esta función se ejecutará cuando se haga clic en un día en el calendario         
-      dateClick: function(info) {
-        // se obtiene la fecha seleccionada
-        const meses = {
-            "01": "Enero",
-            "02": "Febrero",
-            "03": "Marzo",
-            "04": "Abril",
-            "05": "Mayo",
-            "06": "Junio",
-            "07": "Julio",
-            "08": "Agosto",
-            "09": "Septiembre",
-            "10": "Octubre",
-            "11": "Noviembre",
-            "12": "Diciembre",
-          };
-        // se obtiene la fecha seleccionada
-        var dia = info.dateStr.substring(8, 10);
-        dia = dia.replace(/^0+/, '');
-        var mes = meses[info.dateStr.substring(5, 7)];
-        var year = info.dateStr.substring(0, 4);
-        
-        // se muestra el modal para agregar el festivo
-        var label = document.getElementById("tituloModalAgregarDesdeCalendario");
-        label.innerHTML = "Agregar festivo el día " + dia + " de " + mes + " del " + year;
-        // se obtiene el año actual
-        var yearActual = document.getElementById("year_actual");
-        yearActual.value = year;
-        var fechaInicio = document.getElementById("fecha_inicio_seleccionada");
-        fechaInicio.value = info.dateStr;
-        // modifico el index del calendario
-       // se muestra el modal
-        $('#modalAgregarAusenciasDesdeCalendario').modal('show');
-        },
+      
         // Esta función se ejecutará cuando se haga clic en un día en el calendario         
       dateClick: function(info) {
         // se obtiene la fecha seleccionada
@@ -401,10 +369,10 @@ document.addEventListener('DOMContentLoaded', function() {
         dia = dia.replace(/^0+/, '');
         var mes = meses[info.dateStr.substring(5, 7)];
         var year = info.dateStr.substring(0, 4);
-        
+
         // se muestra el modal para agregar el festivo
         var label = document.getElementById("tituloModalAgregarDesdeCalendario");
-        label.innerHTML = "Agregar festivo el día " + dia + " de " + mes + " del " + year;
+        label.innerHTML = "Solicitar " + dia + " de " + mes + " del " + year + " como día de asuntos propios";
 
         // se obtiene el año actual
         var yearActual = document.getElementById("year_actual");
@@ -412,9 +380,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var fechaInicio = document.getElementById("fecha_inicio_seleccionada");
         fechaInicio.value = info.dateStr;
+
+        var fechaFin = document.getElementById("fecha_fin_seleccionada");
+        fechaFin.value = info.dateStr;
+
+        var diasConsumidos = document.getElementById("dias_seleccionados_consumidos");
+        diasConsumidos.value = 1;
+        
         // modifico el index del calendario
-       // se muestra el modal
-        $('#modalAgregarAusenciasDesdeCalendario').modal('show');
+        // se muestra el modal
+        $('#modalAgregarAsuntosPropiosDesdeCalendario').modal('show');
         },
     });
     calendar.render(); // renderizo el calendario
@@ -496,8 +471,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  // forzar cierre del modal
   function forzarCierre(){
-    $('#modalAgregarAusenciasDesdeCalendario').modal('hide');
+    $('#modalAgregarAsuntosPropiosDesdeCalendario').modal('hide');
   }
 
   $("#asuntos_propios_empleados").bootstrapTable({
@@ -585,6 +561,25 @@ document.addEventListener('DOMContentLoaded', function() {
         formatter: function(value, row) {
           var dias = row.dias_consumidos;      
           var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Estado",
+        align: "center",
+        formatter: function(value, row) {
+          var estado = row.estado;
+          var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
+          
+          if (estado == 10)
+          var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+
+          if (estado == 11)
+          var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
+
+          if (estado == 12)
+            var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
+          
           return div;
         }
       },
@@ -688,6 +683,25 @@ document.addEventListener('DOMContentLoaded', function() {
         formatter: function(value, row) {
           var dias = row.dias_consumidos;      
           var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Estado",
+        align: "center",
+        formatter: function(value, row) {
+          var estado = row.estado;
+          var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
+          
+          if (estado == 10)
+          var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+
+          if (estado == 11)
+          var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
+
+          if (estado == 12)
+            var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
+          
           return div;
         }
       },

@@ -2302,7 +2302,6 @@ def solicitarVacaciones(request):
 def solicitarModificarVacaciones(request):
     # guardo los datos en un diccionario
     if request.method == 'POST':
-        
         # obtenemos los datos del empleado
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         idEmpleado = user.id_empleado.id
@@ -2443,6 +2442,23 @@ def datosCalendarioAsuntosPropios(request, year=None):
     salida = salidaFestivos + salidaAsuntosPropios
     # devuelvo la lista en formato json
     return JsonResponse(salida, safe=False)
+
+
+def agregarAsuntosPropiosCalendario(request):
+    if request.method == 'POST':
+        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
+        fechaInicio = request.POST.get("fecha_inicio_seleccionada")
+        fechaFin = request.POST.get("fecha_fin_seleccionada")
+        diasConsumidos = request.POST.get("dias_seleccionados_consumidos")
+        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+        fechaSolicitud = datetime.now()
+        year = request.POST.get("year_actual")
+        nuevoAsuntoPropio = AsuntosPropios(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, estado=estado, fecha_solicitud=fechaSolicitud, year=year)
+        nuevoAsuntoPropio.save(using='timetrackpro')
+        return redirect('timetrackpro:solicitar-asuntos-propios', year=year)
+    
+    return festivos(request)
 
 '''-------------------------------------------
                                 Módulo: subirDocumento
