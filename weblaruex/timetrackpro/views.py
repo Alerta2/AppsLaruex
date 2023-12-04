@@ -2199,7 +2199,41 @@ def solicitarAsuntosPropios(request, year=None):
     if len(mes) == 1:
         mesInicial = "0" + mesInicial
     initialDate = year + "-" + mes + "-01"
+    if request.method == 'POST':
+        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
+        fechaInicio = request.POST.get("fecha_inicio")
+        fechaFin = request.POST.get("fecha_fin")
+        diasConsumidos = request.POST.get("dias_consumidos")
+        
+        recuperable = 0 
+        if request.POST.get("recuperable") == 1:
+            recuperable = 1
 
+        tareasASustituir = None
+        if request.POST.get("tareas_a_sustituir") != "":
+            tareasASustituir = request.POST.get("tareas_a_sustituir")
+
+        descripcion = None
+        if request.POST.get("descripcion") != "":
+            descripcion = request.POST.get("descripcion")
+
+        empleadoSustituto = request.POST.get("sustituto")
+        if empleadoSustituto != 0:        
+            sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0] 
+        else:
+            sustituto = None
+
+        if AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin).exists():
+            return redirect('timetrackpro:solicitar-asuntos-propios')
+        else:
+            estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+            fechaSolicitud = datetime.now()
+            year = fechaInicio.split("-")[0]
+            nuevoAsuntoPropio = AsuntosPropios(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, estado=estado, fecha_solicitud=fechaSolicitud, year=year, recuperable=recuperable, descripcion=descripcion, tareas_a_sustituir=tareasASustituir, sustituto=sustituto)
+            nuevoAsuntoPropio.save(using='timetrackpro')
+
+            return redirect('timetrackpro:solicitar-asuntos-propios', year=year)
     infoVista = {
         "navBar":navBar,
         "administrador":administrador,
@@ -2473,10 +2507,6 @@ def agregarAsuntosPropiosCalendario(request):
         fechaFin = request.POST.get("fecha_fin_seleccionada")
         diasConsumidos = request.POST.get("dias_seleccionados_consumidos")
         
-        print('-------------------------------------------------------')
-        print(request.POST)
-        print('-------------------------------------------------------')
-
         recuperable = 0 
         if request.POST.get("recuperable_calendario") == 1:
             recuperable = 1

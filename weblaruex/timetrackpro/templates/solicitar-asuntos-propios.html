@@ -155,19 +155,43 @@
 
                 <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
                   aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
-                
               </div>  
             </div>
           </div>
           <div class="row">
-            <div class="col-12 col-md-4">
-              <label for="accesoCPD" class="col-form-label">Sala CPD</label>
-                <select class="form-control" id="accesoCPD" name="accesoCPD">
-                  <option value="0" selected>No
-                  </option>
-                  <option value="1">Si
-                  </option>
+            <div class="col-6 col-md-4">
+              <label for="recuperable" class="col-form-label">¿Es recuperable?</label>
+                <select class="form-control" id="recuperable" name="recuperable">
+                  <option value="0" selected>No</option> 
+                  <option value="1">Si</option>
                 </select>
+            </div>
+            <div class="col-6 col-md-4">
+              <label for="sustituto" class="col-form-label">Sustituto</label>
+              <input id="inputSustituto" list="sustitutos" class="form-select">
+              <input type="number" id="sustituto" name="sustituto"  class="form-control" hidden>
+              <datalist id="sustitutos">
+                <option data-id="0">Ninguno</option>
+                {% for s in sustitutos %}
+                <option data-id="{{s.id}}">{{s.nombre}} {{s.apellidos}}</option>
+                {% endfor %}
+              </datalist>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label class="col-form-label">Tareas a sustituir</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique las tareas que deben ser sustituidas." id="tareas_a_sustituir" name="tareas_a_sustituir" aria-describedby="text-addon"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="row" id="descripcionRecuperacion" hidden>
+            <div class="col" >
+              <label class="col-form-label">Descripcion</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique como va a recuperar los días solicitados." id="descripcion" name="descripcion" aria-describedby="text-addon"></textarea>
+              </div>
             </div>
           </div>
         </div>
@@ -335,9 +359,9 @@
                   </div>
                 </div>
               </div>
-              <div class="row" id="descripcionRecuperacion" hidden>
+              <div class="row" id="descripcionRecuperacionCalendario" hidden>
                 <div class="col" >
-                  <label class="col-form-label">Motivo de la solicitud</label>
+                  <label class="col-form-label">Descripcion</label>
                   <div class="mb-3">
                     <textarea type="text" class="form-control" placeholder="Indique como va a recuperar los días solicitados." id="descripcion_calendario" name="descripcion_calendario" aria-describedby="text-addon"></textarea>
                   </div>
@@ -757,6 +781,33 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     document.getElementById('recuperable_calendario').addEventListener('change', function() {
+      const recuperable = this.value;
+      const descripcionRecuperacionCalendario = document.getElementById('descripcionRecuperacionCalendario');
+      if (recuperable == 1){
+        descripcionRecuperacionCalendario.removeAttribute("hidden");
+      }else{
+        descripcionRecuperacionCalendario.setAttribute("hidden", true);
+      }
+    });
+
+
+    document.getElementById('inputSustituto').addEventListener('input', function() {
+        const inputText = this.value;
+        const datalist = document.getElementById('sustitutos');
+        const options = datalist.getElementsByTagName('option');
+        const sustitutoSeleccionado = document.getElementById('sustituto');
+
+        for (const option of options) {
+            if (option.textContent === inputText) {
+                const selectedOptionId = option.getAttribute('data-id');
+                sustitutoSeleccionado.value = selectedOptionId;
+                console.log('ID de la opción seleccionada:', selectedOptionId);
+                break;
+            }
+        }
+    });
+    
+    document.getElementById('recuperable').addEventListener('change', function() {
       const recuperable = this.value;
       const descripcionRecuperacion = document.getElementById('descripcionRecuperacion');
       if (recuperable == 1){
