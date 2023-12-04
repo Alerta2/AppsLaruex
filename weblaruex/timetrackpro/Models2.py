@@ -8,7 +8,7 @@
 from django.db import models
 
 
-class AsuntosPropio(models.Model):
+class AsuntosPropios(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     year = models.IntegerField(db_column='Year')  # Field name made lowercase.
     empleado = models.ForeignKey('Empleados', models.DO_NOTHING, db_column='Empleado')  # Field name made lowercase.
@@ -17,10 +17,14 @@ class AsuntosPropio(models.Model):
     dias_consumidos = models.IntegerField(db_column='Dias_consumidos')  # Field name made lowercase.
     estado = models.ForeignKey('EstadosSolicitudes', models.DO_NOTHING, db_column='Estado')  # Field name made lowercase.
     fecha_solicitud = models.DateTimeField(db_column='Fecha_solicitud')  # Field name made lowercase.
+    recuperable = models.IntegerField(db_column='Recuperable')  # Field name made lowercase.
+    descripcion = models.CharField(db_column='Descripcion', max_length=1000, blank=True, null=True)  # Field name made lowercase.
+    tareas_a_sustituir = models.CharField(db_column='Tareas a sustituir', max_length=1000, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    sustituto = models.ForeignKey('Empleados', models.DO_NOTHING, db_column='Sustituto', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
-        db_table = 'asuntos_propio'
+        db_table = 'asuntos_propios'
 
 
 class AuthGroup(models.Model):
@@ -170,6 +174,7 @@ class EstadosSolicitudes(models.Model):
     nombre = models.CharField(max_length=255)
     vacaciones = models.IntegerField()
     solicitudes = models.IntegerField()
+    incidencias = models.IntegerField()
 
     class Meta:
         managed = False
@@ -195,6 +200,20 @@ class HabilitacionesTimetrackpro(models.Model):
     class Meta:
         managed = False
         db_table = 'habilitaciones_timetrackpro'
+
+
+class Incidencias(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    fecha_solicitud = models.DateTimeField(db_column='Fecha_solicitud')  # Field name made lowercase.
+    solicitante = models.IntegerField(db_column='Solicitante')  # Field name made lowercase.
+    estado = models.IntegerField(db_column='Estado')  # Field name made lowercase.
+    motivo = models.CharField(db_column='Motivo', max_length=255)  # Field name made lowercase.
+    seccion = models.IntegerField(db_column='Seccion')  # Field name made lowercase.
+    prioridad = models.IntegerField(db_column='Prioridad')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'incidencias'
 
 
 class MaquinaControlAsistencia(models.Model):
@@ -386,6 +405,16 @@ class RelJornadaEmpleados(models.Model):
     class Meta:
         managed = False
         db_table = 'rel_jornada_empleados'
+
+
+class Secciones(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    color = models.CharField(db_column='Color', max_length=10)  # Field name made lowercase.
+    tema = models.CharField(db_column='Tema', max_length=30)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'secciones'
 
 
 class TarjetasAcceso(models.Model):

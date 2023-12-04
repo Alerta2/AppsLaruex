@@ -14,6 +14,7 @@ urlpatterns = [
     path('private/timetrackpro/perfil', perfil ,name='perfil'),
     path('private/timetrackpro/404', noEncontrado ,name='404'),
     path('private/timetrackpro/sin-permiso', sinPermiso ,name='sin-permiso'),
+    path('private/timetrackpro/ups', ups ,name='ups'),
 
     # permisos de la aplicación
     path('private/timetrackpro/habilitaciones', habilitaciones ,name='habilitaciones'),

@@ -159,6 +159,17 @@
               </div>  
             </div>
           </div>
+          <div class="row">
+            <div class="col-12 col-md-4">
+              <label for="accesoCPD" class="col-form-label">Sala CPD</label>
+                <select class="form-control" id="accesoCPD" name="accesoCPD">
+                  <option value="0" selected>No
+                  </option>
+                  <option value="1">Si
+                  </option>
+                </select>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           {% if user.is_authenticated  %}
@@ -285,8 +296,6 @@
                       aria-describedby="text-addon" name="fecha_inicio_seleccionada" id="fecha_inicio_seleccionada" onchange="calcularDias('fecha_inicio_seleccionada','fecha_fin_seleccionada', 'dias_seleccionados_consumidos')">
                   </div>
                 </div>
-              </div>
-              <div class="row">
                 <div class="col-xl-6">
                   <label class="col-form-label">Fecha de Fin</label>                  
                   <div class="">
@@ -296,7 +305,46 @@
                   </div>
                 </div>
               </div>
+              <div class="row">
+                <div class="col-6 col-md-4">
+                  <label for="recuperable_calendario" class="col-form-label">¿Es recuperable?</label>
+                    <select class="form-control" id="recuperable_calendario" name="recuperable_calendario">
+                      <option value="0" selected>No
+                      </option>
+                      <option value="1">Si
+                      </option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-4">
+                  <label for="sustituto_calendario" class="col-form-label">Sustituto</label>
+                  <input id="inputSustitutoCalendario" list="sustitutos_calendario" class="form-select">
+                  <input type="number" id="sustituto_calendario" name="sustituto_calendario"  class="form-control" hidden>
+                  <datalist id="sustitutos_calendario">
+                    <option data-id="0">Ninguno</option>
+                    {% for s in sustitutos %}
+                    <option data-id="{{s.id}}">{{s.nombre}} {{s.apellidos}}</option>
+                    {% endfor %}
+                  </datalist>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <label class="col-form-label">Tareas a sustituir</label>
+                  <div class="mb-3">
+                    <textarea type="text" class="form-control" placeholder="Indique las tareas que deben ser sustituidas." id="tareas_a_sustituir_calendario" name="tareas_a_sustituir_calendario" aria-describedby="text-addon"></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="row" id="descripcionRecuperacion" hidden>
+                <div class="col" >
+                  <label class="col-form-label">Motivo de la solicitud</label>
+                  <div class="mb-3">
+                    <textarea type="text" class="form-control" placeholder="Indique como va a recuperar los días solicitados." id="descripcion_calendario" name="descripcion_calendario" aria-describedby="text-addon"></textarea>
+                  </div>
+                </div>
+              </div>
             </div>
+            
             <div class="modal-footer">
               {% if user.is_authenticated %}
               <button type="submit" value="submit" class="btn btn-primary">Guardar</button>
@@ -313,14 +361,10 @@
   function mostrarColumnaOculta(id, columna){
     console.log(id)
     console.log(columna)
-
-
     // Ocultar el botón
     document.getElementById(id).hidden = true;
-
     // Mostrar la columna específica
     document.getElementById(columna).hidden = false;
-
   }
 
   // ppopopo
@@ -346,8 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
         center: 'title',
         right:'today',
       },
-      
-        // Esta función se ejecutará cuando se haga clic en un día en el calendario         
+      // Esta función se ejecutará cuando se haga clic en un día en el calendario         
       dateClick: function(info) {
         // se obtiene la fecha seleccionada
         const meses = {
@@ -396,7 +439,6 @@ document.addEventListener('DOMContentLoaded', function() {
     calendar.updateSize(); // actualizo el tamaño del calendario
   });
 
-
   function calcularDias(inicio, fin, dias_consumidos){
     fecha_inicio = document.getElementById(inicio).value;
     fecha_fin = document.getElementById(fin).value;
@@ -406,10 +448,8 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById(fin).value = fecha_inicio;
     }
     dias_consumidos = document.getElementById(dias_consumidos);
-
     botonGuardarSolicitar = document.getElementById("guardarSolicitarVacaciones");
     botonGuardarModificar = document.getElementById("guardarModificarVacaciones");
-
 
     if (fecha_inicio > fecha_fin && fecha_fin != ""){
       alert("La fecha de inicio no puede ser mayor a la fecha de fin");
@@ -434,8 +474,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }else{
       dias_consumidos.value = dias;
     }
-      
-
   }
 
   function mostrarInfo(){ 
@@ -514,16 +552,14 @@ document.addEventListener('DOMContentLoaded', function() {
           };
           // obtengo la fecha de lectura
           var fechaLectura = row.fecha_inicio;
-
           // obtengo la fecha
           var fecha = fechaLectura.split("T")[0];
           mesFecha = fecha.split("-")[1];
           fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
-
           var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
           return div;
         }
-      },      {
+      },{
         title: "Fecha fin",
         field: "fecha_inicio",
         align: "center",
@@ -544,13 +580,10 @@ document.addEventListener('DOMContentLoaded', function() {
           };
           // obtengo la fecha de lectura
           var fechaLectura = row.fecha_fin;
-
           // obtengo la fecha
           var fecha = fechaLectura.split("T")[0];
           mesFecha = fecha.split("-")[1];
           fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
-
-
           var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
           return div;
         }
@@ -570,13 +603,11 @@ document.addEventListener('DOMContentLoaded', function() {
         formatter: function(value, row) {
           var estado = row.estado;
           var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
-          
           if (estado == 10)
           var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
 
           if (estado == 11)
           var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
-
           if (estado == 12)
             var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
           
@@ -596,7 +627,6 @@ document.addEventListener('DOMContentLoaded', function() {
       },
     ],
     search: true,
-    
   });
   $("#asuntos_propios_solicitados").bootstrapTable({
     method: "get",
@@ -636,7 +666,6 @@ document.addEventListener('DOMContentLoaded', function() {
           };
           // obtengo la fecha de lectura
           var fechaLectura = row.fecha_inicio;
-
           // obtengo la fecha
           var fecha = fechaLectura.split("T")[0];
           mesFecha = fecha.split("-")[1];
@@ -647,7 +676,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       },      {
         title: "Fecha fin",
-        field: "fecha_inicio",
+        field: "fecha_fin",
         align: "center",
         formatter: function(value, row) {
           const mes = {
@@ -666,13 +695,10 @@ document.addEventListener('DOMContentLoaded', function() {
           };
           // obtengo la fecha de lectura
           var fechaLectura = row.fecha_fin;
-
           // obtengo la fecha
           var fecha = fechaLectura.split("T")[0];
           mesFecha = fecha.split("-")[1];
           fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
-
-
           var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
           return div;
         }
@@ -692,16 +718,12 @@ document.addEventListener('DOMContentLoaded', function() {
         formatter: function(value, row) {
           var estado = row.estado;
           var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
-          
           if (estado == 10)
           var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
-
           if (estado == 11)
           var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
-
           if (estado == 12)
             var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
-          
           return div;
         }
       },
@@ -712,13 +734,37 @@ document.addEventListener('DOMContentLoaded', function() {
         formatter: function (value, row) {
           var botonVer = '<a href="/private/timetrackpro/ver-solicitud-asuntos-propios/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
           return botonVer;
-                  
-
         },
       },
     ],
     search: true,
   });
+
+  document.getElementById('inputSustitutoCalendario').addEventListener('input', function() {
+        const inputText = this.value;
+        const datalist = document.getElementById('sustitutos_calendario');
+        const options = datalist.getElementsByTagName('option');
+        const sustitutoCalendarioSeleccionado = document.getElementById('sustituto_calendario');
+
+        for (const option of options) {
+            if (option.textContent === inputText) {
+                const selectedOptionId = option.getAttribute('data-id');
+                sustitutoCalendarioSeleccionado.value = selectedOptionId;
+                console.log('ID de la opción seleccionada:', selectedOptionId);
+                break;
+            }
+        }
+    });
+    
+    document.getElementById('recuperable_calendario').addEventListener('change', function() {
+      const recuperable = this.value;
+      const descripcionRecuperacion = document.getElementById('descripcionRecuperacion');
+      if (recuperable == 1){
+        descripcionRecuperacion.removeAttribute("hidden");
+      }else{
+        descripcionRecuperacion.setAttribute("hidden", true);
+      }
+    });
 </script>
 
 {% endblock %}

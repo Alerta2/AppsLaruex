@@ -4,8 +4,8 @@
 {% block content %}
   <div class="row d-flex justify-content-center">
     
-    <h3 class="text-info text-gradient">Registro erroneo de  </h3>
-    <h4 class="text-secondary">gfsd}</h4>
+    <h3 class="text-info text-gradient">Días de asuntos propios solicitado</h3>
+    <h4 class="text-secondary">{{solicitud.year}}</h4>
     <div class="col-12 col-xl-4">
       {% if administrador %}
         <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
@@ -39,14 +39,12 @@
         <div class="card-header pb-0 p-3">
         </div>
         <div class="card-body pt-0 p-3">
-          
           <ul class="list-group font-weight-bold">
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{solicitud.empleado.nombre}} {{solicitud.empleado.apellidos}}</li>
             
-            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{empleado.id_usuario.nombre}} {{empleado.id_usuario.apellidos}}</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{solicitud.fecha_inicio|date:"d M Y"}} - {{solicitud.fecha_fin|date:"d M Y"}}</li>
             
-            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{error.hora|date:"H:i:s"}}</li>
-            
-            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{error.hora|date:"d M Y"}}</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-mutted me-2"></i> {{solicitud.fecha_solicitud}}</li>
 
             <!-- 1- Pendiente, 2 Rechazado, 3 - Aceptado -->
             {% if error.estado == 1 %}
