@@ -87,18 +87,21 @@ def sinPermiso(request):
     return render(request,"sinPermiso.html",infoVista)
 
 
-def ups(request):
+def ups(request, mensaje=None):
     """
     Vista que se encarga de mostrar la página de "Ups" cuando un usuario intenta insertar solicitudes con fechas que ya existen en la base de datos.
     :param request: HttpRequest que representa la solicitud HTTP que se está procesando.
     :return: HttpResponse que representa la respuesta HTTP resultante.
     """
+    msg = "Ups, Parece que ya existe un registro con esas fechas en la base de datos."
+    if mensaje is not None:
+        msg = mensaje
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
         "administrador":esAdministrador(request.user.id),
         "TimeTrackProTittle":"TimeTrackPro - Ups permiso",
-        "mensaje":"Ups, Parece que ya existe un registro con esas fechas en la base de datos."
+        "mensaje":msg
     }
 
     return render(request,"ups.html",infoVista)
@@ -1858,6 +1861,69 @@ def eliminarVacaciones(request):
         return redirect('timetrackpro:vacaciones-solicitadas')
     else:
         return redirect('timetrackpro:vacaciones-solicitadas')
+
+def modificarAsuntosPropios(request, id):
+    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+    admin = esAdministrador(request.user.id)
+    
+    if request.method == 'POST' and admin:
+        vacaciones.fecha_inicio = request.POST.get("fecha_inicio")
+        vacaciones.fecha_fin = request.POST.get("fecha_fin")
+        vacaciones.dias_consumidos = request.POST.get("dias_consumidos")
+        vacaciones.save(using='timetrackpro')
+
+        return redirect('timetrackpro:vacaciones-solicitadas')
+    else:
+        return redirect('timetrackpro:sin-permiso')
+    
+def cambiarEstadoAsuntosPropios(request, id=None):
+
+    if request.method == 'POST':
+        if id == None:
+            id = request.POST.get("id_asunto")
+        asunto = AsuntosPropios.objects.using("timetrackpro").filter(id=id)[0]
+        estado = request.POST.get("estado")
+        nuevoEstado = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1, id=estado)[0]
+        asunto.estado = nuevoEstado
+        asunto.save(using='timetrackpro')
+        return redirect('timetrackpro:solicitar-asuntos-propios')
+    else:
+        return redirect('timetrackpro:ups', mensaje="No se ha podido cambiar el estado del asunto propio")
+
+def eliminarAsuntosPropios(request):
+    if request.method == 'POST':
+        id = request.POST.get("id_asunto")
+        asunto = AsuntosPropios.objects.using("timetrackpro").filter(id=id)[0]
+        asunto.delete(using='timetrackpro')
+        return redirect('timetrackpro:solicitar-asuntos-propios')
+    else:
+        return redirect('timetrackpro:ups', mensaje="No se ha podido eliminar el asunto propio")
+
+def solicitarModificarAsuntosPropios(request):
+    # guardo los datos en un diccionario
+    if request.method == 'POST':
+        # obtenemos los datos del empleado
+        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        idEmpleado = user.id_empleado.id
+        solicitante = Empleados.objects.using("timetrackpro").filter(id=idEmpleado)[0]
+        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+        # obtenemos los datos del formulario
+        idVacaciones = request.POST.get("vacaciones_modificar")
+        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=idVacaciones)[0]
+        estadoPendiente = EstadosSolicitudes.objects.using("timetrackpro").filter(id=12)[0]
+        vacaciones.estado = estadoPendiente
+        vacaciones.save(using='timetrackpro')
+        fechaInicioActual = request.POST.get("fechaActualInicio")
+        fechaFinActual = request.POST.get("fechaActualFin")
+        diasConsumidosActual = request.POST.get("dias_actuales_consumidos")
+        fechaSolicitud = datetime.now()
+        fechaNuevaInicio = request.POST.get("fechaInicioNueva")
+        fechaNuevaFin = request.POST.get("fechaFinNueva")
+        diasConsumidosNuevos = request.POST.get("dias_nuevos_consumidos")
+        motivoCambio = request.POST.get("motivo_cambio")
+        solicitudModificacionVacaciones = CambiosVacacionesTimetrackpro(id_periodo_cambio=vacaciones, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
+        solicitudModificacionVacaciones.save(using='timetrackpro')
+    return redirect('timetrackpro:solicitar-vacaciones')
 
 
 def documentacion(request):

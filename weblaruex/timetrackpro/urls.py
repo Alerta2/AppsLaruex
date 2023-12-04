@@ -153,4 +153,9 @@ urlpatterns = [
     path('private/timetrackpro/datos-calendario-asuntos-propios/', datosCalendarioAsuntosPropios , name='datos-calendario-asuntos-propios'), 
     path('private/timetrackpro/datos-calendario-asuntos-propios/<slug:year>/', datosCalendarioAsuntosPropios , name='datos-calendario-asuntos-propios'), 
     path('private/timetrackpro/agregar-asuntos-propios-desde-calendario/', agregarAsuntosPropiosCalendario , name='agregar-asuntos-propios-desde-calendario'),
+    path('private/timetrackpro/modificar-asuntos-propios/', modificarAsuntosPropios , name='modificar-asuntos-propios'),
+    path('private/timetrackpro/solicitar-modificacion-asuntos-propios/', solicitarModificarAsuntosPropios , name='solicitar-modificacion-asuntos-propios'),
+    path('private/timetrackpro/cambiar-estado-asuntos-propios/', cambiarEstadoAsuntosPropios , name='cambiar-estado-asuntos-propios'),
+    path('private/timetrackpro/cambiar-estado-asuntos-propios/<slug:id>/', cambiarEstadoAsuntosPropios , name='cambiar-estado-asuntos-propios'),
+    path('private/timetrackpro/eliminar-asuntos-propios/', eliminarAsuntosPropios , name='eliminar-asuntos-propios'),
 ]
