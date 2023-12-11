@@ -1862,17 +1862,27 @@ def eliminarVacaciones(request):
     else:
         return redirect('timetrackpro:vacaciones-solicitadas')
 
-def modificarAsuntosPropios(request, id):
-    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+def modificarAsuntosPropios(request):
     admin = esAdministrador(request.user.id)
     
     if request.method == 'POST' and admin:
-        vacaciones.fecha_inicio = request.POST.get("fecha_inicio")
-        vacaciones.fecha_fin = request.POST.get("fecha_fin")
-        vacaciones.dias_consumidos = request.POST.get("dias_consumidos")
-        vacaciones.save(using='timetrackpro')
+        id = request.POST.get("id_asunto")
+        asunto = AsuntosPropios.objects.using("timetrackpro").filter(id=id)[0]
+        asunto.fecha_inicio = request.POST.get("fecha_inicio")
+        asunto.fecha_fin = request.POST.get("fecha_fin")
+        asunto.dias_consumidos = request.POST.get("dias_consumidos")
+        sustituto = Sustitutos.objects.using("timetrackpro").filter(id=request.POST.get("sustituto"))[0]         
+        asunto.sustituto = sustituto
+        asunto.tareas_a_sustituir= request.POST.get("tareas_a_sustituir")
+        recuperable = request.POST.get("recuperable")
+        asunto.recuperable = recuperable
+        if recuperable == "1": 
+            asunto.descripcion = request.POST.get("descripcion")
+        else:
+            asunto.descripcion = None
+        asunto.save(using='timetrackpro')
 
-        return redirect('timetrackpro:vacaciones-solicitadas')
+        return redirect('timetrackpro:ver-solicitud-asuntos-propios', id=id)
     else:
         return redirect('timetrackpro:sin-permiso')
     
@@ -1885,14 +1895,18 @@ def cambiarEstadoAsuntosPropios(request, id=None):
         estado = request.POST.get("estado")
         nuevoEstado = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1, id=estado)[0]
         asunto.estado = nuevoEstado
+        if asunto.estado.id == 10:
+            motivo = request.POST.get("motivo")
+            asunto.motivo_estado_solicitud = motivo
         asunto.save(using='timetrackpro')
         return redirect('timetrackpro:solicitar-asuntos-propios')
     else:
         return redirect('timetrackpro:ups', mensaje="No se ha podido cambiar el estado del asunto propio")
 
-def eliminarAsuntosPropios(request):
+def eliminarAsuntosPropios(request, id=None):
     if request.method == 'POST':
-        id = request.POST.get("id_asunto")
+        if id == None:
+            id = request.POST.get("id_asunto_eliminar")
         asunto = AsuntosPropios.objects.using("timetrackpro").filter(id=id)[0]
         asunto.delete(using='timetrackpro')
         return redirect('timetrackpro:solicitar-asuntos-propios')
@@ -2486,13 +2500,15 @@ def verSolicitudAsuntosPropios(request, id=None):
         empleado = Empleados.objects.using("timetrackpro").filter(id=solicitud.empleado.id)[0]
         diasConsumidos = AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, year=solicitud.year).aggregate(Sum('dias_consumidos'))['dias_consumidos__sum']
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
+    sustitutos = Sustitutos.objects.using("timetrackpro").values('id', 'nombre', 'apellidos')
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
         "administrador":True,
         "empleados":list(empleados),
         "solicitud":solicitud, 
-        "diasConsumidos":diasConsumidos
+        "diasConsumidos":diasConsumidos,
+        "sustitutos":list(sustitutos),
     }
 
     return render(request,"ver-solicitud-asuntos-propios.html", infoVista)

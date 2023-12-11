@@ -26,7 +26,8 @@ class AsuntosPropios(models.Model):
     descripcion = models.CharField(db_column='Descripcion', max_length=1000, blank=True, null=True)  # Field name made lowercase.
     tareas_a_sustituir = models.CharField(db_column='Tareas_a_sustituir', max_length=1000, blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     sustituto = models.ForeignKey('Sustitutos', models.DO_NOTHING, db_column='Sustituto', blank=True, null=True)  # Field name made lowercase.
-
+    motivo_estado_solicitud = models.CharField(db_column='Motivo_estado_solicitud', max_length=1000, blank=True, null=True)  # Field name made lowercase.
+    
     class Meta:
         managed = False
         db_table = 'asuntos_propios'

@@ -132,7 +132,7 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioSolicitarVacaciones" action="{% url 'timetrackpro:solicitar-asuntos-propios' %}" method="POST"
+        <form id="formularioSolicitarAsuntosPropios" action="{% url 'timetrackpro:solicitar-asuntos-propios' %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
@@ -197,7 +197,7 @@
         </div>
         <div class="modal-footer">
           {% if user.is_authenticated  %}
-          <button type="submit" value="submit"  class="btn btn-primary" id="guardarSolicitarVacaciones" disabled>Guardar</button>
+          <button type="submit" value="submit"  class="btn btn-primary" id="guardarSolicitarAsuntosPropios" disabled>Guardar</button>
           {% endif %}
           <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cerrar</button>
         </div>
@@ -287,7 +287,7 @@
         </div>
         <div class="modal-footer">
           {% if user.is_authenticated  %}
-          <button type="submit" value="submit" class="btn btn-primary" id="guardarModificarVacaciones" disabled>Guardar</button>
+          <button type="submit" value="submit" class="btn btn-primary" id="guardarModificarAsuntosPropios" disabled>Guardar</button>
           {% endif %}
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
         </div>
@@ -472,8 +472,8 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById(fin).value = fecha_inicio;
     }
     dias_consumidos = document.getElementById(dias_consumidos);
-    botonGuardarSolicitar = document.getElementById("guardarSolicitarVacaciones");
-    botonGuardarModificar = document.getElementById("guardarModificarVacaciones");
+    botonGuardarSolicitar = document.getElementById("guardarSolicitarAsuntosPropios");
+    botonGuardarModificar = document.getElementById("guardarModificarAsuntosPropios");
 
     if (fecha_inicio > fecha_fin && fecha_fin != ""){
       alert("La fecha de inicio no puede ser mayor a la fecha de fin");

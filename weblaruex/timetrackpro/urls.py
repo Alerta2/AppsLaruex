@@ -141,7 +141,7 @@ urlpatterns = [
     path('private/timetrackpro/cambiar-estado-vacaciones/<slug:id>/', cambiarEstadoVacaciones , name='cambiar-estado-vacaciones'),
     path('private/timetrackpro/eliminar-vacaciones/', eliminarVacaciones , name='eliminar-vacaciones'),
     
-    #Solicitud de asuntos propios
+    #Solicitud de asuntos propios 
     path('private/timetrackpro/solicitar-asuntos-propios/', solicitarAsuntosPropios , name='solicitar-asuntos-propios'),
     path('private/timetrackpro/solicitar-asuntos-propios/<slug:year>/', solicitarAsuntosPropios , name='solicitar-asuntos-propios'),
     path('private/timetrackpro/datos-asuntos-propios/', datosAsuntosPropiosEmpleados , name='datos-asuntos-propios-empleados'),
@@ -158,4 +158,5 @@ urlpatterns = [
     path('private/timetrackpro/cambiar-estado-asuntos-propios/', cambiarEstadoAsuntosPropios , name='cambiar-estado-asuntos-propios'),
     path('private/timetrackpro/cambiar-estado-asuntos-propios/<slug:id>/', cambiarEstadoAsuntosPropios , name='cambiar-estado-asuntos-propios'),
     path('private/timetrackpro/eliminar-asuntos-propios/', eliminarAsuntosPropios , name='eliminar-asuntos-propios'),
+    path('private/timetrackpro/eliminar-asuntos-propios/<slug:id>/', eliminarAsuntosPropios , name='eliminar-asuntos-propios'),
 ]
