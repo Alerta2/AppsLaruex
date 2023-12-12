@@ -2614,8 +2614,7 @@ def editarObjeto(request, id):
                         rutaImagen = settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
                         
                         subirDocumento(request.FILES['nuevaImagenEquipo'], rutaImagen)
-                        objeto.ruta = imagen
-                
+                        objeto.ruta = imagen                
                 objeto.save(using="docLaruex")
                 equipo.save(using="docLaruex")
                 return HttpResponseRedirect('/private/docLaruex/verObjeto/'+id+'/') 
