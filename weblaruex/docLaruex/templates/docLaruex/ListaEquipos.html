@@ -293,7 +293,7 @@
                 <input type="number" id="nuevaUbicacion" name="nuevaUbicacion"  class="form-control" hidden>
                 <datalist id="nuevasUbicaciones">
                     {% for u in ubicaciones %}
-                        <option data-id="{{ u.id }}">{% if u.id__padre %}[{{ u.id__padre__nombre}}]{% endif %} {{ u.id__nombre }}</option>
+                        <option data-id="{{ u.id }}">{% if u.id__padre %}[{{ u.id__padre__nombre}}]{% endif %}{{ u.id__nombre }}</option>
                     {% endfor %}
                 </datalist>
               </div>
@@ -327,8 +327,6 @@ aria-hidden="true">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      
- 
         <form id="formularioModalEliminarObjeto" action="/private/docLaruex/eliminarObjeto/0/" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
@@ -389,7 +387,6 @@ aria-hidden="true">
         <form id="formularioModalAgregarCodUex" action="/private/docLaruex/agregarCodUex/0/" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
-
           <div class="row">
             <!-- Fecha de baja  -->
             <div class="col d-flex justify-content-center">
@@ -712,9 +709,9 @@ aria-hidden="true">
         const ubicacionElegida = document.getElementById('nuevaUbicacion');
 
         for (const option of options) {
-
             if (option.textContent == inputText) {
                 const selectedOptionId = option.getAttribute('data-id');
+                console.log('ID de la opción seleccionada:', selectedOptionId);
                 ubicacionElegida.value = selectedOptionId;
                 console.log('ID de la opción seleccionada:', selectedOptionId);
                 break;
