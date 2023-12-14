@@ -145,10 +145,12 @@
               <button class="nav-link active" data-bs-toggle="tab"
                 data-bs-target="#profile-overview">Información</button>
             </li>
+            {% if request.user.id == curriculum.id_usuario__id or administrador or direccion %}
             <li class="nav-item">
               <button class="nav-link" data-bs-toggle="tab"
                 data-bs-target="#profile-actualizar">Actualizar Curriculum </button>
             </li>
+            {% endif %}
             {% if administrador %}
             <li class="nav-item">
               <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar datos de
@@ -417,6 +419,7 @@
   </div>
 </section>
 
+{% if request.user.id == curriculum.id_usuario__id or administrador or direccion %}
 
 <!-- ===================== Separación Formaciones ===================== -->
 <div class="section-title">
@@ -524,6 +527,7 @@
     </div>
   </div>
 </section>
+{% endif %}
 
 
 <!-- ===================== Formulario agregar Formaciones ===================== -->
@@ -638,9 +642,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <form id="modalFormularioAgregarDocumentos"
-          action="/private/docLaruex/agregarArchivo/" method="POST"
-          enctype="multipart/form-data">
+        <form id="formularioAgregarDocumentos" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           <div id="formularioDocumento" class="divFormularioDocumentos">
             <div class="row" hidden>
@@ -683,7 +685,7 @@
 
               <div class="col" hidden>
                 <div class="form-group">
-                  <input type="text" class="form-control" id="tipoDocumento" name="tipoDocumento" data-rule="required" readonly style="display: none;"  />
+                  <input type="text" class="form-control" id="tipoDocumento" name="tipoDocumento" value="6" data-rule="required" readonly style="display: none;"  />
                   <input type="text" class="form-control" id="habilitacion" name="habilitacion" data-rule="required" readonly
                     value="{{curriculum.id__id_habilitacion}}" style="display: none;" />
                 </div>
@@ -743,12 +745,12 @@
 
 
             <div class="modal-footer">
-              <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" onclick="crearAviso('agregarAñadirDocumentoCerrar', 'No se ha podido agregar ningun documento asociado {{ curriculum.id__nombre }}', 'alert-warning', 3000)">
+              <button id="cerrarAgregarDocumento" type="button" class="btn btn-secondary" data-dismiss="modal" >
                 Cerrar
               </button>
               <button id="reset" type="reset" class="btn btn-secondary" hidden>
               </button>
-              <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('agregarDocumentoGuardar', 'Nuevo documento asociado a {{ curriculum.id__nombre }}', 'alert-success', 3000)">
+              <button type="submit" value="submit" class="btn btn-primary">
                 Guardar
               </button>
             </div>
@@ -855,7 +857,30 @@ function cerrarModal(){
     return i;
   }
 
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioAgregarDocumentos").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Documento agregado con éxito', 'alert-success', 2000);
+        $('#formularioAgregarDocumentos').trigger('reset');
+        $('#cerrarAgregarDocumento').trigger('click');
+        location.reload(true);
 
+      }
+    });
+  });
 
   // cambiamos la funcionalidad del boton submit del formulario
   $("#formularioEditarContacto").submit(function (e) {
@@ -1115,16 +1140,6 @@ function cerrarModal(){
   function mostrarTitulo(value) {
 
     if (value == "1") {
-      var fechaInicioSeleccionada = document.getElementById("fechaInicioContrato");
-      var fechaInicio = fechaInicioSeleccionada.value;
-      console.log(fechaInicio)
-
-      var prueba =  $("#fechaFinContrato").datepicker('getDate');
-      console.log("value: ", prueba)
-      var fechaFinSeleccionada = document.getElementById("fechaFinContrato");
-      var fechaFin = fechaFinSeleccionada.value;
-
-      $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + fechaInicio + " a " + fechaFin + " de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
       $("#tituloObjetoNombre").html("Añadir Contrato de Trabajo");
       $("#TituloModalDocumento").html("Añadir Contrato de Trabajo");
       $("#tipoDocumento").val('6');
