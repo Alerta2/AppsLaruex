@@ -113,7 +113,7 @@
           </ul>
         </div>
       </div>
-      {% if tarjeta %}
+      {% if empleado.id_tarjeta_acceso %}
       <div class="card mt-4">
         <div class="card-header pb-0 p-3">
           
@@ -139,13 +139,13 @@
         <div class="card-body pt-0 p-3">
           <p class="text-md">
             
-            {% if tarjeta.activo == 1 %}
+            {% if empleado.id_tarjeta_acceso.activo == 1 %}
             <i class="text-success text-gradient text-md font-weight-bold fa-solid fa-address-card"></i>
-            <strong class="text-success">{{tarjeta.id_tarjeta|slice:"0:4"}} {{tarjeta.id_tarjeta|slice:"4:8"}}</strong>
+            <strong class="text-success">{{empleado.id_tarjeta_acceso.id_tarjeta|slice:"0:4"}} {{empleado.id_tarjeta_acceso.id_tarjeta|slice:"4:8"}}</strong>
 
             {% else %}
             <i class="text-danger text-gradient text-sm font-weight-bold fa-solid fa-address-card"></i>
-            <strong class="text-danger">{{tarjeta.id_tarjeta|slice:"0:4"}} {{tarjeta.id_tarjeta|slice:"4:8"}}</strong>
+            <strong class="text-danger">{{empleado.id_tarjeta_acceso.id_tarjeta|slice:"0:4"}} {{empleado.id_tarjeta_acceso.id_tarjeta|slice:"4:8"}}</strong>
 
             {% endif %}
             
@@ -292,7 +292,7 @@
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="form-group">
-            <input type="text" class="form-control" id="idUsuario" name="idUsuario" data-rule="required" readonly
+            <input type="text" class="form-control" id="userApp" name="userApp" data-rule="required" readonly
               value="{{usuario.id}}" style="display: none;" />
           </div>
           <div class="row">
@@ -300,11 +300,11 @@
               <label class="text-sm">Nombre en máquinas de registro</label>
 
               {% if empleado %} 
-                <input class="form-control" type="text" name="idEmpleado" value="{{empleado.id_empleado.id}}" hidden>
+                <input class="form-control" type="text" name="empleado_maquina" value="{{empleado.id_empleado.id}}" hidden>
                 <input class="form-control" type="text" value="{{empleado.id_empleado.nombre}}" readonly>
                     
               {% else %}
-              <select class="form-select" data-rule="required" id="idEmpleado" name="idEmpleado" {% if empleado %} disabled {% endif %}>
+              <select class="form-select" data-rule="required" id="empleado_maquina" name="empleado_maquina" {% if empleado %} disabled {% endif %}>
                 {% for e in empleados %}
                 <option value="{{e.id}}" >
                   {{e.nombre}} 
@@ -316,12 +316,13 @@
             </div>
             <div class="col-xl-4">
               <label class="text-sm">Identificador en la aplicación</label>
-              {% if userDjango %} 
-                  <input type="text" name="idUserApp" value="{{userDjango.id}}" hidden>
-                  <input type="text" value="{{userDjango.first_name}} {{userDjango.last_name}}" readonly>
+              {% if empleado.id_auth_user %} 
+                  <input type="text" name="usuariosDjango" value="{{empleado.id_auth_user.id}}" hidden>
+                  <input type="text" value="{{empleado.id_auth_user.first_name}} {{empleado.id_auth_user.last_name}}" readonly>
                     
               {% else %}
-              <select class="form-select" data-rule="required" id="idUserApp" name="idUserApp" {% if userDjango %} disabled {% endif %}>
+              <select class="form-select" data-rule="required" id="usuariosDjango" name="usuariosDjango" {% if empleado.id_auth_user %} disabled {% endif %}>
+                <option value="0">Sin usuario en apps Django</option>
                 {% for u in usuariosApp %}
                 <option value="{{u.id}}" >
                   {{u.first_name}} {{u.last_name}}
@@ -334,11 +335,11 @@
             <div class="col-xl-4">
 
 
-              {% if tarjeta %} 
-                  <input type="text" name="idTarjeta" value="{{tarjeta.id}}" hidden>
+                {% if empleado.id_tarjeta_acceso %} 
+                  <input type="text" name="tarjeta_empleado" value="{{ empleado.id_tarjeta_acceso.id}}" hidden>
                 {% else %}
                 <label class="text-sm">Tarjeta identificativa</label>
-                <select class="form-select" id="idTarjeta" name="idTarjeta"  onchange="mostrarDatosTarjeta()" {% if tarjeta %} disable  {% endif %}>
+                <select class="form-select" id="tarjeta_empleado" name="tarjeta_empleado"  onchange="mostrarDatosTarjeta()" {% if tarjeta %} disable  {% endif %}>
                     <option value="0" selected>
                       Sin tarjeta
                     </option>
@@ -347,8 +348,9 @@
                         {{ t.nombre }} {{ t.apellidos }} - {{ t.id_tarjeta }}
                       </option>
                     {% endfor %}
-                  {% endif %}
                 </select>
+                {% endif %}
+
             </div>
           </div>
 
