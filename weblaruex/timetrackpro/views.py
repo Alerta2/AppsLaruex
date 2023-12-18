@@ -1127,7 +1127,7 @@ def verEmpleado(request, id):
 
     usuariosApp = AuthUserTimeTrackPro.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
 
-    tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").values()
+    tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").filter(activo=1).values()
 
 
     if RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=usuario).exists():
@@ -1174,7 +1174,7 @@ def asociarUsuario(request):
     # datos de los empleados registrados en django
     usuariosDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
 
-    tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").values()
+    tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").filter(activo=1).values()
 
     infoVista = {
         "navBar":navBar,
@@ -1245,7 +1245,7 @@ def editarAsociarUsuario(request, id):
     # datos de los empleados registrados en django
     usuariosDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
 
-    tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").values()
+    tarjetasAcceso = TarjetasAcceso.objects.using("timetrackpro").filter(activo=1).values()
 
     infoVista = {
         "relacionActual":relacionActual,
