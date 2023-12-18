@@ -1174,7 +1174,7 @@ def verProveedor(request, id):
     return render(
             request,
             "docLaruex/proveedor.html",
-            {"itemsMenu": itemsMenu, "proveedor": proveedor, "administrador": esAdministrador(request.user.id)})
+            {"itemsMenu": itemsMenu, "proveedor": proveedor, "administrador": esAdministrador(request.user.id), "secretaria": esSecretaria(request.user.id)})
 
 
 
@@ -2334,7 +2334,7 @@ def verFabricante(request, id):
     return render(
             request,
             "docLaruex/fabricante.html",
-            {"itemsMenu": itemsMenu, "fabricante": fabricante, "administrador": esAdministrador(request.user.id)})# Devuelve No editable un archivo dado un ID
+            {"itemsMenu": itemsMenu, "fabricante": fabricante, "administrador": esAdministrador(request.user.id), "secretaria":esSecretaria(request.user.id)})# Devuelve No editable un archivo dado un ID
 
 '''------------------------------------------
                                 Módulo: editarFabricante
