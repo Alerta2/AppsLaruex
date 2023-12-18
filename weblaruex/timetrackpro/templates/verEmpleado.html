@@ -40,7 +40,7 @@
                     {% if empleado.id_auth_user.is_active %}
                     <i class="text-success text-gradient text-md font-weight-bold fa-solid fa-circle-check"></i>
                     {% else %}
-                    <i class="text-danger text-gradient text-md font-weight-bold fa-solid fa-circle-xmark"></i>
+                    <i class="icon-danger font-weight-bold fa-solid fa-exclamation fa-xl" title="no tiene asociado usuario, tarjeta o usuario de la app"></i>
                     {% endif %}
 
                   {% else %}
@@ -297,11 +297,11 @@
           </div>
           <div class="row">
             <div class="col-xl-4">
-              <label class="text-sm">Nombre en maquinas de registro</label>
+              <label class="text-sm">Nombre en máquinas de registro</label>
 
               {% if empleado %} 
-                <input type="text" name="idEmpleado" value="{{empleado.id_empleado.id}}" hidden>
-                <input type="text" value="{{empleado.id_empleado.nombre}}" readonly>
+                <input class="form-control" type="text" name="idEmpleado" value="{{empleado.id_empleado.id}}" hidden>
+                <input class="form-control" type="text" value="{{empleado.id_empleado.nombre}}" readonly>
                     
               {% else %}
               <select class="form-select" data-rule="required" id="idEmpleado" name="idEmpleado" {% if empleado %} disabled {% endif %}>

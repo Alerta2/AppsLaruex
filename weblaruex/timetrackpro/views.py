@@ -1132,7 +1132,7 @@ def verEmpleado(request, id):
 
     if RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=usuario).exists():
         empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=usuario)[0]
-        if AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=empleado.id_auth_user.id).exists():
+        if (empleado.id_auth_user != None) and AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=empleado.id_auth_user.id).exists():
             userDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=empleado.id_auth_user.id)[0]
 
     tarjeta = None
@@ -1196,10 +1196,12 @@ def asociarUsuario(request):
 
         # obtenemos el identificador del usuario de django
         idUserDjango = request.POST.get("usuariosDjango")
-        userDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=idUserDjango)[0]
+        userDjango = None
+        if idUserDjango != "0":
+            userDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=idUserDjango)[0]
 
         # obtenemos el identificador de la tarjeta de acceso
-        idTarjeta = request.POST.get("idTarjeta")
+        idTarjeta = request.POST.get("tarjeta_empleado")        
         tarjeta = None
         if idTarjeta != "0":
             tarjeta = TarjetasAcceso.objects.using("timetrackpro").filter(id=idTarjeta)[0]
