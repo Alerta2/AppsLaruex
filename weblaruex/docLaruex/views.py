@@ -801,7 +801,10 @@ def agregarAnexo(request, id_curriculum):
 
     #actualizamos la base de datos de formaciones asociadas a curriculums   
     print("--- cargo formaciones ---")  
-    formaciones = FormacionCurriculum(id_curriculum=curriculum, titulo=request.POST.get("tituloFormacion"), descripcion=request.POST.get("descripcionFormacion"), horas=request.POST.get("horasFormacion"),  fecha_inicio=request.POST.get("fechaInicioFormacion"), fecha_fin=request.POST.get("fechaFinFormacion"))
+    horas = None
+    if request.POST.get("horasFormacion") != "":
+        horas = request.POST.get("horasFormacion")
+    formaciones = FormacionCurriculum(id_curriculum=curriculum, titulo=request.POST.get("tituloFormacion"), descripcion=request.POST.get("descripcionFormacion"), horas=horas,  fecha_inicio=request.POST.get("fechaInicioFormacion"), fecha_fin=request.POST.get("fechaFinFormacion"))
     formaciones.save(using='docLaruex')  
     print("--- guardo formaciones ---")  
 
@@ -866,7 +869,10 @@ def agregarFormacionCurriculum(request, id_curriculum):
 
     #actualizamos la base de datos de formaciones asociadas a curriculums   
     print("--- cargo formaciones ---")  
-    formaciones = FormacionCurriculum(id_curriculum=curriculum, titulo=request.POST.get("tituloFormacion"), descripcion=request.POST.get("descripcionFormacion"), horas=request.POST.get("horasFormacion"),  fecha_inicio=request.POST.get("fechaInicioFormacion"), fecha_fin=request.POST.get("fechaFinFormacion"))
+    horas = None
+    if request.POST.get("horasFormacion") != "":
+        horas = request.POST.get("horasFormacion")
+    formaciones = FormacionCurriculum(id_curriculum=curriculum, titulo=request.POST.get("tituloFormacion"), descripcion=request.POST.get("descripcionFormacion"), horas=horas,  fecha_inicio=request.POST.get("fechaInicioFormacion"), fecha_fin=request.POST.get("fechaFinFormacion"))
     formaciones.save(using='docLaruex')  
     print("--- guardo formaciones ---")  
 
@@ -1174,7 +1180,7 @@ def verProveedor(request, id):
     return render(
             request,
             "docLaruex/proveedor.html",
-            {"itemsMenu": itemsMenu, "proveedor": proveedor, "administrador": esAdministrador(request.user.id)})
+            {"itemsMenu": itemsMenu, "proveedor": proveedor, "administrador": esAdministrador(request.user.id), "secretaria": esSecretaria(request.user.id)})
 
 
 
@@ -2334,7 +2340,7 @@ def verFabricante(request, id):
     return render(
             request,
             "docLaruex/fabricante.html",
-            {"itemsMenu": itemsMenu, "fabricante": fabricante, "administrador": esAdministrador(request.user.id)})# Devuelve No editable un archivo dado un ID
+            {"itemsMenu": itemsMenu, "fabricante": fabricante, "administrador": esAdministrador(request.user.id), "secretaria":esSecretaria(request.user.id)})# Devuelve No editable un archivo dado un ID
 
 '''------------------------------------------
                                 Módulo: editarFabricante

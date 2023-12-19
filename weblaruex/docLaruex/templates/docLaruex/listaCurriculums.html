@@ -1,41 +1,14 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
 
-{% block content %}
-<style>
-    ul.pagination li .page-link {
-      background-color: rgb(255, 255, 255) !important;
-      color: rgb(41, 68, 87);
-    }
-  
-    ul.pagination li.active .page-link {
-      background-color: rgb(41, 68, 87) !important;
-      border-color: rgb(41, 68, 87) !important;
-    }
-  
-    ul.pagination li .page-link:hover {
-      filter: brightness(85%);
-  
-    }
-  
-    ul.pagination li.active .page-link:hover {
-      filter: brightness(120%);
-  
-    }
-  
-    .btn-light {
-      color: rgb(41, 68, 87);
-    }
-  
-    th {
-      color: rgb(41, 68, 87);
-    }
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
 
-    /* estilo añadirFichero PDF*/
-    .addFicheroPDF {
-      color: rgb(161, 16, 32);
-    }
-  </style>
+{% endblock %}
+
+{% block content %}
+
 
 <!-- breadcrumb   -->
 <div class="card-body">
@@ -89,9 +62,10 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
                     <label for="habilitacion">Habilitación</label>
                     <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
                         {% for habilitacion in habilitaciones %}
-                        <option value="{{habilitacion.id}}">
+                        <option value="{{habilitacion.id}}"{% if habilitacion.id == 6 %} selected {% endif %}>
                             {{habilitacion.titulo}}
                         </option>
+                        
                         {% endfor %}
                     </select>
                 </div>
@@ -201,7 +175,6 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
 
     // cambiamos la funcionalidad del boton submit del formulario
     
-    $("#habilitacion").val(69)
     $("#estado").val(1)
     $("#formularioModal").submit(function (e) {
 
