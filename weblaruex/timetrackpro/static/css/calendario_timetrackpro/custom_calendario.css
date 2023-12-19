@@ -15,7 +15,9 @@
     background: #1A252F;
     color: #fff;
 }
-
+.fc-license-message {
+    display: none;
+}
 /* En la vista de 1 año del calendario diferenciar salto de meses con colores*/
 .mespar {
     background-color: rgba(255, 255, 255, 0);

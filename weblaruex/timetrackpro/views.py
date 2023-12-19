@@ -1513,13 +1513,23 @@ def datosFestivosCalendario(request, year=None):
 
 
 def datosFestivosVacacionesEmpleado(request):
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+
     year = datetime.now().year
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+    estadoAceptado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=11)[0]
+    print('\033[91m'+'estadoAceptado: ' + '\033[92m', estadoAceptado)
     usuario = Empleados.objects.using("timetrackpro").filter(id=empleado.id_usuario.id)[0]
+    print('\033[91m'+'usuario: ' + '\033[92m', usuario)
     # obtengo los festivos registrados en la base de datos
     festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=year).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
+    
+    if administrador or director:
+        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado','empleado__nombre','empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
+    else:
+        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(estado=estadoAceptado, empleado=usuario, year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado','empleado__nombre','empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
 
-    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario, year=year, estado=11).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
     # creo una lista vacía para guardar los datos de los festivos
     salidaFestivos = []
 
@@ -1537,9 +1547,9 @@ def datosFestivosVacacionesEmpleado(request):
     for vacacion in vacaciones:
         salidaVacaciones.append({
             'id':vacacion['id'],
-            'title':vacacion['tipo_vacaciones__nombre'],
+            'title':vacacion['empleado__nombre'] + " " +vacacion['empleado__apellidos'],
             'start':vacacion['fecha_inicio'],
-            'end':vacacion['fecha_fin'],
+            'end':vacacion['fecha_fin'] + timedelta(days=1),
             'color':vacacion['tipo_vacaciones__color_calendario']
         })
 
@@ -1549,7 +1559,6 @@ def datosFestivosVacacionesEmpleado(request):
 
 
 def vacacionesSolicitadas(request):
-
     admin = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
 
@@ -2379,7 +2388,6 @@ def solicitarVacaciones(request):
     cambios = []
     vacaciones = []
     if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario.id_usuario, year=int(datetime.now().year)).exists():
-
         vacacionesEncontradas = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario.id_usuario, year=int(datetime.now().year)).values('id','tipo_vacaciones__nombre', 'year', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado__nombre', 'estado__id','fecha_solicitud', 'tipo_vacaciones__color')
         for v in vacacionesEncontradas:
             print(v)
@@ -2414,6 +2422,9 @@ def solicitarVacaciones(request):
     }
 
     if request.method == 'POST':
+        print("------------------------------------")
+        print(request.POST)
+        print("------------------------------------")
         # obtenemos los datos del empleado
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         idEmpleado = user.id_empleado.id
@@ -2425,10 +2436,15 @@ def solicitarVacaciones(request):
         fechaFin = request.POST.get("fecha_fin")
         diasConsumidos = request.POST.get("dias_consumidos")
         fechaSolicitud = datetime.now()
-        year = request.POST.get("year")
-        nuevoRegistroVacaciones = VacacionesTimetrackpro(empleado=empleado, tipo_vacaciones=tipoVacaciones, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, fecha_solicitud=fechaSolicitud, year=year, estado=estado)
-        nuevoRegistroVacaciones.save(using='timetrackpro')
-        return redirect('timetrackpro:solicitar-vacaciones')   
+    
+        year = fechaInicio.split("-")[0]
+        # compruebo si ya existe un registro de vacaciones para ese periodo 
+        if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio=fechaInicio).exists():
+            return redirect('timetrackpro:ups', mensaje="Parece que ya existe una solicitud de vacaciones para esas fechas.")
+        else:
+            nuevoRegistroVacaciones = VacacionesTimetrackpro(empleado=empleado, tipo_vacaciones=tipoVacaciones, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, fecha_solicitud=fechaSolicitud, year=year, estado=estado)
+            nuevoRegistroVacaciones.save(using='timetrackpro')
+            return redirect('timetrackpro:solicitar-vacaciones')   
     
     return render(request,"solicitarVacaciones.html", infoVista)
 

@@ -15,6 +15,7 @@ urlpatterns = [
     path('private/timetrackpro/404', noEncontrado ,name='404'),
     path('private/timetrackpro/sin-permiso', sinPermiso ,name='sin-permiso'),
     path('private/timetrackpro/ups', ups ,name='ups'),
+    path('private/timetrackpro/ups/<str:mensaje>/', ups ,name='ups'),
 
     # permisos de la aplicación
     path('private/timetrackpro/habilitaciones', habilitaciones ,name='habilitaciones'),
@@ -39,7 +40,6 @@ urlpatterns = [
     path('private/timetrackpro/info-configuracion-tarjetas', infoConfigTarjetasAcceso ,name='info-configuracion-tarjetas'),
     path('private/timetrackpro/datos-tarjetas-de-acceso-activas', datosTarjetasAccesoActivas ,name='datos-tarjetas-de-acceso-activas'),
     path('private/timetrackpro/datos-tarjetas-de-acceso-inactivas', datosTarjetasAccesoInactivas ,name='datos-tarjetas-de-acceso-inactivas'),
-
 
     # registros insertados en la base de datos  
     path('private/timetrackpro/agregar-registro', agregarRegistro , name='agregar-registro'),

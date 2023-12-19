@@ -391,44 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
         center: 'title',
         right:'today',
       },
-      // Esta función se ejecutará cuando se haga clic en un día en el calendario         
-      dateClick: function(info) {
-        // se obtiene la fecha seleccionada
-        const meses = {
-            "01": "Enero",
-            "02": "Febrero",
-            "03": "Marzo",
-            "04": "Abril",
-            "05": "Mayo",
-            "06": "Junio",
-            "07": "Julio",
-            "08": "Agosto",
-            "09": "Septiembre",
-            "10": "Octubre",
-            "11": "Noviembre",
-            "12": "Diciembre",
-          };
-        // se obtiene la fecha seleccionada
-        var dia = info.dateStr.substring(8, 10);
-        dia = dia.replace(/^0+/, '');
-        var mes = meses[info.dateStr.substring(5, 7)];
-        var year = info.dateStr.substring(0, 4);
-        
-        // se muestra el modal para agregar el festivo
-        var label = document.getElementById("tituloModalAgregarDesdeCalendario");
-        label.innerHTML = "Agregar festivo el día " + dia + " de " + mes + " del " + year;
-
-        // se obtiene el año actual
-        var yearActual = document.getElementById("year_actual");
-        yearActual.value = year;
-
-        var fechaInicio = document.getElementById("fecha_inicio_seleccionada");
-        fechaInicio.value = info.dateStr;
-        // modifico el index del calendario
-       // se muestra el modal
-        $('#modalAgregarFestivoDesdeCalendario').modal('show');
-      
-        },
+       
     });
     calendar.render(); // renderizo el calendario
     calendar.updateSize(); // actualizo el tamaño del calendario
