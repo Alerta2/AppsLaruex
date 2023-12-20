@@ -505,27 +505,24 @@ def convertirFormatoDateTime(datoFecha):
     return fechaHora.strftime('%Y-%m-%d %H:%M:%S')
 
 
-
 def verRegistro(request, id):
     registro = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=id)[0]
-    
     maquina = MaquinaControlAsistencia.objects.using("timetrackpro").filter(nombre__icontains=registro.seccion)[0]
     # leemos el fichero que acabamos de insertar, linea a linea y comprobamos si ya existe en la base de datos
     ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_NUEVO + registro.ruta
     ruta_leido = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + registro.ruta
 
     if request.method == 'POST':
+        print("-- Entro en el post --")
         if not os.path.isfile(ruta):
             return "El archivo no existe"
         with open(ruta, "r") as archivo:
             archivo.readline()
             for linea in archivo:
                 linea = linea.strip()
-
                 # Comprobar si la línea está vacía
                 if not linea:
                     continue
-
                 # Dividir la línea en campos (supongamos que los campos están separados por comas)
                 campos = linea.split('\t')
                 # Obtener los valores de los campos (reemplaza con los nombres correctos)
@@ -533,14 +530,96 @@ def verRegistro(request, id):
                 empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=id_empleado)[0]
                 nombre = campos[1]
                 hora = convertirFormatoDateTime(campos[3])
-                
-                if Registros.objects.using("timetrackpro").filter(id_empleado=empleado, hora=hora).exists():
-                    continue
+                # Comprobar si en la base de datos existen registros con el mismo id_archivo_leido
+                if Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).exists():
+                    registrosYaInsertados = Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).values()
+                    for r in registrosYaInsertados:
+                        if r["id_empleado"] == empleado.id and r["hora"] == hora:
+                            continue
+                        else:
+                            # Si no existe, crea un nuevo registro en la base de datos
+                            nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
+                            nuevoRegistro.save()
                 else:
                     # Si no existe, crea un nuevo registro en la base de datos
                     nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
                     nuevoRegistro.save()
+        # Mover el archivo a la nueva ruta después de procesarlo
+        shutil.move(ruta, ruta_leido)
+    registrosInsertados = Registros.objects.using("timetrackpro").filter(id_archivo_leido=registro.id).values()
 
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "registro":registro,
+        "registrosInsertados":list(registrosInsertados)
+    }
+    return render(request,"verRegistro.html",infoVista)
+
+
+
+def actulizarRegistro(request, id):
+    registro = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=id)[0]
+    maquina = MaquinaControlAsistencia.objects.using("timetrackpro").filter(nombre__icontains=registro.seccion)[0]
+
+    # cambiamos el nombre al registro antiguo en la ruta de insertados
+    ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + registro.ruta
+    # comprobamos si hay un registro que acabe con _old.txt
+    if os.path.isfile(ruta):
+        nombreNuevo = registro.ruta.replace(".txt", "_old.txt")
+        # si ya existe un registro con ese nombre, lo borramos
+        if os.path.isfile(settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + nombreNuevo):
+            os.remove(settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + nombreNuevo)
+        shutil.move(ruta, settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + nombreNuevo)
+        registro.ruta = nombreNuevo
+        registro.save(using='timetrackpro')
+
+    #insertamos el nuevo registro
+        
+    
+
+
+    
+
+
+
+    # leemos el fichero que acabamos de insertar, linea a linea y comprobamos si ya existe en la base de datos
+    ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_NUEVO + registro.ruta
+    ruta_leido = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + registro.ruta
+
+    if request.method == 'POST':
+        print("-- Entro en el post --")
+        if not os.path.isfile(ruta):
+            return "El archivo no existe"
+        with open(ruta, "r") as archivo:
+            archivo.readline()
+            for linea in archivo:
+                linea = linea.strip()
+                # Comprobar si la línea está vacía
+                if not linea:
+                    continue
+                # Dividir la línea en campos (supongamos que los campos están separados por comas)
+                campos = linea.split('\t')
+                # Obtener los valores de los campos (reemplaza con los nombres correctos)
+                id_empleado = campos[0].lstrip('0')
+                empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=id_empleado)[0]
+                nombre = campos[1]
+                hora = convertirFormatoDateTime(campos[3])
+                # Comprobar si en la base de datos existen registros con el mismo id_archivo_leido
+                if Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).exists():
+                    registrosYaInsertados = Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).values()
+                    for r in registrosYaInsertados:
+                        if r["id_empleado"] == empleado.id and r["hora"] == hora:
+                            continue
+                        else:
+                            # Si no existe, crea un nuevo registro en la base de datos
+                            nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
+                            nuevoRegistro.save()
+                else:
+                    # Si no existe, crea un nuevo registro en la base de datos
+                    nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
+                    nuevoRegistro.save()
         # Mover el archivo a la nueva ruta después de procesarlo
         shutil.move(ruta, ruta_leido)
     registrosInsertados = Registros.objects.using("timetrackpro").filter(id_archivo_leido=registro.id).values()
@@ -797,14 +876,16 @@ def insertarRegistroManual(request):
 
 
 def agregarRegistro(request):
-    
-    if request.method == 'POST':
-        
+    if request.method == 'POST':        
         seccion = request.POST.get("seccion")
         mes = request.POST.get("mes")
         year = request.POST.get("year")
         fecha = datetime.now()
         fecha = fecha.strftime("%Y-%m-%d %H:%M:%S")
+        # compruebo si hay un registro para esa seccion, mes y año
+        if RegistrosJornadaInsertados.objects.using("timetrackpro").filter(seccion=seccion, mes=mes, year=year).exists():
+            return redirect('timetrackpro:ups', mensaje="Ya existe un registro para esa sección, mes y año.")
+        
         nuevoRegistro = RegistrosJornadaInsertados(seccion=seccion, mes=mes, year=year, fecha_lectura=fecha, insertador=AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=int(request.POST.get("registrador")))[0], remoto=0)
         nuevoRegistro.save(using='timetrackpro')
 
@@ -815,14 +896,9 @@ def agregarRegistro(request):
             nuevoRegistro.ruta = nombreArchivo
             nuevoRegistro.save(using='timetrackpro')
         
-        return redirect('timetrackpro:ver-registro', id=nuevoRegistro.id)
+        return verRegistro(request, nuevoRegistro.id)
     else:
-        # obtengo los datos necesarios para la vista
-        infoVista = {
-            "navBar":navBar,
-            "administrador":True,
-        }
-        return render(request,"registros-insertados.html", infoVista)
+        return redirect('timetrackpro:registros-insertados')
 
 
 
@@ -1931,13 +2007,13 @@ def solicitarModificarAsuntosPropios(request):
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         idEmpleado = user.id_empleado.id
         solicitante = Empleados.objects.using("timetrackpro").filter(id=idEmpleado)[0]
-        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=1)[0]
         # obtenemos los datos del formulario
-        idVacaciones = request.POST.get("vacaciones_modificar")
-        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=idVacaciones)[0]
-        estadoPendiente = EstadosSolicitudes.objects.using("timetrackpro").filter(id=12)[0]
-        vacaciones.estado = estadoPendiente
-        vacaciones.save(using='timetrackpro')
+        idAsuntosPropios = request.POST.get("asunto_modificar")
+        asuntoPropio = AsuntosPropios.objects.using("timetrackpro").filter(id=idAsuntosPropios)[0]
+        estadoPendiente = EstadosSolicitudes.objects.using("timetrackpro").filter(id=17)[0]
+        asuntoPropio.estado = estadoPendiente
+        asuntoPropio.save(using='timetrackpro')
         fechaInicioActual = request.POST.get("fechaActualInicio")
         fechaFinActual = request.POST.get("fechaActualFin")
         diasConsumidosActual = request.POST.get("dias_actuales_consumidos")
@@ -1946,8 +2022,8 @@ def solicitarModificarAsuntosPropios(request):
         fechaNuevaFin = request.POST.get("fechaFinNueva")
         diasConsumidosNuevos = request.POST.get("dias_nuevos_consumidos")
         motivoCambio = request.POST.get("motivo_cambio")
-        solicitudModificacionVacaciones = CambiosVacacionesTimetrackpro(id_periodo_cambio=vacaciones, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
-        solicitudModificacionVacaciones.save(using='timetrackpro')
+        solicitudModificacionAsuntosPropios = CambiosAsuntosPropios(id_periodo_cambio=asuntoPropio, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
+        solicitudModificacionAsuntosPropios.save(using='timetrackpro')
     return redirect('timetrackpro:solicitar-vacaciones')
 
 
@@ -2393,20 +2469,17 @@ def solicitarVacaciones(request):
             print(v)
             vacaciones.append(v)
 
-
     if CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(solicitante=usuario.id_usuario,estado__in=EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1, id__in=(9, 10))).exists():
 
         cambiosEncontrados = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(solicitante=usuario.id_usuario,estado__in=EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1, id__in=(9, 10))).values('id', 'solicitante', 'id_periodo_cambio__tipo_vacaciones__nombre', 'id_periodo_cambio__year', 'id_periodo_cambio__fecha_inicio', 'id_periodo_cambio__fecha_fin', 'id_periodo_cambio__dias_consumidos', 'id_periodo_cambio__estado__nombre', 'id_periodo_cambio__estado__id', 'id_periodo_cambio__fecha_solicitud', 'id_periodo_cambio__tipo_vacaciones__color', 'fecha_inicio_actual', 'fecha_fin_actual', 'dias_actuales_consumidos', 'fecha_inicio_nueva', 'fecha_fin_nueva', 'dias_nuevos_consumidos', 'motivo_solicitud', 'estado__nombre', 'estado__id', 'motivo_rechazo', 'fecha_solicitud', 'id_periodo_cambio__id')
         for c in cambiosEncontrados:
             cambios.append(c)
 
-
     festivos = []
     if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__month=mes).exists():
         festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__month=mes).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     
     initialDate = year + "-" + mes + "-" + diaInicial
-    
     
     infoVista = {
         "navBar":navBar,
@@ -2422,9 +2495,6 @@ def solicitarVacaciones(request):
     }
 
     if request.method == 'POST':
-        print("------------------------------------")
-        print(request.POST)
-        print("------------------------------------")
         # obtenemos los datos del empleado
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         idEmpleado = user.id_empleado.id

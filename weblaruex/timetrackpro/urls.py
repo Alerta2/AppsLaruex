@@ -159,4 +159,6 @@ urlpatterns = [
     path('private/timetrackpro/cambiar-estado-asuntos-propios/<slug:id>/', cambiarEstadoAsuntosPropios , name='cambiar-estado-asuntos-propios'),
     path('private/timetrackpro/eliminar-asuntos-propios/', eliminarAsuntosPropios , name='eliminar-asuntos-propios'),
     path('private/timetrackpro/eliminar-asuntos-propios/<slug:id>/', eliminarAsuntosPropios , name='eliminar-asuntos-propios'),
+    path('private/timetrackpro/solicitar-modificar-asuntos-propios/', solicitarModificarAsuntosPropios , name='solicitar-modificar-asuntos-propios'),
+
 ]
