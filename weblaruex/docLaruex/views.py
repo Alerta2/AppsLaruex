@@ -6960,7 +6960,7 @@ ModelChoiceField: Campo para selección de un objeto de modelo.
 ModelMultipleChoiceField: Campo para selección múltiple de objetos de modelo.
 '''
 
-def crearFieldTipo(tipo):
+def crearFieldTipo(tipo, opciones=None):
     if tipo == "datetime":
         return forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M:%S'], widget=forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}))
     elif tipo == "date":
@@ -6977,7 +6977,9 @@ def crearFieldTipo(tipo):
     elif tipo == "float":
         return forms.FloatField(widget=forms.NumberInput(attrs={'type': 'number', 'step':'0.01', 'placeholder':'15.23', 'class':'form-control'}))
     elif tipo == "select":
-        return forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control'}))
+        #return forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control'}))
+        return forms.ChoiceField(choices=[(opcion, opcion) for opcion in opciones], widget=forms.Select(attrs={'class':'form-control'}))
+
     elif tipo == "file":
         return forms.FileField(widget=forms.FileInput(attrs={'class':'form-control-file'}))
     else:
@@ -6987,8 +6989,22 @@ def crearFieldTipo(tipo):
 
 def form_from_json(json_data):
     form = forms.Form()
-    for field in json_data:
-        form.fields[field] = crearFieldTipo(json_data[field])
+    saltar = False
+    for field, tipo in json_data.copy().items():
+        if saltar:
+            saltar = False
+        else:
+            print("field:", field)
+            print("--- tipo:", tipo)
+            if tipo == "select":
+                print("es un select")
+                opciones = json_data.get(f"{field}_opciones", [])  # Puedes agregar opciones específicas para cada campo "select"
+                print("opciones:", opciones)
+                form.fields[field] = crearFieldTipo(tipo, opciones)
+                saltar = True
+            else:
+                form.fields[field] = crearFieldTipo(tipo)
+
     return form
 
 
@@ -7020,16 +7036,13 @@ def DatosEquiposUbicaciones(request):
 
 - Descripción: 
 
-
 - Precondiciones:
 El usuario debe estar autenticado.
 
 - Postcondiciones:
-
 -------------------------------------------'''
 @login_required
 def DatosEquiposUbicacionesFiltro(request, tipo):
-    
     tipoFiltrado = tipo.split(',')
     equipos = Equipo.objects.using('docLaruex').filter(id__id_habilitacion__in=comprobarHabilitaciones(request.user.id), id__tipo__in=tipoFiltrado).order_by('-id').values('id', 'id__padre','id__nombre', 'id__ruta', 'id__fecha_subida','id__tipo','tipo_equipo__nombre', 'cod_laruex', 'id__creador', 'id__id_estado', 'cod_uex', 'id__icono', 'fabricante', 'fabricante__nombre', 'num_serie', 'descripcion','fecha_alta','fecha_baja', 'precio','modelo', 'id__padre__nombre')  
     print('\033[91m'+'equipos: ' + '\033[92m', equipos)
