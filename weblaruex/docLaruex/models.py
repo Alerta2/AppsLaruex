@@ -99,7 +99,7 @@ class Objeto(models.Model):
     icono = models.CharField(db_column='Icono', max_length=255)  # Field name made lowercase.
     id_estado = models.ForeignKey(Estado, models.DO_NOTHING, db_column='ID_estado', blank=True, null=True)  # Field name made lowercase.
     id_habilitacion = models.ForeignKey(Habilitaciones, models.DO_NOTHING, db_column='ID_habilitacion')  # Field name made lowercase.
-    propietario = models.ForeignKey(PropietariosDocumentos, models.DO_NOTHING, db_column='Propietario')  # Field name made lowercase.
+    propietario = models.ForeignKey(PropietariosDocumentos, models.DO_NOTHING, db_column='Propietario', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = True
