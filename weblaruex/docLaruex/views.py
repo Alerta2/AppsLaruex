@@ -2026,8 +2026,9 @@ def InfoVerObjeto(request, id):
     procedimientosExistentes = Procedimiento.objects.using(
         "docLaruex").values_list('id_doc__nombre', flat=True).distinct()
 
-
-
+    print("OBJETO", objeto)
+    print("OBJETO TIPO: ", objeto.padre)
+    print("OBJETO PROPIETARIO: ", objeto.propietario)
     if (objeto.propietario) and (objeto.propietario.id != request.user.id and not administrador and not direccion):
         return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})
     #habilitacionNecesaria = comprobarHabilitacionObjeto(id)
@@ -2449,7 +2450,7 @@ def editarObjeto(request, id):
     objeto = Objeto.objects.using('docLaruex').filter(id=id)[0]
     administrador = esAdministrador(request.user.id)
 
-    if esAdministrador(request.user.id) or objeto.tipo == "Equipo":
+    if esAdministrador(request.user.id) or objeto.tipo == "Equipo" or objeto.tipo == "Curriculum":
         estados = Estado.objects.using("docLaruex").values()
         habilitaciones = Habilitaciones.objects.using('docLaruex').values()
 
