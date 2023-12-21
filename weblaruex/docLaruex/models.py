@@ -29,6 +29,24 @@ class AuthUser(models.Model):
         managed = False
         db_table = 'auth_user'
 
+# Importación de la tabla AuthUser con todos sus campos
+class PropietariosDocumentos(models.Model):
+    id = models.AutoField(db_column='id', primary_key=True)  # Field name made lowercase.
+    password = models.CharField(max_length=128)
+    last_login = models.DateTimeField(blank=True, null=True)
+    is_superuser = models.IntegerField()
+    username = models.CharField(unique=True, max_length=150)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    email = models.CharField(max_length=254)
+    is_staff = models.IntegerField()
+    is_active = models.IntegerField()
+    date_joined = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'auth_user'
+
 # Importación de la tabla Habilitaciones con todos sus campos
 class Estado(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -81,6 +99,7 @@ class Objeto(models.Model):
     icono = models.CharField(db_column='Icono', max_length=255)  # Field name made lowercase.
     id_estado = models.ForeignKey(Estado, models.DO_NOTHING, db_column='ID_estado', blank=True, null=True)  # Field name made lowercase.
     id_habilitacion = models.ForeignKey(Habilitaciones, models.DO_NOTHING, db_column='ID_habilitacion')  # Field name made lowercase.
+    propietario = models.ForeignKey(PropietariosDocumentos, models.DO_NOTHING, db_column='Propietario', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = True
