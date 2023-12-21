@@ -372,8 +372,7 @@ Este módulo se encarga de cargar la información de la tabla que muestra todos 
     Se devuelve un JSON con la información de la tabla que muestra todos los objetos disponibles en el sistema que corresponden a las habilitaciones del usuario y que no son de tipo Equipo o Ubicación.
 -------------------------------------------'''
 def DatosObjetos(request):
-    objetos = Objeto.objects.using('docLaruex').filter(id_habilitacion__in=comprobarHabilitaciones(request.user.id)).exclude(tipo__in = ['Equipo', 'Ubicacion']).order_by('-fecha_subida').values('id', 'padre__id', 'padre__nombre',
-                                                                                 'nombre', 'fecha_subida', 'ruta', 'tipo', 'creador__first_name', 'creador__last_name', 'visible', 'icono', 'id_estado__nombre','id_estado__id',  'ruta_editable')
+    objetos = Objeto.objects.using('docLaruex').filter(id_habilitacion__in=comprobarHabilitaciones(request.user.id)).filter(propietario__isnull=True).exclude(tipo__in = ['Equipo', 'Ubicacion']).order_by('-fecha_subida').values('id', 'padre__id', 'padre__nombre', 'nombre', 'fecha_subida', 'ruta', 'tipo', 'creador__first_name', 'creador__last_name', 'visible', 'icono', 'id_estado__nombre','id_estado__id',  'ruta_editable')
     return JsonResponse(list(objetos), safe=False)
 
     
@@ -922,8 +921,7 @@ El sistema devolverá una respuesta en formato JSON con la información de los d
 -------------------------------------------'''
 @login_required
 def DatosDocumentos(request):
-    documentos = Documento.objects.using('docLaruex').filter(id_doc__id_habilitacion__in=comprobarHabilitaciones(request.user.id)).order_by('-id_doc').values('id_doc', 'id_doc__nombre', 'id_doc__fecha_subida', 'editable',
-                                                                                 'fecha_actualizacion', 'num_modificaciones', 'id_doc__tipo', 'id_doc__creador__first_name',  'id_doc__creador__last_name', 'id_doc__ruta')
+    documentos = Documento.objects.using('docLaruex').filter(id_doc__id_habilitacion__in=comprobarHabilitaciones(request.user.id), id_doc__propietario__isnull=True).order_by('-id_doc').values('id_doc', 'id_doc__nombre', 'id_doc__fecha_subida', 'editable', 'fecha_actualizacion', 'num_modificaciones', 'id_doc__tipo', 'id_doc__creador__first_name',  'id_doc__creador__last_name', 'id_doc__ruta')
     docsExistentes = []
     salida = []
     for d in documentos:
@@ -2012,6 +2010,7 @@ def InfoVerObjeto(request, id):
     secretaria = esSecretaria(request.user.id)
     direccion = esDirector(request.user.id)
 
+
     objeto = Objeto.objects.using("docLaruex").filter(id=id)[0]
     responsables = Responsables.objects.using(
         "docLaruex").order_by('first_name').values('id', 'first_name', 'last_name')
@@ -2028,6 +2027,9 @@ def InfoVerObjeto(request, id):
         "docLaruex").values_list('id_doc__nombre', flat=True).distinct()
 
 
+
+    if (objeto.propietario) and (objeto.propietario.id != request.user.id and not administrador and not direccion):
+        return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})
     #habilitacionNecesaria = comprobarHabilitacionObjeto(id)
     
     if objeto.tipo == "Procedimiento":
@@ -3869,15 +3871,18 @@ Se crea un nuevo objeto de tipo Documento en la tabla Documentos de la base de d
 def agregarDocumento(request, nuevoObjeto):
     if request.POST.get("tipoDocumento") is not None:
         tipoDocumento=TipoDocumentos.objects.using("docLaruex").filter(id=request.POST.get("tipoDocumento")).get()
+        if tipoDocumento.id == 6:
+            nuevoObjeto.propietario = nuevoObjeto.creador
+            nuevoObjeto.save(using='docLaruex')
     else:
         tipoDocumento = TipoDocumentos.objects.using("docLaruex").filter(id=99).get()
 
     # si no hay fecha de actualización obtener fecha actual
     if(request.POST.get("fechaActualizacion") == '' or request.POST.get("fechaActualizacion") == None):
 
-        fechaActualizacion = datetime.now();
+        fechaActualizacion = datetime.now()
     else:
-        fechaActualizacion = request.POST.get("fechaActualizacion");
+        fechaActualizacion = request.POST.get("fechaActualizacion")
     
     if request.POST.get("versionDocumento") is not None:
         nuevoDocumento = Documento(id_doc=nuevoObjeto, editable=request.POST.get(
@@ -4154,9 +4159,13 @@ El usuario debe estar autenticado.
 @login_required
 def consultarArchivo(request, id):
     objeto = Objeto.objects.using('docLaruex').filter(id=id)[0]
+        
+    administrador = esAdministrador(request.user.id)
+    direccion = esDirector(request.user.id)
+
     ruta = settings.MEDIA_ROOT + 'archivos/' + objeto.tipo + '/' + objeto.ruta
     # compruebo si la ruta devuelve algo 
-    if os.path.exists(ruta):
+    if os.path.exists(ruta) and ((not objeto.propietario) or (objeto.propietario.id == request.user.id or administrador or direccion)):
         return FileResponse(open(ruta, 'rb'))
     else:
         return JsonResponse({'status': 'error', 'message': 'El archivo no esta disponible, compruebe que la ruta y el archivo tengan la misma extensión'})
