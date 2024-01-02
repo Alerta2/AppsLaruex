@@ -199,11 +199,11 @@ class TipoFestivos(models.Model):
 class TipoPermisosYAusencias(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='Nombre', max_length=50)  # Field name made lowercase.
-    documentacion = models.CharField(db_column='Documentacion', max_length=150, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'tipo_permisos_y_ausencias'
+
 
 class TipoVacaciones(models.Model):
     id = models.IntegerField(db_column='ID', primary_key=True)  # Field name made lowercase.
@@ -274,22 +274,36 @@ class Permisos(models.Model):
         managed = False
         db_table = 'permisos'
 
-class PermisosYAusencias(models.Model):
+
+
+class PermisosRetribuidos(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
-    tipo = models.IntegerField()
-    estado = models.IntegerField()
-    empleado = models.IntegerField()
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField()
-    dias_solicitados = models.IntegerField()
-    fecha_solicitud = models.DateTimeField()
-    justificante = models.CharField(max_length=255, blank=True, null=True)
+    cod_uex = models.CharField(max_length=7, blank=True, null=True)
+    nombre = models.CharField(max_length=255)
+    tipo = models.ForeignKey('TipoPermisosYAusencias', models.DO_NOTHING, db_column='tipo')
+    dias = models.IntegerField()
+    habiles_o_naturales = models.CharField(max_length=5)
+    solicitud_dias_naturales_antelacion = models.IntegerField()
 
     class Meta:
         managed = False
-        db_table = 'permisos_y_ausencias'
+        db_table = 'permisos_retribuidos'
 
 
+class PermisosYAusenciasSolicitados(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    empleado = models.ForeignKey('Empleados', models.DO_NOTHING, db_column='empleado')
+    fecha_solicitud = models.DateTimeField()
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    dias_solicitados = models.IntegerField()
+    codigo_permiso = models.ForeignKey(PermisosRetribuidos, models.DO_NOTHING, db_column='codigo_permiso')
+    justificante = models.CharField(max_length=255, blank=True, null=True)
+    estado = models.ForeignKey('EstadosSolicitudes', models.DO_NOTHING, db_column='estado')
+
+    class Meta:
+        managed = False
+        db_table = 'permisos_y_ausencias_solicitados'
 
 class RegistroAusencias(models.Model):
     id = models.IntegerField(primary_key=True)

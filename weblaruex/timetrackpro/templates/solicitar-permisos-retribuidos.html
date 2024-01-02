@@ -1,4 +1,3 @@
-
 {% extends "base/base_timetrackpro.html" %}
 {% load static %}
 {% block imports %}
@@ -12,8 +11,9 @@
   <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
 {% endblock %}
 {% block content %}
+
   <div class="row d-flex justify-content-center">
-    <div class="col-12 col-xl-6 ">
+    <div class="col-12 col-xl-5">
         <div class="d-block shadow-xl border-radius-xl">
           <div class="row ">
             <div class="col m-3">
@@ -25,7 +25,7 @@
           </div>
       </div>
     </div>
-    <div class="col-12 col-xl-6">
+    <div class="col-12 col-xl-7">
       {% if not userDjango%}
       <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
         <div class="row">
@@ -49,16 +49,16 @@
           </div>
         </div>
       </div>
-    {% endif %}
+      {% endif %}
 
-    {% if administrador or director %}
+      {% if administrador or director %}
       <div class="card">
         <div class="card-header pb-0 p-3">
           <div class="row">
             <div class="col-md-8 d-flex align-items-center">
               <div class="row">
                 <h5 class="mb-2">
-                  Días asuntos propios solicitados por los empleados
+                  Permisos solicitados por los empleados
                 </h5>
               </div>
             </div>
@@ -66,13 +66,12 @@
         </div>
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
-            <table id="asuntos_propios_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            <table id="permisos_retribuidos_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
         </div>
       </div>
         
-    {% endif %}
-      
+      {% endif %}
 
       <div class="card mt-2">
         <div class="card-header pb-0 p-3">
@@ -80,7 +79,7 @@
             <div class="col-md-8 d-flex align-items-center">
               <div class="row">
                 <h5 class="mb-2">
-                  Días asuntos propios solicitados 
+                  Permisos solicitados 
                 </h5>
               </div>
             </div>
@@ -391,7 +390,7 @@
   }
 
   
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     var calendarDiv = document.getElementById('calendarioMensual');
     var initialDate = '{{initialDate}}';
     var calendar = new FullCalendar.Calendar(calendarDiv, {
@@ -537,10 +536,10 @@ document.addEventListener('DOMContentLoaded', function() {
     $('#modalAgregarAsuntosPropiosDesdeCalendario').modal('hide');
   }
 
-  $("#asuntos_propios_empleados").bootstrapTable({
+  $("#permisos_retribuidos_empleados").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "{% url 'timetrackpro:datos-asuntos-propios-empleados' %}",
+    url: "{% url 'timetrackpro:datos-permisos-retribuidos-empleados' %}",
     cache: false, 
     columns: [
       {

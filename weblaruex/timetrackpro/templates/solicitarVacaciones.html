@@ -391,7 +391,10 @@ document.addEventListener('DOMContentLoaded', function() {
         center: 'title',
         right:'today',
       },
-       
+      height: 'auto', // indico el maximo de alto que puede tener el calendario
+      overflow: 'auto', // si se puede hacer scroll en el calendario
+      // no se puede hacer scroll en el calendario
+
     });
     calendar.render(); // renderizo el calendario
     calendar.updateSize(); // actualizo el tamaño del calendario

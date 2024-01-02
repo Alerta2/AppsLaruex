@@ -2130,7 +2130,6 @@ Agregar un permiso a la base de datos y redirigir a la vista de permisos
 -------------------------------------------'''
 def agregarPermiso(request, year=None):
     # obtengo los datos necesarios para la vista
-    
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
@@ -2364,7 +2363,7 @@ def solicitarAsuntosPropios(request, year=None):
         year = str(datetime.now().year)
     mes = str(datetime.now().month)
     if len(mes) == 1:
-        mesInicial = "0" + mesInicial
+        mes = "0" + mes
     initialDate = year + "-" + mes + "-01"
     if request.method == 'POST':
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
@@ -2414,6 +2413,85 @@ def solicitarAsuntosPropios(request, year=None):
     }
     return render(request,"solicitar-asuntos-propios.html",infoVista)
 
+def solicitarPermisosRetribuidos(request, year=None):
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+    empleados = Empleados.objects.using("timetrackpro").values()
+    sustitutos = Sustitutos.objects.using("timetrackpro").values()
+    asuntosPropiosEmpleados = []
+    diasConsumidos = 0
+    if administrador or director:
+        if year is None:
+            asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").values()
+        else:
+            asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values()
+
+    if not director:
+        if year is None:
+            asuntos = AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado).values()
+        else:
+            asuntos = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).values()
+        
+        for a in asuntos:
+            diasConsumidos += a['dias_consumidos']
+
+    if year is None:
+        year = str(datetime.now().year)
+    mes = str(datetime.now().month)
+    if len(mes) == 1:
+        mes = "0" + mes
+    initialDate = year + "-" + mes + "-01"
+    if request.method == 'POST':
+        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
+        fechaInicio = request.POST.get("fecha_inicio")
+        fechaFin = request.POST.get("fecha_fin")
+        diasConsumidos = request.POST.get("dias_consumidos")
+        
+        recuperable = 0 
+        if request.POST.get("recuperable") == 1:
+            recuperable = 1
+
+        tareasASustituir = None
+        if request.POST.get("tareas_a_sustituir") != "":
+            tareasASustituir = request.POST.get("tareas_a_sustituir")
+
+        descripcion = None
+        if request.POST.get("descripcion") != "":
+            descripcion = request.POST.get("descripcion")
+
+        empleadoSustituto = request.POST.get("sustituto")
+        if empleadoSustituto != 0:        
+            sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0] 
+        else:
+            sustituto = None
+
+        if AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin).exists():
+            return redirect('timetrackpro:solicitar-permisos-retribuidos')
+        else:
+            estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+            fechaSolicitud = datetime.now()
+            year = fechaInicio.split("-")[0]
+            nuevoAsuntoPropio = AsuntosPropios(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, estado=estado, fecha_solicitud=fechaSolicitud, year=year, recuperable=recuperable, descripcion=descripcion, tareas_a_sustituir=tareasASustituir, sustituto=sustituto)
+            nuevoAsuntoPropio.save(using='timetrackpro')
+
+            return redirect('timetrackpro:solicitar-permisos-retribuidos', year=year)
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+        "director":director,
+        "empleados":list(empleados),
+        "asuntosPropiosEmpleados":list(asuntosPropiosEmpleados),
+        "asuntos":list(asuntos),
+        "diasConsumidos":diasConsumidos,
+        "initialDate":initialDate,
+        "sustitutos":list(sustitutos),
+    }
+    return render(request,"solicitar-permisos-retribuidos.html",infoVista)
+
+
 def datosAsuntosPropiosEmpleados(request, year=None):
     admin = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -2445,6 +2523,20 @@ def datosAsuntosPropiosSolicitados(request, year=None):
     else:
         return JsonResponse([], safe=False)
 
+def datosPermisosRetribuidosEmpleados(request, year=None):
+    admin = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    diasSolicitados = []
+
+    if admin or director:
+        if year is None:
+            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
+        else:
+            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
+
+        return JsonResponse(list(diasSolicitados), safe=False)
+    else:
+        return JsonResponse([], safe=False)
 
 def solicitarVacaciones(request):
     estados = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1).values()
