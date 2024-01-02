@@ -2607,7 +2607,7 @@ def editarObjeto(request, id):
                 else:
                     equipo.alta_uex = 0
                 
-                if request.FILES['nuevaImagenEquipo']:
+                if 'nuevaImagenEquipo' in request.FILES:
                     if objeto.ruta is not None:
                         # find file name matches with *
                         rutaImagen = settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
@@ -2623,10 +2623,19 @@ def editarObjeto(request, id):
                         rutaImagen = settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
                         
                         subirDocumento(request.FILES['nuevaImagenEquipo'], rutaImagen)
-                        objeto.ruta = imagen                
-                objeto.save(using="docLaruex")
-                equipo.save(using="docLaruex")
-                return HttpResponseRedirect('/private/docLaruex/verObjeto/'+id+'/') 
+                        objeto.ruta = imagen 
+                    objeto.save(using="docLaruex")
+                    equipo.save(using="docLaruex")
+                    return HttpResponseRedirect('/private/docLaruex/verObjeto/'+id+'/') 
+
+
+                elif 'nuevaImagenEquipo' in request.POST and request.POST['nuevaImagenEquipo'] != "":
+                    equipo.save(using="docLaruex")
+                    return HttpResponseRedirect('/private/docLaruex/verObjeto/'+id+'/') 
+                else: 
+                    equipo.save(using="docLaruex")
+                    return HttpResponseRedirect('/private/docLaruex/verObjeto/'+id+'/') 
+
             
             elif objeto.tipo == "Ubicacion":     
                 ubicacion = Ubicaciones.objects.using('docLaruex').filter(id=id)[0]       
