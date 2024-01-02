@@ -234,12 +234,18 @@
             <strong>Ejemplo de estructura en formato JSON para definir un evento:</strong>
             <pre>
               <code>
-                  {
-                    "Nombre": "string", 
-                    "Fecha": "date",
-                    "Apto": "boolean"
-                  }
+                {
+                  "Fecha_actual": "date",
+                  "Hora": "time",
+                  "importe": "float",
+                  "nombre": "string",
+                  "Realizado": "boolean",
+                  "prueba":"select",
+                  "prueba_opciones": ["Opción 1", "Opción 2", "Opción 3"]
+                }
               </code>
+              <strong>Las opciones deben nombrarse con el nombre del select seguido de _opciones</strong>
+
             </pre>
             <strong>Definición de diferentes tipos de datos en un JSON:</strong>
             <pre>
