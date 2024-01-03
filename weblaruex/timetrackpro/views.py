@@ -2329,72 +2329,40 @@ def verPermisoRetribuido(request, id):
 
 
 def editarPermisoRetribuido(request):
-    id = request.POST.get("id_permiso")
+    if request.method == 'POST':
+        id = request.POST.get("id_permiso")
+        permiso = PermisosRetribuidos.objects.using("timetrackpro").filter(id=id)[0]
+        permiso.cod_uex = request.POST.get("cod_uex")
 
-    permiso = PermisosVacaciones.objects.using("timetrackpro").filter(id=id)[0]
+        tipoPermiso = TipoPermisosYAusencias.objects.using("timetrackpro").filter(id=request.POST.get("tipo_permiso"))[0]
+        permiso.tipo = tipoPermiso
 
-    # obtenemos los datos del formulario
-    permiso.nombre = request.POST.get("nombre_permiso")
-    permiso.duracion = request.POST.get("duracion_permiso")
-    permiso.naturales_o_habiles = request.POST.get("tipo_dias")
-    if "fecha_limite_solicitud" in request.POST and request.POST.get("fecha_limite_solicitud") != "":
-        permiso.fecha_maxima_solicitud = request.POST.get("fecha_limite_solicitud")
-    
-    if "year_permiso" in request.POST:
-        permiso.year = request.POST.get("year_permiso")
-    
-    if "periodo_antelacion" in request.POST:
-        permiso.periodo_antelacion = request.POST.get("periodo_antelacion")
+        permiso.solicitud_dias_naturales_antelacion = request.POST.get("dias_antelacion")
 
-    acreditable = request.POST.get("acreditable")
-    if acreditable == "on":
-        permiso.acreditar = 1
-        docPermiso = request.POST.get("documentacion_permiso")
-        if docPermiso != "":
-            permiso.doc_necesaria = docPermiso
+        permiso.dias = request.POST.get("dias_concedidos")
+        naturales = request.POST.get("naturales")
+        if naturales == "on":
+            permiso.habiles_o_naturales = "Naturales"
         else:
-            permiso.doc_necesaria = "Ninguna"
-    else:
-        permiso.acreditar = 0
-        permiso.doc_necesaria = "Ninguna"       
-    
-    if "legilacion_aplicable" in request.POST:
-        permiso.legislacion_aplicable = request.POST.get("legilacion_aplicable")
+            permiso.habiles_o_naturales = "Hábiles"
+ 
+        if request.POST.get("pas") == "on":
+            permiso.pas = 1
+        else:
+            permiso.pas = 0
+        
+        if request.POST.get("pdi") == "on":
+            permiso.pdi = 1
+        else:
+            permiso.pdi = 0
 
-    bonificable = request.POST.get("bonificable")
-    if bonificable == "on":
-        permiso.bonificable_por_antiguedad = 1
-        permiso.bonificacion_por_15_years = request.POST.get("bonificacion_15_year")
-        permiso.bonificacion_por_20_years = request.POST.get("bonificacion_20_year")
-        permiso.bonificacion_por_25_years = request.POST.get("bonificacion_25_year")
-        permiso.bonificacion_por_30_years = request.POST.get("bonificacion_30_year")
-    else:
-        permiso.bonificable_por_antiguedad = 0
-        permiso.bonificacion_por_15_years = 0
-        permiso.bonificacion_por_20_years = 0
-        permiso.bonificacion_por_25_years = 0
-        permiso.bonificacion_por_30_years = 0
+        if request.POST.get("nombre_permiso") != "":
+            permiso.nombre = request.POST.get("nombre_permiso")
 
-    retribuido = request.POST.get("retribuido")
-    if retribuido == "on":
-        permiso.es_permiso_retribuido = 1
+        permiso.save(using='timetrackpro')
+        return redirect('timetrackpro:ver-permiso-retribuido', id=permiso.id)
     else:
-        permiso.es_permiso_retribuido = 0
-
-    pas = request.POST.get("pas")
-    if pas == "on":
-        permiso.pas = 1
-    else:
-        permiso.pas = 0
-
-    pdi = request.POST.get("pdi")
-    if pdi == "on":
-        permiso.pdi = 1
-    else:
-        permiso.pdi = 0
-
-    permiso.save(using='timetrackpro')
-    return redirect('timetrackpro:ver-permiso', id=permiso.id)
+        return redirect('timetrackpro:lista-permisos-retribuidos')
 '''-------------------------------------------
                                 Módulo: registroManualControlHorario
 
