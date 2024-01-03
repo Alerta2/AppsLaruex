@@ -308,22 +308,6 @@ class PermisosYAusenciasSolicitados(models.Model):
         managed = False
         db_table = 'permisos_y_ausencias_solicitados'
 
-class RegistroAusencias(models.Model):
-    id = models.IntegerField(primary_key=True)
-    id_permiso = models.ForeignKey(PermisosVacaciones, models.DO_NOTHING, db_column='id_permiso', blank=True, null=True)
-    id_empleado = models.ForeignKey('Empleados', models.DO_NOTHING, db_column='id_empleado', blank=True, null=True)
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
-    id_estado = models.ForeignKey('EstadosSolicitudes', models.DO_NOTHING, db_column='id_estado', blank=True, null=True)
-    archivo_solicitud = models.CharField(max_length=255, blank=True, null=True)
-    archivo_justificante = models.CharField(max_length=255, blank=True, null=True)
-    funciones_a_cubrir = models.CharField(max_length=255, blank=True, null=True)
-    id_empleado_sustituto = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'registro_ausencias'
-
 class RegistrosManualesControlHorario(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     id_rel_emp_users = models.ForeignKey('RelEmpleadosUsuarios', models.DO_NOTHING, db_column='id_rel_emp_users')

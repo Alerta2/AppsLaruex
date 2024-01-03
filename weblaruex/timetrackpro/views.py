@@ -2247,6 +2247,18 @@ def editarPermiso(request):
     permiso.save(using='timetrackpro')
     return redirect('timetrackpro:ver-permiso', id=permiso.id)
 
+def eliminarPermiso(request):
+    if request.method == 'POST':
+        id = request.POST.get("id_permiso_eliminar")
+        permiso = PermisosVacaciones.objects.using("timetrackpro").filter(id=id)[0]
+        alerta["activa"] = True
+        alerta["icono"] = iconosAviso["success"]
+        alerta["tipo"] = "success"
+        alerta["mensaje"] = "Permiso con código " + permiso.nombre + " eliminado con éxito."
+        permiso.delete(using='timetrackpro')
+
+    return redirect('timetrackpro:lista-permisos')
+
 
 '''-------------------------------------------
         Permisos retribuidos de empleados

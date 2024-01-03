@@ -14,6 +14,12 @@
         <div class="sign-Btn-link"><i class="fa-solid fa-edit fa-lg" style="color: #ffffff;"></i></div>
         <div class="text text-sm">Editar permiso</div>
       </button>
+    </div> 
+    <div class="col">
+     <button class="botonLinkEliminar" data-toggle="modal" data-target="#modalEliminarPermiso">             
+       <div class="sign-Btn-link"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
+       <div class="text text-sm">Eliminar permiso</div>
+     </button>
     </div>
   </div>
 </div>
@@ -52,8 +58,7 @@
             <div class="numbers">
               <p class="text-sm mb-0 text-capitalize font-weight-bold">Fecha límite para solicitarlo</p>
               <h5 class="font-weight-bolder mb-0">
-                {{ permiso.fecha_maxima_solicitud|date:"j" }} de {{ permiso.fecha_maxima_solicitud|date:"F" }} de {{
-                permiso.fecha_maxima_solicitud|date:"Y" }}
+                {{ permiso.fecha_maxima_solicitud|date:"j" }} de {{ permiso.fecha_maxima_solicitud|date:"F" }} de {{ permiso.fecha_maxima_solicitud|date:"Y" }}
               </h5>
             </div>
           </div>
@@ -389,6 +394,41 @@
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
       </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<div id="modalEliminarPermiso" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEliminarPermiso"
+aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Eliminar permiso {{permiso.nombre}}</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+      <form id="formularioEditarPermiso" action="{% url 'timetrackpro:eliminar-permiso' %}" method="POST"
+        enctype="multipart/form-data">
+        {% csrf_token %}    
+        <input type="text" class="form-control" id="id_permiso_eliminar" name="id_permiso_eliminar" value="{{permiso.id}}" hidden>
+
+        <div class="row">
+          <div class="col-xl-12 text-center">
+            <strong class="text-lg">¿Está seguro que desea eliminar el permiso con código {{permiso.nombre}}?</strong>
+            <p class="text-danger font-italic text-sm mt-2">Recuerda que al eliminar el permiso se eliminarán todas las solicitudes asociadas a este permiso</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        {% if user.is_authenticated  %}
+        <button type="submit" value="submit" class="btn bg-gradient-danger">Eliminar</button>
+        {% endif %}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </form>
     </div>
   </div>
 </div>

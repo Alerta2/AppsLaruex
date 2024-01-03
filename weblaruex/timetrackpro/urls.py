@@ -104,6 +104,7 @@ urlpatterns = [
     path('private/timetrackpro/agregar-permiso/', agregarPermiso , name='agregar-permiso'),
     path('private/timetrackpro/ver-permiso/<slug:id>/', verPermiso , name='ver-permiso'),
     path('private/timetrackpro/editar-permiso/', editarPermiso , name='editar-permiso'),
+    path('private/timetrackpro/eliminar-permiso/', eliminarPermiso , name='eliminar-permiso'),
 
     #Registro control horario
     path('private/timetrackpro/insertar-registro-manual-mensual/', insertarRegistroManualMensual , name='insertar-registro-manual-mensual'),
