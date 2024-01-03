@@ -2326,6 +2326,22 @@ def verPermisoRetribuido(request, id):
     }
     return render(request,"ver-permiso-retribuido.html",infoVista)
 
+def eliminarPermisoRetribuido(request):
+    if request.method == 'POST':
+        id = request.POST.get("id_permiso_eliminar")
+        permiso = PermisosRetribuidos.objects.using("timetrackpro").filter(id=id)[0]
+        solicitudesAsociadas = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id).values()
+        for s in solicitudesAsociadas:
+            s.delete(using='timetrackpro')
+        alerta["activa"] = True
+        alerta["icono"] = iconosAviso["success"]
+        alerta["tipo"] = "success"
+        alerta["mensaje"] = "Permiso con código " + permiso.cod_uex + " eliminado con éxito."
+        permiso.delete(using='timetrackpro')
+
+    return redirect('timetrackpro:lista-permisos-retribuidos')
+
+
 
 
 def editarPermisoRetribuido(request):

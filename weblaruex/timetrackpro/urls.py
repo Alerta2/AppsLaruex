@@ -167,6 +167,7 @@ urlpatterns = [
     path('private/timetrackpro/agregar-permiso-retribuido/', agregarPermisoRetribuido , name='agregar-permiso-retribuido'),
     path('private/timetrackpro/ver-permiso-retribuido/<slug:id>/', verPermisoRetribuido , name='ver-permiso-retribuido'),
     path('private/timetrackpro/editar-permiso-retribuido/', editarPermisoRetribuido , name='editar-permiso-retribuido'),
+    path('private/timetrackpro/eliminar-permiso-retribuido/', eliminarPermisoRetribuido , name='eliminar-permiso-retribuido'),
 
     
     #Solicitud de permisos retribuidos 
