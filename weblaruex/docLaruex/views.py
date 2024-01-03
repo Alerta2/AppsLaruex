@@ -2612,9 +2612,11 @@ def editarObjeto(request, id):
                         # find file name matches with *
                         rutaImagen = settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
                         imagenOld = glob.glob(settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) +  '.*')
+
                         if imagenOld:
                             os.remove(imagenOld[0])
                         subirDocumento(request.FILES['nuevaImagenEquipo'], rutaImagen)
+
                     else:
                         imagen = str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
                         
