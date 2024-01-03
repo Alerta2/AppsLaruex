@@ -70,12 +70,12 @@
             <div class="row">
               <div class="col-xl-4">
                 <label>Código Uex</label>
-                <input type="text" class="form-control" placeholder="ID en el dispositivo"
-                  aria-label="Nombre en el dispositivo" aria-describedby="text-addon" id="cod_uex" name="cod_uex">
+                <input type="text" class="form-control" placeholder="400.1"
+                  aria-label="400.1" aria-describedby="text-addon" id="cod_uex" name="cod_uex">
               </div>
               <div class="col-xl-4">
                 <label>Tipo</label>
-                <select class="form-control" aria-label="Nombre en el dispositivo" id="tipo_permiso"
+                <select class="form-control" aria-label="Tipo de permiso" id="tipo_permiso"
                   name="tipo_permiso" aria-describedby="text-addon">
                   <option value="1" selected>Permisos</option>
                   <option value="2">Permisos con duración inespecífica</option>
@@ -85,8 +85,8 @@
               </div>
               <div class="col-xl-4">
                 <label>Periodo para la notificación</label>
-                <select class="form-control" aria-label="Nombre en el dispositivo" id="tipo_permiso"
-                  name="tipo_permiso" aria-describedby="text-addon">
+                <select class="form-control" aria-label="Periodo para la notificación" id="dias_antelacion"
+                  name="dias_antelacion" aria-describedby="text-addon">
                   <option value="0" selected>Inmediatamente</option>
                   <option value="7">7 días antes</option>
                   <option value="15">15 días antes</option>
@@ -97,14 +97,14 @@
             <div class="row mt-2">
               <div class="col-xl-12">
                 <label>Nombre</label>
-                <textarea type="text" class="form-control" placeholder="Agrege la información adicional del empleado" aria-label="Información adicional del empleado" id="infoAdicional_empleado" name="infoAdicional_empleado" aria-describedby="text-addon"></textarea>
+                <textarea type="text" class="form-control" placeholder="Agrege la información adicional del empleado" aria-label="Información adicional del empleado" id="nombre_permiso" name="nombre_permiso" aria-describedby="text-addon"></textarea>
               </div>
             </div>
             <div class="row mt-2">
               <div class="col-xl-3">
                 <label>Días</label>
-                <input class="form-control" type="number" step="1" min="0" max="999" id="jornada_maxima_empleado"
-                  name="jornada_maxima_empleado" placeholder="máximo 999">
+                <input class="form-control" type="number" step="1" min="0" max="999" id="dias_concedidos"
+                  name="dias_concedidos" placeholder="máximo 999">
               </div>
               <div class="col-xl-6">
                 <div class="d-flex mt-5 mb-0">
@@ -241,12 +241,39 @@
           if (dias == 0){
             mensaje = "Con la mayor antelación posible";
           }else{
-            mensaje = solicitud_dias_naturales_antelacion + " dias naturales";
+            mensaje = dias + " dias naturales";
           }
           var div = '<div class="col-10"><h6 class="mb-0 text-sm text-primary">'+ mensaje + '</h6></div>';
           return div;
         }
-      }, 
+      },       {
+        title: "¿Quién se beneficia?",
+        field: "",
+        align: "center",
+        halign:"center",
+        formatter: function(value, row) {
+          var pas = row.pas;
+          var pdi = row.pdi;
+
+          var divPAS = ""
+          var divPDI = ""
+
+          if (pas == 1){
+            divPAS = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PAS</span></div>';
+          }else{
+            divPAS = '<div><i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PAS</span></div>';
+          }
+          if (pdi == 1){
+            divPDI = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PDI</span></div>';
+          }else{
+            divPDI = '<div><i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PDI</span></div>';
+          }
+          var div = '<div class="ms-4">'+divPAS+divPDI+'</div>';
+          // var div = divA2+divDep+divLab;
+
+          return div;
+        }
+      },
     ],
     search: true,
     sortName: "id",
