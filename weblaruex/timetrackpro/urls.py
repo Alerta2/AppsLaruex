@@ -176,5 +176,5 @@ urlpatterns = [
     path('private/timetrackpro/solicitar-permisos-retribuidos/<slug:year>/', solicitarPermisosRetribuidos , name='solicitar-permisos-retribuidos'),
     path('private/timetrackpro/datos-permisos-retribuidos-empleados/', datosPermisosRetribuidosEmpleados , name='datos-permisos-retribuidos-empleados'),
 
-
+    
 ]

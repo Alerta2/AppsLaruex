@@ -39,7 +39,7 @@
           </div>
           {% endif %}
           <div class="col">
-          <button class="botonLink" data-toggle="modal" data-target="#modalSolicitarAsuntosPropios">    
+          <button class="botonLink" data-toggle="modal" data-target="#modalSolicitarPermisoRetribuido">    
             
             <div class="sign-Btn-link">
               <i class="fa-solid fa-plus fa-lg " style="color: #ffffff;"></i>
@@ -118,7 +118,7 @@
     </div>
   </div>
 
-  <div id="modalSolicitarAsuntosPropios" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalSolicitarAsuntosPropios"
+  <div id="modalSolicitarPermisoRetribuido" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalSolicitarPermisoRetribuido"
   aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -130,7 +130,7 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioSolicitarAsuntosPropios" action="{% url 'timetrackpro:solicitar-asuntos-propios' %}" method="POST"
+        <form id="formularioSolicitarAsuntosPropios" action="{% url 'timetrackpro:solicitar-permisos-retribuidos' %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
@@ -138,58 +138,30 @@
               <label class="col-form-label">Fecha de inicio</label>
               <div class="">
                 <input type="date" class="form-control" aria-label="Fecha inicial de las vacaciones"
-                  aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
+                  aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_solicitados')">
               </div>
             </div>
           </div>
           <div class="row">
             
             <div class="col-xl-6 mt-2"   >
-              <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos"  min="1" required hidden>
+              <input type="number" class="form-control" name="dias_solicitados" id="dias_solicitados"  min="1" required hidden>
 
               <button type="button" class="btn btn-primary " id="botonMostarColumnaOculta" onclick="mostrarColumnaOculta(this.id, 'colFechaFin' )">Solicitar varios dias</button>
               <div class="" id="colFechaFin" hidden>
                 <label class="col-form-label">Fecha de fin</label>
 
                 <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
-                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
+                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_solicitados')">
               </div>  
             </div>
           </div>
           <div class="row">
-            <div class="col-6 col-md-4">
-              <label for="recuperable" class="col-form-label">¿Es recuperable?</label>
-                <select class="form-control" id="recuperable" name="recuperable">
-                  <option value="0" selected>No</option> 
-                  <option value="1">Si</option>
-                </select>
-            </div>
-            <div class="col-6 col-md-4">
-              <label for="sustituto" class="col-form-label">Sustituto</label>
-              <input id="inputSustituto" list="sustitutos" class="form-select">
-              <input type="number" id="sustituto" name="sustituto"  class="form-control" hidden>
-              <datalist id="sustitutos">
-                <option data-id="0">Ninguno</option>
-                {% for s in sustitutos %}
-                <option data-id="{{s.id}}">{{s.nombre}} {{s.apellidos}}</option>
-                {% endfor %}
-              </datalist>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <label class="col-form-label">Tareas a sustituir</label>
-              <div class="mb-3">
-                <textarea type="text" class="form-control" placeholder="Indique las tareas que deben ser sustituidas." id="tareas_a_sustituir" name="tareas_a_sustituir" aria-describedby="text-addon"></textarea>
-              </div>
-            </div>
-          </div>
-          <div class="row" id="descripcionRecuperacion" hidden>
-            <div class="col" >
-              <label class="col-form-label">Descripcion</label>
-              <div class="mb-3">
-                <textarea type="text" class="form-control" placeholder="Indique como va a recuperar los días solicitados." id="descripcion" name="descripcion" aria-describedby="text-addon"></textarea>
-              </div>
+            <div class="col-xl-6 mt-2">
+              <label class="text-sm">Permisos</label>
+              <input id="inputPermisos" list="permisosRetribuidos"  class="form-select">
+              <input type="number" id="id_permiso" name="id_permiso"  class="form-control"  hidden>
+              <datalist id="permisosRetribuidos">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
             </div>
           </div>
         </div>
@@ -337,17 +309,6 @@
                       </option>
                     </select>
                 </div>
-                <div class="col-6 col-md-4">
-                  <label for="sustituto_calendario" class="col-form-label">Sustituto</label>
-                  <input id="inputSustitutoCalendario" list="sustitutos_calendario" class="form-select">
-                  <input type="number" id="sustituto_calendario" name="sustituto_calendario"  class="form-control" hidden>
-                  <datalist id="sustitutos_calendario">
-                    <option data-id="0">Ninguno</option>
-                    {% for s in sustitutos %}
-                    <option data-id="{{s.id}}">{{s.nombre}} {{s.apellidos}}</option>
-                    {% endfor %}
-                  </datalist>
-                </div>
               </div>
               <div class="row">
                 <div class="col">
@@ -461,7 +422,7 @@
     calendar.updateSize(); // actualizo el tamaño del calendario
   });
 
-  function calcularDias(inicio, fin, dias_consumidos){
+  function calcularDias(inicio, fin, dias_solicitados){
     fecha_inicio = document.getElementById(inicio).value;
     fecha_fin = document.getElementById(fin).value;
     // comparo si la fecha de inicio es mayor a la fecha de fin
@@ -469,7 +430,7 @@
       fecha_fin = fecha_inicio;
       document.getElementById(fin).value = fecha_inicio;
     }
-    dias_consumidos = document.getElementById(dias_consumidos);
+    dias_solicitados = document.getElementById(dias_solicitados);
     botonGuardarSolicitar = document.getElementById("guardarSolicitarAsuntosPropios");
     botonGuardarModificar = document.getElementById("guardarModificarAsuntosPropios");
 
@@ -477,25 +438,21 @@
       alert("La fecha de inicio no puede ser mayor a la fecha de fin");
       document.getElementById(inicio).value = "";
       document.getElementById(fin).value = "";
+      dias_solicitados.value = "";
     }
     else{
+      // obtener la diferencia en dias entre las dos fechas
+      var fecha1 = new Date(fecha_inicio);
+      var fecha2 = new Date(fecha_fin);
+      var diff = fecha2.getTime() - fecha1.getTime();
+      var dias = diff / (1000 * 60 * 60 * 24);
+      dias = dias + 1;
+      dias_solicitados.value = dias;
       botonGuardarSolicitar.removeAttribute("disabled");
       botonGuardarModificar.removeAttribute("disabled");
     }
 
-    // obtener la diferencia en dias entre las dos fechas
-    var fecha1 = new Date(fecha_inicio);
-    var fecha2 = new Date(fecha_fin);
-    var diff = fecha2.getTime() - fecha1.getTime();
-    var dias = diff / (1000 * 60 * 60 * 24);
-    dias = dias + 1;
-    if (dias > 6){
-      alert("No se pueden solicitar más de 6 días de asuntos propios");
-      document.getElementById(inicio).value = "";
-      document.getElementById(fin).value = "";
-    }else{
-      dias_consumidos.value = dias;
-    }
+
   }
 
   function mostrarInfo(){ 
@@ -523,7 +480,7 @@
         fechaInicioActual.setAttribute("readonly", true);
         fechaFinActual.value = mylist[i].fecha_fin;
         fechaFinActual.setAttribute("readonly", true);
-        diasConsumidosActuales.value = mylist[i].dias_consumidos;
+        diasConsumidosActuales.value = mylist[i].dias_solicitados;
         diasConsumidosActuales.setAttribute("readonly", true);
         
         console.log(mylist[i]);
@@ -614,7 +571,7 @@
         title: "Días",
         align: "center",
         formatter: function(value, row) {
-          var dias = row.dias_consumidos;      
+          var dias = row.dias_solicitados;      
           var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
           return div;
         }
@@ -731,7 +688,7 @@
         title: "Días",
         align: "center",
         formatter: function(value, row) {
-          var dias = row.dias_consumidos;      
+          var dias = row.dias_solicitados;      
           var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
           return div;
         }
@@ -763,23 +720,24 @@
     ],
     search: true,
   });
+  
+  document.getElementById('inputPermisos').addEventListener('input', function() {
+      const inputText = this.value;
+      const datalist = document.getElementById('permisosRetribuidos');
+      const options = datalist.getElementsByTagName('option');
+      const id_permiso = document.getElementById('id_permiso');
 
-  document.getElementById('inputSustitutoCalendario').addEventListener('input', function() {
-        const inputText = this.value;
-        const datalist = document.getElementById('sustitutos_calendario');
-        const options = datalist.getElementsByTagName('option');
-        const sustitutoCalendarioSeleccionado = document.getElementById('sustituto_calendario');
+      for (const option of options) {
+        option.textContent.replace(/\s/g, '');
+          if (option.textContent === inputText) {
+              const selectedOptionId = option.getAttribute('data-id');
+              id_permiso.value = selectedOptionId;
 
-        for (const option of options) {
-            if (option.textContent === inputText) {
-                const selectedOptionId = option.getAttribute('data-id');
-                sustitutoCalendarioSeleccionado.value = selectedOptionId;
-                console.log('ID de la opción seleccionada:', selectedOptionId);
-                break;
-            }
-        }
-    });
-    
+              console.log('ID de la opción seleccionada:', selectedOptionId);
+              break;
+          }
+      }
+  });
   document.getElementById('recuperable_calendario').addEventListener('change', function() {
     const recuperable = this.value;
     const descripcionRecuperacionCalendario = document.getElementById('descripcionRecuperacionCalendario');
@@ -791,22 +749,6 @@
   });
 
 
-  document.getElementById('inputSustituto').addEventListener('input', function() {
-      const inputText = this.value;
-      const datalist = document.getElementById('sustitutos');
-      const options = datalist.getElementsByTagName('option');
-      const sustitutoSeleccionado = document.getElementById('sustituto');
-
-      for (const option of options) {
-          if (option.textContent === inputText) {
-              const selectedOptionId = option.getAttribute('data-id');
-              sustitutoSeleccionado.value = selectedOptionId;
-              console.log('ID de la opción seleccionada:', selectedOptionId);
-              break;
-          }
-      }
-  });
-  
   document.getElementById('recuperable').addEventListener('change', function() {
       const recuperable = this.value;
       const descripcionRecuperacion = document.getElementById('descripcionRecuperacion');
@@ -816,6 +758,9 @@
         descripcionRecuperacion.setAttribute("hidden", true);
       }
     });
+
+
+
 </script>
 
 {% endblock %}
