@@ -2324,7 +2324,7 @@ def verPermisoRetribuido(request, id):
         "administrador":True,
         "permiso":permiso,
     }
-    return render(request,"verPermiso.html",infoVista)
+    return render(request,"ver-permiso-retribuido.html",infoVista)
 
 
 
