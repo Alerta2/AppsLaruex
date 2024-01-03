@@ -1,249 +1,254 @@
-
 {% extends "base/base_timetrackpro.html" %}
 {% load static %}
 {% block content %}
 
 
-  <div class="row d-flex justify-content-center">
-    <h3 class="font-weight-bolder text-dark text-gradient">Editar {{permiso.nombre}} del año {{permiso.year}}</h3>
-  </div>
-  {% if not userDjango%}
+<div class="row d-flex justify-content-center">
+  <h3 class="font-weight-bolder text-dark text-gradient">Editar {{permiso.nombre}} del año {{permiso.year}}</h3>
+</div>
+{% if administrador%}
 <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
   <div class="row">
     <div class="col">
-     <button class="botonLink" data-toggle="modal" data-target="#modalAsociarUsuario">             
-      <div class="sign-Btn-link"><i class="fa-solid fa-edit fa-lg" style="color: #ffffff;"></i></div>
-      <div class="text text-sm">Editar datos</div>
-    </button>
+      <button class="botonLink" data-toggle="modal" data-target="#modalEditarPermiso">
+        <div class="sign-Btn-link"><i class="fa-solid fa-edit fa-lg" style="color: #ffffff;"></i></div>
+        <div class="text text-sm">Editar permiso</div>
+      </button>
     </div>
   </div>
 </div>
 {% endif %}
-  <div class="row">
-    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-      <div class="card">
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col-9">
-              <div class="numbers">
-                <p class="text-sm mb-0 text-capitalize font-weight-bold">Duración en días</p>
-                <h5 class="font-weight-bolder mb-0">
-                 {{permiso.duracion}} días {{permiso.naturales_o_habiles}}
-                 {% if permiso.bonificable_por_antiguedad == 1%} 
-                  <span class="text-success text-sm font-weight-bolder">
-                    + antigüedad</span>
-                  {% endif %}
-                </h5>
-              </div>
-            </div>
-            <div class="col-3 text-end">
-              <div class="icon icon-shape bg-gradient-dark shadow text-center border-radius-md">
-                <i class="fa-kit fa-solid-calendar-days-user fa-xl" aria-hidden="true"></i>
-              </div>
+<div class="row">
+  <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-9">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Duración en días</p>
+              <h5 class="font-weight-bolder mb-0">
+                {{permiso.duracion}} días {{permiso.naturales_o_habiles}}
+                {% if permiso.bonificable_por_antiguedad == 1%}
+                <span class="text-success text-sm font-weight-bolder">
+                  + antigüedad</span>
+                {% endif %}
+              </h5>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-      <div class="card">
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col-8">
-              <div class="numbers">
-                <p class="text-sm mb-0 text-capitalize font-weight-bold">Fecha límite para solicitarlo</p>
-                <h5 class="font-weight-bolder mb-0">
-                  {{ permiso.fecha_maxima_solicitud|date:"j" }} de {{ permiso.fecha_maxima_solicitud|date:"F" }} de {{ permiso.fecha_maxima_solicitud|date:"Y" }}
-                </h5>
-              </div>
-            </div>
-            <div class="col-4 text-end">
-              <div class="icon icon-shape bg-gradient-dark shadow text-center border-radius-md">
-                <i class="fa-kit fa-solid-calendar-days-clock fa-xl" aria-hidden="true"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-2 col-sm-4 mb-xl-0 mb-4">
-      <div class="card">
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col-12">
-              <div class="numbers">
-                <p class="text-sm mb-0 text-capitalize font-weight-bold">¿Quién se beneficia?</p>
-                <h5 class="font-weight-bolder mb-0">
-                  {% if permiso.pas == 1%}
-                  <i class="fa-solid fa-check text-success fa-lg" aria-hidden="true"></i>
-                  {% else %}
-                  <i class="fa-solid fa-xmark fa-lg text-danger" aria-hidden="true"></i>
-
-                  {% endif %}
-                  PAS
-
-                </h5>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-2 col-sm-4 mb-xl-0 mb-4">
-      <div class="card">
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col-12">
-              <div class="numbers">
-                <p class="text-sm mb-0 text-capitalize font-weight-bold">¿Quién se beneficia?</p>
-                <h5 class="font-weight-bolder mb-0">
-                  {% if permiso.pdi == 1%}
-                  <i class="fa-solid fa-check text-success fa-lg" aria-hidden="true"></i>
-                  {% else %}
-                  <i class="fa-solid fa-xmark fa-lg text-danger" aria-hidden="true"></i>
-
-                  {% endif %}
-                  PDI
-
-                </h5>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xl-2 col-sm-4">
-      <div class="card">
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col-8">
-              <div class="numbers">
-                <p class="text-sm mb-0 text-capitalize font-weight-bold">¿Es retribuido?</p>
-                <h5 class="font-weight-bolder mb-0">
-                  {% if permiso.retribuido == 1%}
-                  Si
-                  {% else %}
-                  No
-                  {% endif %}
-                </h5>
-              </div>
-            </div>
-            <div class="col-4 text-end">
-              <div class="icon icon-shape bg-gradient-dark shadow text-center border-radius-md">
-                <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
-              </div>
+          <div class="col-3 text-end">
+            <div class="icon icon-shape bg-gradient-dark shadow text-center border-radius-md">
+              <i class="fa-kit fa-solid-calendar-days-user fa-xl" aria-hidden="true"></i>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="row d-flex justify-content-center">
-    {% if permiso.bonificable_por_antiguedad == 1 %}
-
-    <div class="col-12 col-xl-4">
-      <div class="card mt-4">
-        <div class="card-header pb-0 p-3">
-          <h6 class="mb-2"> <i class="fa-solid fa-layer-plus fa-xl text-muted me-2"></i>
-            Bonificaciones por antigüedad</h6>
-
-
+  <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-8">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Fecha límite para solicitarlo</p>
+              <h5 class="font-weight-bolder mb-0">
+                {{ permiso.fecha_maxima_solicitud|date:"j" }} de {{ permiso.fecha_maxima_solicitud|date:"F" }} de {{
+                permiso.fecha_maxima_solicitud|date:"Y" }}
+              </h5>
+            </div>
+          </div>
+          <div class="col-4 text-end">
+            <div class="icon icon-shape bg-gradient-dark shadow text-center border-radius-md">
+              <i class="fa-kit fa-solid-calendar-days-clock fa-xl" aria-hidden="true"></i>
+            </div>
+          </div>
         </div>
-        <div class="card-body pt-0 p-3">
-          <ul class="list-group">
-            <li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">15 años:</strong> &nbsp;+ {{permiso.bonificacion_por_15_years}} día</li>
-            <li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">20 años:</strong> &nbsp;+ {{permiso.bonificacion_por_20_years}} día</li>
-            <li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">25 años:</strong> &nbsp;+ {{permiso.bonificacion_por_25_years}} día</li>
-            <li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">30 años:</strong> &nbsp;+ {{permiso.bonificacion_por_30_years}} día</li>
-          </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-2 col-sm-4 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-12">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">¿Quién se beneficia?</p>
+              <h5 class="font-weight-bolder mb-0">
+                {% if permiso.pas == 1%}
+                <i class="fa-solid fa-check text-success fa-lg" aria-hidden="true"></i>
+                {% else %}
+                <i class="fa-solid fa-xmark fa-lg text-danger" aria-hidden="true"></i>
+
+                {% endif %}
+                PAS
+
+              </h5>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-2 col-sm-4 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-12">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">¿Quién se beneficia?</p>
+              <h5 class="font-weight-bolder mb-0">
+                {% if permiso.pdi == 1%}
+                <i class="fa-solid fa-check text-success fa-lg" aria-hidden="true"></i>
+                {% else %}
+                <i class="fa-solid fa-xmark fa-lg text-danger" aria-hidden="true"></i>
+
+                {% endif %}
+                PDI
+
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-2 col-sm-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-8">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">¿Es retribuido?</p>
+              <h5 class="font-weight-bolder mb-0">
+                {% if permiso.retribuido == 1%}
+                Si
+                {% else %}
+                No
+                {% endif %}
+              </h5>
+            </div>
+          </div>
+          <div class="col-4 text-end">
+            <div class="icon icon-shape bg-gradient-dark shadow text-center border-radius-md">
+              <i class="ni ni-money-coins text-lg opacity-10" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row d-flex justify-content-center">
+  {% if permiso.bonificable_por_antiguedad == 1 %}
+
+  <div class="col-12 col-xl-4">
+    <div class="card mt-4">
+      <div class="card-header pb-0 p-3">
+        <h6 class="mb-2"> <i class="fa-solid fa-layer-plus fa-xl text-muted me-2"></i>
+          Bonificaciones por antigüedad</h6>
+
+
+      </div>
+      <div class="card-body pt-0 p-3">
+        <ul class="list-group">
+          <li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">15 años:</strong> &nbsp;+
+            {{permiso.bonificacion_por_15_years}} día</li>
+          <li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">20 años:</strong> &nbsp;+
+            {{permiso.bonificacion_por_20_years}} día</li>
+          <li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">25 años:</strong> &nbsp;+
+            {{permiso.bonificacion_por_25_years}} día</li>
+          <li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">30 años:</strong> &nbsp;+
+            {{permiso.bonificacion_por_30_years}} día</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="col-12 col-xl-4">
+    <div class="card mt-4">
+      <div class="card-header pb-0 p-3">
+        <h6 class="mb-2">
+          <i class="fa-duotone fa-circle-calendar me-2 fa-xl text-muted" aria-hidden="true"></i>
+          Perido para solicitarlo
+        </h6>
+
+      </div>
+      <div class="card-body pt-1 p-3">
+        <p class="text-md text-wrap text-center">
+          {{permiso.periodo_antelacion|safe}}
+
+
+        </p>
+      </div>
+    </div>
+    {% if permiso.acreditar == 1 %}
+    <div class="card mt-4">
+      <div class="card-header pb-0 p-3">
+        <h6 class="mb-2"><i class="fa-duotone fa-files text-muted fa-xl me-2"></i>
+          Documentación para su justificación</h6>
+
+      </div>
+      <div class="card-body  p-3">
+        <p class="text-md text-wrap text-center">
+          {{permiso.doc_necesaria|safe}}
+        </p>
       </div>
     </div>
     {% endif %}
-    
-    <div class="col-12 col-xl-4">
-      <div class="card mt-4">
-        <div class="card-header pb-0 p-3">
-                  <h6 class="mb-2">
-                    <i class="fa-duotone fa-circle-calendar me-2 fa-xl text-muted" aria-hidden="true"></i>
-                    Perido para solicitarlo
-                    </h6>
-     
-        </div>
-        <div class="card-body pt-1 p-3">
-          <p class="text-md text-wrap text-center">
-            {{permiso.periodo_antelacion|safe}}
-
-            
-          </p>
-        </div>
-      </div>
-      {% if permiso.acreditar == 1 %}
-      <div class="card mt-4">
-        <div class="card-header pb-0 p-3">
-          <h6 class="mb-2"><i class="fa-duotone fa-files text-muted fa-xl me-2"></i>
-            Documentación para su justificación</h6>
-
-        </div>
-        <div class="card-body  p-3">
-          <p class="text-md text-wrap text-center">
-            {{permiso.doc_necesaria|safe}}
-          </p>
-        </div>
-      </div>
-     {% endif %}
-      
-    </div>
-    <div class="col-12 col-xl-4">
-      <div class="card mt-4">
-        <div class="card-header pb-0 p-3">
-          
-          <h6 class="mb-2">
-            <i class="fa-duotone fa-scale-balanced fa-xl text-muted me-2" aria-hidden="true"></i>
-            Legislación aplicable
-            </h6>
-          
-        </div>
-        <div class="card-body p-3">
-          <p class="text-md text-wrap text-center">
-
-          {{permiso.legislacion_aplicable|safe}}
-          </p>
-        </div>
-      </div>
-    </div>
 
   </div>
+  <div class="col-12 col-xl-4">
+    <div class="card mt-4">
+      <div class="card-header pb-0 p-3">
 
-  <div id="modalAsociarUsuario" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAsociarUsuario"
-  aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Modificar datos {{permiso.nombre}} de {{permiso.year}}</h5>
-          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
+        <h6 class="mb-2">
+          <i class="fa-duotone fa-scale-balanced fa-xl text-muted me-2" aria-hidden="true"></i>
+          Legislación aplicable
+        </h6>
 
-        <div class="modal-body">
+      </div>
+      <div class="card-body p-3">
+        <p class="text-md text-wrap text-center">
+
+          {{permiso.legislacion_aplicable|safe}}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalEditarPermiso" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEditarPermiso" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modificar datos {{permiso.nombre}} de {{permiso.year}}</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
         <form id="formularioEditarPermiso" action="{% url 'timetrackpro:editar-permiso' %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
-
           <div class="row">
             <div class="col-xl-4">
               <label>Nombre</label>
               <div class="mb-3">
-                <input type="text" class="form-control"  value="{{permiso.id}}"  id="id_permiso" name="id_permiso" aria-describedby="text-addon" hidden>
-                <input type="text" class="form-control" placeholder="Nombre en el dispositivo" value="{{permiso.nombre}}" aria-label="Nombre en el dispositivo" id="nombre_permiso" name="nombre_permiso" aria-describedby="text-addon">
+                <input type="text" class="form-control" value="{{permiso.id}}" id="id_permiso" name="id_permiso"
+                  aria-describedby="text-addon" hidden>
+                <input type="text" class="form-control" placeholder="Nombre en el dispositivo"
+                  value="{{permiso.nombre}}" aria-label="Nombre en el dispositivo" id="nombre_permiso"
+                  name="nombre_permiso" aria-describedby="text-addon">
               </div>
             </div>
             <div class="col-xl-2">
               <label>Duración en días</label>
               <div class="mb-3">
-                <input type="number" class="form-control" placeholder="3" aria-label="Duración del permiso" id="duracion_permiso" name="duracion_permiso" min="1" value="{{permiso.duracion|safe}}" aria-describedby="text-addon">
+                <input type="number" class="form-control" placeholder="3" aria-label="Duración del permiso"
+                  id="duracion_permiso" name="duracion_permiso" min="1" value="{{permiso.duracion|safe}}"
+                  aria-describedby="text-addon">
               </div>
             </div>
             <div class="col-xl-3">
@@ -256,61 +261,59 @@
               </select>
               </div>
             </div>
+
+
             <div class="col-xl-3">
               <label>Fecha límite para la solicitud</label>
               <div class="mb-3">
                 <input type="date" class="form-control" aria-label="Nombre en el dispositivo"
-                  aria-describedby="text-addon" name="fecha_limite_solicitud" id="fecha_limite_solicitud" value="{{permiso.fecha_maxima_solicitud|safe}}"> 
+                  aria-describedby="text-addon" name="fecha_limite_solicitud" id="fecha_limite_solicitud"
+                  value="{{permiso.fecha_maxima_solicitud|safe}}">
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-xl-6">
-              <label>Periodo de antelación</label>
-              <div class="mb-3">
-                <textarea type="text" class="form-control" placeholder="Indique con palabras el perido con el que se puede solicitar" aria-label="Información sobre el periodo de antelación" id="periodo_antelacion" name="periodo_antelacion" aria-describedby="text-addon">{{permiso.periodo_antelacion|safe}}</textarea>
-              </div>
+              <label>Periodo de antelación</label><textarea type="text" class="form-control" placeholder="Indique con palabras el perido con el que se puede solicitar" aria-label="Información sobre el periodo de antelación" id="periodo_antelacion" name="periodo_antelacion" aria-describedby="text-addon">{{permiso.periodo_antelacion|safe}}</textarea>
             </div>
-            <div class="col-xl-6" id="docNecesaria" {% if permiso.acreditar  != 1 %} hidden {% endif %}>
+            <div class="col-xl-6" id="docNecesaria" {% if permiso.acreditar != 1 %} hidden {% endif %}>
               <label>Documentación a aportar</label>
               <div class="mb-3">
-                <textarea type="text" class="form-control" placeholder="Documentación que debe aportar para justificar el permiso" aria-label="Documentación justificativa" id="documentacion_permiso" name="documentacion_permiso" aria-describedby="text-addon">{{permiso.doc_necesaria|safe}}</textarea>
+                <textarea type="text" class="form-control"
+                  placeholder="Documentación que debe aportar para justificar el permiso"
+                  aria-label="Documentación justificativa" id="documentacion_permiso" name="documentacion_permiso"
+                  aria-describedby="text-addon">{{permiso.doc_necesaria|safe}}</textarea>
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-xl-9">
               <label>Legislación aplicable</label>
-              <div class="mb-3">
                 <textarea type="text" class="form-control" placeholder="Legislación en la que se recoge el derecho a este permiso" aria-label="Legislacion aplicable al permiso" id="legilacion_aplicable" name="legilacion_aplicable" aria-describedby="text-addon">{{permiso.legislacion_aplicable|safe }}</textarea>
-              </div>
             </div>
-                          
             <div class="col-xl-3">
               <label>¿Quién se beneficia?</label>
               <div class="mb-3">
                 <div class="form-switch ps-1 my-2">
-                  <label >PAS</label>
+                  <label>PAS</label>
 
-                  <input class="form-check-input ms-auto" type="checkbox" id="pas" name="pas" {% if permiso.pas  == 1 %} checked {% endif %}>
+                  <input class="form-check-input ms-auto" type="checkbox" id="pas" name="pas" {% if permiso.pas == 1 %} checked {% endif %}>
                   <label class="text-muted">Si</label>
                 </div>
                 <div class="form-switch ps-1 my-2">
-                  <label >PDI</label>
-                  <input class="form-check-input ms-auto" type="checkbox" id="pdi" name="pdi" {% if permiso.pdi  == 1 %} checked {% endif %}>
+                  <label>PDI</label>
+                  <input class="form-check-input ms-auto" type="checkbox" id="pdi" name="pdi" {% if permiso.pdi == 1 %} checked {% endif %}>
                   <label class="text-muted">Si</label>
                 </div>
               </div>
             </div>
-            
           </div>
           <div class="row">
             <div class="col-xl-4">
               <label>Bonificable por antigüedad</label>
               <div class="mb-3">
                 <div class="form-switch ps-1 my-2">
-
-                  <input class="form-check-input ms-auto" type="checkbox" id="bonificable" name="bonificable" {% if permiso.bonificable_por_antiguedad  == 1 %} checked {% endif %}>
+                  <input class="form-check-input ms-auto" type="checkbox" id="bonificable" name="bonificable" {% if permiso.bonificable_por_antiguedad == 1 %} checked {% endif %}>
                   <label class="text-muted">Si</label>
                 </div>
               </div>
@@ -320,70 +323,80 @@
               <div class="mb-3">
                 <div class="form-switch ps-1 my-2">
 
-                  <input class="form-check-input ms-auto" type="checkbox" id="retribuido" name="retribuido" {% if permiso.es_permiso_retribuido  == 1 %} checked {% endif %}>
+                  <input class="form-check-input ms-auto" type="checkbox" id="retribuido" name="retribuido" {% if permiso.es_permiso_retribuido == 1 %} checked {% endif %}>
                   <label class="text-muted">Si</label>
                 </div>
               </div>
-            </div>                  
+            </div>
             <div class="col-xl-4">
               <label>¿Se debe acreditar?</label>
               <div class="mb-3">
                 <div class="form-switch ps-1 my-2">
 
-                  <input class="form-check-input ms-auto" type="checkbox" id="acreditable" name="acreditable" {% if permiso.acreditar  == 1 %} checked {% endif %}>
+                  <input class="form-check-input ms-auto" type="checkbox" id="acreditable" name="acreditable" {% if permiso.acreditar == 1 %} checked {% endif %}>
                   <label class="text-muted">Si</label>
                 </div>
               </div>
             </div>
-            <div class="col-xl-4" hidden >
+            <div class="col-xl-4" hidden>
               <label>Año al que aplica</label>
               <div class="mb-3">
-                <input type="number" class="form-control" placeholder="2023" min="2022" max="2050" id="year_permiso" name="year_permiso" aria-label="Año al que aplica"  value="{{permiso.year|safe}}" aria-describedby="text-addon">
-              </div>
-            </div>    
-          </div>
-          <div class="row" id="bonificaciones" {% if permiso.bonificable_por_antiguedad  != 1 %} hidden {% endif %}>
-            <div class="col-xl-3">
-              <label>Por 15 años</label>
-              <div class="mb-3">
-                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_15_year" value="{{permiso.bonificacion_por_15_years|safe}}" name="bonificacion_15_year" aria-label="Año al que aplica" aria-describedby="text-addon" >
-              </div>
-            </div>                  
-            <div class="col-xl-3">
-              <label>Por 20 años</label>
-              <div class="mb-3">
-                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_20_year" value="{{permiso.bonificacion_por_20_years|safe}}" name="bonificacion_20_year"  aria-label="Año al que aplica" aria-describedby="text-addon">
-              </div>
-            </div>                
-            <div class="col-xl-3">
-              <label>Por 25 años</label>
-              <div class="mb-3">
-                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_25_year" value="{{permiso.bonificacion_por_25_years|safe}}" name="bonificacion_25_year" aria-label="Año al que aplica" aria-describedby="text-addon">
-              </div>
-            </div>                
-            <div class="col-xl-3">
-              <label>Por 30 años</label>
-              <div class="mb-3">
-                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_30_year" value="{{permiso.bonificacion_por_30_years|safe}}" name="bonificacion_30_year" aria-label="Año al que aplica" aria-describedby="text-addon">
+                <input type="number" class="form-control" placeholder="2023" min="2022" max="2050" id="year_permiso"
+                  name="year_permiso" aria-label="Año al que aplica" value="{{permiso.year|safe}}"
+                  aria-describedby="text-addon">
               </div>
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          {% if user.is_authenticated  %}
-          <button type="submit" value="submit"  class="btn btn-primary">Guardar</button>
-          {% endif %}
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-        </div>
-      </form>
+          <div class="row" id="bonificaciones" {% if permiso.bonificable_por_antiguedad != 1 %} hidden {% endif %}>
+            <div class="col-xl-3">
+              <label>Por 15 años</label>
+              <div class="mb-3">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_15_year"
+                  value="{{permiso.bonificacion_por_15_years|safe}}" name="bonificacion_15_year"
+                  aria-label="Año al que aplica" aria-describedby="text-addon">
+              </div>
+            </div>
+            <div class="col-xl-3">
+              <label>Por 20 años</label>
+              <div class="mb-3">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_20_year"
+                  value="{{permiso.bonificacion_por_20_years|safe}}" name="bonificacion_20_year"
+                  aria-label="Año al que aplica" aria-describedby="text-addon">
+              </div>
+            </div>
+            <div class="col-xl-3">
+              <label>Por 25 años</label>
+              <div class="mb-3">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_25_year"
+                  value="{{permiso.bonificacion_por_25_years|safe}}" name="bonificacion_25_year"
+                  aria-label="Año al que aplica" aria-describedby="text-addon">
+              </div>
+            </div>
+            <div class="col-xl-3">
+              <label>Por 30 años</label>
+              <div class="mb-3">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_30_year"
+                  value="{{permiso.bonificacion_por_30_years|safe}}" name="bonificacion_30_year"
+                  aria-label="Año al que aplica" aria-describedby="text-addon">
+              </div>
+            </div>
+          </div>
       </div>
+      <div class="modal-footer">
+        {% if user.is_authenticated %}
+        <button type="submit" value="submit" class="btn btn-primary">Guardar</button>
+        {% endif %}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+      </form>
     </div>
   </div>
+</div>
 
 
 <script>
-  $(document).ready(function(){
-    $("#fecha_limite_solicitud").change(function(){
+  $(document).ready(function () {
+    $("#fecha_limite_solicitud").change(function () {
       if ($("#fecha_limite_solicitud").val() == "") {
         var d = new Date();
         var n = d.getFullYear();
@@ -396,8 +409,8 @@
     });
   });
 
-  $(document).ready(function(){
-    $("#bonificable").click(function(){
+  $(document).ready(function () {
+    $("#bonificable").click(function () {
       if ($("#bonificable").is(':checked')) {
         $("#bonificacion_15_year").val(1);
         $("#bonificacion_20_year").val(1);
@@ -428,8 +441,8 @@
     });
   });
 
-  $(document).ready(function(){
-    $("#acreditable").click(function(){
+  $(document).ready(function () {
+    $("#acreditable").click(function () {
       if ($("#acreditable").is(':checked')) {
         $("#docNecesaria").removeAttr("hidden");
         $("#documentacion_permiso").attr("required", true);

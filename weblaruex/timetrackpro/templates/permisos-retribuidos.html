@@ -246,7 +246,8 @@
           var div = '<div class="col-10"><h6 class="mb-0 text-sm text-primary">'+ mensaje + '</h6></div>';
           return div;
         }
-      },       {
+      },
+      {
         title: "¿Quién se beneficia?",
         field: "",
         align: "center",
@@ -273,7 +274,17 @@
 
           return div;
         }
-      },
+      },{
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          var botonVer = '<a href="/private/timetrackpro/ver-permiso-retribuido/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          return botonVer;
+                  
+
+        },
+      }
     ],
     search: true,
     sortName: "id",

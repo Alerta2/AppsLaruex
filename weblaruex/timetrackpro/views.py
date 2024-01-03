@@ -2040,9 +2040,6 @@ def dashBoard(request):
     return render(request,"dashboard.html",{"navBar":navBar})
 
 def tablas(request):        
-    # obtengo los datos necesarios para la vista
-    
-
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
@@ -2161,11 +2158,11 @@ def agregarPermiso(request, year=None):
         # registramos el permiso en la base de datos
         nuevoPermiso = PermisosVacaciones(nombre=nombre, duracion=duracion, naturales_o_habiles=tipoDias, periodo_antelacion=periodoAntelacion, fecha_maxima_solicitud=fechaLimite, acreditar=acreditable, doc_necesaria=documentacionJustificativa, legislacion_aplicable=legislacionAplicable, bonificable_por_antiguedad=bonificable, bonificacion_por_15_years=bonificacion_15, bonificacion_por_20_years=bonificacion_20, bonificacion_por_25_years=bonificacion_25, bonificacion_por_30_years=bonificacion_30, year=year, es_permiso_retribuido=retribuido, pdi=pdi, pas=pas)
         nuevoPermiso.save(using='timetrackpro')
-        alerta.activa = True
-        alerta.icono = iconosAviso["success"]
-        alerta.tipo = "success"
-        alerta.mensaje = "Permiso agregado correctamente."
-        return redirect('timetrackpro:permisos', year=year)
+        alerta["activa"] = True
+        alerta["icono"] = iconosAviso["success"]
+        alerta["tipo"] = "success"
+        alerta["mensaje"] = "Permiso agregado correctamente."
+        return redirect('timetrackpro:lista-permisos', year=year)
             # return redirect('timetrackpro:permisos', id=nuevoRegistro.id)
     else:
         return render(request,"agregar-permisos.html", infoVista)
