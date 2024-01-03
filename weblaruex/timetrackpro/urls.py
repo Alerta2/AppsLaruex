@@ -97,10 +97,10 @@ urlpatterns = [
     path('private/timetrackpro/errores-en-registros/<slug:idEmpleado>/<slug:year>/<slug:mes>/', erroresRegistroEmpleado , name='errores-en-registros-empleado'),
 
     #Permisos
-    path('private/timetrackpro/permisos/', permisos , name='permisos'),
-    path('private/timetrackpro/permisos/<slug:year>/', permisos , name='permisos'),
-    path('private/timetrackpro/datos-permisos/', datosPermisos , name='datos-permisos'),
-    path('private/timetrackpro/datos-permisos/<slug:year>/', datosPermisos , name='datos-permisos'),
+    path('private/timetrackpro/lista-permisos/', listaPermisos , name='lista-permisos'),
+    path('private/timetrackpro/lista-permisos/<slug:year>/', listaPermisos , name='lista-permisos'),
+    path('private/timetrackpro/datos-lista-permisos/', datosListaPermisos , name='datos-lista-permisos'),
+    path('private/timetrackpro/datos-lista-permisos/<slug:year>/', datosListaPermisos , name='datos-lista-permisos'),
     path('private/timetrackpro/agregar-permiso/', agregarPermiso , name='agregar-permiso'),
     path('private/timetrackpro/ver-permiso/<slug:id>/', verPermiso , name='ver-permiso'),
     path('private/timetrackpro/editar-permiso/', editarPermiso , name='editar-permiso'),
@@ -161,12 +161,18 @@ urlpatterns = [
     path('private/timetrackpro/eliminar-asuntos-propios/<slug:id>/', eliminarAsuntosPropios , name='eliminar-asuntos-propios'),
     path('private/timetrackpro/solicitar-modificar-asuntos-propios/', solicitarModificarAsuntosPropios , name='solicitar-modificar-asuntos-propios'),
 
-    
+    # permisos retribuidos
+    path('private/timetrackpro/lista-permisos-retribuidos/', listaPermisosRetribuidos , name='lista-permisos-retribuidos'),
+    path('private/timetrackpro/datos-lista-permisos-retribuidos/', datosListaPermisosRetribuidos , name='datos-lista-permisos-retribuidos'),    
+    path('private/timetrackpro/agregar-permiso-retribuido/', agregarPermisoRetribuido , name='agregar-permiso-retribuido'),
+    path('private/timetrackpro/ver-permiso-retribuido/<slug:id>/', verPermisoRetribuido , name='ver-permiso-retribuido'),
+    path('private/timetrackpro/editar-permiso-retribuido/', editarPermisoRetribuido , name='editar-permiso-retribuido'),
+
     
     #Solicitud de permisos retribuidos 
     path('private/timetrackpro/solicitar-permisos-retribuidos/', solicitarPermisosRetribuidos , name='solicitar-permisos-retribuidos'),
     path('private/timetrackpro/solicitar-permisos-retribuidos/<slug:year>/', solicitarPermisosRetribuidos , name='solicitar-permisos-retribuidos'),
     path('private/timetrackpro/datos-permisos-retribuidos-empleados/', datosPermisosRetribuidosEmpleados , name='datos-permisos-retribuidos-empleados'),
-    path('private/timetrackpro/datos-permisos-retribuidos-empleados/<slug:year>/', datosPermisosRetribuidosEmpleados , name='datos-permisos-retribuidos-empleados'),
+
 
 ]

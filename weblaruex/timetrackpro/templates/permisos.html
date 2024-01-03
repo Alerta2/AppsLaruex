@@ -57,22 +57,21 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Agregar usuario a la máquina</h5>
+          <h5 class="modal-title">Agregar nuevo permiso vacacional</h5>
           <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
 
         <div class="modal-body">
-        <form id="formularioAgregarUsuarioMaquina" action="{% url 'timetrackpro:agregar-usuario-maquina' %}" method="POST"
+        <form id="formularioAgregarPermiso" action="{% url 'timetrackpro:agregar-permiso' %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}         
             <div class="row">
               <div class="col-xl-2">
                 <label>ID</label>
                 <input type="text" class="form-control" placeholder="ID en el dispositivo"
-                  aria-label="Nombre en el dispositivo" id="id_empleado_maquina" name="id_empleado_maquina"
-                  aria-describedby="text-addon" id="id_empleado_maquina" name="id_empleado_maquina" >
+                  aria-label="Nombre en el dispositivo" id="id_empleado_maquina" name="id_empleado_maquina" aria-describedby="text-addon">
               </div>
               <div class="col-xl-4">
                 <label>Nombre</label>
@@ -164,7 +163,7 @@
     $("#tabla_permisos").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "{% url 'timetrackpro:datos-permisos' %}",
+    url: "{% url 'timetrackpro:datos-lista-permisos' %}",
     cache: false, 
     columns: [
       {

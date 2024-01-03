@@ -1,0 +1,265 @@
+
+{% extends "base/base_timetrackpro.html" %}
+
+{% load static %}
+{% block imports %}
+<!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/timetrackpro-boostrap-table.css' %}" /> -->
+
+{% endblock %}
+{% block content %}
+
+{% if alerta.activa == True %}
+<div class="alert alert-{{alerta.tipo}} alert-dismissible fade show" role="alert">
+  <div>
+
+    {% if alerta.icono != ""%}
+    <i class="{{alerta.icono}} me-2"></i>
+    {% endif %}
+    {{alerta.mensaje}}
+  </div>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+    <strong >&times;</strong>
+  </button>
+
+</div> 
+{% endif %}
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h5>Permisos reconocidos por la Uex</h5>
+          
+            
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="table-responsive p-0 mx-4">
+            
+       <div id="toolbar">
+
+        <button class="botonLink" data-toggle="modal" data-target="#modalAgregarPermiso">
+          <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+          <div class="text text-sm">Agregar permiso</div>
+        </button>
+      </div>
+            <table id="tabla_permisos_retribuidos" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
+    data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+    data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+    data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-row-style="rowStyle"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalAgregarPermiso" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAgregarPermiso"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Agregar nuevo permiso retribuido</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioAgregarPermisoRetribuido" action="{% url 'timetrackpro:agregar-permiso-retribuido' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}         
+            <div class="row">
+              <div class="col-xl-4">
+                <label>Código Uex</label>
+                <input type="text" class="form-control" placeholder="ID en el dispositivo"
+                  aria-label="Nombre en el dispositivo" aria-describedby="text-addon" id="cod_uex" name="cod_uex">
+              </div>
+              <div class="col-xl-4">
+                <label>Tipo</label>
+                <select class="form-control" aria-label="Nombre en el dispositivo" id="tipo_permiso"
+                  name="tipo_permiso" aria-describedby="text-addon">
+                  <option value="1" selected>Permisos</option>
+                  <option value="2">Permisos con duración inespecífica</option>
+                  <option value="3">Reducción de jornada</option>
+                  <option value="4">Ausencia</option>
+                </select>
+              </div>
+              <div class="col-xl-4">
+                <label>Periodo para la notificación</label>
+                <select class="form-control" aria-label="Nombre en el dispositivo" id="tipo_permiso"
+                  name="tipo_permiso" aria-describedby="text-addon">
+                  <option value="0" selected>Inmediatamente</option>
+                  <option value="7">7 días antes</option>
+                  <option value="15">15 días antes</option>
+                  <option value="30">30 días antes</option>
+                </select>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-xl-12">
+                <label>Nombre</label>
+                <textarea type="text" class="form-control" placeholder="Agrege la información adicional del empleado" aria-label="Información adicional del empleado" id="infoAdicional_empleado" name="infoAdicional_empleado" aria-describedby="text-addon"></textarea>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-xl-3">
+                <label>Días</label>
+                <input class="form-control" type="number" step="1" min="0" max="999" id="jornada_maxima_empleado"
+                  name="jornada_maxima_empleado" placeholder="máximo 999">
+              </div>
+              <div class="col-xl-6">
+                <div class="d-flex mt-5 mb-0">
+                  <div class="form-check form-check-inline ">
+                    <input class="form-check-input" type="radio" name="naturales" id="naturales" onchange="changeSelected('habiles')">
+                    <label class="custom-control-label" for="naturales">Naturales</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="habiles" id="habiles" onchange="changeSelected('naturales')">
+                    <label class="custom-control-label" for="habiles">Hábiles</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-xl-12">
+                <label class="d-inline">Personal beneficiado</label>
+                <div class="d-inline form-switch ps-0">
+                  <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">PAS</label>
+                  <input class="form-check-input ms-auto" type="checkbox" id="pas" name="pas"> 
+                </div>
+                <div class="d-inline form-switch ps-0">
+                  <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">PDI</label>
+                  <input class="form-check-input ms-auto" type="checkbox" id="pdi" name="pdi">
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn btn-primary">Guardar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    $("#tabla_permisos_retribuidos").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-lista-permisos-retribuidos' %}",
+    cache: false, 
+    columns: [   
+      {
+        title: "Tipo",
+        field: "tipo",
+        align: "left",
+        halign: "left",
+        wrapped: true,
+        formatter: function(value, row) {
+          var tipo = row.tipo__id;
+          var div = "";
+          switch (tipo) {
+            case 1:
+              div = '<div><span class="badge badge-xs bg-gradient-info">'+row.tipo__nombre+'</span></div>';
+              break;
+            case 2:
+              div = '<div><span class="badge badge-xs bg-gradient-info">'+row.tipo__nombre+'</span></div>';
+              break;
+            case 3:
+              div = '<div><span class="badge badge-xs bg-gradient-warning">'+row.tipo__nombre+'</span></div>';
+              break;
+            case 4:
+              div = '<div><span class="badge badge-xs bg-gradient-danger">'+row.tipo__nombre+'</span></div>';
+              break;
+            default:
+              div = '<div><span class="badge badge-xs bg-gradient-dark">'+row.tipo__nombre+'</span></div>';
+              break;
+          }
+            return div;
+        }
+      },
+      {
+        title: "Código uex",
+        field: "cod_uex",
+        align: "left",
+        halign: "left",
+        formatter: function(value, row) {
+          var codigo = row.cod_uex;
+          var div = '<div class="col-10"><h6 class="mb-0 text-sm">'+ codigo +'</h6></div>';
+          return div;
+        }
+      },      
+      {
+        title: "Tipología",
+        field: "nombre",
+        align: "left",
+        halign: "left",
+        wrapped: true,
+        formatter: function(value, row) {
+          var nombre = row.nombre;
+          var div = '<div class="col-10"><h6 class="mb-0 text-sm">'+ nombre +'</h6></div>';
+          return div;
+        }
+      },     
+      {
+        title: "Duración",
+        field: "dias",
+        align: "left",
+        halign: "left",
+        wrapped: true,
+        formatter: function(value, row) {
+          var dias = row.dias;
+          var tipo_dias = row.habiles_o_naturales;
+          var mensaje = "";
+          switch (dias) {
+            case 0:
+              mensaje = "Determinado por el jefe de departamento";
+              break;
+            case 999:
+              mensaje = "Consultar a recursos humanos";
+              break;
+            default:
+              mensaje = dias + " dias " + tipo_dias;
+              break;
+          }
+          var div = '<div class="col-10"><h6 class="mb-0 text-sm">'+ mensaje + '</h6></div>';
+          return div;
+        }
+      },      
+      {
+        title: "Periodo de solicitud",
+        field: "solicitud_dias_naturales_antelacion",
+        align: "left",
+        halign: "left",
+        wrapped: true,
+        formatter: function(value, row) {
+          var dias = row.solicitud_dias_naturales_antelacion;
+          var mensaje = "";
+          if (dias == 0){
+            mensaje = "Con la mayor antelación posible";
+          }else{
+            mensaje = solicitud_dias_naturales_antelacion + " dias naturales";
+          }
+          var div = '<div class="col-10"><h6 class="mb-0 text-sm text-primary">'+ mensaje + '</h6></div>';
+          return div;
+        }
+      }, 
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+
+  
+function changeSelected (button){
+  document.getElementById(button).checked = false;
+}
+
+</script>
+
+
+{% endblock %}

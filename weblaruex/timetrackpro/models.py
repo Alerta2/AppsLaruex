@@ -250,7 +250,7 @@ class MaquinaControlAsistencia(models.Model):
 
 
 
-class Permisos(models.Model):
+class PermisosVacaciones(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     nombre = models.CharField(max_length=255, blank=True, null=True)
     duracion = models.IntegerField(blank=True, null=True)
@@ -282,8 +282,10 @@ class PermisosRetribuidos(models.Model):
     nombre = models.CharField(max_length=255)
     tipo = models.ForeignKey('TipoPermisosYAusencias', models.DO_NOTHING, db_column='tipo')
     dias = models.IntegerField()
-    habiles_o_naturales = models.CharField(max_length=5)
+    habiles_o_naturales = models.CharField(max_length=15)
     solicitud_dias_naturales_antelacion = models.IntegerField()
+    pas = models.IntegerField()
+    pdi = models.IntegerField()
 
     class Meta:
         managed = False
@@ -300,6 +302,7 @@ class PermisosYAusenciasSolicitados(models.Model):
     codigo_permiso = models.ForeignKey(PermisosRetribuidos, models.DO_NOTHING, db_column='codigo_permiso')
     justificante = models.CharField(max_length=255, blank=True, null=True)
     estado = models.ForeignKey('EstadosSolicitudes', models.DO_NOTHING, db_column='estado')
+    year = models.IntegerField()
 
     class Meta:
         managed = False
@@ -307,7 +310,7 @@ class PermisosYAusenciasSolicitados(models.Model):
 
 class RegistroAusencias(models.Model):
     id = models.IntegerField(primary_key=True)
-    id_permiso = models.ForeignKey(Permisos, models.DO_NOTHING, db_column='id_permiso', blank=True, null=True)
+    id_permiso = models.ForeignKey(PermisosVacaciones, models.DO_NOTHING, db_column='id_permiso', blank=True, null=True)
     id_empleado = models.ForeignKey('Empleados', models.DO_NOTHING, db_column='id_empleado', blank=True, null=True)
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()

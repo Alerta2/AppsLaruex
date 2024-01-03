@@ -20,3 +20,5 @@ weblaruex/static/
 *.tmp
 *.MP4
 *.pyc
+
+weblaruex/timetrackpro/Models2.py

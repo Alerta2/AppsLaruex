@@ -2066,44 +2066,18 @@ def signUp(request):
     return render(request,"sign-up.html",{})
 
 
-'''-------------------------------------------
-        Permisos de empleados
--------------------------------------------'''
-'''-------------------------------------------
-                                Módulo: permisos
-
-- Descripción: 
-listado de permisos reconocidos que cualquier empleado puede disfrutar
-
-- Precondiciones:
-El usuario debe estar autenticado.
-
-- Postcondiciones:
-
--------------------------------------------'''
-def datosPermisos(request, year=None):
+def datosListaPermisos(request, year=None):
     # obtengo los datos necesarios para la vista
     if year == None:
-        permisos = Permisos.objects.using("timetrackpro").values('id','nombre', 'duracion', 'naturales_o_habiles', 'periodo_antelacion', 'fecha_maxima_solicitud', 'acreditar', 'doc_necesaria', 'legislacion_aplicable', 'bonificable_por_antiguedad', 'bonificacion_por_15_years', 'bonificacion_por_20_years', 'bonificacion_por_25_years', 'bonificacion_por_30_years', 'year', 'es_permiso_retribuido', 'pas', 'pdi')
+        permisos = PermisosVacaciones.objects.using("timetrackpro").values('id','nombre', 'duracion', 'naturales_o_habiles', 'periodo_antelacion', 'fecha_maxima_solicitud', 'acreditar', 'doc_necesaria', 'legislacion_aplicable', 'bonificable_por_antiguedad', 'bonificacion_por_15_years', 'bonificacion_por_20_years', 'bonificacion_por_25_years', 'bonificacion_por_30_years', 'year', 'es_permiso_retribuido', 'pas', 'pdi')
     else:
-        permisos = Permisos.objects.using("timetrackpro").filter(year=year).values('id','nombre', 'duracion', 'naturales_o_habiles', 'periodo_antelacion', 'fecha_maxima_solicitud', 'acreditar', 'doc_necesaria', 'legislacion_aplicable', 'bonificable_por_antiguedad', 'bonificacion_por_15_years', 'bonificacion_por_20_years', 'bonificacion_por_25_years', 'bonificacion_por_30_years', 'year', 'es_permiso_retribuido', 'pas', 'pdi')
+        permisos = PermisosVacaciones.objects.using("timetrackpro").filter(year=year).values('id','nombre', 'duracion', 'naturales_o_habiles', 'periodo_antelacion', 'fecha_maxima_solicitud', 'acreditar', 'doc_necesaria', 'legislacion_aplicable', 'bonificable_por_antiguedad', 'bonificacion_por_15_years', 'bonificacion_por_20_years', 'bonificacion_por_25_years', 'bonificacion_por_30_years', 'year', 'es_permiso_retribuido', 'pas', 'pdi')
 
     # devuelvo la lista en formato json
     return JsonResponse(list(permisos), safe=False)
 
-'''-------------------------------------------
-                                Módulo: permisos
 
-- Descripción: 
-listado de permisos reconocidos que cualquier empleado puede disfrutar
-
-- Precondiciones:
-El usuario debe estar autenticado.
-
-- Postcondiciones:
-
--------------------------------------------'''
-def permisos(request, year=None):
+def listaPermisos(request, year=None):
     # obtengo los datos necesarios para la vista
 
     # guardo los datos en un diccionario
@@ -2115,19 +2089,6 @@ def permisos(request, year=None):
     return render(request,"permisos.html", infoVista)
 
 
-'''-------------------------------------------
-                         Módulo: agregarPermiso
-
-- Descripción: 
-vista que permite agregar un permiso a la base de datos
-
-- Precondiciones:
-El usuario debe estar autenticado.
-
-- Postcondiciones:
-Agregar un permiso a la base de datos y redirigir a la vista de permisos
-
--------------------------------------------'''
 def agregarPermiso(request, year=None):
     # obtengo los datos necesarios para la vista
     # guardo los datos en un diccionario
@@ -2198,7 +2159,7 @@ def agregarPermiso(request, year=None):
             bonificacion_30 = request.POST.get("bonificacion_30_year")
 
         # registramos el permiso en la base de datos
-        nuevoPermiso = Permisos(nombre=nombre, duracion=duracion, naturales_o_habiles=tipoDias, periodo_antelacion=periodoAntelacion, fecha_maxima_solicitud=fechaLimite, acreditar=acreditable, doc_necesaria=documentacionJustificativa, legislacion_aplicable=legislacionAplicable, bonificable_por_antiguedad=bonificable, bonificacion_por_15_years=bonificacion_15, bonificacion_por_20_years=bonificacion_20, bonificacion_por_25_years=bonificacion_25, bonificacion_por_30_years=bonificacion_30, year=year, es_permiso_retribuido=retribuido, pdi=pdi, pas=pas)
+        nuevoPermiso = PermisosVacaciones(nombre=nombre, duracion=duracion, naturales_o_habiles=tipoDias, periodo_antelacion=periodoAntelacion, fecha_maxima_solicitud=fechaLimite, acreditar=acreditable, doc_necesaria=documentacionJustificativa, legislacion_aplicable=legislacionAplicable, bonificable_por_antiguedad=bonificable, bonificacion_por_15_years=bonificacion_15, bonificacion_por_20_years=bonificacion_20, bonificacion_por_25_years=bonificacion_25, bonificacion_por_30_years=bonificacion_30, year=year, es_permiso_retribuido=retribuido, pdi=pdi, pas=pas)
         nuevoPermiso.save(using='timetrackpro')
         alerta.activa = True
         alerta.icono = iconosAviso["success"]
@@ -2209,20 +2170,8 @@ def agregarPermiso(request, year=None):
     else:
         return render(request,"agregar-permisos.html", infoVista)
     
-'''-------------------------------------------
-                                Módulo: verPermiso
-
-- Descripción: 
-Muestra la información de cada uno de los permisos registrados en la base de datos
-
-- Precondiciones:
-El usuario debe estar autenticado.
-
-- Postcondiciones:
-
--------------------------------------------'''
 def verPermiso(request, id):
-    permiso = Permisos.objects.using("timetrackpro").filter(id=id)[0]
+    permiso = PermisosVacaciones.objects.using("timetrackpro").filter(id=id)[0]
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
@@ -2232,22 +2181,11 @@ def verPermiso(request, id):
     return render(request,"verPermiso.html",infoVista)
 
 
-'''-------------------------------------------
-                                Módulo: editarPermiso
 
-- Descripción: 
-edita la informacion de un permiso en la base de datos
-
-- Precondiciones:
-El usuario debe estar autenticado.
-
-- Postcondiciones:
-
--------------------------------------------'''
 def editarPermiso(request):
     id = request.POST.get("id_permiso")
 
-    permiso = Permisos.objects.using("timetrackpro").filter(id=id)[0]
+    permiso = PermisosVacaciones.objects.using("timetrackpro").filter(id=id)[0]
 
     # obtenemos los datos del formulario
     permiso.nombre = request.POST.get("nombre_permiso")
@@ -2313,6 +2251,187 @@ def editarPermiso(request):
     return redirect('timetrackpro:ver-permiso', id=permiso.id)
 
 
+'''-------------------------------------------
+        Permisos retribuidos de empleados
+-------------------------------------------'''
+def datosListaPermisosRetribuidos(request):
+    # obtengo los datos necesarios para la vista
+    permisos = PermisosRetribuidos.objects.using("timetrackpro").values('id', 'cod_uex', 'nombre', 'tipo__id', 'tipo__nombre', 'dias', 'habiles_o_naturales', 'solicitud_dias_naturales_antelacion')
+
+    # devuelvo la lista en formato json
+    return JsonResponse(list(permisos), safe=False)
+
+def listaPermisosRetribuidos(request):
+    # obtengo los datos necesarios para la vista
+
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "alerta":alerta,
+    }
+    return render(request,"permisos-retribuidos.html", infoVista)
+
+def agregarPermisoRetribuido(request, year=None):
+    # obtengo los datos necesarios para la vista
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+    }
+    if request.method == 'POST':
+        # obtenemos los datos del formulario
+        nombre = request.POST.get("nombre_permiso")
+        duracion = request.POST.get("duracion_permiso")
+        tipoDias = request.POST.get("tipo_dias")
+        fechaLimite = None
+        if "fecha_limite_solicitud" in request.POST and request.POST.get("fecha_limite_solicitud") != "":
+            fechaLimite = request.POST.get("fecha_limite_solicitud")
+
+        year = None
+        if "year_permiso" in request.POST:
+            year = request.POST.get("year_permiso")
+        
+        periodoAntelacion = None
+        if "periodo_antelacion" in request.POST:
+            periodoAntelacion = request.POST.get("periodo_antelacion")
+        
+        documentacionJustificativa = None
+        if "documentacion_permiso" in request.POST:
+            documentacionJustificativa = request.POST.get("documentacion_permiso")
+        
+        legislacionAplicable = None
+        if "legilacion_aplicable" in request.POST:
+            legislacionAplicable = request.POST.get("legilacion_aplicable")
+
+        bonificable = request.POST.get("bonificable")
+        if bonificable == "on":
+            bonificable = 1
+        else:
+            bonificable = 0
+
+        retribuido = request.POST.get("bonificable")
+        if retribuido == "on":
+            retribuido = 1
+        else:
+            retribuido = 0
+
+        pas = request.POST.get("pas")
+        if pas == "on":
+            pas = 1
+        else:
+            pas = 0
+        
+        pdi = request.POST.get("pdi")
+        if pdi == "on":
+            pdi = 1
+        else:
+            pdi = 0
+
+        acreditable = request.POST.get("acreditable")
+        if acreditable == "on":
+            acreditable = 1
+        else:
+            acreditable = 0
+
+        bonificacion_15, bonificacion_20, bonificacion_25, bonificacion_30 = 0, 0, 0, 0
+        if bonificable == 1:
+            bonificacion_15 = request.POST.get("bonificacion_15_year")
+            bonificacion_20 = request.POST.get("bonificacion_20_year")
+            bonificacion_25 = request.POST.get("bonificacion_25_year")
+            bonificacion_30 = request.POST.get("bonificacion_30_year")
+
+        # registramos el permiso en la base de datos
+        nuevoPermiso = PermisosVacaciones(nombre=nombre, duracion=duracion, naturales_o_habiles=tipoDias, periodo_antelacion=periodoAntelacion, fecha_maxima_solicitud=fechaLimite, acreditar=acreditable, doc_necesaria=documentacionJustificativa, legislacion_aplicable=legislacionAplicable, bonificable_por_antiguedad=bonificable, bonificacion_por_15_years=bonificacion_15, bonificacion_por_20_years=bonificacion_20, bonificacion_por_25_years=bonificacion_25, bonificacion_por_30_years=bonificacion_30, year=year, es_permiso_retribuido=retribuido, pdi=pdi, pas=pas)
+        nuevoPermiso.save(using='timetrackpro')
+        alerta.activa = True
+        alerta.icono = iconosAviso["success"]
+        alerta.tipo = "success"
+        alerta.mensaje = "Permiso agregado correctamente."
+        return redirect('timetrackpro:permisos', year=year)
+            # return redirect('timetrackpro:permisos', id=nuevoRegistro.id)
+    else:
+        return render(request,"agregar-permisos.html", infoVista)
+    
+def verPermisoRetribuido(request, id):
+    permiso = PermisosVacaciones.objects.using("timetrackpro").filter(id=id)[0]
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "permiso":permiso,
+    }
+    return render(request,"verPermiso.html",infoVista)
+
+
+
+def editarPermisoRetribuido(request):
+    id = request.POST.get("id_permiso")
+
+    permiso = PermisosVacaciones.objects.using("timetrackpro").filter(id=id)[0]
+
+    # obtenemos los datos del formulario
+    permiso.nombre = request.POST.get("nombre_permiso")
+    permiso.duracion = request.POST.get("duracion_permiso")
+    permiso.naturales_o_habiles = request.POST.get("tipo_dias")
+    if "fecha_limite_solicitud" in request.POST and request.POST.get("fecha_limite_solicitud") != "":
+        permiso.fecha_maxima_solicitud = request.POST.get("fecha_limite_solicitud")
+    
+    if "year_permiso" in request.POST:
+        permiso.year = request.POST.get("year_permiso")
+    
+    if "periodo_antelacion" in request.POST:
+        permiso.periodo_antelacion = request.POST.get("periodo_antelacion")
+
+    acreditable = request.POST.get("acreditable")
+    if acreditable == "on":
+        permiso.acreditar = 1
+        docPermiso = request.POST.get("documentacion_permiso")
+        if docPermiso != "":
+            permiso.doc_necesaria = docPermiso
+        else:
+            permiso.doc_necesaria = "Ninguna"
+    else:
+        permiso.acreditar = 0
+        permiso.doc_necesaria = "Ninguna"       
+    
+    if "legilacion_aplicable" in request.POST:
+        permiso.legislacion_aplicable = request.POST.get("legilacion_aplicable")
+
+    bonificable = request.POST.get("bonificable")
+    if bonificable == "on":
+        permiso.bonificable_por_antiguedad = 1
+        permiso.bonificacion_por_15_years = request.POST.get("bonificacion_15_year")
+        permiso.bonificacion_por_20_years = request.POST.get("bonificacion_20_year")
+        permiso.bonificacion_por_25_years = request.POST.get("bonificacion_25_year")
+        permiso.bonificacion_por_30_years = request.POST.get("bonificacion_30_year")
+    else:
+        permiso.bonificable_por_antiguedad = 0
+        permiso.bonificacion_por_15_years = 0
+        permiso.bonificacion_por_20_years = 0
+        permiso.bonificacion_por_25_years = 0
+        permiso.bonificacion_por_30_years = 0
+
+    retribuido = request.POST.get("retribuido")
+    if retribuido == "on":
+        permiso.es_permiso_retribuido = 1
+    else:
+        permiso.es_permiso_retribuido = 0
+
+    pas = request.POST.get("pas")
+    if pas == "on":
+        permiso.pas = 1
+    else:
+        permiso.pas = 0
+
+    pdi = request.POST.get("pdi")
+    if pdi == "on":
+        permiso.pdi = 1
+    else:
+        permiso.pdi = 0
+
+    permiso.save(using='timetrackpro')
+    return redirect('timetrackpro:ver-permiso', id=permiso.id)
 '''-------------------------------------------
                                 Módulo: registroManualControlHorario
 
