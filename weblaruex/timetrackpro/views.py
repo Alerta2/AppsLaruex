@@ -2720,32 +2720,6 @@ def modificarSolicitudPermisoRetribuido(request):
     else:
         return redirect('timetrackpro:sin-permiso')
     
-def solicitarModificacionSolicitudPermisoRetribuido(request, id=None):
-    # guardo los datos en un diccionario
-    if request.method == 'POST':
-        # obtenemos los datos del empleado
-        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        idEmpleado = user.id_empleado.id
-        solicitante = Empleados.objects.using("timetrackpro").filter(id=idEmpleado)[0]
-        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=1)[0]
-        # obtenemos los datos del formulario
-        idAsuntosPropios = request.POST.get("asunto_modificar")
-        asuntoPropio = AsuntosPropios.objects.using("timetrackpro").filter(id=idAsuntosPropios)[0]
-        estadoPendiente = EstadosSolicitudes.objects.using("timetrackpro").filter(id=17)[0]
-        asuntoPropio.estado = estadoPendiente
-        asuntoPropio.save(using='timetrackpro')
-        fechaInicioActual = request.POST.get("fechaActualInicio")
-        fechaFinActual = request.POST.get("fechaActualFin")
-        diasConsumidosActual = request.POST.get("dias_actuales_consumidos")
-        fechaSolicitud = datetime.now()
-        fechaNuevaInicio = request.POST.get("fechaInicioNueva")
-        fechaNuevaFin = request.POST.get("fechaFinNueva")
-        diasConsumidosNuevos = request.POST.get("dias_nuevos_consumidos")
-        motivoCambio = request.POST.get("motivo_cambio")
-        solicitudModificacionAsuntosPropios = CambiosAsuntosPropios(id_periodo_cambio=asuntoPropio, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
-        solicitudModificacionAsuntosPropios.save(using='timetrackpro')
-    return redirect('timetrackpro:solicitar-vacaciones')
-
 
 def solicitarVacaciones(request):
     estados = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1).values()

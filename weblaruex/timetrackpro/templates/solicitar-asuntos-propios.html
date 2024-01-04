@@ -92,7 +92,6 @@
           </div>
         </div>
       </div>
-    {% endif %}
 
       {% if cambios %} 
  
@@ -197,7 +196,7 @@
         </div>
         <div class="modal-footer">
           {% if user.is_authenticated  %}
-          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="guardarSolicitarAsuntosPropios" disabled>Guardar</button>
+          <button type="submit" value="submit"  class="btn btn-primary" id="guardarSolicitarAsuntosPropios" disabled>Guardar</button>
           {% endif %}
           <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cerrar</button>
         </div>
@@ -287,7 +286,7 @@
         </div>
         <div class="modal-footer">
           {% if user.is_authenticated  %}
-          <button type="submit" value="submit" class="btn bg-gradient-primary" id="guardarModificarAsuntosPropios" disabled>Guardar</button>
+          <button type="submit" value="submit" class="btn btn-primary" id="guardarModificarAsuntosPropios" disabled>Guardar</button>
           {% endif %}
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
         </div>
@@ -371,7 +370,7 @@
             
             <div class="modal-footer">
               {% if user.is_authenticated %}
-              <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+              <button type="submit" value="submit" class="btn btn-primary">Guardar</button>
               {% endif %}
               <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
             </div>

@@ -29,15 +29,6 @@
       {% if not userDjango%}
       <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
         <div class="row">
-          {% if asuntos %}
-          <div class="col">
-           <button class="botonLinkFestivos" data-toggle="modal" data-target="#modalSolicitarModificarAsuntosPropios">             
-            <div class="sign-Btn-link">
-              <i class="fa-kit fa-solid-calendar-days-pen fa-lg ms-2" style="color: #ffffff;"></i></div>
-            <div class="text text-sm">Solicitar cambio</div>
-          </button>
-          </div>
-          {% endif %}
           <div class="col">
           <button class="botonLink" data-toggle="modal" data-target="#modalSolicitarPermisoRetribuido">    
             
@@ -94,28 +85,6 @@
       </div>
       {% endif %}
 
-      {% if cambios %} 
- 
-      <div class="card mt-4">
-        <div class="card-header pb-0 p-3">
-          <div class="row">
-            <div class="col-md-8 d-flex align-items-center">
-              <div class="row">
-                
-                <h5 class="mb-2">
-                  Cambio Solicitados
-                </h5>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="card-body pt-0 p-3" >
-          <div class="table-responsive ms-3 me-3">
-
-            <table  id="ausencias_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
-          </div>     
-        </div>
-        {% endif %}
       </div>
     </div>
   </div>
@@ -178,95 +147,6 @@
     </div>
   </div>
 
-  <div id="modalSolicitarModificarAsuntosPropios" tabindex="-2" role="dialog" class="modal fade modal-lg" aria-labelledby="modalSolicitarModificarAsuntosPropios"
-  aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Modificar Asuntos propios</h5>
-          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-
-        <div class="modal-body">
-        <form id="formularioModificarVacaciones" action="{% url 'timetrackpro:solicitar-modificar-asuntos-propios' %}" method="POST"
-          enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="row  d-flex justify-content-center">
-            <div class="col-xl-10">
-              <label class="col-form-label">Seleccione las vacaciones</label>
-              {{ asuntos|json_script:"listaAsuntos" }}
-              
-              <div class=" mb-2">
-                <select class="form-control" aria-label="Nombre en el dispositivo" id="asuntos_modificar"
-                name="vacaciones_modificar" aria-describedby="text-addon" onchange="mostrarInfo()" >
-                {% for a in asuntos %} 
-
-                <option value="{{a.id}}">{% if a.fecha_fin != a.fecha_inicio %} Del {{a.fecha_inicio|date:"d M"}} al {{a.fecha_fin|date:"d M Y"}}{% else %} {{a.fecha_inicio}} {% endif %}</option>
-                
-                {% endfor %}
-
-              </select>
-              
-              </div>
-
-            </div>
-          </div>
-          
-          <div class="row d-flex justify-content-center mb-2">
-            <div class="col-xl-4"  id="divFechaInicioActual" hidden>
-              <label class="col-form-label text-muted">Fecha inicio actual</label>
-
-              <input type="date" class="form-control" name="fechaActualInicio" id="fechaActualInicio"  style="background-color: #dbdbdf;">
-            </div>
-            <div class="col-xl-4"  id="divFechaFinActual" hidden>
-              <label class="col-form-label text-muted">Fecha fin actual</label>
-              <input type="date" class="form-control" name="fechaActualFin" id="fechaActualFin" style="background-color: #dbdbdf;" >
-            </div>
-            
-            <div class="col-xl-2"  id="divDiasActualesConsumidos" hidden>
-              <label class="col-form-label text-muted">Dias</label>
-
-              <input type="number" class="form-control" name="dias_actuales_consumidos" id="dias_actuales_consumidos"  min="1"  style="background-color: #dbdbdf;">
-
-            </div>
-
-          </div>
-
-          <div class="row d-flex justify-content-center mb-2">
-            <div class="col-xl-5">
-              <label class="col-form-label">Nueva fecha de inicio</label>
-
-              <input type="date" class="form-control" name="fechaInicioNueva" id="fechaInicioNueva" >
-            </div>
-            <div class="col-xl-5">
-              <label class="col-form-label">Nueva fecha de fin</label>
-
-              <input type="date" class="form-control" name="fechaFinNueva" id="fechaFinNueva"  onchange="calcularDias('fechaInicioNueva','fechaFinNueva', 'dias_nuevos_consumidos')">
-              <input type="number" class="form-control" name="dias_nuevos_consumidos" id="dias_nuevos_consumidos"  min="1" hidden>
-
-            </div>
-          </div>
-          <div class="row d-flex justify-content-center">
-            <div class="col-xl-10">
-              <label class="col-form-label">Motivo de la solicitud</label>
-              <div class="mb-3">
-                <textarea type="text" class="form-control" placeholder="Indique cual es el motivo por el que desea solicitar un cambio en sus vacaciones" id="motivo_cambio" name="motivo_cambio" aria-describedby="text-addon" required></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          {% if user.is_authenticated  %}
-          <button type="submit" value="submit" class="btn bg-gradient-primary" id="guardarModificarAsuntosPropios" disabled>Guardar</button>
-          {% endif %}
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-        </div>
-      </form>
-      </div>
-    </div>
-  </div>
 
   <! -- Modal Solicitar Permiso Retribuido desde el calendario -->
   <div id="modalSolicitarPermisoDesdeCalendario" tabindex="-1" role="dialog" class="modal fade modal-lg"
@@ -568,8 +448,6 @@
           if (estado == 20)
             var div = '<span class="badge badge-sm bg-gradient-info">Aceptada</span>';
           if (estado == 21)
-            var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
-          if (estado == 22)
             var div = '<span class="badge badge-sm bg-gradient-success">Justificada</span>';
           
           return div;
@@ -686,8 +564,6 @@
           if (estado == 20)
             var div = '<span class="badge badge-sm bg-gradient-info">Aceptada</span>';
           if (estado == 21)
-            var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
-          if (estado == 22)
             var div = '<span class="badge badge-sm bg-gradient-success">Justificada</span>';
           return div;
         }

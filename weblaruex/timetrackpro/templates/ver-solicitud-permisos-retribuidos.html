@@ -49,12 +49,9 @@
                 <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-danger">Rechazada</span></li>
                 {% elif solicitud.estado.id == 20 %}
                 <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-info">Aceptada</span></li>
-                {% elif solicitud.estado.id == 21 %}
-                <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span></li>
                 {% else %}
                 <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-success">Justificada</span></li>
                 {% endif %}
-
                 <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{solicitud.empleado.nombre}} {{solicitud.empleado.apellidos}}</li>
                 <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-barcode text-dark me-2"></i> {{solicitud.codigo_permiso.cod_uex}} - {{solicitud.codigo_permiso.nombre}}</li> 
 
@@ -176,8 +173,7 @@
                 <option value="19" {% if solicitud.estado.id == 19 %} selected {% endif %}>Rechazada</option>
                 <option value="20" {% if solicitud.estado.id == 20 %} selected {% endif %}>Aceptada</option>
                 {% if administrador %}
-                <option value="21" {% if solicitud.estado.id == 10 %} selected {% endif %}>Cambio Solicitado</option>
-                <option value="22" {% if solicitud.estado.id == 11 %} selected {% endif %}>Justificada</option>
+                <option value="21" {% if solicitud.estado.id == 21 %} selected {% endif %}>Justificada</option>
                 {% endif %}
               </select>
             </div>
