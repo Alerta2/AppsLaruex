@@ -174,6 +174,7 @@ urlpatterns = [
     #Solicitud de permisos retribuidos 
     path('private/timetrackpro/solicitar-permisos-retribuidos/', solicitarPermisosRetribuidos , name='solicitar-permisos-retribuidos'),
     path('private/timetrackpro/solicitar-permisos-retribuidos/<slug:year>/', solicitarPermisosRetribuidos , name='solicitar-permisos-retribuidos'),
+    path('private/timetrackpro/solicitar-permiso-retribuido-desde-calendario/', solicitarPermisoRetribuidoCalendario , name='solicitar-permiso-rertibuido-desde-calendario'),
     path('private/timetrackpro/datos-permisos-retribuidos-empleados/', datosPermisosRetribuidosEmpleados , name='datos-permisos-retribuidos-empleados'),
     path('private/timetrackpro/datos-permisos-retribuidos-empleados/<slug:year>/', datosPermisosRetribuidosEmpleados , name='datos-permisos-retribuidos-empleados'),
     path('private/timetrackpro/datos-permisos-retribuidos-solicitados/', datosPermisosRetribuidosSolicitados , name='datos-permisos-retribuidos-solicitados'),

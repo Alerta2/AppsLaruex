@@ -268,11 +268,11 @@
     </div>
   </div>
 
-  <! -- Modal Agregar Festivo -->
-  <div id="modalAgregarAsuntosPropiosDesdeCalendario" tabindex="-1" role="dialog" class="modal fade modal-lg"
-    aria-labelledby="modalAgregarAsuntosPropiosDesdeCalendario" aria-hidden="true">
+  <! -- Modal Solicitar Permiso Retribuido desde el calendario -->
+  <div id="modalSolicitarPermisoDesdeCalendario" tabindex="-1" role="dialog" class="modal fade modal-lg"
+    aria-labelledby="modalSolicitarPermisoDesdeCalendario" aria-hidden="true">
     <div class="modal-dialog" role="document">
-      <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:agregar-asuntos-propios-desde-calendario' %}" method="POST"
+      <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:solicitar-permiso-rertibuido-desde-calendario' %}" method="POST"
       enctype="multipart/form-data">
       {% csrf_token %}
         <div class="modal-content">
@@ -289,43 +289,24 @@
                   <label class="col-form-label">Fecha de inicio</label>                  
                   <div class="">
                     <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
-                      aria-describedby="text-addon" name="fecha_inicio_seleccionada" id="fecha_inicio_seleccionada" onchange="calcularDias('fecha_inicio_seleccionada','fecha_fin_seleccionada', 'dias_seleccionados_consumidos')">
+                      aria-describedby="text-addon" name="fecha_inicio_calendario" id="fecha_inicio_calendario" onchange="calcularDias('fecha_inicio_calendario','fecha_fin_calendario', 'dias_solicitados_seleccionados')">
                   </div>
                 </div>
                 <div class="col-xl-6">
                   <label class="col-form-label">Fecha de Fin</label>                  
                   <div class="">
                     <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
-                      aria-describedby="text-addon" name="fecha_fin_seleccionada" id="fecha_fin_seleccionada"  onchange="calcularDias('fecha_inicio_seleccionada','fecha_fin_seleccionada', 'dias_seleccionados_consumidos')">
-                      <input type="number" class="form-control" name="dias_seleccionados_consumidos" id="dias_seleccionados_consumidos"  min="1" hidden>
+                      aria-describedby="text-addon" name="fecha_fin_calendario" id="fecha_fin_calendario"  onchange="calcularDias('fecha_inicio_calendario','fecha_fin_calendario', 'dias_solicitados_seleccionados')">
+                      <input type="number" class="form-control" name="dias_solicitados_seleccionados" id="dias_solicitados_seleccionados"  min="1" hidden >
                   </div>
                 </div>
               </div>
               <div class="row">
-                <div class="col-6 col-md-4">
-                  <label for="recuperable_calendario" class="col-form-label">¿Es recuperable?</label>
-                    <select class="form-control" id="recuperable_calendario" name="recuperable_calendario">
-                      <option value="0" selected>No
-                      </option>
-                      <option value="1">Si
-                      </option>
-                    </select>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <label class="col-form-label">Tareas a sustituir</label>
-                  <div class="mb-3">
-                    <textarea type="text" class="form-control" placeholder="Indique las tareas que deben ser sustituidas." id="tareas_a_sustituir_calendario" name="tareas_a_sustituir_calendario" aria-describedby="text-addon"></textarea>
-                  </div>
-                </div>
-              </div>
-              <div class="row" id="descripcionRecuperacionCalendario" hidden>
-                <div class="col" >
-                  <label class="col-form-label">Descripcion</label>
-                  <div class="mb-3">
-                    <textarea type="text" class="form-control" placeholder="Indique como va a recuperar los días solicitados." id="descripcion_calendario" name="descripcion_calendario" aria-describedby="text-addon"></textarea>
-                  </div>
+                <div class="col-xl-12 col-md-12">
+                      <label class="text-sm">Permisos</label>
+                      <input id="inputPermisosCalendario" list="permisosRetribuidosCalendario"  class="form-select">
+                      <input type="number" id="id_permiso_calendario" name="id_permiso_calendario"  class="form-control"  hidden>
+                      <datalist id="permisosRetribuidosCalendario">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
                 </div>
               </div>
             </div>
@@ -406,18 +387,18 @@
         var yearActual = document.getElementById("year_actual");
         yearActual.value = year;
 
-        var fechaInicio = document.getElementById("fecha_inicio_seleccionada");
+        var fechaInicio = document.getElementById("fecha_inicio_calendario");
         fechaInicio.value = info.dateStr;
 
-        var fechaFin = document.getElementById("fecha_fin_seleccionada");
+        var fechaFin = document.getElementById("fecha_fin_calendario");
         fechaFin.value = info.dateStr;
 
-        var diasConsumidos = document.getElementById("dias_seleccionados_consumidos");
+        var diasConsumidos = document.getElementById("dias_solicitados_seleccionados");
         diasConsumidos.value = 1;
         
         // modifico el index del calendario
         // se muestra el modal
-        $('#modalAgregarAsuntosPropiosDesdeCalendario').modal('show');
+        $('#modalSolicitarPermisoDesdeCalendario').modal('show');
         },
     });
     calendar.render(); // renderizo el calendario
@@ -492,7 +473,7 @@
 
   // forzar cierre del modal
   function forzarCierre(){
-    $('#modalAgregarAsuntosPropiosDesdeCalendario').modal('hide');
+    $('#modalSolicitarPermisoDesdeCalendario').modal('hide');
   }
 
   $("#permisos_retribuidos_empleados").bootstrapTable({
@@ -734,32 +715,29 @@
           if (option.textContent === inputText) {
               const selectedOptionId = option.getAttribute('data-id');
               id_permiso.value = selectedOptionId;
-
-              console.log('ID de la opción seleccionada:', selectedOptionId);
               break;
           }
       }
   });
-  document.getElementById('recuperable_calendario').addEventListener('change', function() {
-    const recuperable = this.value;
-    const descripcionRecuperacionCalendario = document.getElementById('descripcionRecuperacionCalendario');
-    if (recuperable == 1){
-      descripcionRecuperacionCalendario.removeAttribute("hidden");
-    }else{
-      descripcionRecuperacionCalendario.setAttribute("hidden", true);
-    }
+
+  document.getElementById('inputPermisosCalendario').addEventListener('input', function() {
+      const inputText = this.value;
+      const datalist = document.getElementById('permisosRetribuidosCalendario');
+      const options = datalist.getElementsByTagName('option');
+      const id_permiso = document.getElementById('id_permiso_calendario');
+
+      for (const option of options) {
+        console.log("----hge dafdas---")
+        option.textContent.replace(/\s/g, '');
+          if (option.textContent === inputText) {
+              const selectedOptionId = option.getAttribute('data-id');
+              id_permiso.value = selectedOptionId;
+              break;
+          }
+      }
   });
 
 
-  document.getElementById('recuperable').addEventListener('change', function() {
-      const recuperable = this.value;
-      const descripcionRecuperacion = document.getElementById('descripcionRecuperacion');
-      if (recuperable == 1){
-        descripcionRecuperacion.removeAttribute("hidden");
-      }else{
-        descripcionRecuperacion.setAttribute("hidden", true);
-      }
-    });
 
 
 

@@ -2324,7 +2324,7 @@ def agregarPermisoRetribuido(request, year=None):
             # return redirect('timetrackpro:permisos', id=nuevoRegistro.id)
     else:
         return redirect('timetrackpro:lista-permisos-retribuidos')
-    
+   
 def verPermisoRetribuido(request, id):
     permiso = PermisosRetribuidos.objects.using("timetrackpro").filter(id=id)[0]
     # guardo los datos en un diccionario
@@ -2334,6 +2334,7 @@ def verPermisoRetribuido(request, id):
         "permiso":permiso,
     }
     return render(request,"ver-permiso-retribuido.html",infoVista)
+
 
 def eliminarPermisoRetribuido(request):
     if request.method == 'POST':
@@ -2568,6 +2569,32 @@ def solicitarPermisosRetribuidos(request, year=None):
     }
     return render(request,"solicitar-permisos-retribuidos.html",infoVista)
 
+def solicitarPermisoRetribuidoCalendario(request, year=None):
+    if request.method == 'POST':
+        permisos = PermisosYAusenciasSolicitados.objects.using("timetrackpro").values()
+        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
+        idPermiso = request.POST.get("id_permiso_calendario")
+        codigoPermiso = PermisosRetribuidos.objects.using("timetrackpro").filter(id=idPermiso)[0]
+        fechaInicio = request.POST.get("fecha_inicio_calendario")
+        fechaFin = request.POST.get("fecha_fin_calendario")
+        if fechaFin == "":
+            fechaFin = fechaInicio
+        diasSolicitados = request.POST.get("dias_solicitados_seleccionados")
+        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+        fechaSolicitud = datetime.now()
+        year = fechaInicio.split("-")[0]
+        
+        for p in permisos:
+            if p['fecha_inicio'] == fechaInicio:
+                return redirect('timetrackpro:ups', mensaje='Ya existe un permiso retribuido para el día ' + fechaInicio + '')
+        nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso)
+        nuevoPermiso.save(using='timetrackpro')
+        alerta["activa"] = True
+        alerta["icono"] = iconosAviso["success"]
+        alerta["tipo"] = "success"
+        alerta["mensaje"] = "Permiso agregado correctamente."
+    return redirect('timetrackpro:solicitar-permisos-retribuidos', year=year)
 
 def datosAsuntosPropiosEmpleados(request, year=None):
     admin = esAdministrador(request.user.id)
