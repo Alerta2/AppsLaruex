@@ -185,6 +185,8 @@ urlpatterns = [
     path('private/timetrackpro/cambiar-estado-permisos-retribuidos/<slug:id>/', cambiarEstadoSolicitudPermisoRetribuido , name='cambiar-estado-permisos-retribuidos'),
     path('private/timetrackpro/eliminar-permisos-retribuidos/', eliminarSolicitudPermisoRetribuido , name='eliminar-permisos-retribuidos'),
     path('private/timetrackpro/eliminar-permisos-retribuidos/<slug:id>/', eliminarSolicitudPermisoRetribuido , name='eliminar-permisos-retribuidos'),
+    path('private/timetrackpro/justificar-solicitud-permisos-retribuidos/', justicarSolicitudPermisosRetribuidos , name='justificar-solicitud-permisos-retribuidos'),
+    path('private/timetrackpro/justificar-solicitud-permisos-retribuidos/<slug:id>/', justicarSolicitudPermisosRetribuidos , name='justificar-solicitud-permisos-retribuidos'),
 
     
 ]
