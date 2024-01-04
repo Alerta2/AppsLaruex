@@ -73,7 +73,7 @@
         
     {% endif %}
       
-
+    {% if not director %}
       <div class="card mt-2">
         <div class="card-header pb-0 p-3">
           <div class="row">
@@ -92,6 +92,7 @@
           </div>
         </div>
       </div>
+    {% endif %}
 
       {% if cambios %} 
  
@@ -540,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function() {
   $("#asuntos_propios_empleados").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "{% url 'timetrackpro:datos-asuntos-propios-empleados' %}",
+    url: "{% url 'timetrackpro:datos-asuntos-propios-empleados' year=currentYear %}",
     cache: false, 
     columns: [
       {
@@ -656,7 +657,7 @@ document.addEventListener('DOMContentLoaded', function() {
   $("#asuntos_propios_solicitados").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "{% url 'timetrackpro:datos-asuntos-propios-solicitados' %}",
+    url: "{% url 'timetrackpro:datos-asuntos-propios-solicitados' year=currentYear %}",
     cache: false, 
     columns: [
       {

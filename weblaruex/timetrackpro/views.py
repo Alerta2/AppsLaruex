@@ -2484,6 +2484,7 @@ def solicitarAsuntosPropios(request, year=None):
         "asuntos":list(asuntos),
         "diasConsumidos":diasConsumidos,
         "initialDate":initialDate,
+        "currentYear":year,
         "sustitutos":list(sustitutos),
     }
     return render(request,"solicitar-asuntos-propios.html",infoVista)
@@ -2562,6 +2563,7 @@ def solicitarPermisosRetribuidos(request, year=None):
         "permisos":list(permisos),
         "diasConsumidos":diasConsumidos,
         "initialDate":initialDate,
+        "currentYear":year,
         "sustitutos":list(sustitutos),
     }
     return render(request,"solicitar-permisos-retribuidos.html",infoVista)
@@ -2584,34 +2586,42 @@ def datosAsuntosPropiosEmpleados(request, year=None):
 
 
 def datosAsuntosPropiosSolicitados(request, year=None):
-    admin = esAdministrador(request.user.id)
-    if admin:
-        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
-        diasSolicitados = []
-        if year is None:
-            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
-        else:
-            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
-        
-        return JsonResponse(list(diasSolicitados), safe=False)
+    user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+    diasSolicitados = []
+    if year is None:
+        diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
     else:
-        return JsonResponse([], safe=False)
-
+        diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
+    
+    return JsonResponse(list(diasSolicitados), safe=False)
+    
 def datosPermisosRetribuidosEmpleados(request, year=None):
     admin = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
-    diasSolicitados = []
+    permisosEmpleados = []
 
     if admin or director:
         if year is None:
-            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
+            permisosEmpleados = PermisosYAusenciasSolicitados.objects.using("timetrackpro").values('id', 'empleado__nombre', 'empleado__apellidos', 'empleado', 'year', 'dias_solicitados', 'fecha_solicitud', 'estado__nombre', 'estado__id', 'estado', 'fecha_inicio', 'fecha_fin', 'justificante', 'codigo_permiso__nombre', 'codigo_permiso__id', 'codigo_permiso')
         else:
-            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
+            permisosEmpleados = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(year=year).values('id', 'empleado__nombre', 'empleado__apellidos', 'empleado', 'year', 'dias_solicitados', 'fecha_solicitud', 'estado__nombre', 'estado__id', 'estado', 'fecha_inicio', 'fecha_fin', 'justificante', 'codigo_permiso__nombre', 'codigo_permiso__id', 'codigo_permiso')
 
-        return JsonResponse(list(diasSolicitados), safe=False)
+        return JsonResponse(list(permisosEmpleados), safe=False)
     else:
         return JsonResponse([], safe=False)
+
+
+def datosPermisosRetribuidosSolicitados(request, year=None):
+    user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+    permisosSolicitados = []
+    if year is None:
+        permisosSolicitados = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=empleado).values('id', 'empleado__nombre', 'empleado__apellidos', 'empleado', 'year', 'dias_solicitados', 'fecha_solicitud', 'estado__nombre', 'estado__id', 'estado', 'fecha_inicio', 'fecha_fin', 'justificante', 'codigo_permiso__nombre', 'codigo_permiso__id', 'codigo_permiso')
+    else:
+        permisosSolicitados = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(year=year,empleado=empleado).values('id', 'empleado__nombre', 'empleado__apellidos', 'empleado', 'year', 'dias_solicitados', 'fecha_solicitud', 'estado__nombre', 'estado__id', 'estado', 'fecha_inicio', 'fecha_fin', 'justificante', 'codigo_permiso__nombre', 'codigo_permiso__id', 'codigo_permiso')
+    
+    return JsonResponse(list(permisosSolicitados), safe=False)
 
 def solicitarVacaciones(request):
     estados = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1).values()

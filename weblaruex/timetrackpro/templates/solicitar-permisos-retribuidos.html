@@ -73,6 +73,7 @@
         
       {% endif %}
 
+      {% if not director %}
       <div class="card mt-2">
         <div class="card-header pb-0 p-3">
           <div class="row">
@@ -87,10 +88,11 @@
         </div>
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
-            <table  id="asuntos_propios_solicitados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            <table  id="permisos_retribuidos_solicitados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
         </div>
       </div>
+      {% endif %}
 
       {% if cambios %} 
  
@@ -496,7 +498,7 @@
   $("#permisos_retribuidos_empleados").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "{% url 'timetrackpro:datos-permisos-retribuidos-empleados' %}",
+    url: "{% url 'timetrackpro:datos-permisos-retribuidos-empleados' year=currentYear %}",
     cache: false, 
     columns: [
       {
@@ -609,10 +611,10 @@
   });
 
 
-  $("#asuntos_propios_solicitados").bootstrapTable({
+  $("#permisos_retribuidos_solicitados").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "{% url 'timetrackpro:datos-asuntos-propios-solicitados' %}",
+    url: "{% url 'timetrackpro:datos-permisos-retribuidos-solicitados' year=currentYear %}",
     cache: false, 
     columns: [
       {
