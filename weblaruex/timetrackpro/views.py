@@ -2537,7 +2537,7 @@ def solicitarPermisosRetribuidos(request, year=None):
         if fechaFin == "":
             fechaFin = fechaInicio
         diasSolicitados = request.POST.get("dias_solicitados")
-        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=18)[0]
         fechaSolicitud = datetime.now()
         year = fechaInicio.split("-")[0]
         
@@ -2581,7 +2581,7 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
         if fechaFin == "":
             fechaFin = fechaInicio
         diasSolicitados = request.POST.get("dias_solicitados_seleccionados")
-        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=18)[0]
         fechaSolicitud = datetime.now()
         year = fechaInicio.split("-")[0]
         
@@ -2649,6 +2649,103 @@ def datosPermisosRetribuidosSolicitados(request, year=None):
         permisosSolicitados = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(year=year,empleado=empleado).values('id', 'empleado__nombre', 'empleado__apellidos', 'empleado', 'year', 'dias_solicitados', 'fecha_solicitud', 'estado__nombre', 'estado__id', 'estado', 'fecha_inicio', 'fecha_fin', 'justificante', 'codigo_permiso__nombre', 'codigo_permiso__id', 'codigo_permiso')
     
     return JsonResponse(list(permisosSolicitados), safe=False)
+
+
+def verSolicitudPermisosRetribuidos(request, id=None):
+    if id is not None:
+        solicitud = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]    
+        empleado = Empleados.objects.using("timetrackpro").filter(id=solicitud.empleado.id)[0]
+        diasConsumidos = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=empleado, year=solicitud.year).aggregate(Sum('dias_solicitados'))['dias_solicitados__sum']
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
+    sustitutos = Sustitutos.objects.using("timetrackpro").values('id', 'nombre', 'apellidos')
+    permisos = PermisosRetribuidos.objects.using("timetrackpro").values('id', 'cod_uex', 'nombre', 'tipo__id', 'tipo__nombre', 'dias', 'habiles_o_naturales', 'solicitud_dias_naturales_antelacion', 'pas', 'pdi')
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":True,
+        "empleados":list(empleados),
+        "permisos":list(permisos),
+        "solicitud":solicitud, 
+        "diasConsumidos":diasConsumidos,
+        "sustitutos":list(sustitutos),
+    }
+
+    return render(request,"ver-solicitud-permisos-retribuidos.html", infoVista)
+
+def cambiarEstadoSolicitudPermisoRetribuido(request, id=None):
+    if request.method == 'POST':
+        if id == None:
+            id = request.POST.get("id_permiso")
+        permiso = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]
+        estado = request.POST.get("estado")
+        nuevoEstado = EstadosSolicitudes.objects.using("timetrackpro").filter(permisos_retribuidos=1, id=estado)[0]
+        permiso.estado = nuevoEstado
+        motivo = None
+        if permiso.estado.id == 19:
+            motivo = request.POST.get("motivo")
+        permiso.motivo_estado_solicitud = motivo
+        permiso.save(using='timetrackpro')
+        return redirect('timetrackpro:ver-solicitud-permisos-retribuidos', id=id)
+    else:
+        return redirect('timetrackpro:ups', mensaje="No se ha podido cambiar el estado del permiso retribuido")
+
+def eliminarSolicitudPermisoRetribuido(request, id=None):
+    if request.method == 'POST':
+        if id == None:
+            id = request.POST.get("id_permiso_eliminar")
+        permiso = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]
+        permiso.delete(using='timetrackpro')
+        return redirect('timetrackpro:solicitar-permisos-retribuidos')
+    else:
+        return redirect('timetrackpro:ups', mensaje="No se ha podido eliminar el asunto propio")
+    
+
+
+def modificarSolicitudPermisoRetribuido(request):
+    admin = esAdministrador(request.user.id)
+    
+    if request.method == 'POST' and admin:
+        id = request.POST.get("id_solicitu_modificar")
+        codigoPermiso = PermisosRetribuidos.objects.using("timetrackpro").filter(id=request.POST.get("id_permiso_modificar"))[0]
+        permiso = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]
+        permiso.fecha_inicio = request.POST.get("fecha_inicio")
+        permiso.fecha_fin = request.POST.get("fecha_fin")
+        permiso.dias_solicitados = request.POST.get("dias_solicitados")
+        permiso.codigo_permiso = codigoPermiso
+        if request.POST.get("motivoEditar") != "":
+            permiso.motivo = request.POST.get("motivoEditar")
+        permiso.save(using='timetrackpro')
+
+        return redirect('timetrackpro:ver-solicitud-permisos-retribuidos', id=id)
+    else:
+        return redirect('timetrackpro:sin-permiso')
+    
+def solicitarModificacionSolicitudPermisoRetribuido(request, id=None):
+    # guardo los datos en un diccionario
+    if request.method == 'POST':
+        # obtenemos los datos del empleado
+        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        idEmpleado = user.id_empleado.id
+        solicitante = Empleados.objects.using("timetrackpro").filter(id=idEmpleado)[0]
+        estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=1)[0]
+        # obtenemos los datos del formulario
+        idAsuntosPropios = request.POST.get("asunto_modificar")
+        asuntoPropio = AsuntosPropios.objects.using("timetrackpro").filter(id=idAsuntosPropios)[0]
+        estadoPendiente = EstadosSolicitudes.objects.using("timetrackpro").filter(id=17)[0]
+        asuntoPropio.estado = estadoPendiente
+        asuntoPropio.save(using='timetrackpro')
+        fechaInicioActual = request.POST.get("fechaActualInicio")
+        fechaFinActual = request.POST.get("fechaActualFin")
+        diasConsumidosActual = request.POST.get("dias_actuales_consumidos")
+        fechaSolicitud = datetime.now()
+        fechaNuevaInicio = request.POST.get("fechaInicioNueva")
+        fechaNuevaFin = request.POST.get("fechaFinNueva")
+        diasConsumidosNuevos = request.POST.get("dias_nuevos_consumidos")
+        motivoCambio = request.POST.get("motivo_cambio")
+        solicitudModificacionAsuntosPropios = CambiosAsuntosPropios(id_periodo_cambio=asuntoPropio, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
+        solicitudModificacionAsuntosPropios.save(using='timetrackpro')
+    return redirect('timetrackpro:solicitar-vacaciones')
+
 
 def solicitarVacaciones(request):
     estados = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1).values()

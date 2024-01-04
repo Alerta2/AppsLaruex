@@ -179,7 +179,14 @@ urlpatterns = [
     path('private/timetrackpro/datos-permisos-retribuidos-empleados/<slug:year>/', datosPermisosRetribuidosEmpleados , name='datos-permisos-retribuidos-empleados'),
     path('private/timetrackpro/datos-permisos-retribuidos-solicitados/', datosPermisosRetribuidosSolicitados , name='datos-permisos-retribuidos-solicitados'),
     path('private/timetrackpro/datos-permisos-retribuidos-solicitados/<slug:year>/', datosPermisosRetribuidosSolicitados , name='datos-permisos-retribuidos-solicitados'),
-    #path('private/timetrackpro/ver-solicitud-permisos-retribuidos/<slug:id>/', verSolicitudPermisosRetribuidos , name='ver-solicitud-permisos-retribuidos'),
+    path('private/timetrackpro/ver-solicitud-permisos-retribuidos/<slug:id>/', verSolicitudPermisosRetribuidos , name='ver-solicitud-permisos-retribuidos'),
+    path('private/timetrackpro/modificar-solicitud-permiso-retribuido/', modificarSolicitudPermisoRetribuido , name='modificar-solicitud-permiso-retribuido'),
+    path('private/timetrackpro/solicitar-modificacion-solicitud-permiso-retribuido/', solicitarModificacionSolicitudPermisoRetribuido , name='solicitar-modificacion-solicitud-permiso-retribuido'),
+    path('private/timetrackpro/solicitar-modificacion-solicitud-permiso-retribuido/<slug:id>/', solicitarModificacionSolicitudPermisoRetribuido , name='solicitar-modificacion-solicitud-permiso-retribuido'),
+    path('private/timetrackpro/cambiar-estado-permisos-retribuidos/', cambiarEstadoSolicitudPermisoRetribuido , name='cambiar-estado-permisos-retribuidos'),
+    path('private/timetrackpro/cambiar-estado-permisos-retribuidos/<slug:id>/', cambiarEstadoSolicitudPermisoRetribuido , name='cambiar-estado-permisos-retribuidos'),
+    path('private/timetrackpro/eliminar-permisos-retribuidos/', eliminarSolicitudPermisoRetribuido , name='eliminar-permisos-retribuidos'),
+    path('private/timetrackpro/eliminar-permisos-retribuidos/<slug:id>/', eliminarSolicitudPermisoRetribuido , name='eliminar-permisos-retribuidos'),
 
     
 ]

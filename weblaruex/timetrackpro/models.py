@@ -303,6 +303,8 @@ class PermisosYAusenciasSolicitados(models.Model):
     justificante = models.CharField(max_length=255, blank=True, null=True)
     estado = models.ForeignKey('EstadosSolicitudes', models.DO_NOTHING, db_column='estado')
     year = models.IntegerField()
+    motivo_estado_solicitud = models.CharField(db_column='Motivo_estado_solicitud', max_length=1000, blank=True, null=True)  # Field name made lowercase.
+
 
     class Meta:
         managed = False
@@ -404,6 +406,7 @@ class EstadosSolicitudes(models.Model):
     nombre = models.CharField(max_length=255)
     vacaciones = models.IntegerField()
     solicitudes = models.IntegerField()
+    permisos_retribuidos = models.IntegerField()
 
     class Meta:
         managed = False

@@ -169,7 +169,7 @@
         </div>
         <div class="modal-footer">
           {% if user.is_authenticated  %}
-          <button type="submit" value="submit"  class="btn btn-primary" id="guardarSolicitarAsuntosPropios" disabled>Guardar</button>
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="guardarSolicitarAsuntosPropios" disabled>Guardar</button>
           {% endif %}
           <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cerrar</button>
         </div>
@@ -259,7 +259,7 @@
         </div>
         <div class="modal-footer">
           {% if user.is_authenticated  %}
-          <button type="submit" value="submit" class="btn btn-primary" id="guardarModificarAsuntosPropios" disabled>Guardar</button>
+          <button type="submit" value="submit" class="btn bg-gradient-primary" id="guardarModificarAsuntosPropios" disabled>Guardar</button>
           {% endif %}
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
         </div>
@@ -313,7 +313,7 @@
             
             <div class="modal-footer">
               {% if user.is_authenticated %}
-              <button type="submit" value="submit" class="btn btn-primary">Guardar</button>
+              <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
               {% endif %}
               <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
             </div>
@@ -434,8 +434,6 @@
       botonGuardarSolicitar.removeAttribute("disabled");
       botonGuardarModificar.removeAttribute("disabled");
     }
-
-
   }
 
   function mostrarInfo(){ 
@@ -564,14 +562,15 @@
         align: "center",
         formatter: function(value, row) {
           var estado = row.estado;
-          var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
-          if (estado == 10)
-          var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
-
-          if (estado == 11)
-          var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
-          if (estado == 12)
+          var div= '<span class="badge badge-sm bg-gradient-dark text-wrap">Sin justificar</span>';
+          if (estado == 19)
+            var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+          if (estado == 20)
+            var div = '<span class="badge badge-sm bg-gradient-info">Aceptada</span>';
+          if (estado == 21)
             var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
+          if (estado == 22)
+            var div = '<span class="badge badge-sm bg-gradient-success">Justificada</span>';
           
           return div;
         }
@@ -581,7 +580,7 @@
         field: "",
         align: "center",
         formatter: function (value, row) {
-          var botonVer = '<a href="/private/timetrackpro/ver-solicitud-asuntos-propios/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          var botonVer = '<a href="/private/timetrackpro/ver-solicitud-permisos-retribuidos/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
           return botonVer;
                   
 
@@ -681,13 +680,15 @@
         align: "center",
         formatter: function(value, row) {
           var estado = row.estado;
-          var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
-          if (estado == 10)
-          var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
-          if (estado == 11)
-          var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
-          if (estado == 12)
+          var div= '<span class="badge badge-sm bg-gradient-dark text-wrap">Sin justificar</span>';
+          if (estado == 19)
+            var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+          if (estado == 20)
+            var div = '<span class="badge badge-sm bg-gradient-info">Aceptada</span>';
+          if (estado == 21)
             var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
+          if (estado == 22)
+            var div = '<span class="badge badge-sm bg-gradient-success">Justificada</span>';
           return div;
         }
       },
@@ -696,7 +697,7 @@
         field: "",
         align: "center",
         formatter: function (value, row) {
-          var botonVer = '<a href="/private/timetrackpro/ver-solicitud-asuntos-propios/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          var botonVer = '<a href="/private/timetrackpro/ver-solicitud-permisos-retribuidos/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
           return botonVer;
         },
       },
