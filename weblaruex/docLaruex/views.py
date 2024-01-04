@@ -3882,7 +3882,10 @@ def agregarDocumento(request, nuevoObjeto):
     if request.POST.get("tipoDocumento") is not None:
         tipoDocumento=TipoDocumentos.objects.using("docLaruex").filter(id=request.POST.get("tipoDocumento")).get()
         if tipoDocumento.id == 6:
-            nuevoObjeto.propietario = nuevoObjeto.creador
+            print("es un tipo 6")
+            auxPropietario = PropietariosDocumentos.objects.using("docLaruex").filter(id=nuevoObjeto.creador.id).get()
+            nuevoObjeto.propietario = auxPropietario
+            print("Propietario", nuevoObjeto.propietario)
             nuevoObjeto.save(using='docLaruex')
     else:
         tipoDocumento = TipoDocumentos.objects.using("docLaruex").filter(id=99).get()
