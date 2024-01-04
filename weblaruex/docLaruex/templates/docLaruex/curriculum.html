@@ -612,7 +612,7 @@
                   <label for="sobreNombreDocumento">Tipo de Documento</label>
                   <select class="form-select" data-rule="required" id="sobreNombreDocumento" name="sobreNombreDocumento"
                     onchange="mostrarTitulo(this.value)">
-                    <option value="1">Contrato de trabajo </option>
+                    <option value="1" >Contrato de trabajo </option>
                     <option value="2">Contrato de confidencialidad </option>
                     <option value="3">Investigación </option>
                   </select>
@@ -640,14 +640,14 @@
               <div class="col-3">
                 <div class="form-group">
                   <label for="fechaActualizacion" id="tituloFechainicioContrato">Fecha de Inicio</label>
-                  <input type="date" class="form-control" id="fechaActualizacion" name="fechaActualizacion" onchange="cambiarFechaInicio()"/>
+                  <input type="date" class="form-control" id="fechaActualizacion" name="fechaActualizacion" onchange="cambiarFechaInicio()" required/>
                 </div>
               
               </div>
               <div class="col-3">
                 <div class="form-group">
                   <label for="fechaFinContrato" id="tituloFechaFinContrato">Fecha de finalización</label>
-                  <input type="date" class="form-control" id="fechaFinContrato" name="fechaFinContrato" onchange="cambiarFechaFin()" />
+                  <input type="date" class="form-control" id="fechaFinContrato" name="fechaFinContrato" onchange="cambiarFechaFin()" required/>
                 </div>
               </div>
 
@@ -955,6 +955,7 @@ function cerrarModal(){
         title: "Nombre",
         field: "id_relacionado__nombre",
         align: "center",
+        sortable: "true",
       }, {
         title: "Acciones",
         field: "action",
@@ -986,6 +987,7 @@ function cerrarModal(){
     ],
     search: true,
     sortOrder: "desc",
+    
   });
 
 
