@@ -2703,6 +2703,7 @@ def eliminarSolicitudPermisoRetribuido(request, id=None):
         return redirect('timetrackpro:ups', mensaje="No se ha podido eliminar el asunto propio")
     
 def justicarSolicitudPermisosRetribuidos(request, id=None):
+    print("--  entro en justificar --")
     # obtengo los datos necesarios para la vista    
     if request.method == 'POST':
         if id == None:
@@ -2714,10 +2715,14 @@ def justicarSolicitudPermisosRetribuidos(request, id=None):
     try: 
         if request.FILES['justificante']:
             nombreJustificante = str(permiso.id) + '_justificante.' + request.FILES['justificante'].name.split('.')[-1]
+            print('\033[91m'+'nombreJustificante: ' + '\033[92m', nombreJustificante)
+
             ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_JUSTIFICANTES + nombreJustificante
-            subirDocumento(request.FILES['imagenTarjeta'], ruta)
+            print('\033[91m'+'ruta: ' + '\033[92m', ruta)
             permiso.justificante = nombreJustificante
             permiso.save(using='timetrackpro')
+            print('\033[91m'+'permiso.justificante: ' + '\033[92m', permiso.justificante)
+            subirDocumento(request.FILES['justificante'], ruta)
     except:
         #cambiar
         print("Error al subir la foto del equipo")
@@ -2725,7 +2730,7 @@ def justicarSolicitudPermisosRetribuidos(request, id=None):
     permiso.estado = estado
     permiso.save(using='timetrackpro')
 
-    return redirect('timetrackpro:tarjetas-de-acceso') 
+    return redirect('timetrackpro:ver-solicitud-permisos-retribuidos', id=id) 
 
 
 def modificarSolicitudPermisoRetribuido(request):
