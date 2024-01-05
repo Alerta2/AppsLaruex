@@ -2694,6 +2694,9 @@ def eliminarSolicitudPermisoRetribuido(request, id=None):
         if id == None:
             id = request.POST.get("id_permiso_eliminar")
         permiso = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]
+        if permiso.justificante != None:
+            ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_JUSTIFICANTES + permiso.justificante
+            os.remove(ruta)
         permiso.delete(using='timetrackpro')
         return redirect('timetrackpro:solicitar-permisos-retribuidos')
     else:
