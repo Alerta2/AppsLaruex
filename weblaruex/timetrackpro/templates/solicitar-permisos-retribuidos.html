@@ -516,13 +516,26 @@
         align: "center",
         formatter: function (value, row) {
           var estado = row.estado;
+
+          var botones = "";
           var botonAddJustificante = '<a href="" title="Añadir justificante" data-toggle="modal" data-target="#modalAddJustificante" onclick="$('+"'#formularioModalAddJustificante').attr('action', '/private/timetrackpro/justificar-solicitud-permisos-retribuidos/"+ row.id +"/');"+'" class="mx-1"><i class="fa-duotone fa-file-plus fa-lg"></i></a>';
 
           var botonVer = '<a href="/private/timetrackpro/ver-solicitud-permisos-retribuidos/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
-          if (estado == 18)
-            return botonVer + botonAddJustificante;
-          else
-            return botonVer;
+
+          var botonDescargar = '<a href="/private/timetrackpro/descargar-solicitud-permisos-retribuidos/' + row.id + '/" class="mx-1 text-sm" title="descargar justificante" download><i class="fa-solid fa-download fa-lg entrar"></i></a>';
+
+          switch (estado) {
+            case 18:
+              botones = botonAddJustificante + botonVer;
+              break;
+            case 21:
+              botones = botonDescargar + botonVer;
+              break;
+            default:
+              botones = botonVer;
+              break;
+          }
+          return botones;
                   
 
         },
