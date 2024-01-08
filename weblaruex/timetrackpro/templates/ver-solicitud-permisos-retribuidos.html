@@ -31,6 +31,14 @@
              </button>
              </div>
              {% endif %}
+             {% if director or administrador %}
+             <div class="col">
+              <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarPermisosRetribuidos">             
+               <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
+               <div class="text text-sm">Eliminar</div>
+             </button>
+             </div>
+             {% endif %}
           </div>
         </div>
       <div class="row">
