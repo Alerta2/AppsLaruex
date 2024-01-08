@@ -2772,10 +2772,13 @@ def actualizarJustificanteSolicitudPermisosRetribuidos(request, id):
     if administrador or direccion:
         permiso = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]
         ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_JUSTIFICANTES + permiso.justificante
-        rutaOld = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_JUSTIFICANTES + '_old.' + permiso.justificante.split('.')[-1]
+        rutaOld = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_JUSTIFICANTES + permiso.justificante.split('.')[0] + '_old.' + permiso.justificante.split('.')[-1]
+        print('\033[91m'+'rutaOld: ' + '\033[92m', rutaOld)
+
         # si existe el archivo lo renombro 
         if os.path.exists(rutaOld):
             os.remove(rutaOld)
+        if os.path.exists(ruta):
             os.rename(ruta, rutaOld)
         permiso.justificante = str(permiso.id) + '_justificante.' + request.FILES["justificante_actualizar"].name.split('.')[-1]
         permiso.save(using='timetrackpro')

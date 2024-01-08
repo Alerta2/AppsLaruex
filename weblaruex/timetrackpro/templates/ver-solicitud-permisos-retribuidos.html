@@ -10,7 +10,7 @@
      
         <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
           <div class="row">
-            {% if solicitud.justificante == None %}
+            {% if not solicitud.justificante %}
             <div class="col">
              <button class="botonLink" data-toggle="modal" data-target="#modalAddJustificante">             
               <div class="sign-Btn-link"><i class="fa-solid fa-cloud-arrow-up fa-lg" style="color: #ffffff;"></i></div>
@@ -19,7 +19,7 @@
             </div>
             {% endif %}
 
-            {% if director or administrador %}
+            {% if director or administrador and solicitud.justificante %}
             <div class="col">
              <button class="botonLinkFestivos" data-toggle="modal" data-target="#modalActualizarJustificante">             
               <div class="sign-Btn-link"><i class="fa-solid fa-pen-to-square fa-lg" style="color: #ffffff;"></i></div>
@@ -278,6 +278,7 @@
           <form id="formularioModalAddJustificante" action="/private/timetrackpro/justificar-solicitud-permisos-retribuidos/" method="POST"
             enctype="multipart/form-data">
             {% csrf_token %}
+            <input type="text" id="id_permiso_justificar" name="id_permiso_justificar" value="{{solicitud.id}}" hidden>
             <div class="row" id="rowImagen" hidden>
               <div class="col d-flex justify-content-center">
                 <img class="w-30 rounded" id="imagenPrevia" src="" alt="" >
@@ -301,7 +302,7 @@
                 <a href=""  title="subir-imagen" data-toggle="modal"  ><i id="iconoInput" class="fa-duotone fa-file-plus fa-4x"></i></a>
         
 
-                <input type="file" id="justificanter" name="justificante" accept="image/*"
+                <input type="file" id="justificante" name="justificante" accept="image/*"
                 onchange="previsualizarImagen()" style="display:none">
               </div>
             </div>
