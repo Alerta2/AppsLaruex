@@ -10,6 +10,23 @@
      
         <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
           <div class="row">
+            {% if solicitud.justificante == None %}
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalAddJustificante">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-cloud-arrow-up fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm"> Agregar Justificante</div>
+            </button>
+            </div>
+            {% endif %}
+
+            {% if director or administrador %}
+            <div class="col">
+             <button class="botonLinkFestivos" data-toggle="modal" data-target="#modalActualizarJustificante">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-pen-to-square fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm"> Actualizar</div>
+            </button>
+            </div>
+            {% endif %}
 
             {% if administrador %}
             <div class="col">
@@ -18,21 +35,19 @@
               <div class="text text-sm">Editar</div>
             </button>
             </div>
+            {% endif %}
+
+            {% if administrador or director %}
             <div class="col">
              <button class="botonLink" data-toggle="modal" data-target="#modalCambiarEstado">             
               <div class="sign-Btn-link"><i class="fa-solid fa-sign-hanging fa-lg" style="color: #ffffff;"></i></div>
               <div class="text text-sm">Cambiar estado</div>
             </button>
             </div>
+            {% endif %}
+
+            {% if administrador %}
             <div class="col">
-              <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarPermisosRetribuidos">             
-               <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
-               <div class="text text-sm">Eliminar</div>
-             </button>
-             </div>
-             {% endif %}
-             {% if director or administrador %}
-             <div class="col">
               <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarPermisosRetribuidos">             
                <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
                <div class="text text-sm">Eliminar</div>
@@ -247,7 +262,117 @@
     </div>
   </div>
 
+  <div id="modalAddJustificante" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
 
+          <h5 class="modal-title" id="TituloModal"><strong>Agregar justificante</strong> </h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <form id="formularioModalAddJustificante" action="/private/timetrackpro/justificar-solicitud-permisos-retribuidos/" method="POST"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row" id="rowImagen" hidden>
+              <div class="col d-flex justify-content-center">
+                <img class="w-30 rounded" id="imagenPrevia" src="" alt="" >
+
+              </div>
+            </div>
+
+            <div class="row mt-2 mb-2" id="labelImagenSeleccionada" hidden>
+              <div class="col d-flex justify-content-center">
+                  <div class="my-auto d-flex align-items-center ">
+
+                  <i class="fa-duotone fa-circle-check fa-4x" style="--fa-primary-color: #2ab24c; --fa-secondary-color: #2ab24c;"></i>           
+                  <label class="col-form-label text-muted" id="nombreImagenSeleccionada"></label>
+                  
+                  </div>
+              </div>
+            </div>
+            <div class="row container mb-2" id="selectorImagen">
+              <div class="col d-flex justify-content-center">
+                
+                <a href=""  title="subir-imagen" data-toggle="modal"  ><i id="iconoInput" class="fa-duotone fa-file-plus fa-4x"></i></a>
+        
+
+                <input type="file" id="justificanter" name="justificante" accept="image/*"
+                onchange="previsualizarImagen()" style="display:none">
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              {% if user.is_authenticated %}
+              <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+              {% endif %}
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalActualizarJustificante" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+
+          <h5 class="modal-title" id="TituloModal"><strong>Actualizar justificante</strong> </h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <form id="formularioModalActualizarJustificante" action="/private/timetrackpro/actualizar-justificante-solicitud-permisos-retribuidos/{{solicitud.id}}/" method="POST"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row" id="rowImagen_actualizar" hidden>
+              <div class="col d-flex justify-content-center">
+                <img class="w-30 rounded" id="imagenPrevia_actualizar" src="" alt="" >
+
+              </div>
+            </div>
+
+            <div class="row mt-2 mb-2" id="labelImagenSeleccionada_actualizar" hidden>
+              <div class="col d-flex justify-content-center">
+                  <div class="my-auto d-flex align-items-center ">
+
+                  <i class="fa-duotone fa-circle-check fa-4x" style="--fa-primary-color: #2ab24c; --fa-secondary-color: #2ab24c;"></i>           
+                  <label class="col-form-label text-muted" id="nombreImagenSeleccionada_actualizar"></label>
+                  
+                  </div>
+              </div>
+            </div>
+            <div class="row container mb-2" id="selectorImagen_actualizar">
+              <div class="col d-flex justify-content-center">
+                
+                <a href=""  title="subir-imagen_actualizar" data-toggle="modal"><i id="iconoInput_actualizar" class="fa-duotone fa-file-plus fa-4x"></i></a>
+        
+
+                <input type="file" id="justificante_actualizar" name="justificante_actualizar" accept="image/*"
+                onchange="previsualizarImagenActualizar()" style="display:none">
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              {% if user.is_authenticated %}
+              <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+              {% endif %}
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 <script>
 
   function mostrarTextArea (){
@@ -322,6 +447,78 @@
           }
       }
   });
+
+
+  // JavaScript para activar el input cuando se hace clic en el enlace
+document.querySelector("a[title='subir-imagen']").addEventListener("click", function (e) {
+e.preventDefault(); // Evita que el enlace redireccione
+document.getElementById("justificante").click(); // Simula un clic en el input
+});
+  function previsualizarImagen() {
+  var archivoInput = document.getElementById('justificante');
+  var imagenPrevia = document.getElementById('imagenPrevia');
+  var rowImagen = document.getElementById('rowImagen');
+  var selector = document.getElementById('selectorImagen');
+  var etiqueta = document.getElementById('labelImagenSeleccionada');
+  var nombreImagen = document.getElementById('nombreImagenSeleccionada');
+  var iconoInput = document.getElementById('iconoInput');
+  if (archivoInput.files && archivoInput.files[0]) {
+    var lector = new FileReader();
+
+    lector.onload = function(e) {
+      rowImagen.removeAttribute("hidden");
+      imagenPrevia.src = e.target.result;
+      imagenPrevia.style.display = 'block';
+    }
+    selector.style.display = 'none';
+    //eliminar atributo hidden de la etiqueta
+    etiqueta.removeAttribute("hidden");
+    nombreImagen.innerHTML = archivoInput.files[0].name;
+
+    lector.readAsDataURL(archivoInput.files[0]);
+
+    iconoInput.setAttribute("hidden", "true");
+  } else {
+    imagenPrevia.src = '';
+    imagenPrevia.style.display = 'none';
+  }
+}
+
+
+// JavaScript para activar el input cuando se hace clic en el enlace
+document.querySelector("a[title='subir-imagen_actualizar']").addEventListener("click", function (e) {
+e.preventDefault(); // Evita que el enlace redireccione
+document.getElementById("justificante_actualizar").click(); // Simula un clic en el input
+});
+function previsualizarImagenActualizar() {
+  var archivoInput = document.getElementById('justificante_actualizar');
+  var imagenPrevia = document.getElementById('imagenPrevia_actualizar');
+  var rowImagen = document.getElementById('rowImagen_actualizar');
+  var selector = document.getElementById('selectorImagen_actualizar');
+  var etiqueta = document.getElementById('labelImagenSeleccionada_actualizar');
+  var nombreImagen = document.getElementById('nombreImagenSeleccionada_actualizar');
+  var iconoInput = document.getElementById('iconoInput_actualizar');
+  if (archivoInput.files && archivoInput.files[0]) {
+    var lector = new FileReader();
+
+    lector.onload = function(e) {
+      rowImagen.removeAttribute("hidden");
+      imagenPrevia.src = e.target.result;
+      imagenPrevia.style.display = 'block';
+    }
+    selector.style.display = 'none';
+    //eliminar atributo hidden de la etiqueta
+    etiqueta.removeAttribute("hidden");
+    nombreImagen.innerHTML = archivoInput.files[0].name;
+
+    lector.readAsDataURL(archivoInput.files[0]);
+
+    iconoInput.setAttribute("hidden", "true");
+  } else {
+    imagenPrevia.src = '';
+    imagenPrevia.style.display = 'none';
+  }
+}
   
 
 </script>

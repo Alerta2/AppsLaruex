@@ -206,59 +206,59 @@
 
   <div id="modalAddJustificante" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
 
-        <h5 class="modal-title" id="TituloModal"><strong>Agregar justificante</strong> </h5>
-        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <form id="formularioModalAddJustificante" action="/private/timetrackpro/justificar-solicitud-permisos-retribuidos/0/" method="POST"
-          enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="row" id="rowImagen" hidden>
-            <div class="col d-flex justify-content-center">
-              <img class="w-30 rounded" id="imagenPrevia" src="" alt="" >
+          <h5 class="modal-title" id="TituloModal"><strong>Agregar justificante</strong> </h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <form id="formularioModalAddJustificante" action="/private/timetrackpro/justificar-solicitud-permisos-retribuidos/0/" method="POST"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row" id="rowImagen" hidden>
+              <div class="col d-flex justify-content-center">
+                <img class="w-30 rounded" id="imagenPrevia" src="" alt="" >
 
+              </div>
             </div>
-          </div>
 
-          <div class="row mt-2 mb-2" id="labelImagenSeleccionada" hidden>
-            <div class="col d-flex justify-content-center">
-                <div class="my-auto d-flex align-items-center ">
+            <div class="row mt-2 mb-2" id="labelImagenSeleccionada" hidden>
+              <div class="col d-flex justify-content-center">
+                  <div class="my-auto d-flex align-items-center ">
 
-                <i class="fa-duotone fa-circle-check fa-4x" style="--fa-primary-color: #2ab24c; --fa-secondary-color: #2ab24c;"></i>           
-                <label class="col-form-label text-muted" id="nombreImagenSeleccionada"></label>
+                  <i class="fa-duotone fa-circle-check fa-4x" style="--fa-primary-color: #2ab24c; --fa-secondary-color: #2ab24c;"></i>           
+                  <label class="col-form-label text-muted" id="nombreImagenSeleccionada"></label>
+                  
+                  </div>
+              </div>
+            </div>
+            <div class="row container mb-2" id="selectorImagen">
+              <div class="col d-flex justify-content-center">
                 
-                </div>
-            </div>
-          </div>
-          <div class="row container mb-2" id="selectorImagen">
-            <div class="col d-flex justify-content-center">
-              
-              <a href=""  title="subir-imagen" data-toggle="modal"  ><i id="iconoInput" class="fa-duotone fa-file-plus fa-4x"></i></a>
-      
+                <a href=""  title="subir-imagen" data-toggle="modal"  ><i id="iconoInput" class="fa-duotone fa-file-plus fa-4x"></i></a>
+        
 
-              <input type="file" id="justificante" name="justificante" accept="image/*"
-              onchange="previsualizarImagen()" style="display:none">
+                <input type="file" id="justificante" name="justificante" accept="image/*"
+                onchange="previsualizarImagen()" style="display:none">
+              </div>
             </div>
-          </div>
 
-          <div class="modal-footer">
-            {% if user.is_authenticated %}
-            <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
-            {% endif %}
-            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
-          </div>
-        </form>
+            <div class="modal-footer">
+              {% if user.is_authenticated %}
+              <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+              {% endif %}
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 <script>
 
   function mostrarColumnaOculta(id, columna){
@@ -698,10 +698,10 @@
       }
   });
 
-  // JavaScript para activar el input cuando se hace clic en el enlace
-  document.querySelector("a[title='subir-imagen']").addEventListener("click", function (e) {
-  e.preventDefault(); // Evita que el enlace redireccione
-  document.getElementById("justificante").click(); // Simula un clic en el input
+// JavaScript para activar el input cuando se hace clic en el enlace
+document.querySelector("a[title='subir-imagen']").addEventListener("click", function (e) {
+e.preventDefault(); // Evita que el enlace redireccione
+document.getElementById("justificante").click(); // Simula un clic en el input
 });
 
 function previsualizarImagen() {

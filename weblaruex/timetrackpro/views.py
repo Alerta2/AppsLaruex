@@ -2624,7 +2624,8 @@ def datosAsuntosPropiosSolicitados(request, year=None):
         diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
     
     return JsonResponse(list(diasSolicitados), safe=False)
-    
+
+@login_required   
 def datosPermisosRetribuidosEmpleados(request, year=None):
     admin = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -2640,7 +2641,7 @@ def datosPermisosRetribuidosEmpleados(request, year=None):
     else:
         return JsonResponse([], safe=False)
 
-
+@login_required
 def datosPermisosRetribuidosSolicitados(request, year=None):
     user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
     empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
@@ -2656,6 +2657,9 @@ def datosPermisosRetribuidosSolicitados(request, year=None):
 def verSolicitudPermisosRetribuidos(request, id=None):
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
+    if not request.POST:
+        print("No es post")
+        alerta['activa'] = False
 
     if id is not None:
         solicitud = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]    
@@ -2675,6 +2679,7 @@ def verSolicitudPermisosRetribuidos(request, id=None):
             "solicitud":solicitud, 
             "diasConsumidos":diasConsumidos,
             "sustitutos":list(sustitutos),
+            "alerta":alerta,
         }
 
         return render(request,"ver-solicitud-permisos-retribuidos.html", infoVista)
@@ -2767,18 +2772,19 @@ def actualizarJustificanteSolicitudPermisosRetribuidos(request, id):
     if administrador or direccion:
         permiso = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]
         ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_JUSTIFICANTES + permiso.justificante
-        rutaOld = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_JUSTIFICANTES + + '_old.' + permiso.justificante.split('.')[-1]
+        rutaOld = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_JUSTIFICANTES + '_old.' + permiso.justificante.split('.')[-1]
         # si existe el archivo lo renombro 
-        if os.path.exists(ruta):
+        if os.path.exists(rutaOld):
+            os.remove(rutaOld)
             os.rename(ruta, rutaOld)
-        permiso.justificante = str(permiso.id) + '_justificante.' + request.FILES["justificanteActualizado"].name.split('.')[-1]
+        permiso.justificante = str(permiso.id) + '_justificante.' + request.FILES["justificante_actualizar"].name.split('.')[-1]
         permiso.save(using='timetrackpro')
         ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_JUSTIFICANTES + permiso.justificante
-        subirDocumento(request.FILES["justificanteActualizado"], ruta)
+        subirDocumento(request.FILES["justificante_actualizar"], ruta)
 
     # compruebo si la ruta devuelve algo 
     if os.path.exists(ruta) and (administrador or direccion or request.user.id == permiso.empleado.id):
-        return FileResponse(open(ruta, 'rb'))
+        return redirect('timetrackpro:ver-solicitud-permisos-retribuidos', id=id)
     else:
         return JsonResponse({'status': 'error', 'message': 'El archivo no esta disponible, compruebe que la ruta y el archivo tengan la misma extensión'})
 
