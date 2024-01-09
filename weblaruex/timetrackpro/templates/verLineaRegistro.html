@@ -7,9 +7,10 @@
     <h3 class="text-primary text-gradient">Información registro {{registro.nombre_empleado}}</h3>
     <h4 class="text-secondary">{{registro.hora|date:"d M Y"}}</h4>
     <div class="col-12 col-xl-4">
-      {% if administrador %}
+      
         <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
           <div class="row">
+            {% if not administrador %}
             <div class="col">
              <button class="botonLink" data-toggle="modal" data-target="#modalEditarRegistro">             
               <div class="sign-Btn-link"><i class="fa-solid fa-pen fa-lg" style="color: #ffffff;"></i></div>
@@ -23,10 +24,17 @@
                <div class="text text-sm">Eliminar</div>
              </button>
              </div>
+             {% else %}
+             <div class="col">
+              <button class="botonLinkFestivos" data-toggle="modal" data-target="#modalNotificarError">             
+               <div class="sign-Btn-link"><i class="fa-solid fa-paper-plane fa-lg" style="color: #ffffff;"></i></div>
+               <div class="text text-sm">Notificar error</div>
+             </button>
+             </div>
+             {% endif %}
           </div>
         </div>
-        
-      {% endif %}
+
         
 
       <div class="card ">
@@ -143,6 +151,49 @@
     </div>
   </div>
 
+  <div id="modalNotificarError" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalNotificarError"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modificar registro de {{registro.nombre_empleado}}</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:notificar-error-fichaje' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Fecha y Hora</label>
+              <input class="form-control" type="text" id="idEmpleadoMaquina" name="idEmpleadoMaquina" value="{{registro.id_empleado.id}}" required hidden >
+
+              <input class="form-control" type="datetime-local" id="horaError" name="hora" value="{{registro.hora|date:'Y-m-d H:i' }}" required>
+            </div>
+            
+          </div>
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2">
+              <label class="text-sm">Motivo de la modificación</label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Indique el motivo por el que se ha modificado el registro" id="motivoError" name="motivoError" aria-describedby="text-addon" required></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonModificarError" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
 
 <script>
   // compruebo si en textarea de motivo hay algo escrito
@@ -152,6 +203,13 @@
     $('#motivo').keyup(function(){
       if($(this).val().length > 10)
         $('#botonModificar').attr('disabled', false);
+    })
+  });
+
+  $(document).ready(function(){
+    $('#motivoError').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificarError').attr('disabled', false);
     })
   });
 
