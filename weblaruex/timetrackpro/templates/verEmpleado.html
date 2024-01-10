@@ -52,7 +52,7 @@
 
               </div>
             </div>
-            {% if administrador and userDjango %}
+            {% if administrador  %}
             <div class="col-md-4 text-end">
               <a href="{% url 'timetrackpro:editar-empleado' id=usuario.id %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar datos del empleado">
                 <i class="fa-solid fa-user-pen text-secondary fa-xl"></i>

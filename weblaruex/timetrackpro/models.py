@@ -583,6 +583,7 @@ class VacacionesTimetrackpro(models.Model):
     dias_consumidos = models.IntegerField(db_column='Dias_consumidos')  # Field name made lowercase.
     estado = models.ForeignKey(EstadosSolicitudes, models.DO_NOTHING, db_column='Estado')  # Field name made lowercase.
     fecha_solicitud = models.DateTimeField(db_column='Fecha_solicitud')  # Field name made lowercase.
+    motivo_rechazo = models.CharField(db_column='Motivo_rechazo', max_length=1000, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False

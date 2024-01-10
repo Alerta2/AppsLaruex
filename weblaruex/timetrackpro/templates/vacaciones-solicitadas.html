@@ -330,14 +330,14 @@ document.addEventListener('DOMContentLoaded', function() {
         field: "",
         align: "center",
         formatter: function (value, row) {
-          admin = '{{admin}}';
+          administrador = '{{administrador}}';
           director = '{{director}}';
 
           var botonVer = '<a href="/private/timetrackpro/ver-vacaciones-seleccionadas/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
 
 
           var botonCambiarEstado = '<a href="" title="Agregar Stock" data-toggle="modal" data-target="#modalCambiarEstado" onclick="$('+"'#formularioCambiarEstado').attr('action', '/private/timetrackpro/cambiar-estado-vacaciones/"+ row.id +"/');"+'" class="mx-1"><i class="fa-solid fa-flag"></i></a>';
-          if (admin == "True" || director == "True" )
+          if (administrador == "True" || director == "True" )
             return botonVer + botonCambiarEstado;
           else
             return botonVer;

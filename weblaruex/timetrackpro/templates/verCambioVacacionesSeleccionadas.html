@@ -2,15 +2,17 @@
 {% extends "base/base_timetrackpro.html" %}
 {% load static %}
 {% block content %}
+
   <div class="row d-flex justify-content-center">
     
-    <h3 class="text-info text-gradient">{{vacaciones.tipo_vacaciones__nombre}}</h3>
-    <h4 class="text-secondary">{{vacaciones.empleado__nombre}} {{vacaciones.empleado__apellidos}}</h4>
+    <h3 class="text-info text-gradient">{{vacaciones.id_periodo_cambio__tipo_vacaciones__nombre}}</h3>
+    <h4 class="text-secondary">{{vacaciones.solicitante__nombre}} {{vacaciones.solicitante__apellidos}}</h4>
     <h6 class="text-secondary">Solicitadas el {{vacaciones.fecha_solicitud}}</h6>
     <div class="col-12 col-xl-4">
         <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
           <div class="row">
             {% if administrador %}
+
             <div class="col">
              <button class="botonLink" data-toggle="modal" data-target="#modalEditar">             
               <div class="sign-Btn-link"><i class="fa-solid fa-pen fa-lg" style="color: #ffffff;"></i></div>
@@ -18,7 +20,7 @@
             </button>
             </div>
             {% endif %}
-            {% if administrador or director %}
+            {% if administrador  or director %}
             <div class="col">
              <button class="botonLink" data-toggle="modal" data-target="#modalCambiarEstado">             
               <div class="sign-Btn-link"><i class="fa-solid fa-sign-hanging fa-lg" style="color: #ffffff;"></i></div>
@@ -62,13 +64,20 @@
             {% endif %}
 
           </div>
-
           
           <ul class="list-group font-weight-bold">
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg text-primary">Solicitud actual</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i>{{vacaciones.fecha_inicio_actual|date:"d M"}} <strong>al</strong> {{vacaciones.fecha_fin_actual}}</li>
             
-            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i>{{vacaciones.fecha_inicio|date:"d M"}} <strong>al</strong> {{vacaciones.fecha_fin}}</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_actuales_consumidos}} días</li>
+          </ul>
+          <hr class="separacion">
+          <ul class="list-group font-weight-bold">
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg text-primary">Cambio solicitado</li>
             
-            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_consumidos}} días</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i>{{vacaciones.fecha_inicio_nueva|date:"d M"}} <strong>al</strong> {{vacaciones.fecha_fin_nueva}}</li>
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_nuevos_consumidos}} días</li>
           </ul>
         </div>
       </div>
@@ -88,26 +97,26 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioEditarVacacionesSolicitadas" action="{% url 'timetrackpro:modificar-vacaciones' id=vacaciones.id %}" method="POST"
+        <form id="formularioEditarVacacionesSolicitadas" action="{% url 'timetrackpro:modificar-cambio-vacaciones' id=vacaciones.id %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
 
           <div class="row">
             <div class="col-xl-6 mx-auto my-2">
-              <label class="text-sm" id="labelMotivo">Inicio</label>
-              <input class="form-control" type="date" id="fecha_inicio" name="fecha_inicio" value="{{vacaciones.fecha_inicio|safe}}" onchange="calcularDias()" required>
+              <label class="text-sm" id="labelMotivo">Nueva Fecha Inicio</label>
+              <input class="form-control" type="date" id="fecha_inicio" name="fecha_inicio" value="{{vacaciones.fecha_inicio_nueva|safe}}" onchange="calcularDias()" required>
             </div> 
 
             <div class="col-xl-6 mx-auto my-2">
-              <label class="text-sm" id="labelMotivo">Fin</label>
-              <input class="form-control" type="date" id="fecha_fin" name="fecha_fin" value="{{vacaciones.fecha_fin|safe}}" onchange="calcularDias()" required>
+              <label class="text-sm" id="labelMotivo">Nueva Fecha Fin</label>
+              <input class="form-control" type="date" id="fecha_fin" name="fecha_fin" value="{{vacaciones.fecha_fin_nueva|safe}}" onchange="calcularDias()" required>
             </div>
           </div>
 
           <div class="row" hidden>
             <div class="col-xl-6 mx-auto my-2">
               <label class="text-sm" id="labelMotivo">Días</label>
-              <input class="form-control" type="number" id="dias_consumidos" name="dias_consumidos" value="{{vacaciones.dias_consumidos|safe}}" required >
+              <input class="form-control" type="number" id="dias_consumidos" name="dias_consumidos" value="{{vacaciones.dias_nuevos_consumidos|safe}}" required >
             </div>
             
           </div>
@@ -135,7 +144,7 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioEditarEstadoVacaciones" action="{% url 'timetrackpro:cambiar-estado-vacaciones' id=vacaciones.id %}" method="POST"
+        <form id="formularioEditarEstadoVacaciones" action="{% url 'timetrackpro:cambiar-estado-cambio-vacaciones' id=vacaciones.id %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
@@ -184,15 +193,19 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioEliminarSolicitudVacaciones" action="{% url 'timetrackpro:eliminar-vacaciones'%}" method="POST"
+        <form id="formularioEliminarSolicitudVacaciones" action="{% url 'timetrackpro:eliminar-cambio-vacaciones'%}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
 
-            <div class="col-xl-8 mx-auto my-2" >
-              <h6>¿Está seguro/a de eliminar la solicitud?</h6>
-              <p>Del {{vacaciones.fecha_inicio}} al {{vacaciones.fecha_fin}}</p>
-              <p>{{vacaciones.empleado__nombre}} {{vacaciones.empleado__apellidos}}</p>
+            <div class="col-xl-8 mx-auto my-2">
+              <h6>¿Está seguro/a de eliminar la solicitud de cambio?</h6>
+              <strong class="text-primary">Fecha actual</strong>
+              <p>Del {{vacaciones.fecha_inicio_actual}} al {{vacaciones.fecha_fin_actual}}</p>
+              <strong class="text-primary">Nueva fecha</strong>
+              <p>Del {{vacaciones.fecha_inicio_nueva}} al {{vacaciones.fecha_fin_nueva}}</p>
+              <strong class="text-primary">Solicitado por</strong>
+              <p>{{vacaciones.solicitante__nombre}} {{vacaciones.solicitante__apellidos}}</p>
             </div>
             <div class="col-xl-8 mx-auto my-2" hidden>
               <input type="text" class="form-control" id="id_vacaciones" name="id_vacaciones" value="{{vacaciones.id}}">

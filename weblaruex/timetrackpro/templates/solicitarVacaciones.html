@@ -76,59 +76,7 @@
           <p class="text-sm"><strong class="text-info">Aún no ha seleccionado vacaciones</strong></p>
           {% else %}
           <div class="table-responsive ms-3 me-3">
-            <table class="table align-items-center mb-0 ">
-              <thead>
-                <tr>
-                                  <!-- <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th> -->
-
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Inicio</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Fin</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Días</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for v in vacaciones %}   
-                
-                <tr>
-                  <td>
-  
-                    <div>
-                      <span class="text-md font-weight-bold ">{{v.tipo_vacaciones__nombre}} </span>
-                    </div>
-                  </td>
-                  <td>
-                        <div class="d-flex justify-content-start">
-                          <span class="text-md font-weight-bold">{{v.fecha_inicio|date:"d M Y"}}</span>
-                        </div>
-                  </td>
-                  <td>
-                        <div class="d-flex justify-content-start">
-                          <span class="text-md font-weight-bold">{{v.fecha_fin|date:"d M Y"}}</span>
-                        </div>
-                  </td>
-                  <td class="text-center">
-                    <span class="text-md font-weight-bold"> {{v.dias_consumidos|safe}}</span>
-                  </td>
-                  <td>
-                    <div class="d-flex justify-content-center" data-toggle="tooltip" data-placement="top" title="{{v.estado__nombre}}">
-                    {% if v.estado__id == 9 %}
-                      <i class="fa-solid fa-circle-info fa-lg me-3" style="color: #32325d;"></i>
-                    {% elif v.estado__id == 10 %}
-                    <i class="fa-solid fa-circle-xmark fa-lg me-3" style="color: #ea0606;"></i>
-                    {% elif v.estado__id == 11 %}
-                      <i class="fa-solid fa-circle-check fa-lg me-3" style="color: #82d616;"></i>
-                    {% elif v.estado__id == 12 %}
-                      <i class="fa-solid fa-circle-exclamation fa-lg me-3" style="color: #ee660b;"></i>
-                    {% endif  %}
-                  </div>
-  
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+            <table  id="vacaciones_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
           {% endif %}
           
@@ -147,7 +95,7 @@
               <div class="row">
                 
                 <h5 class="mb-2">
-                  Cambio Solicitados
+                  Cambios Solicitados
                 </h5>
               </div>
             </div>
@@ -156,59 +104,7 @@
         
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
-            <table class="table align-items-center mb-0 ">
-              <thead>
-                <tr>
-                                  <!-- <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th> -->
-
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Vacaciones</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Inicio</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2">Fin</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Días</th>
-                  <th class="text-secondary text-sm font-weight-bolder opacity-7 ps-2 text-center">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for c in cambios %}   
-                
-                <tr>
-                  <td>
-  
-                    <div>
-                      <span class="text-md font-weight-bold ">{{c.id_periodo_cambio__tipo_vacaciones__nombre}} </span>
-                    </div>
-                  </td>
-                  <td>
-                        <div class="d-flex justify-content-start">
-                          <span class="text-md font-weight-bold">{{c.fecha_inicio_nueva|date:"d M Y"}}</span>
-                        </div>
-                  </td>
-                  <td>
-                        <div class="d-flex justify-content-start">
-                          <span class="text-md font-weight-bold">{{c.fecha_fin_nueva|date:"d M Y"}}</span>
-                        </div>
-                  </td>
-                  <td class="text-center">
-                    <span class="text-md font-weight-bold"> {{c.dias_nuevos_consumidos|safe}}</span>
-                  </td>
-                  <td>
-                    <div class="d-flex justify-content-center" data-toggle="tooltip" data-placement="top" title="{{c.estado__nombre}}">
-                    {% if c.estado__id == 9 %}
-                      <i class="fa-solid fa-circle-info fa-lg me-3" style="color: #32325d;"></i>
-                    {% elif c.estado__id == 10 %}
-                    <i class="fa-solid fa-circle-xmark fa-lg me-3" style="color: #ea0606;"></i>
-                    {% elif c.estado__id == 11 %}
-                      <i class="fa-solid fa-circle-check fa-lg me-3" style="color: #82d616;"></i>
-                    {% elif c.estado__id == 12 %}
-                      <i class="fa-solid fa-circle-exclamation fa-lg me-3" style="color: #ee660b;"></i>
-                    {% endif  %}
-                  </div>
-  
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+                <table  id="cambio_vacaciones_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>     
         </div>
         {% endif %}
@@ -367,8 +263,310 @@
     </div>
   </div>
 
+  <div id="modalCambiarEstado" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalCambiarEstado"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modificar el estado de la solicitud</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioCambiarEstado" action="/private/timetrackpro/cambiar-estado-vacaciones/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Nuevo estado</label>
+              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
+                
+                <option value="9" {% if vacaciones.estado__id == 9 %} selected {% endif %}>Pendiente</option>
+                <option value="10" {% if vacaciones.estado__id == 10 %} selected {% endif %}>Rechazado</option>
+                <option value="11" {% if vacaciones.estado__id == 11 %} selected {% endif %}>Aceptado</option>
+              </select>
+            </div>
+            
+          </div>
+          <div class="row" id="rowMotivo" >
+            <div class="col-xl-8 mx-auto my-2"  >
+              <label class="text-sm" id="labelMotivo">Motivo del cambio de estado </label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el error" aria-label="Indique el motivo por el que se ha modificado el error" id="motivo" name="motivo" aria-describedby="text-addon"></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonModificar" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
 
 <script>
+  function mostrarTextArea (){
+    if($('#estado').val() == 10){
+      
+      $('#botonModificar').attr('disabled', true);
+      $('#rowMotivo').show();
+      $('#motivo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+    }else{
+      
+      $('#botonModificar').attr('disabled', false);
+      
+      $('#rowMotivo').hide();
+    }
+  }
+
+$("#vacaciones_solicitadas").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-vacaciones-solicitadas' %}",
+    cache: false, 
+    columns: [
+      {
+        title: "Empleado",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var empleado = row.empleado__nombre +" "+ row.empleado__apellidos;
+          var tipoVacaciones = row.tipo_vacaciones__nombre;
+          var div = '<div>'+'<h6 class="mb-0 text-sm text-primary">'+empleado+'</h6>'+'<h6 class="mb-0 text-sm">'+tipoVacaciones+'</h6>'+'</div>';
+          return div;
+        }
+      },    
+      {
+        title: "Fecha inicio",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_inicio;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },{
+        title: "Fecha fin",
+        field: "fecha_fin",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_fin;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Días",
+        align: "center",
+        formatter: function(value, row) {
+          var dias = row.dias_consumidos;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Estado",
+        align: "center",
+        formatter: function(value, row) {
+          var estado = row.estado;
+          var div= '<span class="badge badge-sm bg-gradient-secondary" text-wrap">Pendiente</span>';
+          if (estado == 10)
+            var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+          if (estado == 11)
+            var div = '<span class="badge badge-sm bg-gradient-success">Aceptada</span>';
+          return div;
+        }
+      },
+      {
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          administrador = '{{administrador}}';
+          director = '{{director}}';
+
+          var botonVer = '<a href="/private/timetrackpro/ver-vacaciones-seleccionadas/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+
+          var botonCambiarEstado = '<a href="" title="Cambiar estado solicitud de vacaciones" data-toggle="modal" data-target="#modalCambiarEstado" onclick="$('+"'#formularioCambiarEstado').attr('action', '/private/timetrackpro/cambiar-estado-vacaciones/"+ row.id +"/');"+'" class="mx-1"><i class="fa-solid fa-flag"></i></a>';
+          if (administrador == "True" || director == "True" )
+            return botonVer + botonCambiarEstado;
+          else
+            return botonVer;
+
+
+        },
+      },
+    ],
+    search: true,
+  });
+
+$("#cambio_vacaciones_solicitadas").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-cambio-vacaciones-solicitadas' %}",
+    cache: false, 
+    columns: [
+      {
+        title: "Empleado",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var empleado = row.solicitante__nombre +" "+ row.solicitante__apellidos;
+          var tipoVacaciones = row.id_periodo_cambio__tipo_vacaciones__nombre;
+          var div = '<div>'+'<h6 class="mb-0 text-sm text-primary">'+empleado+'</h6>'+'<h6 class="mb-0 text-sm">'+tipoVacaciones+'</h6>'+'</div>';
+          return div;
+        }
+      },    
+      {
+        title: "Fecha inicio",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_inicio_actual;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },      {
+        title: "Fecha fin",
+        field: "fecha_fin",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_fin_actual;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Días",
+        align: "center",
+        formatter: function(value, row) {
+          var dias = row.dias_nuevos_consumidos;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Estado",
+        align: "center",
+        formatter: function(value, row) {
+          var estado = row.estado;
+          var div= '<span class="badge badge-sm bg-gradient-dark text-wrap">Cambio solicitado</span>';
+          if (estado == 19)
+            var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+          if (estado == 20)
+            var div = '<span class="badge badge-sm bg-gradient-info">Aceptada</span>';
+          if (estado == 21)
+            var div = '<span class="badge badge-sm bg-gradient-success">Justificada</span>';
+          return div;
+        }
+      },
+      {
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          var estado = row.estado;
+
+          var botonVer = '<a href="/private/timetrackpro/ver-cambio-vacaciones-seleccionadas/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+  
+          return botonVer;
+
+
+        },
+      },
+    ],
+    search: true,
+  });
 document.addEventListener('DOMContentLoaded', function() {
     var calendarDiv = document.getElementById('calendarioMensual');
     var initialDate = '{{initialDate}}';

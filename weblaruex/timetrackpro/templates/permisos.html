@@ -216,7 +216,7 @@
     $("#tabla_permisos").bootstrapTable({
     method: "get",
     locale: navigator.language,
-    url: "{% url 'timetrackpro:datos-lista-permisos' %}",
+    url: "{% url 'timetrackpro:datos-lista-permisos' year=year %}",
     cache: false, 
     columns: [
       {

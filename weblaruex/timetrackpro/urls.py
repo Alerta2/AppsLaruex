@@ -44,13 +44,13 @@ urlpatterns = [
     # registros insertados en la base de datos  
     path('private/timetrackpro/agregar-registro', agregarRegistro , name='agregar-registro'),
     path('private/timetrackpro/registros-insertados', registrosInsertados , name='registros-insertados'),
-    path('private/timetrackpro/datos-registros-insertados', datosRegistrosInsertados , name='registros-insertados'),
+    path('private/timetrackpro/datos-registros-insertados', datosRegistrosInsertados , name='datos-registros-insertados'),
     path('private/timetrackpro/ver-registro/<slug:id>/', verRegistro , name='ver-registro'),
     path('private/timetrackpro/datos-registro/<slug:id>/', datosRegistro , name='datos-registro'),
     path('private/timetrackpro/ver-linea-registro/<slug:id>/', verLineaRegistro , name='ver-linea-registro'),
     path('private/timetrackpro/editar-linea-registro/<slug:id>/', editarLineaRegistro , name='editar-linea-registro'),
     path('private/timetrackpro/eliminar-linea-registro/<slug:id>/', eliminarLineaRegistro , name='eliminar-linea-registro'),
-    path('private/timetrackpro/obtener-registro/', obtenerRegistro , name='obtener-registro'),
+    path('private/timetrackpro/obtener-registro', obtenerRegistro , name='obtener-registro'),
     path('private/timetrackpro/obtener-registro/<slug:year>', obtenerRegistro , name='obtener-registro'),
     path('private/timetrackpro/obtener-registro/<slug:year>/<slug:mes>/', obtenerRegistro , name='obtener-registro'),
     path('private/timetrackpro/obtener-registro/<slug:year>/<slug:mes>/<slug:semana>/', obtenerRegistro , name='obtener-registro'),
@@ -85,6 +85,7 @@ urlpatterns = [
     
     path('private/timetrackpro/calendario-festivos/<slug:mes>/<slug:year>/', calendarioFestivos , name='calendario-festivos'),
     path('private/timetrackpro/calendario-festivos/<slug:mes>/', calendarioFestivos , name='calendario-festivos'),
+    path('private/timetrackpro/calendario-festivos/', calendarioFestivos , name='calendario-festivos'),
     path('private/timetrackpro/festivos/', festivos , name='festivos'),
     path('private/timetrackpro/festivos/<slug:year>/', festivos , name='festivos-year'),
     path('private/timetrackpro/agregar-festivo/', agregarFestivo , name='agregar-festivo'),
@@ -129,18 +130,22 @@ urlpatterns = [
     path('private/timetrackpro/solicitudes/', solicitudes , name='solicitudes'),
     path('private/timetrackpro/solicitar-vacaciones/', solicitarVacaciones , name='solicitar-vacaciones'),
     path('private/timetrackpro/solicitar-modificar-vacaciones/', solicitarModificarVacaciones , name='solicitar-modificar-vacaciones'),
-    path('private/timetrackpro/ver-solicitudes-vacaciones/', verSolicitudesVacaciones , name='ver-solicitudes-vacaciones'),
-    path('private/timetrackpro/ver-solicitudes-vacaciones/<slug:id>/', verSolicitudesVacaciones , name='ver-solicitudes-vacaciones'),
 
     #Solicitud de vacaciones
     path('private/timetrackpro/datos-festivos-vacaciones-empleado/', datosFestivosVacacionesEmpleado , name='datos-festivos-vacaciones-empleado'),
     path('private/timetrackpro/vacaciones-solicitadas/', vacacionesSolicitadas , name='vacaciones-solicitadas'),
     path('private/timetrackpro/datos-vacaciones-solicitadas/', datosVacacionesSolicitadas , name='datos-vacaciones-solicitadas'),
+    path('private/timetrackpro/datos-cambio-vacaciones-solicitadas/', datosCambioVacacionesSolicitadas , name='datos-cambio-vacaciones-solicitadas'),
+    path('private/timetrackpro/datos-cambio-vacaciones-solicitadas/<slug:year>/', datosCambioVacacionesSolicitadas , name='datos-cambio-vacaciones-solicitadas'),
+    path('private/timetrackpro/ver-cambio-vacaciones-seleccionadas/<slug:id>/', verCambioVacacionesSeleccionadas , name='ver-cambio-vacaciones-seleccionadas'),
     path('private/timetrackpro/datos-calendario-vacaciones-solicitadas/', datosCalendarioVacacionesSolicitadas , name='datos-calendario-vacaciones-solicitadas'),
     path('private/timetrackpro/ver-vacaciones-seleccionadas/<slug:id>/', verVacacionesSeleccionadas , name='ver-vacaciones-seleccionadas'),
     path('private/timetrackpro/modifcar-vacaciones/<slug:id>/', modificarVacaciones , name='modificar-vacaciones'),
     path('private/timetrackpro/cambiar-estado-vacaciones/<slug:id>/', cambiarEstadoVacaciones , name='cambiar-estado-vacaciones'),
     path('private/timetrackpro/eliminar-vacaciones/', eliminarVacaciones , name='eliminar-vacaciones'),
+    path('private/timetrackpro/modifcar-cambio-vacaciones/<slug:id>/', modificarCambioVacaciones , name='modificar-cambio-vacaciones'),
+    path('private/timetrackpro/cambiar-estado-cambio-vacaciones/<slug:id>/', cambiarEstadoCambioVacaciones , name='cambiar-estado-cambio-vacaciones'),
+    path('private/timetrackpro/eliminar-cambio-vacaciones/', eliminarCambioVacaciones , name='eliminar-cambio-vacaciones'),
     
     #Solicitud de asuntos propios 
     path('private/timetrackpro/solicitar-asuntos-propios/', solicitarAsuntosPropios , name='solicitar-asuntos-propios'),
@@ -149,7 +154,7 @@ urlpatterns = [
     path('private/timetrackpro/datos-asuntos-propios/<slug:year>/', datosAsuntosPropiosEmpleados , name='datos-asuntos-propios-empleados'),
     path('private/timetrackpro/datos-asuntos-propios-admin/', datosAsuntosPropiosSolicitados , name='datos-asuntos-propios-solicitados'),
     path('private/timetrackpro/datos-asuntos-propios-admin/<slug:year>/', datosAsuntosPropiosSolicitados , name='datos-asuntos-propios-solicitados'),    
-    path('private/timetrackpro/ver-solicitudes-asuntos-propios/', verSolicitudAsuntosPropios , name='ver-solicitudes-asuntos-propios'),
+    path('private/timetrackpro/ver-solicitud-asuntos-propios/', verSolicitudAsuntosPropios , name='ver-solicitud-asuntos-propios'),
     path('private/timetrackpro/ver-solicitud-asuntos-propios/<slug:id>/', verSolicitudAsuntosPropios , name='ver-solicitud-asuntos-propios'),
     path('private/timetrackpro/datos-calendario-asuntos-propios/', datosCalendarioAsuntosPropios , name='datos-calendario-asuntos-propios'), 
     path('private/timetrackpro/datos-calendario-asuntos-propios/<slug:year>/', datosCalendarioAsuntosPropios , name='datos-calendario-asuntos-propios'), 
@@ -188,7 +193,5 @@ urlpatterns = [
     path('private/timetrackpro/justificar-solicitud-permisos-retribuidos/', justicarSolicitudPermisosRetribuidos , name='justificar-solicitud-permisos-retribuidos'),
     path('private/timetrackpro/justificar-solicitud-permisos-retribuidos/<slug:id>/', justicarSolicitudPermisosRetribuidos , name='justificar-solicitud-permisos-retribuidos'),
     path('private/timetrackpro/descargar-solicitud-permisos-retribuidos/<slug:id>/', descargarSolicitudPermisosRetribuidos , name='descargar-solicitud-permisos-retribuidos'),
-    path('private/timetrackpro/actualizar-justificante-solicitud-permisos-retribuidos/<slug:id>/', actualizarJustificanteSolicitudPermisosRetribuidos , name='actualizar-justificante-solicitud-permisos-retribuidos'),
-
-    
+    path('private/timetrackpro/actualizar-justificante-solicitud-permisos-retribuidos/<slug:id>/', actualizarJustificanteSolicitudPermisosRetribuidos , name='actualizar-justificante-solicitud-permisos-retribuidos'),   
 ]

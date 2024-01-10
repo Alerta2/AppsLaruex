@@ -10,7 +10,7 @@
       
         <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
           <div class="row">
-            {% if not administrador %}
+            {% if administrador %}
             <div class="col">
              <button class="botonLink" data-toggle="modal" data-target="#modalEditarRegistro">             
               <div class="sign-Btn-link"><i class="fa-solid fa-pen fa-lg" style="color: #ffffff;"></i></div>
@@ -173,7 +173,6 @@
 
               <input class="form-control" type="datetime-local" id="horaError" name="hora" value="{{registro.hora|date:'Y-m-d H:i' }}" required>
             </div>
-            
           </div>
           <div class="row">
             <div class="col-xl-8 mx-auto my-2">
