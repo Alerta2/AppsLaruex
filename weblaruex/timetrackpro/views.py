@@ -3472,7 +3472,7 @@ def notificarDatosErroneos(request):
         estado = estadosErrores["Pendiente"]
         fechaRegistro = datetime.now()
         motivo = request.POST.get("motivoError")
-        tipo = "Corrección de datos"
+        tipo = "2"
         error = ProblemasDetectadosTimeTrackPro(usuario=usuario, estado=estado, fecha_registro=fechaRegistro, problema_detectado=motivo, tipo=tipo)
         error.save(using='timetrackpro')
 
@@ -3503,13 +3503,51 @@ def notificarErroresApp(request):
         estado = estadosErrores["Pendiente"]
         fechaRegistro = datetime.now()
         motivo = request.POST.get("motivoError")
-        tipo = "Fallos en la aplicación"
+        tipo = "1"
         error = ProblemasDetectadosTimeTrackPro(usuario=usuario, estado=estado, fecha_registro=fechaRegistro, problema_detectado=motivo, tipo=tipo)
         error.save(using='timetrackpro')
 
         return redirect('timetrackpro:ver-errores-notificados', id=error.id)    
      
     return render(request,"notificar-incidencia.html", infoVista)
+
+
+@login_required
+def problemasNotificados(request):
+    infoVista = {
+        "navBar":navBar,
+        "administrador":esAdministrador(request.user.id),
+        "rutaActual": "Incidencias notificadas",
+
+    }
+    return render(request,"listado-incidencias.html",infoVista)
+
+
+@login_required   
+def datosProblemasNotificados(request, tipo=None, estado=None):
+    print('\033[91m'+'estado: ' + '\033[92m', estado)
+    print('\033[91m'+'tipo: ' + '\033[92m', tipo)
+    if tipo is None or tipo == "Todos":
+        tipo = ["1", "2"]
+    if estado is None or estado == "0":
+        estado = ["1", "2", "3"]
+    incidencias = ProblemasDetectadosTimeTrackPro.objects.using("timetrackpro").filter(tipo__in=tipo, estado__in=estado).values('id', 'usuario__username', 'usuario__first_name', 'usuario__last_name', 'usuario', 'fecha_registro', 'estado', 'problema_detectado', 'tipo')
+
+    return JsonResponse(list(incidencias), safe=False)
+
+
+
+@login_required
+def verProblema(request, id):
+    incidencia = ProblemasDetectadosTimeTrackPro.objects.using("timetrackpro").filter(id=id)[0]
+    infoVista = {
+        "navBar":navBar,
+        "administrador":esAdministrador(request.user.id),
+        "rutaActual": "Incidencia nº " + str(incidencia.id),
+        "rutaPrevia": "Incidencias notificadas",
+        "urlRutaPrevia": reverse('timetrackpro:problemas-notificados'),
+    }
+    return render(request,"ver-problema.html",infoVista)
 '''-------------------------------------------
                                 Módulo: subirDocumento
 

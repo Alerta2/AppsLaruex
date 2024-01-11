@@ -595,7 +595,7 @@ class ProblemasDetectadosTimeTrackPro(models.Model):
     usuario = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='usuario')
     fecha_registro = models.DateTimeField()
     estado = models.IntegerField()
-    tipo = models.CharField(max_length=20)
+    tipo = models.IntegerField()
     fecha_resolucion = models.DateTimeField(blank=True, null=True)
     observaciones = models.CharField(max_length=1000, blank=True, null=True)
     problema_detectado = models.CharField(max_length=1000)

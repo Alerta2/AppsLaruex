@@ -198,6 +198,11 @@ urlpatterns = [
     #Informar de problemas
     path('private/timetrackpro/notificar-problemas', notificarProblemas , name='notificar-problemas'),  
     path('private/timetrackpro/notificar-datos-erroneos', notificarDatosErroneos , name='notificar-datos-erroneos'),  
-    path('private/timetrackpro/notificar-errores-app', notificarErroresApp , name='notificar-errores-app'),  
+    path('private/timetrackpro/notificar-errores-app', notificarErroresApp , name='notificar-errores-app'),   
+    path('private/timetrackpro/listado-incidencias', problemasNotificados , name='listado-incidencias'),  
+    path('private/timetrackpro/datos-listado-incidencias', datosProblemasNotificados , name='datos-listado-incidencias'), 
+    path('private/timetrackpro/datos-listado-incidencias/<slug:tipo>/', datosProblemasNotificados , name='datos-listado-incidencias'),  
+    path('private/timetrackpro/datos-listado-incidencias/<slug:estado>/', datosProblemasNotificados , name='datos-listado-incidencias'), 
+    path('private/timetrackpro/datos-listado-incidencias/<slug:tipo>/<slug:estado>/', datosProblemasNotificados , name='datos-listado-incidencias'), 
 
 ]
