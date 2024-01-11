@@ -1,0 +1,174 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+  <div class="row d-flex justify-content-center">
+    
+    <h3 class="text-primary text-gradient">Incidencia nº {{incidencia.id}}</h3>
+    <h4 class="text-secondary">{{incidencia.fecha_registro|date:"d M Y"}}</h4>
+    <div class="col-12 col-xl-4">
+      {% if administrador %}
+        <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+          <div class="row">
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalCambiarEstadoIncidencia">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-flag fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Editar</div>
+            </button>
+            </div>
+            <div class="col">
+              <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarIncidencia">             
+               <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
+               <div class="text text-sm">Eliminar</div>
+             </button>
+             </div>
+          </div>
+        </div>
+      {% endif %}
+      <div class="card ">
+        <div class="card-header pb-0 p-3">
+        </div>
+        <div class="card-body pt-0 p-3">
+          <ul class="list-group font-weight-bold">
+            
+            {% if incidencia.estado == 1 %}
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-secondary">Pendiente</span></li>
+            {% endif %}
+            {% if incidencia.estado == 2 %}
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-danger">Rechazada</span></li>
+            {% endif %}
+            {% if incidencia.estado == 3 %}
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-success">Resuelta</span></li>
+            {% endif %}
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i>{{incidencia.usuario.first_name}} {{incidencia.usuario.last_name}}</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{incidencia.fecha_registro|date:"d M Y"}}</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg">
+              {{incidencia.problema_detectado}}</li>
+          </ul>
+          {% if incidencia.observaciones %}
+          <hr class="separacion">
+
+          <ul class="list-group font-weight-bold">
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg text-primary">Resolución</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{incidencia.fecha_resolucion|date:"d M Y"}}</li>
+
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg">{{incidencia.observaciones}}</li>
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="modalCambiarEstadoIncidencia" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalCambiarEstadoIncidencia"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modificar estado de la incidencia nº {{incidencia.id}}</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:cambiar-estado-incidencia' id=incidencia.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Nuevo estado</label>
+              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
+                
+                <option value="1" {% if incidencia.estado == 1 %} selected {% endif %}>Pendiente</option>
+                <option value="2" {% if incidencia.estado == 2 %} selected {% endif %}>Rechazado</option>
+                <option value="3" {% if incidencia.estado == 3 %} selected {% endif %}>Aceptado</option>
+              </select>
+            </div>
+            
+          </div>
+          <div class="row"  id="rowMotivo">
+            <div class="col-xl-8 mx-auto my-2">
+              <label class="text-sm" id="labelMotivo">Motivo</label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el error" aria-label="Indique el motivo por el que se rechaza" id="motivo" name="motivo" aria-describedby="text-addon"></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonModificar" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalEliminarIncidencia" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEliminarIncidencia"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar incidencia nº {{incidencia.id}}</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:eliminar-incidencia' id=incidencia.id %}" method="POST"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+
+              <div class="col-xl-8 mx-auto my-2" >
+                <h6>¿Está seguro/a de eliminar la incidencia nº {{incidenica.id}}?</h6>
+                <span>{{incidencia.problema_detectado}}</span>
+                
+              </div>
+              
+            </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated and administrador  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonEliminar" >Eliminar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+  // compruebo si en textarea de motivo hay algo escrito
+  // si hay algo escrito, habilito el boton de guardar
+  // si no hay nada escrito, deshabilito el boton de guardar
+  $(document).ready(function(){
+    $('#motivo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+  });
+
+
+  function mostrarTextArea (){
+    if($('#estado').val() == 2){
+      $('#botonModificar').attr('disabled', true);
+      $('#rowMotivo').show();
+      $('#motivo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+    }else{
+      
+      $('#botonModificar').attr('disabled', false);
+      
+      $('#rowMotivo').hide();
+    }
+  }
+
+</script>
+{% endblock %}

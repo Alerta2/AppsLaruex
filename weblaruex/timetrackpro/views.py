@@ -3538,16 +3538,46 @@ def datosProblemasNotificados(request, tipo=None, estado=None):
 
 
 @login_required
-def verProblema(request, id):
+def verIncidencia(request, id):
+    administrador = esAdministrador(request.user.id)
     incidencia = ProblemasDetectadosTimeTrackPro.objects.using("timetrackpro").filter(id=id)[0]
     infoVista = {
         "navBar":navBar,
         "administrador":esAdministrador(request.user.id),
         "rutaActual": "Incidencia nº " + str(incidencia.id),
         "rutaPrevia": "Incidencias notificadas",
-        "urlRutaPrevia": reverse('timetrackpro:problemas-notificados'),
+        "urlRutaPrevia": reverse('timetrackpro:listado-incidencias'),
+        "incidencia":incidencia,
+        "administrador":administrador,
     }
-    return render(request,"ver-problema.html",infoVista)
+    return render(request,"ver-incidencia.html",infoVista)
+
+@login_required
+def cambiarEstadoIncidencia(request, id):
+    administrador = esAdministrador(request.user.id)
+    if administrador:
+        if request.method == 'POST':
+            incidencia = ProblemasDetectadosTimeTrackPro.objects.using("timetrackpro").filter(id=id)[0]
+            incidencia.estado = request.POST.get("estado")
+            incidencia.fecha_resolucion = datetime.now()
+            if request.POST.get("estado") == "2":
+                incidencia.observaciones = request.POST.get("motivo")
+            else:
+                incidencia.observaciones = None
+            incidencia.save(using='timetrackpro')
+            return redirect('timetrackpro:ver-incidencia', id=id)
+        return redirect('timetrackpro:listado-incidencias')
+    return redirect('timetrackpro:ups', mensaje="No se ha podido modificar el estado de la incidencia")
+
+
+@login_required
+def eliminarIncidencia(request, id):
+    administrador = esAdministrador(request.user.id)
+    if request.method == 'POST' and administrador:
+        incidencia = ProblemasDetectadosTimeTrackPro.objects.using("timetrackpro").filter(id=id)[0]
+        incidencia.delete(using='timetrackpro')
+        return redirect('timetrackpro:listado-incidencias')
+    return redirect('timetrackpro:ups', mensaje="No se ha podido eliminar la incidencia")
 '''-------------------------------------------
                                 Módulo: subirDocumento
 

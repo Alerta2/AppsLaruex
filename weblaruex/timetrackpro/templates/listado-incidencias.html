@@ -70,8 +70,9 @@ $("#tabla_incidencias_notificadas").bootstrapTable({
         halign:"left",
         sortable: true,
         align: "left",
+        wrapped: true,
         formatter: function(value, row) {
-          var div = '<span class="text-sm font-weight-bold mb-0">'+ row.problema_detectado +'</span>';
+          var div = '<span class="text-sm font-weight-bold mb-0 text-wrap">'+ row.problema_detectado +'</span>';
           return div;
         }
       },
@@ -149,7 +150,7 @@ $("#tabla_incidencias_notificadas").bootstrapTable({
         field: "",
         align: "center",
         formatter: function (value, row) {
-          var botonVer = '<a href="/private/timetrackpro/ver-registro/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          var botonVer = '<a href="/private/timetrackpro/ver-incidencia/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
           return botonVer;
                   
 

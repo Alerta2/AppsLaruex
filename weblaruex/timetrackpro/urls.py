@@ -204,5 +204,8 @@ urlpatterns = [
     path('private/timetrackpro/datos-listado-incidencias/<slug:tipo>/', datosProblemasNotificados , name='datos-listado-incidencias'),  
     path('private/timetrackpro/datos-listado-incidencias/<slug:estado>/', datosProblemasNotificados , name='datos-listado-incidencias'), 
     path('private/timetrackpro/datos-listado-incidencias/<slug:tipo>/<slug:estado>/', datosProblemasNotificados , name='datos-listado-incidencias'), 
+    path('private/timetrackpro/ver-incidencia/<slug:id>/', verIncidencia , name='ver-incidencia'),
+    path('private/timetrackpro/cambiar-estado-incidencia/<slug:id>/', cambiarEstadoIncidencia , name='cambiar-estado-incidencia'),
+    path('private/timetrackpro/eliminar-incidencia/<slug:id>/', eliminarIncidencia , name='eliminar-incidencia'),
 
 ]
