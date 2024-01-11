@@ -4,14 +4,14 @@
 {% block content %}
 
 <h3 class="font-weight-bolder text-info text-gradient">Hola {{request.user.first_name}} {{request.user.last_name}}</h3>
-<p class="mb-4" id="textSeleccionado">Rellena el siguiente formulario para notificar un error al fichar.</p>  
+<p class="mb-4" id="textSeleccionado">Rellena el siguiente formulario para reportar la incidencia detectada.</p>  
 
 
   <div class="page-header min-vh-75">
        
     <div class="container"> 
   
-      <form action="{% url 'timetrackpro:notificar-error-fichaje' %}" method="POST" enctype="multipart/form-data">
+      <form action="{{formulario}}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         
         <div class="row">
@@ -24,34 +24,11 @@
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col mb-3">
-
-                    <label class="col-form-label text-white">Empleado</label>
-  
-                    <select class="form-control" aria-label="Nombre en el dispositivo" id="empleado_maquina"
-                    name="empleado_maquina" aria-describedby="text-addon" {% if not administrador %} disabled {% endif %}
-                    >
-                    {% for empleado in empleados %}
-                      <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
-                    {% endfor %}
-                    </select>
-                    </div>
-                  <div class="col mb-3">
-
-                  <label class="col-form-label text-white">Fecha y hora</label>
-
-                  <input class="form-control" type="datetime-local" id="hora" name="hora" value="{{registro.hora|date:'Y-m-d H:i' }}" required>
-                  </div>
-                  
-
-
-                </div>
-                <div class="row">
                   <div class="mb-3">
 
-                  <label class="col-form-label text-white">Motivo</label>
+                  <label class="col-form-label text-white">Descripción del problema</label>
 
-                  <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Indique el motivo de la solicitud" id="motivoError" name="motivoError" aria-describedby="text-addon" rows="4" required></textarea>
+                  <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Describe detalladamente el problema detectado" id="motivoError" name="motivoError" aria-describedby="text-addon" rows="10" maxlength="900" required></textarea>
                   </div>
                 </div>
               </div>

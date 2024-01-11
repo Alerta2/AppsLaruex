@@ -44,7 +44,7 @@
               <p class="mb-1 pt-1 text-bold">Corrección de datos</p>
               <h5 class="font-weight-bolder">Datos erroneos</h5>
               <p class="mb-5">Si la información personal que hay en la aplicación es incorrecta, notificanoslo.</p>
-              <a class="text-body text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+              <a class="text-body text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="{% url 'timetrackpro:notificar-datos-erroneos' %}">
                 Solicitar corrección
                 <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
               </a>
@@ -73,7 +73,7 @@
               <p class="mb-1 pt-1 text-bold">Bugs</p>
               <h5 class="font-weight-bolder">Errores detectados</h5>
               <p class="mb-5">Si has detectado algún error en la app o crees que algo no se ve correctamente.</p>
-              <a class="text-body text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+              <a class="text-body text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="{% url 'timetrackpro:notificar-errores-app' %}">
                 Notificar
                 <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
               </a>

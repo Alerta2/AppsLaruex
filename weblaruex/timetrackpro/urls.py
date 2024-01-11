@@ -197,5 +197,7 @@ urlpatterns = [
 
     #Informar de problemas
     path('private/timetrackpro/notificar-problemas', notificarProblemas , name='notificar-problemas'),  
+    path('private/timetrackpro/notificar-datos-erroneos', notificarDatosErroneos , name='notificar-datos-erroneos'),  
+    path('private/timetrackpro/notificar-errores-app', notificarErroresApp , name='notificar-errores-app'),  
 
 ]

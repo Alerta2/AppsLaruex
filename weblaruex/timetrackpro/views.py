@@ -3450,6 +3450,66 @@ def notificarProblemas(request):
     }
      
     return render(request,"notificar-problemas.html", infoVista)
+
+
+
+@login_required
+def notificarDatosErroneos(request):    
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
+    administrador = esAdministrador(request.user.id)
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+        "empleados":list(empleados), 
+        "rutaActual": "Notificar datos erroneos",
+        "rutaPrevia": "Notificar problemas",
+        "urlRutaPrevia": reverse('timetrackpro:notificar-problemas'),
+        "formulario": reverse('timetrackpro:notificar-datos-erroneos'),
+    }
+    if request.method == 'POST':
+        usuario = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
+        estado = estadosErrores["Pendiente"]
+        fechaRegistro = datetime.now()
+        motivo = request.POST.get("motivoError")
+        tipo = "Corrección de datos"
+        error = ProblemasDetectadosTimeTrackPro(usuario=usuario, estado=estado, fecha_registro=fechaRegistro, problema_detectado=motivo, tipo=tipo)
+        error.save(using='timetrackpro')
+
+        return redirect('timetrackpro:ver-errores-notificados', id=error.id)   
+     
+    return render(request,"notificar-incidencia.html", infoVista)
+
+
+
+@login_required
+def notificarErroresApp(request):
+    
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
+    administrador = esAdministrador(request.user.id)
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+        "empleados":list(empleados), 
+        "rutaActual": "Notificar error en la aplicación",
+        "rutaPrevia": "Notificar problemas",
+        "urlRutaPrevia": reverse('timetrackpro:notificar-problemas'),
+        "formulario": reverse('timetrackpro:notificar-errores-app'),
+
+    }
+    if request.method == 'POST':
+        usuario = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
+        estado = estadosErrores["Pendiente"]
+        fechaRegistro = datetime.now()
+        motivo = request.POST.get("motivoError")
+        tipo = "Fallos en la aplicación"
+        error = ProblemasDetectadosTimeTrackPro(usuario=usuario, estado=estado, fecha_registro=fechaRegistro, problema_detectado=motivo, tipo=tipo)
+        error.save(using='timetrackpro')
+
+        return redirect('timetrackpro:ver-errores-notificados', id=error.id)    
+     
+    return render(request,"notificar-incidencia.html", infoVista)
 '''-------------------------------------------
                                 Módulo: subirDocumento
 

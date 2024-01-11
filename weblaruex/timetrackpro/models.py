@@ -589,3 +589,18 @@ class VacacionesTimetrackpro(models.Model):
         managed = False
         db_table = 'vacaciones'
 
+
+class ProblemasDetectadosTimeTrackPro(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    usuario = models.ForeignKey(AuthUserTimeTrackPro, models.DO_NOTHING, db_column='usuario')
+    fecha_registro = models.DateTimeField()
+    estado = models.IntegerField()
+    tipo = models.CharField(max_length=20)
+    fecha_resolucion = models.DateTimeField(blank=True, null=True)
+    observaciones = models.CharField(max_length=1000, blank=True, null=True)
+    problema_detectado = models.CharField(max_length=1000)
+
+    class Meta:
+        managed = False
+        db_table = 'problemas_detectados'
+
