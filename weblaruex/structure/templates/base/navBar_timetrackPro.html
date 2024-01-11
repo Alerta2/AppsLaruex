@@ -24,15 +24,22 @@
           </div>
           <ul class="navbar-nav  justify-content-end">
             <li class="nav-item d-flex align-items-center">
-              <a class="btn btn-outline-primary btn-sm mb-0 me-3" target="_blank" href="https://www.creative-tim.com/builder?ref=navbar-soft-ui-dashboard"><i class="fa-solid fa-paper-plane me-sm-1"></i>Notificar un problema
+              <a class="btn btn-outline-primary btn-sm mb-0 me-3" target="_blank" href="{% url 'timetrackpro:notificar-problemas' %}"><i class="fa-solid fa-paper-plane me-sm-1"></i>Notificar un problema
               </a>
             </li>
+            {% if not user.is_authenticated %}
             <li class="nav-item d-flex align-items-center">
-              <a href="javascript:;" class="nav-link text-body font-weight-bold px-0">
-                <i class="fa fa-user me-sm-1"></i>
+              <a href="/accounts/login/?next={{request.path}}" class="nav-link text-body font-weight-bold px-0">
                 <span class="d-sm-inline d-none">Sign In</span>
               </a>
             </li>
+            {% else %}
+            <li class="nav-item d-flex align-items-center">
+              <a href="/accounts/logout/?next={{request.path}}" class="nav-link text-body font-weight-bold px-0">
+                <span class="d-sm-inline d-none">Hola, {{ request.user.first_name }} <i class="fa-solid fa-person-to-door"></i></span>
+              </a>
+            </li>
+            {% endif %}
             <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
               <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
                 <div class="sidenav-toggler-inner">

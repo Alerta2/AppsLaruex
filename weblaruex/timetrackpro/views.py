@@ -3436,6 +3436,20 @@ def notificarIncidencias(request):
 
 
 
+
+
+@login_required
+def notificarProblemas(request):
+    
+    administrador = esAdministrador(request.user.id)
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+        "rutaActual": "Notificar problemas",
+    }
+     
+    return render(request,"notificar-problemas.html", infoVista)
 '''-------------------------------------------
                                 Módulo: subirDocumento
 
