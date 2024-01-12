@@ -1,0 +1,247 @@
+
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+
+{% block content %}
+<div class="row d-flex justify-content-end">
+  <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-8">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Días asuntos propios restantes</p>
+              <h5 class="font-weight-bolder mb-0">
+                {{diasPropiosRestantes}}
+                {% if diasPropiosSolicitados != 0 %}
+                <span class="text-danger text-sm font-weight-bolder">-{{diasPropiosSolicitados}}</span>
+                {% endif %}
+              </h5>
+            </div>
+          </div>
+          <div class="col-4 text-end">
+            <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+              <i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-8">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Días de vacaciones restantes</p>
+              <h5 class="font-weight-bolder mb-0">
+                {{diasVacacionesRestantes}}
+                {% if diasVacacionesSolicitados != 0 %}
+                <span class="text-danger text-sm font-weight-bolder">-{{diasVacacionesSolicitados}}</span>
+                {% endif %}
+              </h5>
+            </div>
+          </div>
+          <div class="col-4 text-end">
+            <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+              <i class="ni ni-cart text-lg opacity-10" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col-lg-3">
+    <div class="card w-90">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover  background-timetrackpro-festivos h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Festivos</h5>
+          <p class="text-white">Acceso al listdo de festivos.<br> <br></p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-permisos h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Permisos</h5>
+          <p class="text-white">Acceso al listado de permisos reconocidos por la Uex.</p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-vacaciones h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Permisos remunerados</h5>
+          <p class="text-white">Listado de permisos remunerados reconocidos por la uex.</p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-solicitudes h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Solicitud de dias</h5>
+          <p class="text-white">Acceso las secciones que permiten gestionar solicitudes</p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row mt-4">
+  <div class="col-lg-3">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-report h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Panel de control Horario</h5>
+          <p class="text-white">Dashboard con la información relevante del control horario</p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card w-90">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover  background-timetrackpro-huella h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Registros de jornada</h5>
+          <p class="text-white">Acceso al listado de registros horarios registrados en la web</p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-informe-jornada h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Informes de Jornada</h5>
+          <p class="text-white">Acceso al informes obtenidos del control horario de los trabajadores.</p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-errores h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Informe de errores</h5>
+          <p class="text-white">Informe de errores obtenidos de los registros horarios.</p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="row mt-4">
+  <div class="col-lg-3">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-empleados h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Empleados</h5>
+          <p class="text-white">Listado con información de los empleados</p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card w-90">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover  background-timetrackpro-usuarios h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Usuarios máquinas</h5>
+          <p class="text-white">Listado de empleados registrados en las maquinas de control de asistencia</p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-card h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Tarjetas de acceso</h5>
+          <p class="text-white">Acceso al listado de tarjetas de acceso.<br> <br></p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-habilitaciones h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Habilitaciones</h5>
+          <p class="text-white">Acceso al listado de habilitaciones asignadas a los usuarios</p>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="javascript:;">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

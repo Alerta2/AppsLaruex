@@ -55,12 +55,32 @@ navBar = NavBar.objects.using("timetrackpro").values()
 
 
 def home(request):
-    
-    # guardo los datos en un diccionario
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    diasPropiosConsumidos = 3
+    diasPropiosRestantes= 6-diasPropiosConsumidos
+    diasPropiosSolicitados = 0
+    diasVacacionesConsumidos = 15
+    diasVacacionesRestantes = 30-diasVacacionesConsumidos
+    diasVacacionesSolicitados = 8
     infoVista = {
         "navBar":navBar,
-        "administrador":esAdministrador(request.user.id),
+        "administrador":administrador,
+        "director":director,
+        "rutaActual": "Home",
+        "diasPropiosRestantes":diasPropiosRestantes,
+        "diasVacacionesRestantes":diasVacacionesRestantes,
+        "diasPropiosSolicitados":diasPropiosSolicitados,
+        "diasVacacionesSolicitados":diasVacacionesSolicitados,
     }
+    if administrador:
+        return render(request,"home-admin.html",infoVista)
+    elif director:
+        return render(request,"home.html",infoVista)
+    else:
+        return render(request,"home.html",infoVista)
+    # guardo los datos en un diccionario
+
 
     return render(request,"home.html",infoVista)
 
