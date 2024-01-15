@@ -9,6 +9,8 @@ from django.conf.urls import url
 app_name = 'timetrackpro'
 
 urlpatterns = [
+    path('private/timetrackpro/prueba/', pruebaAgrupacion ,name='pruebaAgrupacion'),
+
     path('private/timetrackpro/', home ,name='home'),
     path('private/timetrackpro/documentacion', documentacion ,name='documentacion'),
     path('private/timetrackpro/perfil', perfil ,name='perfil'),

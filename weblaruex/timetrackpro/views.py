@@ -53,6 +53,55 @@ excluidos = ["Prueba", "Pruebas", "prueba", "pruebas", "PRUEBA", "PRUEBAS", "Usu
 # Defino la barra de navegación
 navBar = NavBar.objects.using("timetrackpro").values()
 
+def pruebaAgrupacion(request):
+    informe = calcularHoras([17], datetime(2023, 5, 2),datetime(2023, 11, 15))
+    return JsonResponse(list(informe), safe=False)
+
+def calcularHoras (usuarios, fechaInicio, fechaFin):
+    '''
+        Función que se encarga de calcular las horas de los usuarios que se le pasan por parámetro.
+        @param usuarios: Lista de usuarios a los que se les calcularán las horas.
+        @param fechaInicio: Fecha de inicio del cálculo.
+        @param fechaFin: Fecha de fin del cálculo.
+    '''
+    # linea de informe ejemplo
+    # {"empleado": 1, "dia": dd/mm/yyyy, "horas": 7, "correcto": "si", "observaciones": "", fichajes: 2}
+    informe = []
+    # sumo un dia a la fecha fin
+    fechaFin = fechaFin + timedelta(days=1)
+
+    registros = Registros.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
+
+    empleados = registros.values('id_empleado').distinct()
+    
+    for e in empleados:
+        dias = registros.filter(id_empleado__id=e["id_empleado"]).values('hora__date').distinct()
+        for d in dias:
+            dia_siguiente = d["hora__date"]+timedelta(days=1)
+            registrosDiaEmpleado = registros.filter(id_empleado__id=e["id_empleado"], hora__range=(d["hora__date"],dia_siguiente)).all()
+            # aquí podríamos comprobar cuando el usuario no tienen ningun registro ese día si tiene alguna justificacion para ajustar
+            print("Empleado: ",e["id_empleado"], d["hora__date"], len(registrosDiaEmpleado))
+            if len(registrosDiaEmpleado)%2 == 0:
+                horas = 0
+                tramo = 0
+                auxHoras = 0
+                for r in registrosDiaEmpleado:
+                    if tramo == 0:
+                        auxHoras = r.hora
+                        tramo = 1
+                    else:
+                        horas = horas + (r.hora - auxHoras).total_seconds()/3600
+                        tramo = 0
+                    print(r.hora)
+
+                # comprobar justificaciones para ajustar las horas del dia
+                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado)})
+
+            else:
+                fichajesHechos = registrosDiaEmpleado.values_list('hora__time', flat=True)
+                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos)})
+    return informe
+    
 
 def home(request):
     administrador = esAdministrador(request.user.id)
