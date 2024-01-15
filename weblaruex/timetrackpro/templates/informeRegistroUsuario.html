@@ -8,15 +8,42 @@
     <div class="col-12">
       <div class="card mb-4">
         <div class="card-header pb-0">
-          <h5>Informe empleados 
-
-            <a href="{% url 'timetrackpro:agregar-usuario' %}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Dar de alta un empleado en la aplicación">
-              <i class="fa-solid fa-user-plus ps-2"></i>
-            </a>
-          </h5>
+          <h3>Informe de asistencia</h3>
         </div>
-        <div class="card-body mx-4 pt-0 pb-2">
+        <div class="card-body pt-0 pb-2">
           <div class="table-responsive p-0">
+            
+            <div class="mx-4">
+            <div id="toolbar">
+              <div class="row my-auto">
+                <div class="col my-auto">
+                  <label class="text-sm" ></label>
+
+                  <button class="btn btn-outline-primary" type="button" data-toggle="modal" data-target="#modalEmpleados">
+                  Empleados
+                </button>
+                <select name="empleados" id="empleados" multiple="multiple" hidden>
+                </select>
+                </div>
+                <div class="col ">
+                  <label class="text-sm" >Fecha</label>
+                  <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" aria-describedby="text-addon">
+                </div>
+                <div class="col ">
+                  <label class="text-sm" >Fecha Fin</label>
+                  <input type="date" class="form-control" id="fechaFin" name="fechaFin" aria-describedby="text-addon">
+                </div>
+                <div class="col">
+                  <button type="submit" value="submit" class="btn bg-gradient-primary btn-round w-100 mt-4 mb-0" onclick="filtrarTabla()">Filtrar</button>
+
+                  <input type="text" id="inputEmpleados" name="inputEmpleados" hidden>
+
+                </div>
+              </div>
+
+            </div>
+                
+            </div>
             <table  id="informe_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
 
           </div>
@@ -25,23 +52,91 @@
     </div>
   </div>
 
+  <!-- Modal con listado de Empleados -->
+<div class="modal fade" id="modalEmpleados" tabindex="-1" role="dialog" aria-labelledby="modalEmpleadosLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEmpleadosLabel">Seleccionar Empleados</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <button class="dropdown-item" type="button" id="todosEmpleados" >
+            <input type="checkbox" id="checkTodosEmpleados" onclick="marcarTodos()">
+            Seleccionar todos
+          </button>
+          {% for empleado in empleados %}
+          <button class="dropdown-item" type="button" id="empleadosModalExtra" >
+            <input type="checkbox" value="{{empleado.id}}" name="empleadosModalExtra">
+            {{empleado.nombre}}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cerrarEmpleados">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="obtenerSeleccionados()">Guardar Selecionados</button>
+      </div>
+    </div>
+  </div>
+</div>
 
   <script>
-      
+    function marcarTodos(){
+      var empleados = document.getElementsByName("empleadosModalExtra");
+      if (checkTodosEmpleados.checked) {
+        // recorro la lista de empleados y los marco todos
+        for (var i = 0; i < empleados.length; i++) {
+          empleados[i].checked = true;
+          console.log(empleados[i].value);
+        }
+      } else {
+        // recorro la lista de empleados y los desmarco todos
+        for (var i = 0; i < empleados.length; i++) {
+          empleados[i].checked = false;
+        }
+      }
+    }
+    function obtenerSeleccionados(){
+      // recorro la lista empleadosModalExtra
+      var empleados = document.getElementsByName("empleadosModalExtra");
+      // recorro la lista de empleados y los guardo separados por #
+      var empleadosSeleccionados = "";
+      for (var i = 0; i < empleados.length; i++) {
+        if (empleados[i].checked){
+          empleadosSeleccionados += empleados[i].value + "_";
+        }
+      }
+      // elimino el ultimo #
+      empleadosSeleccionados = empleadosSeleccionados.slice(0, -1);
+      // guardo los empleados seleccionados en el input
+      document.getElementById("inputEmpleados").value = empleadosSeleccionados;
+      console.log(document.getElementById("inputEmpleados").value);
+      // cierro el modal
+      $('#modalEmpleados').trigger('click');
+    }
+
 $("#informe_empleados").bootstrapTable({
   method: "get",
   locale: navigator.language,
   url: "{% url 'timetrackpro:datos-registro-empleados' %}",
   cache: false, 
-
   columns: [
     {
       title: "Nombre",
-      field: "nombre_empleado",
+      field: "empleado",
       halign:"left",
       sortable: true,
       align: "left",
       width:"5",
+      formatter: function(value, row) {
+        var hora = row.empleado;
+        var divHora = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+hora +'</h6></div>';
+        return divHora ;
+      }
       // formatter: function(value, row) {
       //   var nombre = row.nombre_empleado;
       //   var divNombre = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+nombre +'</h6></div>';
@@ -49,56 +144,57 @@ $("#informe_empleados").bootstrapTable({
       // }
     },{
       title: "Fecha",
-      field: "hora",
+      field: "dia",
       align: "center",
       width:"10",
-      formatter: function(value, row) {
-        const mes = {
-          "01": "Ene",
-          "02": "Feb",
-          "03": "Mar",
-          "04": "Abr",
-          "05": "May",
-          "06": "Jun",
-          "07": "Jul",
-          "08": "Ago",
-          "09": "Sep",
-          "10": "Oct",
-          "11": "Nov",
-          "12": "Dic",
-        };
-        // obtengo la fecha de lectura
-        var fechaLectura = row.fecha;
-          // obtengo la fecha
-          var fecha = fechaLectura.split("T")[0];
-          mesFecha = fecha.split("-")[1];
-          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
-          var div = '<span class="text-xs font-weight-bold">'+ fecha +'</span>';
-          return div;
-      }
+      sortable: true,
+      // formatter: function(value, row) {
+      //   const mes = {
+      //     "01": "Ene",
+      //     "02": "Feb",
+      //     "03": "Mar",
+      //     "04": "Abr",
+      //     "05": "May",
+      //     "06": "Jun",
+      //     "07": "Jul",
+      //     "08": "Ago",
+      //     "09": "Sep",
+      //     "10": "Oct",
+      //     "11": "Nov",
+      //     "12": "Dic",
+      //   };
+      //   // obtengo la fecha de lectura
+      //   var fechaLectura = row.fecha;
+      //     // obtengo la fecha
+      //     var fecha = fechaLectura.split("T")[0];
+      //     mesFecha = fecha.split("-")[1];
+      //     fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+      //     var div = '<span class="text-xs font-weight-bold">'+ fecha +'</span>';
+      //     return div;
+      // }
     },
     {
       title: "Entrada",
-      field: "hora",
+      field: "row.horas",
       halign:"left",
       sortable: true,
       align: "left",
       width:"20",
       formatter: function(value, row) {
-        var hora = row.hora_entrada;
+        var hora = row.horas;
         var divHora = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+hora +'</h6></div>';
         return divHora ;
       }
     },
     {
       title: "Salida",
-      field: "hora",
+      field: "correcto",
       halign:"left",
       sortable: true,
       align: "left",
       width:"20",
       formatter: function(value, row) {
-        var hora = row.hora_salida;
+        var hora = row.correcto;
         var divHora = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+hora +'</h6></div>';
         return divHora ;
       }
@@ -122,5 +218,37 @@ $("#informe_empleados").bootstrapTable({
 
   
 });
+  function filtrarTabla(){
+    if (document.getElementById("fechaInicio").value == ""){
+      // mostrar un dialogo de error
+      alert("Debe ingresar una fecha de inicio");
+      alert.title = "Error";
+
+      return false;
+    }
+    if (document.getElementById("fechaFin").value == ""){
+      alert("Debe ingresar una fecha de fin");
+      return false;
+    }
+
+    fechaInicio = document.getElementById("fechaInicio").value;
+    fechaFin = document.getElementById("fechaFin").value;
+    if (fechaInicio > fechaFin){
+      alert("La fecha de inicio debe ser menor a la fecha de fin");
+      return false;
+    }
+    
+    var empleados = $('#inputEmpleados').val();
+    var fechaInicio = document.getElementById("fechaInicio").value;
+    var fechaFin = document.getElementById("fechaFin").value;
+    // cerrar el modal
+    $('#modalEmpleados').trigger('click');
+    // nueva url
+    var nuevaUrl = "{% url 'timetrackpro:datos-registro-empleados' %}?listEmpleados="+empleados+"&fechaInicio="+fechaInicio+"&fechaFin="+fechaFin;
+    // cambiar la url de la tabla
+    $("#informe_empleados").bootstrapTable('refreshOptions', {url: nuevaUrl});
+  }
+
+// Función para filtrar la tabla por fecha
   </script>
 {% endblock %}

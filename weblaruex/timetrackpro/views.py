@@ -15,6 +15,7 @@ from timetrackpro.funciones.funcionesAuxiliares import *
 from django.db.models.functions import TruncDate
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
+import calendar
 
 
 
@@ -41,6 +42,21 @@ estadosErrores = {
     "Aceptado":3
 }
 
+nombreMeses = {
+    1:"Enero",
+    2:"Febrero",
+    3:"Marzo",
+    4:"Abril",
+    5:"Mayo",
+    6:"Junio",
+    7:"Julio",
+    8:"Agosto",
+    9:"Septiembre",
+    10:"Octubre",
+    11:"Noviembre",
+    12:"Diciembre"
+}
+
 
 # ? información tarjeta acceso reverso
 infoGeneralTarjeta ="Este carné es propiedad del LARUEX y deberá devuelto al departamento de administración una vez acabada la relación contractual con el mismo."
@@ -53,55 +69,6 @@ excluidos = ["Prueba", "Pruebas", "prueba", "pruebas", "PRUEBA", "PRUEBAS", "Usu
 # Defino la barra de navegación
 navBar = NavBar.objects.using("timetrackpro").values()
 
-def pruebaAgrupacion(request):
-    informe = calcularHoras([17], datetime(2023, 5, 2),datetime(2023, 11, 15))
-    return JsonResponse(list(informe), safe=False)
-
-def calcularHoras (usuarios, fechaInicio, fechaFin):
-    '''
-        Función que se encarga de calcular las horas de los usuarios que se le pasan por parámetro.
-        @param usuarios: Lista de usuarios a los que se les calcularán las horas.
-        @param fechaInicio: Fecha de inicio del cálculo.
-        @param fechaFin: Fecha de fin del cálculo.
-    '''
-    # linea de informe ejemplo
-    # {"empleado": 1, "dia": dd/mm/yyyy, "horas": 7, "correcto": "si", "observaciones": "", fichajes: 2}
-    informe = []
-    # sumo un dia a la fecha fin
-    fechaFin = fechaFin + timedelta(days=1)
-
-    registros = Registros.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
-
-    empleados = registros.values('id_empleado').distinct()
-    
-    for e in empleados:
-        dias = registros.filter(id_empleado__id=e["id_empleado"]).values('hora__date').distinct()
-        for d in dias:
-            dia_siguiente = d["hora__date"]+timedelta(days=1)
-            registrosDiaEmpleado = registros.filter(id_empleado__id=e["id_empleado"], hora__range=(d["hora__date"],dia_siguiente)).all()
-            # aquí podríamos comprobar cuando el usuario no tienen ningun registro ese día si tiene alguna justificacion para ajustar
-            print("Empleado: ",e["id_empleado"], d["hora__date"], len(registrosDiaEmpleado))
-            if len(registrosDiaEmpleado)%2 == 0:
-                horas = 0
-                tramo = 0
-                auxHoras = 0
-                for r in registrosDiaEmpleado:
-                    if tramo == 0:
-                        auxHoras = r.hora
-                        tramo = 1
-                    else:
-                        horas = horas + (r.hora - auxHoras).total_seconds()/3600
-                        tramo = 0
-                    print(r.hora)
-
-                # comprobar justificaciones para ajustar las horas del dia
-                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado)})
-
-            else:
-                fichajesHechos = registrosDiaEmpleado.values_list('hora__time', flat=True)
-                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos)})
-    return informe
-    
 
 def home(request):
     administrador = esAdministrador(request.user.id)
@@ -554,50 +521,102 @@ def datosRegistrosInsertados(request):
 
 
 
-def obtenerRegistro(request, year=None, mes=None, semana=None):
-    #empleados de las máquinas de control de asistencia
-    empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
+
+@login_required
+def obtenerRegistroUsuario(request):
+
     administrador = esAdministrador(request.user.id)
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
     
     infoVista = {
         "navBar":navBar,
         "administrador":administrador,
-    }
-    return render(request,"informeRegistro.html",infoVista)
-
-def obtenerRegistroUsuario(request, id=None, year=None, mes=None, semana=None):
-    administrador = esAdministrador(request.user.id)
-    #empleados de las máquinas de control de asistencia
-    empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
-
-    # current_url = request.path[1:]
-    infoVista = {
-        "navBar":navBar,
-        "administrador":administrador,
+        "empleados":list(empleados),
+        "rutaActual": "Informe de asistencia empleados",
     }
     return render(request,"informeRegistroUsuario.html",infoVista)
 
 
-def datosRegistroUsuario(request, id=None, year=None, mes=None, semana=None):
-    #empleados de las máquinas de control de asistencia
-    salida = []
+@login_required
+def datosRegistroUsuario(request):
+    mesPrevio = datetime.now().month
+    yearActual = datetime.now().year
+    if mesPrevio == 1:
+        mesPrevio = 12
+        yearActual = yearActual - 1
+    usuarios = []
+    print("listEmpleados: ", request.GET.get("listEmpleados"))
 
-    empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
-    #filter=models.Q(hora__date__gte=datetime.strptime(year + "-" + mes + "-01", '%Y-%m-%d').date()), distinct=True)
-    if id is not  None:
-        empleados = EmpleadosMaquina.objects.using("timetrackpro").filter(id__in=id).values()
+    if request.GET.get("listEmpleados") != None:
+        usuarios = request.GET.get("listEmpleados").split("_")
+    else: 
+        usuarios = EmpleadosMaquina.objects.using("timetrackpro").values_list('id', flat=True)
+    if request.GET.get("fechaInicio") != None:
+        fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%Y-%m-%d')
+    else:
+        fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
+        fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')
+        print('\033[91m'+'fechaInicio: ' + '\033[92m', fechaInicio)
+
+    if request.GET.get("fechaFin") != None:
+        fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%Y-%m-%d')
+    else:
+        ultimoDiaMes = calendar.monthrange(yearActual, mesPrevio)  
+        fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
+        fechaFin = datetime.strptime(fechaFin, '%Y-%m-%d')
+        print('\033[91m'+'fechaFin: ' + '\033[92m', fechaFin)
+    informe = calcularHoras(usuarios, fechaInicio, fechaFin)
+    return JsonResponse(list(informe), safe=False)
+
+
+
+    
+def calcularHoras (usuarios, fechaInicio, fechaFin):
+    '''
+        Función que se encarga de calcular las horas de los usuarios que se le pasan por parámetro.
+        @param usuarios: Lista de usuarios a los que se les calcularán las horas.
+        @param fechaInicio: Fecha de inicio del cálculo.
+        @param fechaFin: Fecha de fin del cálculo.
+    '''
+
+    # linea de informe ejemplo
+    # {"empleado": 1, "dia": dd/mm/yyyy, "horas": 7, "correcto": "si", "observaciones": "", fichajes: 2}
+    informe = []
+    # sumo un dia a la fecha fin
+    fechaFin = fechaFin + timedelta(days=1)
+
+    registros = Registros.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
+
+    empleados = registros.values('id_empleado').distinct()
+    
     for e in empleados:
-        #registros = Registros.objects.using("timetrackpro").filter(id_empleado=e["id"]).annotate(fecha=TruncDate('hora')).values('hora__date','hora__time','id_empleado','nombre_empleado', 'fecha').annotate(hora_entrada=Min('hora__time'), hora_salida=Max('hora__time')).order_by('fecha')
-        registros= Registros.objects.using("timetrackpro").filter(id_empleado=e["id"]).annotate(fecha=TruncDate('hora')).values('fecha', 'id_empleado', 'nombre_empleado', 'hora__time').order_by('-fecha','hora__time')
+        dias = registros.filter(id_empleado__id=e["id_empleado"]).values('hora__date').distinct()
+        for d in dias:
+            dia_siguiente = d["hora__date"]+timedelta(days=1)
+            registrosDiaEmpleado = registros.filter(id_empleado__id=e["id_empleado"], hora__range=(d["hora__date"],dia_siguiente)).all()
+            # aquí podríamos comprobar cuando el usuario no tienen ningun registro ese día si tiene alguna justificacion para ajustar
+            #print("Empleado: ",e["id_empleado"], d["hora__date"], len(registrosDiaEmpleado))
+            if len(registrosDiaEmpleado)%2 == 0:
+                horas = 0
+                tramo = 0
+                auxHoras = 0
+                for r in registrosDiaEmpleado:
+                    if tramo == 0:
+                        auxHoras = r.hora
+                        tramo = 1
+                    else:
+                        horas = horas + (r.hora - auxHoras).total_seconds()/3600
+                        tramo = 0
 
-        #.annotate(hora_entrada=Min('hora__time'), hora_salida=Max('hora__time'))
-        for r in registros:
+                # comprobar justificaciones para ajustar las horas del dia
+                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado)})
 
-
-            salida.append(r)
-    # current_url = request.path[1:]
-    return JsonResponse(list(salida), safe=False)
+            else:
+                fichajesHechos = registrosDiaEmpleado.values_list('hora__time', flat=True)
+                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos)})
+    return informe
+    
 
 
 

@@ -1,6 +1,6 @@
 
 #from timetrackpro.views import *
-from django.urls import path
+from django.urls import path, re_path
 from django.conf.urls import url
 from .views import *
 from django.conf.urls.static import static
@@ -9,8 +9,6 @@ from django.conf.urls import url
 app_name = 'timetrackpro'
 
 urlpatterns = [
-    path('private/timetrackpro/prueba/', pruebaAgrupacion ,name='pruebaAgrupacion'),
-
     path('private/timetrackpro/', home ,name='home'),
     path('private/timetrackpro/documentacion', documentacion ,name='documentacion'),
     path('private/timetrackpro/perfil', perfil ,name='perfil'),
@@ -52,17 +50,11 @@ urlpatterns = [
     path('private/timetrackpro/ver-linea-registro/<slug:id>/', verLineaRegistro , name='ver-linea-registro'),
     path('private/timetrackpro/editar-linea-registro/<slug:id>/', editarLineaRegistro , name='editar-linea-registro'),
     path('private/timetrackpro/eliminar-linea-registro/<slug:id>/', eliminarLineaRegistro , name='eliminar-linea-registro'),
-    path('private/timetrackpro/obtener-registro', obtenerRegistro , name='obtener-registro'),
-    path('private/timetrackpro/obtener-registro/<slug:year>', obtenerRegistro , name='obtener-registro'),
-    path('private/timetrackpro/obtener-registro/<slug:year>/<slug:mes>/', obtenerRegistro , name='obtener-registro'),
-    path('private/timetrackpro/obtener-registro/<slug:year>/<slug:mes>/<slug:semana>/', obtenerRegistro , name='obtener-registro'),
 
     # información de los registros por cada empleado Laruex
     path('private/timetrackpro/obtener-registro-empleados/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
     path('private/timetrackpro/datos-registro-empleados/', datosRegistroUsuario , name='datos-registro-empleados'),
-    path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>', obtenerRegistroUsuario , name='obtener-registro-empleados'),
-    path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>/<slug:mes>/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
-    path('private/timetrackpro/obtener-registro-empleados/<slug:id>/<slug:year>/<slug:mes>/<slug:semana>/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
+    #path('private/timetrackpro/datos-registro-empleados/<str:listEmpleados>/<slug:fechaInicio>/<slug:fechaFin>', datosRegistroUsuario , name='datos-registro-empleados'),
 
     # información de los empleados del Laruex
     path('private/timetrackpro/agregar-usuario', agregarUsuario , name='agregar-usuario'),
