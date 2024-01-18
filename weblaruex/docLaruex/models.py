@@ -256,7 +256,7 @@ class FormacionCurriculum(models.Model):
     descripcion = models.CharField(db_column='Descripcion', max_length=10000, blank=True, null=True)  # Field name made lowercase.
     horas = models.FloatField(db_column='Horas', blank=True, null=True)  # Field name made lowercase.
     ruta = models.CharField(db_column='Ruta', max_length=255, blank=True, null=True)  # Field name made lowercase.
-    fecha_inicio = models.DateTimeField(db_column='Fecha_inicio')  # Field name made lowercase.
+    fecha_inicio = models.DateTimeField(db_column='Fecha_inicio', blank=True, null=True)  # Field name made lowercase.
     fecha_fin = models.DateTimeField(db_column='Fecha_fin')  # Field name made lowercase.
 
     class Meta:
