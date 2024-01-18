@@ -11,7 +11,7 @@
 
 <div class="card-body">
   <nav>
-    <h5 class="card-title">{{curriculum.id_usuario__first_name}} {{curriculum.id_usuario__last_name}} 
+    <h5 class="card-title">{{curriculum.id_usuario__first_name}} {{curriculum.id_usuario__last_name}}
       {% if request.user.id == curriculum.id_usuario__id or administrador %}
       <a href="" title="Añadir Documento" class="mx-1" data-toggle="modal" data-target="#modalFormularioAgregarDocumentos"
         style="color: #ee9b00"><i class="fa-duotone fa-square-plus fa-lg add"></i></a>
@@ -883,9 +883,14 @@ function cerrarModal(){
         align: "center",
         formatter: function (value, row) {
           var fecha = new Date(row.fecha_inicio);
-          return (
-            $.datepicker.formatDate("dd-mm-yy", fecha)
-          );
+          console.log(fecha, typeof(fecha));
+          if (row.fecha_inicio == null){
+            return "--";
+          }else{
+            return (
+              $.datepicker.formatDate("dd-mm-yy", fecha)
+            );
+          }
         },
       },
       {
