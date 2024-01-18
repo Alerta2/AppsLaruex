@@ -372,11 +372,8 @@ Este módulo se encarga de cargar la información de la tabla que muestra todos 
     Se devuelve un JSON con la información de la tabla que muestra todos los objetos disponibles en el sistema que corresponden a las habilitaciones del usuario y que no son de tipo Equipo o Ubicación.
 -------------------------------------------'''
 def DatosObjetos(request):
-    objetos = Objeto.objects.using('docLaruex').filter(id_habilitacion__in=comprobarHabilitaciones(request.user.id)).filter(propietario__isnull=True).exclude(tipo__in = ['Equipo', 'Ubicacion']).order_by('-fecha_subida').values('id', 'padre__id', 'padre__nombre', 'nombre', 'fecha_subida', 'ruta', 'tipo', 'creador__first_name', 'creador__last_name', 'visible', 'icono', 'id_estado__nombre','id_estado__id',  'ruta_editable')
+    objetos = Objeto.objects.using('docLaruex').filter(id_habilitacion__in=comprobarHabilitaciones(request.user.id)).filter(propietario__isnull=True).exclude(tipo__in = ['Equipo', 'Ubicacion', 'Curriculum']).order_by('-fecha_subida').values('id', 'padre__id', 'padre__nombre', 'nombre', 'fecha_subida', 'ruta', 'tipo', 'creador__first_name', 'creador__last_name', 'visible', 'icono', 'id_estado__nombre','id_estado__id',  'ruta_editable')
     return JsonResponse(list(objetos), safe=False)
-
-    
-
 
 '''------------------------------------------
 - Descripción:
@@ -871,7 +868,10 @@ def agregarFormacionCurriculum(request, id_curriculum):
     horas = None
     if request.POST.get("horasFormacion") != "":
         horas = request.POST.get("horasFormacion")
-    formaciones = FormacionCurriculum(id_curriculum=curriculum, titulo=request.POST.get("tituloFormacion"), descripcion=request.POST.get("descripcionFormacion"), horas=horas,  fecha_inicio=request.POST.get("fechaInicioFormacion"), fecha_fin=request.POST.get("fechaFinFormacion"))
+    fechaInicio = None
+    if request.POST.get("fechaInicioFormacion") != "":
+        fechaInicio = request.POST.get("fechaInicioFormacion")
+    formaciones = FormacionCurriculum(id_curriculum=curriculum, titulo=request.POST.get("tituloFormacion"), descripcion=request.POST.get("descripcionFormacion"), horas=horas,  fecha_inicio=fechaInicio, fecha_fin=request.POST.get("fechaFinFormacion"))
     formaciones.save(using='docLaruex')  
     print("--- guardo formaciones ---")  
 
