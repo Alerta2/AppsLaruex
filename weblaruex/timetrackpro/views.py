@@ -16,7 +16,8 @@ from django.db.models.functions import TruncDate
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 import calendar
-
+from django.db.models import Sum
+from django.db.models.functions import ExtractWeek
 
 
 
@@ -218,7 +219,6 @@ def asociarHabilitacion(request):
                 if empleado_obj and not RelHabilitacionesUsuarioTimeTrackPro.objects.using("timetrackpro").filter(id_habilitacion=habilitacion, id_auth_user=empleado_obj).exists():
                     nuevaRelacion = RelHabilitacionesUsuarioTimeTrackPro(id_auth_user=empleado_obj, id_habilitacion=habilitacion)
                     nuevaRelacion.save(using='timetrackpro')
-
                     alerta["activa"] = True
                     alerta["icono"] = iconosAviso["success"]
                     alerta["tipo"] = "success"
@@ -523,7 +523,7 @@ def datosRegistrosInsertados(request):
 
 
 @login_required
-def obtenerRegistroUsuario(request):
+def obtenerRegistroEmpleados(request):
 
     administrador = esAdministrador(request.user.id)
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
@@ -539,7 +539,22 @@ def obtenerRegistroUsuario(request):
 
 
 @login_required
-def datosRegistroUsuario(request):
+def obtenerRegistroSemanalEmpleados(request):
+
+    administrador = esAdministrador(request.user.id)
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
+    # current_url = request.path[1:]
+    
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+        "empleados":list(empleados),
+        "rutaActual": "Informe de asistencia empleados",
+    }
+    return render(request,"informeRegistroUsuario.html",infoVista)
+
+@login_required
+def datosRegistroEmpleados(request):
     mesPrevio = datetime.now().month
     yearActual = datetime.now().year
     if mesPrevio == 1:
@@ -555,21 +570,61 @@ def datosRegistroUsuario(request):
     if request.GET.get("fechaInicio") != None:
         fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%Y-%m-%d')
     else:
-        fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
+        # fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
+        fechaInicio = "2023-05-01"
         fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')
+
         print('\033[91m'+'fechaInicio: ' + '\033[92m', fechaInicio)
 
     if request.GET.get("fechaFin") != None:
         fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%Y-%m-%d')
     else:
         ultimoDiaMes = calendar.monthrange(yearActual, mesPrevio)  
-        fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
+        # fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
+        fechaFin = "2023-05-31"
         fechaFin = datetime.strptime(fechaFin, '%Y-%m-%d')
+
         print('\033[91m'+'fechaFin: ' + '\033[92m', fechaFin)
     informe = calcularHoras(usuarios, fechaInicio, fechaFin)
     return JsonResponse(list(informe), safe=False)
 
 
+
+
+@login_required
+def datosRegistroSemanalEmpleados(request):
+    mesPrevio = datetime.now().month
+    yearActual = datetime.now().year
+    if mesPrevio == 1:
+        mesPrevio = 12
+        yearActual = yearActual - 1
+    usuarios = []
+    print("listEmpleados: ", request.GET.get("listEmpleados"))
+
+    if request.GET.get("listEmpleados") != None:
+        usuarios = request.GET.get("listEmpleados").split("_")
+    else: 
+        usuarios = EmpleadosMaquina.objects.using("timetrackpro").values_list('id', flat=True)
+    if request.GET.get("fechaInicio") != None:
+        fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%Y-%m-%d')
+    else:
+        # fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
+        fechaInicio = "2023-05-01"
+        fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')
+
+        print('\033[91m'+'fechaInicio: ' + '\033[92m', fechaInicio)
+
+    if request.GET.get("fechaFin") != None:
+        fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%Y-%m-%d')
+    else:
+        ultimoDiaMes = calendar.monthrange(yearActual, mesPrevio)  
+        # fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
+        fechaFin = "2023-05-31"
+        fechaFin = datetime.strptime(fechaFin, '%Y-%m-%d')
+
+        print('\033[91m'+'fechaFin: ' + '\033[92m', fechaFin)
+    informe = calcularHorasSemanales(usuarios, fechaInicio, fechaFin)
+    return JsonResponse(list(informe), safe=False)
 
     
 def calcularHoras (usuarios, fechaInicio, fechaFin):
@@ -587,11 +642,12 @@ def calcularHoras (usuarios, fechaInicio, fechaFin):
     fechaFin = fechaFin + timedelta(days=1)
 
     registros = Registros.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
-
-    empleados = registros.values('id_empleado').distinct()
-    
+    # agrupo los registros por semana 
+    registrosSemanales = registros.annotate(semana=ExtractWeek('hora')).order_by('semana')
+    empleados = registrosSemanales.values('id_empleado').distinct()
     for e in empleados:
         dias = registros.filter(id_empleado__id=e["id_empleado"]).values('hora__date').distinct()
+        empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e["id_empleado"])[0]
         for d in dias:
             dia_siguiente = d["hora__date"]+timedelta(days=1)
             registrosDiaEmpleado = registros.filter(id_empleado__id=e["id_empleado"], hora__range=(d["hora__date"],dia_siguiente)).all()
@@ -608,17 +664,65 @@ def calcularHoras (usuarios, fechaInicio, fechaFin):
                     else:
                         horas = horas + (r.hora - auxHoras).total_seconds()/3600
                         tramo = 0
-
                 # comprobar justificaciones para ajustar las horas del dia
-                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado)})
-
+                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos})
             else:
                 fichajesHechos = registrosDiaEmpleado.values_list('hora__time', flat=True)
-                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos)})
+                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos})
     return informe
-    
+
+def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
+    # linea de informe ejemplo
+    # {"empleado": 1, "semana": dd al dd MM de YYYY, "horas": 37.5, "correcto": "si", "observaciones": "", fichajes: 2}
+    informe = []
+    # sumo un dia a la fecha fin
+    fechaFin = fechaFin + timedelta(days=1)
+    registros = Registros.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
+    empleados = registros.values('id_empleado').distinct()
+    for e in empleados:
+        semanas = registros.filter(id_empleado__id=e["id_empleado"]).annotate(semana=ExtractWeek('hora')).values('semana').distinct()
+        empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e["id_empleado"])[0]
+        #obtengo las horas por dias y las agrupo por semana.
+        for s in semanas:
+            dias = registros.filter(id_empleado__id=e["id_empleado"], hora__week=s["semana"]).values('hora__date').distinct()
+            year = dias[0]["hora__date"].year
+            # obtengo todos los dias de esa semana 
+            inicioSemana, finSemana = obtenerFechaSemana(year, s["semana"])            
+            horas = 0
+            diasErrores = []
+            diasFichados = 0
+            for d in dias:
+                # comprubeo si el dia tiene un numero par de registros
+                dia_siguiente = d["hora__date"]+timedelta(days=1)
+                registrosDiaEmpleado = registros.filter(id_empleado__id=e["id_empleado"], hora__range=(d["hora__date"],dia_siguiente)).all()
+                if len(registrosDiaEmpleado)%2 == 0:
+                    tramo = 0
+                    auxHoras = 0
+                    for r in registrosDiaEmpleado:
+                        if tramo == 0:
+                            auxHoras = r.hora
+                            tramo = 1
+                        else:
+                            horas = horas + (r.hora - auxHoras).total_seconds()/3600
+                            tramo = 0
+                    diasFichados = diasFichados + 1
+                else:
+                    diasErrores.append(d["hora__date"])
+            # si hay dias con errores, los añado al informe
+            # inicioSemana = 
+            if len(diasErrores) > 0:                
+                informe.append({"empleado": e["id_empleado"], "semana": s["semana"], "horas": horas, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": diasFichados, "diasErrores": diasErrores, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana})
+            else:
+                informe.append({"empleado": e["id_empleado"], "semana": s["semana"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": diasFichados, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana})
+    return informe
 
 
+def obtenerFechaSemana(year, week):
+    # Assuming ISO week starts from Monday
+    start_of_week = datetime.strptime(f'{year}-W{week}-1', "%Y-W%W-%w").date()
+    end_of_week = start_of_week + timedelta(days=6)
+
+    return start_of_week, end_of_week
 
 def quitarAcentos(cadena):
     return ''.join((c for c in unicodedata.normalize('NFD', cadena) if unicodedata.category(c) != 'Mn'))
@@ -698,8 +802,6 @@ def verRegistro(request, id):
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para ver el registro seleccionado.")
 
     # guardo los datos en un diccionario
-
-
 
 @login_required
 def actulizarRegistro(request, id):
@@ -827,6 +929,7 @@ def editarLineaRegistro(request, id):
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para editar el registro seleccionado.")
 
+@login_required
 def eliminarLineaRegistro(request, id):
     registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
     archivoModificado = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=registro.id_archivo_leido.id)[0]
@@ -2444,8 +2547,15 @@ def perfil(request):
     return render(request,"profile.html",{"navBar":navBar, })
 
 def dashBoard(request):
+    infoVista = {
+        "navBar":navBar,
+        "administrador":esAdministrador(request.user.id),
+        "rutaActual": "Dashboard Mensual",
+        "fechaInicio": datetime.now().strftime("%Y-%m-%d"),
+        "fechaFin": datetime.now().strftime("%Y-%m-%d"),
+    }
     
-    return render(request,"dashboard.html",{"navBar":navBar})
+    return render(request,"dashboard.html",infoVista)
 
 def tablas(request):        
     # guardo los datos en un diccionario

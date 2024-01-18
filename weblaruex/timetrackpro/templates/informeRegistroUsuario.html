@@ -1,49 +1,71 @@
-
 {% extends "base/base_timetrackpro.html" %}
 {% load static %}
 {% block content %}
-
+<div class="row">
+  <div class="col-md-4">
+    <button type="button" class="btn btn-block bg-gradient-warning mb-3" data-bs-toggle="modal" data-bs-target="#modal-notification">Notification</button>
+    <div class="modal fade" id="modal-notification" tabindex="-1" role="dialog" aria-labelledby="modal-notification" aria-hidden="true">
+      <div class="modal-dialog modal-danger modal-dialog-centered modal-" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h6 class="modal-title" id="modal-title-notification">Your attention is required</h6>
+            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="py-3 text-center">
+              <i class="ni ni-bell-55 ni-3x"></i>
+              <h4 class="text-gradient text-danger mt-4">You should read this!</h4>
+              <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-white">Ok, Got it</button>
+            <button type="button" class="btn btn-link text-white ml-auto" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
   <div class="row">
     <div class="col-12">
       <div class="card mb-4">
         <div class="card-header pb-0">
-          <h3>Informe de asistencia</h3>
+          <h3 id="tituloPagina" class="text-center text-gradient text-primary" >Informe de asistencia </h3>
         </div>
         <div class="card-body pt-0 pb-2">
-          <div class="table-responsive p-0">
+          <div class="table-responsive p-2">
             
-            <div class="mx-4">
-            <div id="toolbar">
-              <div class="row my-auto">
-                <div class="col my-auto">
-                  <label class="text-sm" ></label>
+              <div id="toolbar" class="pt-0" >
+                <div class="row my-auto">
+                  <div class="col my-auto">
+                    <label class="text-sm" ></label>
+                    <button class="btn btn-outline-primary" type="button" data-toggle="modal" data-target="#modalEmpleados">
+                    Empleados
+                  </button>
+          
+                  </div>
+                  <div class="col ">
+                    <label class="text-sm" >Fecha</label>
+                    <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" aria-describedby="text-addon">
+                  </div>
+                  <div class="col ">
+                    <label class="text-sm" >Fecha Fin</label>
+                    <input type="date" class="form-control" id="fechaFin" name="fechaFin" aria-describedby="text-addon">
+                  </div>
+                  <div class="col">
+                    <button type="submit" value="submit" class="btn bg-gradient-primary btn-round w-100 mt-4 mb-0" onclick="filtrarTabla()">Filtrar</button>
 
-                  <button class="btn btn-outline-primary" type="button" data-toggle="modal" data-target="#modalEmpleados">
-                  Empleados
-                </button>
-                <select name="empleados" id="empleados" multiple="multiple" hidden>
-                </select>
-                </div>
-                <div class="col ">
-                  <label class="text-sm" >Fecha</label>
-                  <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" aria-describedby="text-addon">
-                </div>
-                <div class="col ">
-                  <label class="text-sm" >Fecha Fin</label>
-                  <input type="date" class="form-control" id="fechaFin" name="fechaFin" aria-describedby="text-addon">
-                </div>
-                <div class="col">
-                  <button type="submit" value="submit" class="btn bg-gradient-primary btn-round w-100 mt-4 mb-0" onclick="filtrarTabla()">Filtrar</button>
+                    <input type="text" id="inputEmpleados" name="inputEmpleados" hidden>
 
-                  <input type="text" id="inputEmpleados" name="inputEmpleados" hidden>
-
+                  </div>
                 </div>
+
               </div>
-
-            </div>
                 
-            </div>
             <table  id="informe_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
 
           </div>
@@ -132,11 +154,6 @@ $("#informe_empleados").bootstrapTable({
       sortable: true,
       align: "left",
       width:"5",
-      formatter: function(value, row) {
-        var hora = row.empleado;
-        var divHora = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+hora +'</h6></div>';
-        return divHora ;
-      }
       // formatter: function(value, row) {
       //   var nombre = row.nombre_empleado;
       //   var divNombre = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+nombre +'</h6></div>';
@@ -231,6 +248,7 @@ $("#informe_empleados").bootstrapTable({
       return false;
     }
 
+    var tituloPagina = document.getElementById("tituloPagina");
     fechaInicio = document.getElementById("fechaInicio").value;
     fechaFin = document.getElementById("fechaFin").value;
     if (fechaInicio > fechaFin){
@@ -247,6 +265,9 @@ $("#informe_empleados").bootstrapTable({
     var nuevaUrl = "{% url 'timetrackpro:datos-registro-empleados' %}?listEmpleados="+empleados+"&fechaInicio="+fechaInicio+"&fechaFin="+fechaFin;
     // cambiar la url de la tabla
     $("#informe_empleados").bootstrapTable('refreshOptions', {url: nuevaUrl});
+    // cambiar el titulo de la pagina
+    tituloPagina.innerHTML = "Informe de asistencia desde "+fechaInicio+" hasta "+fechaFin;
+
   }
 
 // Función para filtrar la tabla por fecha

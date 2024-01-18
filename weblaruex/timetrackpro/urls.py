@@ -52,8 +52,10 @@ urlpatterns = [
     path('private/timetrackpro/eliminar-linea-registro/<slug:id>/', eliminarLineaRegistro , name='eliminar-linea-registro'),
 
     # información de los registros por cada empleado Laruex
-    path('private/timetrackpro/obtener-registro-empleados/', obtenerRegistroUsuario , name='obtener-registro-empleados'),
-    path('private/timetrackpro/datos-registro-empleados/', datosRegistroUsuario , name='datos-registro-empleados'),
+    path('private/timetrackpro/obtener-registro-empleados/', obtenerRegistroEmpleados , name='obtener-registro-empleados'),
+    path('private/timetrackpro/datos-registro-empleados/', datosRegistroEmpleados , name='datos-registro-empleados'),
+    path('private/timetrackpro/obtener-registro-semanal-empleados/', obtenerRegistroSemanalEmpleados , name='obtener-registro-empleados'),
+    path('private/timetrackpro/datos-registro-semanal-empleados/', datosRegistroSemanalEmpleados , name='datos-registro-empleados'),
     #path('private/timetrackpro/datos-registro-empleados/<str:listEmpleados>/<slug:fechaInicio>/<slug:fechaFin>', datosRegistroUsuario , name='datos-registro-empleados'),
 
     # información de los empleados del Laruex

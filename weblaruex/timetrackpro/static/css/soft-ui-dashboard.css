@@ -10707,6 +10707,11 @@ fieldset:disabled .btn {
   background-color: #fff !important;
 }
 
+.bg-table-danger{
+  background-color: #f59794 !important;
+  color: white !important;
+}
+
 .bg-transparent {
   background-color: transparent !important;
 }
