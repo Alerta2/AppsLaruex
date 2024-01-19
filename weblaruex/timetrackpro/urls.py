@@ -54,8 +54,8 @@ urlpatterns = [
     # información de los registros por cada empleado Laruex
     path('private/timetrackpro/obtener-registro-empleados/', obtenerRegistroEmpleados , name='obtener-registro-empleados'),
     path('private/timetrackpro/datos-registro-empleados/', datosRegistroEmpleados , name='datos-registro-empleados'),
-    path('private/timetrackpro/obtener-registro-semanal-empleados/', obtenerRegistroSemanalEmpleados , name='obtener-registro-empleados'),
-    path('private/timetrackpro/datos-registro-semanal-empleados/', datosRegistroSemanalEmpleados , name='datos-registro-empleados'),
+    path('private/timetrackpro/obtener-registro-semanal-empleados/', obtenerRegistroSemanalEmpleados , name='obtener-registro-semanal-empleados'),
+    path('private/timetrackpro/datos-registro-semanal-empleados/', datosRegistroSemanalEmpleados , name='datos-registro-semanal-empleados'),
     #path('private/timetrackpro/datos-registro-empleados/<str:listEmpleados>/<slug:fechaInicio>/<slug:fechaFin>', datosRegistroUsuario , name='datos-registro-empleados'),
 
     # información de los empleados del Laruex
@@ -203,5 +203,14 @@ urlpatterns = [
     path('private/timetrackpro/ver-incidencia/<slug:id>/', verIncidencia , name='ver-incidencia'),
     path('private/timetrackpro/cambiar-estado-incidencia/<slug:id>/', cambiarEstadoIncidencia , name='cambiar-estado-incidencia'),
     path('private/timetrackpro/eliminar-incidencia/<slug:id>/', eliminarIncidencia , name='eliminar-incidencia'),
+
+    # jornadas de los empleados 
+    path('private/timetrackpro/jornadas/', jornadas , name='jornadas'),
+    # path('private/timetrackpro/agregar-jornada/', agregarJornada , name='agregar-jornadas'),
+    # path('private/timetrackpro/ver-jornada/<slug:id>/', VerJornada , name='ver-jornadas'),
+    path('private/timetrackpro/datos-jornadas/', datosJornadas , name='datos-jornadas'),
+    # path('private/timetrackpro/eliminar-jornada/<slug:id>/', VerJornada , name='eliminar-jornadas'),
+    # path('private/timetrackpro/editar-jornada/<slug:id>/', editarJornada , name='editar-jornada'),
+
 
 ]

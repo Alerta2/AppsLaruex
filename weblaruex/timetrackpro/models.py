@@ -479,9 +479,9 @@ class RelHabilitacionesUsuarioTimeTrackPro(models.Model):
 class RelJornadaEmpleados(models.Model):
     id = models.IntegerField(primary_key=True)
     id_empleado = models.IntegerField(blank=True, null=True)
-    fecha_inicio = models.DateTimeField()
-    motivo = models.CharField(max_length=255, blank=True, null=True)
-    horas_semanales = models.FloatField(blank=True, null=True)
+    fecha_inicio = models.DateField(db_column='fecha_inicio', blank=True, null=True)  # Field name made lowercase.
+    fecha_fin = models.DateField(db_column='fecha_fin', blank=True, null=True)  # Field name made lowercase.
+    horas_semanales = models.FloatField()
 
     class Meta:
         managed = False

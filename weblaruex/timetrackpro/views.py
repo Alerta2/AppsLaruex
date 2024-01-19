@@ -709,7 +709,6 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
                 else:
                     diasErrores.append(d["hora__date"])
             # si hay dias con errores, los añado al informe
-            # inicioSemana = 
             if len(diasErrores) > 0:                
                 informe.append({"empleado": e["id_empleado"], "semana": s["semana"], "horas": horas, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": diasFichados, "diasErrores": diasErrores, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana})
             else:
@@ -3776,6 +3775,47 @@ def eliminarIncidencia(request, id):
         incidencia.delete(using='timetrackpro')
         return redirect('timetrackpro:listado-incidencias')
     return redirect('timetrackpro:ups', mensaje="No se ha podido eliminar la incidencia")
+
+@login_required
+def jornadas(request):
+
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+
+    if administrador or director:
+        empleados = Empleados.objects.using("timetrackpro").values()
+        jornadas = RelJornadaEmpleados.objects.using("timetrackpro").values()
+
+        # current_url = request.path[1:]
+        
+        infoVista = {
+            "navBar":navBar,
+            "administrador":administrador,
+            "jornadas":list(jornadas),
+            "empleados":list(empleados), 
+            "rutaActual": "Festivos",
+        }
+        return render(request,"jornada-empleados.html",infoVista)
+    else:
+        return redirect('timetrackpro:ups', mensaje="No tiene permisos para ver esta página")
+
+
+@login_required
+def datosJornadas(request):
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    jornadas=[]
+    if administrador or director:
+        auxJornadas = RelJornadaEmpleados.objects.using("timetrackpro").values()
+        for j in auxJornadas:
+            # obtengo el nombre del empleado
+            empleado = Empleados.objects.using("timetrackpro").filter(id=j['id_empleado'])[0]
+            j['empleado'] = empleado.nombre + " " + empleado.apellidos
+            jornadas.append(j)
+
+        return JsonResponse(list(jornadas), safe=False)
+    else:
+        return redirect('timetrackpro:ups', mensaje="No tiene permisos para ver esta página")
 '''-------------------------------------------
                                 Módulo: subirDocumento
 
