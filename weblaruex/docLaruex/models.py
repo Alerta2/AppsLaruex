@@ -60,6 +60,7 @@ class Estado(models.Model):
 class Habilitaciones(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     titulo = models.CharField(db_column='Titulo', max_length=255)  # Field name made lowercase.
+    funcional = models.IntegerField(db_column='Funcional')  # Field name made lowercase.
 
     class Meta:
         managed = True

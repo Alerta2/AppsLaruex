@@ -216,7 +216,10 @@ def verUsuario (request, id):
     print ("-------------------")
     contactoUsuario = Curriculum.objects.using("docLaruex").filter(id_usuario=id).values('id_usuario','id_usuario','id_usuario__first_name','id_usuario__last_name','id_usuario__email','id_usuario__is_active','id_usuario__is_staff','id_usuario__is_superuser','id_usuario__last_login','id_usuario__date_joined','id_usuario__username','id_usuario__password','id_usuario__is_superuser','id_usuario__is_staff','id_usuario__is_active','id_usuario__date_joined','id_usuario__last_login', 'id_contacto', 'id_contacto__id', 'id_contacto__nombre', 'id_contacto__telefono', 'id_contacto__telefono_fijo','id_contacto__email','id_contacto__direccion','id_contacto__info_adicional','id_contacto__puesto','id_contacto__extension', 'id__id_habilitacion',).first()
     
-    habilitacionesUsuario = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id).values('id','tipo','fecha','id_habilitacion','id_habilitacion__id', 'id_habilitacion__titulo')
+    habilitacionesUsuario = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id, id_habilitacion__funcional=0).values('id','tipo','fecha','id_habilitacion','id_habilitacion__id', 'id_habilitacion__titulo')
+
+    # obtener las habilitaciones del usuario descartando aquellas que sean funcionalidades
+    habilitacionesUsuarioFuncionales = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id, id_habilitacion__funcional=1).values('id','tipo','fecha','id_habilitacion','id_habilitacion__id', 'id_habilitacion__titulo')
 
     contactoUserNombre = Contacto.objects.using("docLaruex").filter(nombre__icontains=nombreyApellidos).values('id','nombre','telefono','telefono_fijo','email','info_adicional','id_habilitacion','puesto','direccion','empresa','extension','img','dni','fecha_nacimiento','tipo_contacto').first()
     
@@ -225,7 +228,7 @@ def verUsuario (request, id):
     print ("-------------------")
     administrador = esAdministrador(request.user.id)
     if (request.user.id == usuario.id) or administrador:
-        return render(request, 'docLaruex/usuario.html', {"itemsMenu": itemsMenu, "usuario": usuario, "contactoUsuario": contactoUsuario, "administrador": administrador, "habilitacionesUsuario": list(habilitacionesUsuario), "contactoUserNombre":contactoUserNombre})
+        return render(request, 'docLaruex/usuario.html', {"itemsMenu": itemsMenu, "usuario": usuario, "contactoUsuario": contactoUsuario, "administrador": administrador, "habilitacionesUsuario": list(habilitacionesUsuario), "contactoUserNombre":contactoUserNombre, "habilitacionesUsuarioFuncionales":list(habilitacionesUsuarioFuncionales)})
     else:
         return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})
 
@@ -1843,7 +1846,7 @@ Se retorna una lista de objetos JSON con la información de las habilitaciones r
 def DatosHabilitacionesRelacionadas(request, id):   
     if esAdministrador(request.user.id):
         relacionHabilitacionesUsuarios = RelUsuarioHabilitaciones.objects.using('docLaruex').filter(id_usuario=id).order_by('-id_habilitacion').values(
-            'id_habilitacion', 'id_usuario', 'id_usuario__first_name', 'id_usuario__last_name', 'id_usuario__id', 'id_habilitacion__titulo', 'id_habilitacion__id', 'tipo', 'fecha')
+            'id_habilitacion', 'id_usuario', 'id_usuario__first_name', 'id_usuario__last_name', 'id_usuario__id', 'id_habilitacion__titulo', 'id_habilitacion__id', 'tipo', 'fecha', 'id_habilitacion__funcional')
 
         habilitacionesExistentes = []
         salida = []
@@ -1873,7 +1876,7 @@ Se retorna una lista de objetos JSON con la información de las habilitaciones r
 def DatosHabilitaciones(request):
     if esAdministrador(request.user.id):
         habilitaciones = Habilitaciones.objects.using('docLaruex').order_by('id').values(
-            'id','titulo')
+            'id','titulo', 'funcional')
         return JsonResponse(list(habilitaciones), safe=False)
 
 '''------------------------------------------
@@ -1891,7 +1894,13 @@ Se agrega una nueva habilitación con el título especificado en la base de dato
 @login_required
 def agregarHabilitacion(request):
     if esAdministrador(request.user.id):
-        nuevaHabilitacion = Habilitaciones(titulo=request.POST.get("titulo"))
+        funcional = 0 
+        if 'funcional' in request.POST:
+            checkbox = request.POST['funcional']
+            if checkbox == "on":
+                funcional = 1
+
+        nuevaHabilitacion = Habilitaciones(titulo=request.POST.get("titulo"), funcional=funcional)
         nuevaHabilitacion.save(using='docLaruex')
         
         return JsonResponse({"documento": "ok"}, safe=False)

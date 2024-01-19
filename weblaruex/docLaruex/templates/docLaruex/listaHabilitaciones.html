@@ -1,47 +1,12 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
 
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
 {% block content %}
-
-
-<style>
-  ul.pagination li .page-link {
-    background-color: rgb(255, 255, 255) !important;
-    color: rgb(41, 68, 87);
-
-  }
-
-  ul.pagination li.active .page-link {
-    background-color: rgb(41, 68, 87) !important;
-    border-color: rgb(41, 68, 87) !important;
-  }
-
-  ul.pagination li .page-link:hover {
-    filter: brightness(85%);
-
-  }
-
-  ul.pagination li.active .page-link:hover {
-    filter: brightness(120%);
-
-  }
-
-  .btn-light {
-    color: rgb(41, 68, 87);
-  }
-
-  th {
-    color: rgb(41, 68, 87);
-  }
-  .enlace:hover {
-    color: #095657;
-  }
-  
-  .add:hover {
-    color: #cb8501;
-  }
-
-</style>
 
 <!-- breadcrumb   -->
 <div class="card-body">
@@ -90,6 +55,17 @@
               <div class="form-group">
                 <label for="titulo">Nombre de Habilitacion</label>
                 <input type="text" class="form-control" id="titulo" name="titulo" data-rule="required" />
+              </div>
+            </div>
+          </div>
+          <div class="row my-2">
+            <div class="col d-flex justify-content-center">
+              <div class="form-check my-auto">
+                <input class="form-check-input" type="checkbox" id="funcional" name="funcional">
+                <label class="form-check-label" for="funcional" style="font-size: 1.2rem; color: #195746;">
+                  <i class="fa-duotone fa-triangle-exclamation"></i>
+                  Marcar si es una habilitación funcional
+                </label>
               </div>
             </div>
           </div>
@@ -334,6 +310,20 @@
       title: 'Nombre',
       field: 'titulo',
       align: "center"
+    }, {
+      title: 'Funcional',
+      field: 'funcional',
+      align: "center",
+      sortable: true,
+      formatter: function (value, row) {
+        var funcional = row.funcional;
+        if (funcional == 1) {
+          return "Si"
+        }
+        else {
+          return "No"
+        }
+      }
     },{
       title: "Acciones",
       field: "action",
@@ -354,6 +344,20 @@
     search: true,
     sortName: 'id_habilitacion',
     sortOrder: 'desc',
+    // compruebo si la habilitacion es funcional si es funcional hago que en la tabla se vea en verde
+    rowStyle: function (row, index) {
+      var funcional = row.funcional;
+      if (funcional == 1) {
+        return {
+          classes: 'table-info'
+        }
+      }
+      else {
+        return {
+          classes: 'table-white'
+        }
+      }
+    },
 
   });
   $('#tabla_relacion_habilitaciones').bootstrapTable({
@@ -389,6 +393,20 @@
         );
       },
     },{
+      title: 'Funcional',
+      field: 'id_habilitacion__funcional',
+      align: "center",
+      sortable: true,
+      formatter: function (value, row) {
+        var funcional = row.id_habilitacion__funcional;
+        if (funcional == 1) {
+          return "Si"
+        }
+        else {
+          return "No"
+        }
+      }
+    },{
       title: "Acciones",
       field: "action",
       align: "center",
@@ -409,7 +427,20 @@
     search: true,
     sortName: 'id_habilitacion',
     sortOrder: 'desc',
-
+    // compruebo si la habilitacion es funcional si es funcional hago que en la tabla se vea en verde
+    rowStyle: function (row, index) {
+      var funcional = row.id_habilitacion__funcional;
+      if (funcional == 1) {
+        return {
+          classes: 'table-info'
+        }
+      }
+      else {
+        return {
+          classes: 'table-white'
+        }
+      }
+    },
   });
 
   $(".accordion").collapse();
