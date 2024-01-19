@@ -15,7 +15,8 @@
       {% if request.user.id == curriculum.id_usuario__id or administrador %}
       <a href="" title="Añadir Documento" class="mx-1" data-toggle="modal" data-target="#modalFormularioAgregarDocumentos"
         style="color: #ee9b00"><i class="fa-duotone fa-square-plus fa-lg add"></i></a>
-        <a href=""  title="Agregar formaciones" data-toggle="modal" data-target="#modalFormularioAgregarFormaciones" style="color: #005F73"><i class="fa-duotone fa-books-medical fa-lg agregarFormacionCurriculum"></i></a>
+      <a href=""  title="Agregar formaciones" data-toggle="modal" data-target="#modalFormularioAgregarFormaciones" style="color: #005F73"><i class="fa-duotone fa-books-medical fa-lg agregarFormacionCurriculum"></i></a>
+      
       {% endif %}
     </h5>
     <ol class="breadcrumb" style="background-color:#fff !important">
@@ -567,7 +568,7 @@
   <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="TituloModalDocumento">Añadir Contrato</h5>
+        <h5 class="modal-title" id="TituloModalDocumento">Añadir Documentos Asociados</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -605,9 +606,11 @@
                   <label for="sobreNombreDocumento">Tipo de Documento</label>
                   <select class="form-select" data-rule="required" id="sobreNombreDocumento" name="sobreNombreDocumento"
                     onchange="mostrarTitulo(this.value)">
-                    <option value="1" >Contrato de trabajo </option>
+                    <option selected hidden></option>
+                    <option value="1">Contrato de trabajo</option>
                     <option value="2">Contrato de confidencialidad </option>
                     <option value="3">Investigación </option>
+                    <option value="4">Habilitaciones </option>
                   </select>
                 </div>
               </div>
@@ -1076,13 +1079,20 @@ function cerrarModal(){
 
 
   function mostrarTitulo(value) {
-
+    
+    var fechaInicioSeleccionada = document.getElementById("fechaActualizacion");
+    var fechaFinSeleccionada = document.getElementById("fechaFinContrato");
     if (value == "1") {
-      $("#tituloObjetoNombre").html("Añadir Contrato de Trabajo");
+      fechaInicioSeleccionada.required = true;
+      fechaFinSeleccionada.required = true;
       $("#TituloModalDocumento").html("Añadir Contrato de Trabajo");
+      $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + "de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
+
       $("#tipoDocumento").val('6');
       
     } else if (value == "2") {
+      fechaInicioSeleccionada.required = true;
+      fechaFinSeleccionada.required = false;
       $("#tituloObjetoNombre").html("Añadir Contrato de Confidencialidad");
       $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + "de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
       
@@ -1091,13 +1101,26 @@ function cerrarModal(){
       
       $("#tipoDocumento").val('6');
     } else if (value == "3") {
+      fechaInicioSeleccionada.required = false;
+      fechaFinSeleccionada.required = true;
       $("#tituloObjetoNombre").html("Añadir Investigación");
       
       $("#TituloModalDocumento").html("Añadir Investigación");
       $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + " - " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
       
       $("#tipoDocumento").val('9');
-    } else {
+    }  else if (value == "4") {
+
+      // hacer que la fecha no sea obligatoria
+      fechaInicioSeleccionada.required = false;
+      fechaFinSeleccionada.required = false;
+      $("#tituloObjetoNombre").html("Añadir Habilitaciones");
+      
+      $("#TituloModalDocumento").html("Añadir Habilitaciones");
+      $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + "de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
+      
+      $("#tipoDocumento").val('10');
+    }else {
       $("#tituloObjetoNombre").html("Añadir Documento");
     }
   }

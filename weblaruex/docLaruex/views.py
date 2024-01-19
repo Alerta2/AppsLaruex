@@ -3075,10 +3075,11 @@ Retorna un objeto JSON que contiene la lista de archivos asociados a un document
 -------------------------------------------'''
 @login_required
 def archivosAsociados(request, id_documento):
+
     archivoAsociado = RelacionDocumentaciones.objects.using('docLaruex').filter(id_doc__id=id_documento,id_doc__id_habilitacion__in=comprobarHabilitaciones(request.user.id)).values(
-        'id_relacionado', 'id_relacionado__id','id_relacionado__nombre', 'id_relacionado__tipo', 'id_relacionado__id_habilitacion','id_relacionado__id_habilitacion__id','id_relacionado__id_habilitacion__titulo','id_relacionado__creador__last_name', 'id_relacionado__creador__first_name', 'id_relacionado__fecha_subida', 'id_relacionado__id_estado__id', 'id_relacionado__id_estado__nombre')
+        'id_relacionado', 'id_relacionado__id','id_relacionado__nombre', 'id_relacionado__tipo', 'id_relacionado__id_habilitacion','id_relacionado__id_habilitacion__id','id_relacionado__id_habilitacion__titulo','id_relacionado__creador__last_name', 'id_relacionado__creador__first_name', 'id_relacionado__fecha_subida', 'id_relacionado__id_estado__id', 'id_relacionado__id_estado__nombre', 'id_relacionado__propietario')
     archivoAsociadoInverso = RelacionDocumentacionesInverso.objects.using('docLaruex').filter(id_doc__id=id_documento,id_doc__id_habilitacion__in=comprobarHabilitaciones(request.user.id)).values(
-        'id_relacionado', 'id_relacionado__id','id_relacionado__nombre', 'id_relacionado__tipo', 'id_relacionado__id_habilitacion','id_relacionado__id_habilitacion__id','id_relacionado__id_habilitacion__titulo', 'id_relacionado__creador__last_name', 'id_relacionado__creador__first_name', 'id_relacionado__fecha_subida', 'id_relacionado__id_estado__id', 'id_relacionado__id_estado__nombre')
+        'id_relacionado', 'id_relacionado__id','id_relacionado__nombre', 'id_relacionado__tipo', 'id_relacionado__id_habilitacion','id_relacionado__id_habilitacion__id','id_relacionado__id_habilitacion__titulo', 'id_relacionado__creador__last_name', 'id_relacionado__creador__first_name', 'id_relacionado__fecha_subida', 'id_relacionado__id_estado__id', 'id_relacionado__id_estado__nombre', 'id_relacionado__propietario')
     salida = list(archivoAsociado) + list(archivoAsociadoInverso)
     return JsonResponse(salida, safe=False)
 
@@ -3890,7 +3891,7 @@ Se crea un nuevo objeto de tipo Documento en la tabla Documentos de la base de d
 def agregarDocumento(request, nuevoObjeto):
     if request.POST.get("tipoDocumento") is not None:
         tipoDocumento=TipoDocumentos.objects.using("docLaruex").filter(id=request.POST.get("tipoDocumento")).get()
-        if tipoDocumento.id == 6:
+        if tipoDocumento.id == 6 or tipoDocumento.id == 10:
             print("es un tipo 6")
             auxPropietario = PropietariosDocumentos.objects.using("docLaruex").filter(id=nuevoObjeto.creador.id).get()
             nuevoObjeto.propietario = auxPropietario
