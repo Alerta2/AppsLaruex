@@ -1950,11 +1950,20 @@ def agregarJornada(request, year=None):
                 fechaInicio = request.POST.get("fecha_inicio")
             else:
                 fechaInicio = datetime.now().date()
-            empleado = request.POST.get("empleadoSeleccionado")
-            empleado = Empleados.objects.using("timetrackpro").filter(id=empleado)[0]
+            id_empleado = request.POST.get("empleadoSeleccionado")
             horas = request.POST.get("horas")
-            nuevaJornada = RelJornadaEmpleados(id_empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, horas_semanales=horas)
-            nuevaJornada.save(using='timetrackpro')
+
+            if id_empleado == "0":
+                # obtengo todos los empleados
+                empleados = Empleados.objects.using("timetrackpro").filter(fecha_baja_app__isnull=True).values()
+                for e in empleados:
+                    empleado = Empleados.objects.using("timetrackpro").filter(id=e['id'])[0]
+                    nuevaJornada = RelJornadaEmpleados(id_empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, horas_semanales=horas)
+                    nuevaJornada.save(using='timetrackpro')
+            else:
+                empleado = Empleados.objects.using("timetrackpro").filter(id=id_empleado)[0]
+                nuevaJornada = RelJornadaEmpleados(id_empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, horas_semanales=horas)
+                nuevaJornada.save(using='timetrackpro')
             
             alerta["activa"] = True
             alerta["icono"] = iconosAviso["success"]

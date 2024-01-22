@@ -95,6 +95,7 @@
                   <input id="inputEmpleado" list="empleados" class="form-select">
                   <input type="number" id="empleadoSeleccionado" name="empleadoSeleccionado"  class="form-control"  hidden>
                   <datalist id="empleados" >
+                      <option data-id="0">Todos</option>
                       {% for e in empleados %}
                         <option data-id="{{ e.id }}">{{ e.nombre }} {{ e.apellidos }}</option>
                       {% endfor %}
@@ -103,7 +104,7 @@
               <div class="col-xl-6" id="inputFechaFin">
                 <label>Horas</label>
                 <div class="">
-                  <input type="number" class="form-control" placeholder="37,5" aria-label="Horas semanales que dura la jornada" id="horas" name="horas" min="0.5" max="37.5" aria-describedby="text-addon" required>
+                  <input type="number" class="form-control" placeholder="37,5" aria-label="Horas semanales que dura la jornada" id="horas" name="horas" min="0.5" max="37.5" step="0.10" aria-describedby="text-addon" required>
                 </div>
               </div>
             </div>
@@ -295,16 +296,32 @@ document.getElementById('inputEmpleado').addEventListener('input', function() {
         const empleadoSeleccionado = document.getElementById('empleadoSeleccionado');
 
         for (const option of options) {
+
+        
             option.textContent.replace(/\s/g, '');
+            // si la opción seleccionada es todos, es necesario indicar la fecha fin
+            // si no es todos, no es necesario indicar la fecha fin
+
             if (option.textContent === inputText) {
                 const selectedOptionId = option.getAttribute('data-id');
                 empleadoSeleccionado.value = selectedOptionId;
+                if (selectedOptionId == 0){
+                  document.getElementById('fecha_fin').required = true;
+                }
+                else{
+                  document.getElementById('fecha_fin').required = false;
+                }
 
                 console.log('ID de la opción seleccionada:', selectedOptionId);
                 break;
             }
         }
     });
+
+
+  // comprobamos si el empleado seleccionado es todos
+  // si es todos, indicamos que es obligatorio indicar la fecha fin 
+  // si no es todos, indicamos que no es obligatorio indicar la fecha fin
 
 </script>
 
