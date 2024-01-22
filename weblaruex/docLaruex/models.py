@@ -469,6 +469,7 @@ class Proveedor(models.Model):
     correo_2 = models.CharField(db_column='Correo_2', max_length=50, blank=True, null=True)  # Field name made lowercase.
     web = models.CharField(db_column='Web', max_length=50, blank=True, null=True)  # Field name made lowercase.
     comentarios = models.CharField(db_column='Comentarios', max_length=500, blank=True, null=True)  # Field name made lowercase.
+    baja = models.IntegerField(db_column='Baja')  # Field name made lowercase.
 
     class Meta:
         managed = False

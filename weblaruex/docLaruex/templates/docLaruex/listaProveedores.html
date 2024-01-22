@@ -1,42 +1,15 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
 
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
 {% block content %}
 
 
-<style>
-  ul.pagination li .page-link {
-    background-color: rgb(255, 255, 255) !important;
-    color: rgb(41, 68, 87);
 
-  }
-
-  ul.pagination li.active .page-link {
-    background-color: rgb(41, 68, 87) !important;
-    border-color: rgb(41, 68, 87) !important;
-  }
-
-  ul.pagination li .page-link:hover {
-    filter: brightness(85%);
-
-  }
-
-  ul.pagination li.active .page-link:hover {
-    filter: brightness(120%);
-
-  }
-
-  .btn-light {
-    color: rgb(41, 68, 87);
-  }
-
-  th {
-    color: rgb(41, 68, 87);
-  }
-    .add:hover {
-    color: #ce8312;
-  }
-</style>
 
 <!-- breadcrumb   -->
 <div class="card-body">
@@ -48,7 +21,16 @@
       <li class="breadcrumb-item active" style="font-size: large;">Proveedores</li>
     </ol>
   </nav>
+  <div class="alert alert-info alert-dismissible fade show" id="alert-info-proveedores" role="alert">
+    <h4 class="alert-heading">Información sobre la lista de Proveedores</h4>
+    Los proveedores son las empresas que suministran los materiales y equipos necesarios para la realización de las actividades del laboratorio. Aquellos proveedores que aparezcan con color <strong>rojo, significa que actualmente no son proveedores de Laruex.</strong> <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
 </div>
+
+
+
 
 {% if administrador %}
 <div id="toolbar">
@@ -294,7 +276,7 @@
         var admin = '{{administrador}}';
         var botonVerProveedor = '<a href="/private/docLaruex/verProveedor/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
         if (admin == 'True') { 
-          var botonEditarProveedor = '<a href="/private/docLaruex/editarProveedor/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#9768b2"></i></a>';
+          var botonEditarProveedor = '<a href="/private/docLaruex/editarProveedor/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen fa-lg" style="color:#18414b"></i></a>';
           return (botonVerProveedor + botonEditarProveedor);
         } else {
           return (botonVerProveedor);
@@ -306,6 +288,19 @@
     search: true,
     sortName: 'id',
     sortOrder: 'desc',
+    rowStyle: function (row, index) {
+      var baja = row.baja;
+      if (baja == 1) {
+        return {
+          classes: 'table-danger'
+        }
+      }
+      else {
+        return {
+          classes: 'table-white'
+        }
+      }
+    },
 
   });
 
@@ -352,8 +347,12 @@
     });
   });
 
-
-
+  // hacer que el alert desaparezca tras 7 segundos
+  window.setTimeout(function () {
+    $('#alert-info-proveedores').fadeTo(500, 0).slideUp(500, function () {
+      $(this).remove();
+    });
+  }, 5000);
 
 </script>
 {% endblock %}
