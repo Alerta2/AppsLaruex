@@ -1909,6 +1909,8 @@ def festivos(request, year=None):
     }
     return render(request,"festivos.html",infoVista)
 
+
+
 def datosFestivosCalendario(request, year=None):
     # obtengo los festivos registrados en la base de datos
     festivos = []
@@ -1932,6 +1934,75 @@ def datosFestivosCalendario(request, year=None):
     # devuelvo la lista en formato json
     return JsonResponse(salida, safe=False)
 
+
+
+@login_required
+def agregarJornada(request, year=None):
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    if administrador or director:
+        if request.method == 'POST':
+            fechaFin = None
+            if request.POST.get("fecha_fin") != "":
+                fechaFin = request.POST.get("fecha_fin")
+            fechaInicio = None
+            if request.POST.get("fecha_inicio") != "":
+                fechaInicio = request.POST.get("fecha_inicio")
+            else:
+                fechaInicio = datetime.now().date()
+            empleado = request.POST.get("empleadoSeleccionado")
+            empleado = Empleados.objects.using("timetrackpro").filter(id=empleado)[0]
+            horas = request.POST.get("horas")
+            nuevaJornada = RelJornadaEmpleados(id_empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, horas_semanales=horas)
+            nuevaJornada.save(using='timetrackpro')
+            
+            alerta["activa"] = True
+            alerta["icono"] = iconosAviso["success"]
+            alerta["tipo"] = "success"
+            alerta["mensaje"] = "Nueva jornada agregada correctamente."
+        return redirect('timetrackpro:jornadas')
+    else:
+        return redirect('timetrackpro:ups', mensaje="No tienes permiso para agregar una jornada.")
+
+
+@login_required
+def verJornada(request, id):
+    administrador = esAdministrador(request.user.id)
+    jornada = RelJornadaEmpleados.objects.using("timetrackpro").filter(id=id)[0]
+    
+    infoVista = {
+        "navBar":navBar,
+        "administrador":esAdministrador(request.user.id),
+        "rutaActual": jornada.id_empleado.nombre + " " + jornada.id_empleado.apellidos,
+        "rutaPrevia": "Jornadas",
+        "urlRutaPrevia": reverse('timetrackpro:jornadas'),
+        "jornada":jornada,
+        "administrador":administrador,
+    }
+    return render(request,"ver-jornada.html",infoVista)
+
+@login_required
+def eliminarJornada(request, id):
+    administrador = esAdministrador(request.user.id)
+    if request.method == 'POST' and administrador:
+        jornada = RelJornadaEmpleados.objects.using("timetrackpro").filter(id=id)[0]
+        jornada.delete(using='timetrackpro')
+        return redirect('timetrackpro:jornadas')
+    return redirect('timetrackpro:ups', mensaje="No se ha podido eliminar la jornada indicada")
+
+
+@login_required
+def editarJornada(request, id):
+    administrador = esAdministrador(request.user.id)
+    if request.method == 'POST' and administrador:
+        jornada = RelJornadaEmpleados.objects.using("timetrackpro").filter(id=id)[0]
+        jornada.fecha_inicio = request.POST.get("fecha_inicio")
+        if request.POST.get("fecha_fin") != "":
+            jornada.fecha_fin = request.POST.get("fecha_fin")
+        jornada.horas_semanales = request.POST.get("horas")
+        jornada.save(using='timetrackpro')
+        return redirect('timetrackpro:ver-jornada', id=id)
+    return redirect('timetrackpro:ups', mensaje="No se ha podido modificar la jornada indicada")
 
 
 @login_required
@@ -3791,9 +3862,11 @@ def jornadas(request):
         infoVista = {
             "navBar":navBar,
             "administrador":administrador,
+            "director":director,
             "jornadas":list(jornadas),
+            "alerta":alerta, 
             "empleados":list(empleados), 
-            "rutaActual": "Festivos",
+            "rutaActual": "Jornadas de los empleados",
         }
         return render(request,"jornada-empleados.html",infoVista)
     else:
@@ -3808,9 +3881,16 @@ def datosJornadas(request):
     if administrador or director:
         auxJornadas = RelJornadaEmpleados.objects.using("timetrackpro").values()
         for j in auxJornadas:
-            # obtengo el nombre del empleado
-            empleado = Empleados.objects.using("timetrackpro").filter(id=j['id_empleado'])[0]
-            j['empleado'] = empleado.nombre + " " + empleado.apellidos
+
+            empleado_id = j.get('id_empleado_id')
+            if empleado_id is not None:
+                empleado = Empleados.objects.using("timetrackpro").filter(id=empleado_id).first()
+                if empleado:
+                    j['empleado'] = empleado.nombre + " " + empleado.apellidos
+                else:
+                    j['empleado'] = "Empleado no encontrado"
+            else:
+                j['empleado'] = "ID de empleado no proporcionado"
             jornadas.append(j)
 
         return JsonResponse(list(jornadas), safe=False)

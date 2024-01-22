@@ -477,9 +477,9 @@ class RelHabilitacionesUsuarioTimeTrackPro(models.Model):
         db_table = 'rel_habilitaciones_usuario_timetrackpro'
 
 class RelJornadaEmpleados(models.Model):
-    id = models.IntegerField(primary_key=True)
-    id_empleado = models.IntegerField(blank=True, null=True)
-    fecha_inicio = models.DateField(db_column='fecha_inicio', blank=True, null=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='id', primary_key=True)
+    id_empleado = models.ForeignKey('Empleados', models.DO_NOTHING, db_column='id_empleado')  # Field name made lowercase.
+    fecha_inicio = models.DateField(db_column='fecha_inicio')  # Field name made lowercase.
     fecha_fin = models.DateField(db_column='fecha_fin', blank=True, null=True)  # Field name made lowercase.
     horas_semanales = models.FloatField()
 
@@ -489,7 +489,7 @@ class RelJornadaEmpleados(models.Model):
 
 
 class RelJustificantesEmpleados(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(db_column='ID', primary_key=True)
     id_ausencia = models.IntegerField(blank=True, null=True)
     id_empleado = models.IntegerField(blank=True, null=True)
     justificante = models.CharField(max_length=255, blank=True, null=True)

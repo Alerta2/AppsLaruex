@@ -7,7 +7,6 @@ from django.conf.urls.static import static
 from django.conf.urls import url
 
 app_name = 'timetrackpro'
-
 urlpatterns = [
     path('private/timetrackpro/', home ,name='home'),
     path('private/timetrackpro/documentacion', documentacion ,name='documentacion'),
@@ -206,11 +205,11 @@ urlpatterns = [
 
     # jornadas de los empleados 
     path('private/timetrackpro/jornadas/', jornadas , name='jornadas'),
-    # path('private/timetrackpro/agregar-jornada/', agregarJornada , name='agregar-jornadas'),
-    # path('private/timetrackpro/ver-jornada/<slug:id>/', VerJornada , name='ver-jornadas'),
+    path('private/timetrackpro/agregar-jornada/', agregarJornada , name='agregar-jornada'),
+    path('private/timetrackpro/ver-jornada/<slug:id>/', verJornada , name='ver-jornada'),
     path('private/timetrackpro/datos-jornadas/', datosJornadas , name='datos-jornadas'),
-    # path('private/timetrackpro/eliminar-jornada/<slug:id>/', VerJornada , name='eliminar-jornadas'),
-    # path('private/timetrackpro/editar-jornada/<slug:id>/', editarJornada , name='editar-jornada'),
+    path('private/timetrackpro/eliminar-jornada/<slug:id>/', eliminarJornada , name='eliminar-jornada'),
+    path('private/timetrackpro/editar-jornada/<slug:id>/', editarJornada , name='editar-jornada'),
 
 
 ]

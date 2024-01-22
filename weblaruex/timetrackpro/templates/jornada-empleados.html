@@ -1,0 +1,312 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+{% if alerta.activa == True %}
+<div class="alert alert-{{alerta.tipo}} alert-dismissible fade show" role="alert">
+  <div>
+
+    {% if alerta.icono != ""%}
+    <i class="{{alerta.icono}} me-2"></i>
+    {% endif %}
+    {{alerta.mensaje}}
+  </div>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+    <strong >&times;</strong>
+  </button>
+
+</div> 
+{% endif %}
+
+<div class="row">
+  <div class="col-lg-12">
+    {% if administrador %}
+    <div class="pb-0  d-flex justify-content-start " style="background-color: transparent;">
+      <div class="row">
+        <div class="col">
+          <button class="botonLink" data-toggle="modal" data-target="#modalAgregarJornada">
+            <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+            <div class="text text-xs">Agregar jornada</div>
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row my-3">
+  <div class="col-lg-4 col-md-4 mb-md-0 mb-4">
+    <div class="card">
+      <div class="card-header pb-0 mb-0">
+        <h5>Información de interes  <i class="fa-duotone fa-comment-exclamation fa-fade text-info" style="--fa-animation-duration: 2s;"></i></h5>
+      </div>
+      <div class="card-body pb-0 mb-0">
+          <p class="text-center text-md">
+            En esta sección se pueden ver las jornadas de los empleados.
+          </p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-8 col-md-8 mb-md-0">
+    <div class="card">
+      <div class="card-header pb-0">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="d-flex justify-content-start">
+              <h5>Jornadas 
+              </h5>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="card-body px-0 pb-2">
+        <div class="table-responsive ms-3 me-3">
+          <table  id="jornada_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="modalAgregarJornada" tabindex="-1" role="dialog" class="modal fade modal-lg"
+  aria-labelledby="modalAgregarJornada" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    
+    <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:agregar-jornada' %}" method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Agregar jornada</h5>
+            <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-xl-6">
+                  <label class="text-sm">Empleado/a</label>
+                  <input id="inputEmpleado" list="empleados" class="form-select">
+                  <input type="number" id="empleadoSeleccionado" name="empleadoSeleccionado"  class="form-control"  hidden>
+                  <datalist id="empleados" >
+                      {% for e in empleados %}
+                        <option data-id="{{ e.id }}">{{ e.nombre }} {{ e.apellidos }}</option>
+                      {% endfor %}
+                  </datalist>
+              </div>
+              <div class="col-xl-6" id="inputFechaFin">
+                <label>Horas</label>
+                <div class="">
+                  <input type="number" class="form-control" placeholder="37,5" aria-label="Horas semanales que dura la jornada" id="horas" name="horas" min="0.5" max="37.5" aria-describedby="text-addon" required>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xl-6">
+                <label>Inicio</label>
+                <div class="">
+                  <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                    aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio">
+                </div>
+              </div>
+              <div class="col-xl-6" id="inputFechaFin">
+                <label>Fin</label>
+                <div class="">
+                  <input type="date" class="form-control" aria-label="Fecha final de la festividad"
+                    aria-describedby="text-addon" name="fecha_fin" id="fecha_fin">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            {% if user.is_authenticated %}
+            <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+            {% endif %}
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          </div>
+      </div>
+    
+    </form>
+  </div>
+</div>
+
+<script>
+
+  var admin = "{{ administrador }}";
+  var director = "{{ director }}";
+  $("#jornada_empleados").bootstrapTable({
+  method: "get",
+  locale: navigator.language,
+  url: "{% url 'timetrackpro:datos-jornadas' %}",
+  cache: false, 
+  columns: [
+    {
+      title: "Empleado",
+      field: "empleado",
+      align: "left",
+      width:"10",
+      sortable: true,
+      formatter: function(value, row) {
+        var nombre = row.empleado;
+        var textNombre = "";
+          textNombre = '<h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+nombre +'</h6>';
+        
+        var divNombre = '<div>'+textNombre +'</div>';
+        return divNombre ;
+      }
+    },{
+      title: "Fecha de inicio",
+      field: "hora",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      width:"5",
+      // formatter: function(value, row) {
+      //   var hora = row.dia;
+      //   var divHora = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>Del '+hora +' al '+ hora+'</h6></div>';
+      //   return divHora ;
+      // }
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+
+          var fechaInicio = row.fecha_inicio;
+          var mesFecha = fechaInicio.split("-")[1];
+          var year = fechaInicio.split("-")[0];
+          var dia = fechaInicio.split("-")[2];
+
+          // obtengo la fecha de lectura
+          // obtengo la fecha
+          fechaInicio = dia + " de " + mes[mesFecha] + " de " + year;
+          var textCorrecto = '<h6 class="text-sm mb-0">'+fechaInicio +'</h6>';
+          
+          var div = '<div>'+ textCorrecto +'</h6></div>';
+          return div;
+      }
+    },{
+      title: "Fecha de fin",
+      field: "hora",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      width:"5",
+      // formatter: function(value, row) {
+      //   var hora = row.dia;
+      //   var divHora = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>Del '+hora +' al '+ hora+'</h6></div>';
+      //   return divHora ;
+      // }
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+
+          var fechaFin = row.fecha_fin;
+          var textCorrecto = "";
+          if (fechaFin == null){
+            textCorrecto = '--';
+          }
+          else{
+            var mesFecha = fechaFin.split("-")[1];
+            var year = fechaFin.split("-")[0];
+            var dia = fechaFin.split("-")[2];
+
+            // obtengo la fecha de lectura
+            // obtengo la fecha
+            fechaFin = dia + " de " + mes[mesFecha] + " de " + year;
+            textCorrecto = '<h6 class="text-sm mb-0">'+fechaFin +'</h6>';
+          }
+          var div = '<div>'+ textCorrecto +'</h6></div>';
+          return div;
+      }
+    },
+    {
+      title: "Horas totales",
+      field: "row.horas",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      width:"20",
+      formatter: function(value, row) {
+        var hora = row.horas_semanales;
+        // redondear a 2 decimales
+        hora = Math.round(hora * 100) / 100;
+        var textHora = "";
+          textHora = '<h6 class="text-sm mb-0"><i class="fa-solid fa-clock text-secondary fa-lg me-2" aria-hidden="true"></i>'+hora +'</h6>';
+        var divHora = '<div>'+ textHora +'</div>';
+        return divHora;
+      }
+    },
+
+    {
+      title: "",
+      field: "Acciones",
+      align: "center",
+      visible:(admin == "True" || director == "True" ),
+      formatter: function (value, row) {
+
+        var botonVer = '<a href="/private/timetrackpro/ver-jornada/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+        return botonVer;
+
+      },
+    },
+
+  ],
+
+  search: true,
+  pagination: true,
+
+});
+
+
+document.getElementById('inputEmpleado').addEventListener('input', function() {
+        const inputText = this.value;
+        const datalist = document.getElementById('empleados');
+        const options = datalist.getElementsByTagName('option');
+        const empleadoSeleccionado = document.getElementById('empleadoSeleccionado');
+
+        for (const option of options) {
+            option.textContent.replace(/\s/g, '');
+            if (option.textContent === inputText) {
+                const selectedOptionId = option.getAttribute('data-id');
+                empleadoSeleccionado.value = selectedOptionId;
+
+                console.log('ID de la opción seleccionada:', selectedOptionId);
+                break;
+            }
+        }
+    });
+
+</script>
+
+
+{% endblock %}
