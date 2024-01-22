@@ -1126,7 +1126,7 @@ Devuelve los datos de los proveedores en formato JSON.
 @login_required
 def DatosProveedores(request):
     proveedores = Proveedor.objects.using('docLaruex').order_by('id').values(
-        'id','nombre', 'cif', 'direccion', 'telefono', 'telefono_2', 'fax', 'correo', 'correo_2', 'web', 'comentarios')
+        'id','nombre', 'cif', 'direccion', 'telefono', 'telefono_2', 'fax', 'correo', 'correo_2', 'web', 'comentarios', 'baja')
     return JsonResponse(list(proveedores), safe=False)
     
 '''------------------------------------------
@@ -1152,7 +1152,9 @@ def agregarProveedor(request):
     fax = request.POST.get("prefijoFax") + request.POST.get("fax")
 
 
-    nuevoProveedor = Proveedor(nombre=request.POST.get("nombre"),cif=request.POST.get("cif"), telefono=telefono, telefono_2=telefono2, fax=fax, correo=request.POST.get("correo"),correo_2=request.POST.get("correo2"), web=request.POST.get("web"), direccion=request.POST.get("direccion"), comentarios=request.POST.get("comentarios"))
+
+
+    nuevoProveedor = Proveedor(nombre=request.POST.get("nombre"),cif=request.POST.get("cif"), telefono=telefono, telefono_2=telefono2, fax=fax, correo=request.POST.get("correo"),correo_2=request.POST.get("correo2"), web=request.POST.get("web"), direccion=request.POST.get("direccion"), comentarios=request.POST.get("comentarios"), baja=0)
     nuevoProveedor.save(using='docLaruex')
     
     return render(request, 'docLaruex/listaProveedores.html', {"itemsMenu": itemsMenu})
@@ -1176,7 +1178,7 @@ El proveedor debe existir en la base de datos.
 def verProveedor(request, id):
     
     itemsMenu = MenuBar.objects.using("docLaruex").values()
-    proveedor = Proveedor.objects.using('docLaruex').values('id','nombre', 'cif', 'direccion', 'telefono', 'telefono_2', 'fax', 'correo', 'correo_2', 'web', 'comentarios').filter(id=id)[0]
+    proveedor = Proveedor.objects.using('docLaruex').values('id','nombre', 'cif', 'direccion', 'telefono', 'telefono_2', 'fax', 'correo', 'correo_2', 'web', 'comentarios', 'baja').filter(id=id)[0]
 
     return render(
             request,
@@ -1216,6 +1218,7 @@ def editarProveedor(request, id):
         proveedor.fax = request.POST['nuevoPrefijoFax'] + request.POST['nuevoFax']
         proveedor.correo = request.POST['nuevoCorreo']
         proveedor.correo_2 = request.POST['nuevoCorreo2']
+        proveedor.baja = request.POST['estadoProveedor']
         
         proveedor.web = request.POST['nuevaWeb']
         proveedor.comentarios = request.POST['nuevosComentarios']

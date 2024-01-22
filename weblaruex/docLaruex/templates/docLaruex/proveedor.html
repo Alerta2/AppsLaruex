@@ -11,7 +11,7 @@
 
 <!-- breadcrumb   -->
 <div class="card-body" >
-  <h5 class="card-title">{{ proveedor.nombre }}</h5>
+  <h5 class="card-title {% if proveedor.baja == 1 %} text-danger {% endif %}">{{ proveedor.nombre }}</h5>
   <nav >
     <ol class="breadcrumb"style="background-color:#fff !important">
       <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i class="bi bi-house-door"></i></a></li>
@@ -32,14 +32,16 @@
     <div class="col-xl-4">
 
       <div class="card">
-        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+        <div class="card-body profile-card pt-4 d-flex flex-column align-items-center" >
           
           <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"
             style="background-color: #41c9ef52;">
-            <i class="fa-solid fa-user-tie fa-4x" style="color: #18414b; "></i>
+            <i class="fa-solid fa-user-tie fa-4x" {% if proveedor.baja == 1 %} style="color: #dc3545;" {% else %} style="color: #18414b;"{% endif %}></i>
           </div>
-          <h2>{{proveedor.nombre}}</h2>
+          <h2 {% if proveedor.baja == 1 %} class="text-danger" {% endif %}>{{proveedor.nombre}}</h2>
           <h3>CIF {{proveedor.cif}}</h3>
+          {% if proveedor.baja == 1 %} <h3><span class="badge badge-danger">PROVEEDOR EN DESUSO</span></h3> {% endif %}
+
         </div>
       </div>
 
@@ -56,7 +58,7 @@
               <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Información</button>
             </li>            
 
-            {% if secretaria %}
+            {% if secretaria or administrador %}
             <li class="nav-item">
               <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar</button>
             </li>
@@ -71,7 +73,7 @@
           <div class="tab-content pt-2">
 
             <div class="tab-pane fade show active profile-overview" id="profile-overview">
-              <h5 class="card-title">Información de {{proveedor.nombre}}</h5>
+              <h5 class="card-title {% if proveedor.baja == 1 %} text-danger {% endif %} ">Información de {{proveedor.nombre}}</h5>
 
               <div class="row">
                 <div class="col-lg-3 col-md-4 label ">Nombre comercial</div>
@@ -132,6 +134,16 @@
               <form id="formularioEditarProveedor"  action="/private/docLaruex/editarProveedor/{{proveedor.id}}/" method="POST"
               enctype="multipart/form-data">
               {% csrf_token %}
+              
+                <div class="row mb-3">
+                  <label for="estadoProveedor" class="col-md-4 col-lg-3 col-form-label">Estado</label>
+                  <div class="col-md-3 col-lg-3">
+                    <select class="form-select my-auto" id="estadoProveedor" name="estadoProveedor" >
+                      <option value="0" {% if proveedor.baja == 0 %} selected {% endif %}>Activo</option>
+                      <option value="1" {% if proveedor.baja == 1 %} selected {% endif %}>Baja</option>
+                      </select>                  
+                  </div>
+                </div>
 
                 <div class="row mb-3">
                   <label for="nuevoNombre" class="col-md-4 col-lg-3 col-form-label">Nombre</label>
@@ -141,10 +153,11 @@
                 </div>
 
                 <div class="row mb-3">
-                  <label for="nuevoCif" class="col-md-4 col-lg-3 col-form-label">CIF</label>
-                  <div class="col-md-8 col-lg-9">
-                    <input name="nuevoCif" type="text" class="form-control" id="nuevoCif" value="{{proveedor.cif}}">
-                  </div>
+                    <label for="nuevoCif" class="col-md-4 col-lg-3 col-form-label">CIF</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="nuevoCif" type="text" class="form-control" id="nuevoCif" value="{{proveedor.cif}}">
+                    </div>
+                  
                 </div>
 
 
