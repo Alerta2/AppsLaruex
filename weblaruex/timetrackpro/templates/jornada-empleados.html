@@ -73,7 +73,6 @@
 </div>
 
 
-
 <div id="modalAgregarJornada" tabindex="-1" role="dialog" class="modal fade modal-lg"
   aria-labelledby="modalAgregarJornada" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -132,13 +131,11 @@
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
           </div>
       </div>
-    
     </form>
   </div>
 </div>
 
 <script>
-
   var admin = "{{ administrador }}";
   var director = "{{ director }}";
   $("#jornada_empleados").bootstrapTable({
@@ -209,11 +206,6 @@
       sortable: true,
       align: "center",
       width:"5",
-      // formatter: function(value, row) {
-      //   var hora = row.dia;
-      //   var divHora = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>Del '+hora +' al '+ hora+'</h6></div>';
-      //   return divHora ;
-      // }
         formatter: function(value, row) {
           const mes = {
             "01": "Ene",
@@ -258,6 +250,7 @@
       width:"20",
       formatter: function(value, row) {
         var hora = row.horas_semanales;
+        var jornada = 
         // redondear a 2 decimales
         hora = Math.round(hora * 100) / 100;
         var textHora = "";

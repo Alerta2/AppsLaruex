@@ -1,40 +1,13 @@
 {% extends "base/base_timetrackpro.html" %}
 {% load static %}
 {% block content %}
-<div class="row">
-  <div class="col-md-4">
-    <button type="button" class="btn btn-block bg-gradient-warning mb-3" data-bs-toggle="modal" data-bs-target="#modal-notification">Notification</button>
-    <div class="modal fade" id="modal-notification" tabindex="-1" role="dialog" aria-labelledby="modal-notification" aria-hidden="true">
-      <div class="modal-dialog modal-danger modal-dialog-centered modal-" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h6 class="modal-title" id="modal-title-notification">Your attention is required</h6>
-            <button type="button" class="btn-close text-dark" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="py-3 text-center">
-              <i class="ni ni-bell-55 ni-3x"></i>
-              <h4 class="text-gradient text-danger mt-4">You should read this!</h4>
-              <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-white">Ok, Got it</button>
-            <button type="button" class="btn btn-link text-white ml-auto" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+
 
   <div class="row">
     <div class="col-12">
       <div class="card mb-4">
         <div class="card-header pb-0">
-          <h3 id="tituloPagina" class="text-center text-gradient text-primary" >Informe de asistencia </h3>
+          <h3 id="tituloPagina" class="text-center text-gradient text-primary" >Informe diario de asistencia</h3>
         </div>
         <div class="card-body pt-0 pb-2">
           <div class="table-responsive p-2">
@@ -149,46 +122,48 @@ $("#informe_empleados").bootstrapTable({
   columns: [
     {
       title: "Nombre",
-      field: "empleado",
+      field: "nombreEmpleado",
       halign:"left",
       sortable: true,
       align: "left",
       width:"5",
-      // formatter: function(value, row) {
-      //   var nombre = row.nombre_empleado;
-      //   var divNombre = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+nombre +'</h6></div>';
-      //   return divNombre ;
-      // }
+      formatter: function(value, row) {
+        var jornada = row.jornada;
+        var nombre = row.nombreEmpleado;
+        var divNombre = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+nombre +' </h6><h6 class="text-sm mb-0 text-secondary"> Jornada: '+jornada +' horas semanales </h6></div>';
+        return divNombre ;
+      }
     },{
       title: "Fecha",
       field: "dia",
       align: "center",
       width:"10",
       sortable: true,
-      // formatter: function(value, row) {
-      //   const mes = {
-      //     "01": "Ene",
-      //     "02": "Feb",
-      //     "03": "Mar",
-      //     "04": "Abr",
-      //     "05": "May",
-      //     "06": "Jun",
-      //     "07": "Jul",
-      //     "08": "Ago",
-      //     "09": "Sep",
-      //     "10": "Oct",
-      //     "11": "Nov",
-      //     "12": "Dic",
-      //   };
-      //   // obtengo la fecha de lectura
-      //   var fechaLectura = row.fecha;
-      //     // obtengo la fecha
-      //     var fecha = fechaLectura.split("T")[0];
-      //     mesFecha = fecha.split("-")[1];
-      //     fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
-      //     var div = '<span class="text-xs font-weight-bold">'+ fecha +'</span>';
-      //     return div;
-      // }
+      formatter: function(value, row) {
+        const mes = {
+          "01": "Ene",
+          "02": "Feb",
+          "03": "Mar",
+          "04": "Abr",
+          "05": "May",
+          "06": "Jun",
+          "07": "Jul",
+          "08": "Ago",
+          "09": "Sep",
+          "10": "Oct",
+          "11": "Nov",
+          "12": "Dic",
+        };
+        // obtengo la fecha de lectura
+        var fechaLectura = row.dia;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+          var div = '<div><h6 class="text-sm mb-0"><i class="fa fa-calendar text-secondary fa-lg me-2" aria-hidden="true"></i>'+fecha +'</h6></div>';          
+          //var div = '<span class="text-xs font-weight-bold">'+ fecha +'</span>';
+          return div;
+      }
     },
     {
       title: "Entrada",
@@ -199,20 +174,65 @@ $("#informe_empleados").bootstrapTable({
       width:"20",
       formatter: function(value, row) {
         var hora = row.horas;
-        var divHora = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+hora +'</h6></div>';
-        return divHora ;
+        var jornada = row.jornada;
+        var permisos = row.permisos;
+        var vacaciones = row.vacaciones;
+        var asuntosPropios = row.asuntosPropios;
+        var jornadaDiaria = jornada / 5;
+        jornadaDiaria = Math.round(jornadaDiaria * 100) / 100;
+        
+        hora = Math.round(hora * 100) / 100;
+        var resultado = "";
+        div = "";
+        // calcular el porcentaje de completado
+        var porcentaje = (hora / jornadaDiaria)*100;
+        porcentaje = Math.round(porcentaje * 100) / 100;
+
+        switch (true) {
+          case (hora == 0):
+            resultadoPermisos = '<h6 class="text-sm mb-0">'+permisos +'</h6>';
+            resultadoVacaciones = '<h6 class="text-sm mb-0">'+vacaciones +'</h6>';
+            resultadoAsuntosPropios = '<h6 class="text-sm mb-0">'+asuntosPropios +'</h6>';
+            resultado = row.observaciones + ' (nº de fichajes:' + row.fichajes + ')' +'\n';
+            div = '<div><h6 class="text-sm mb-0"><i class="fa fa-clock text-secondary fa-lg me-2" aria-hidden="true"></i>'+resultado +'</h6>'+ resultadoPermisos+ resultadoVacaciones +resultadoAsuntosPropios+ '</div>';
+            break;   
+          case (porcentaje > 99):
+            resultado = hora + ' horas ';
+            div = '<div><h6 class="text-sm mb-0 "><i class="fa fa-clock fa-lg me-2 text-success" aria-hidden="true"></i>'+resultado +'</h6></div>';
+            break;
+          case (porcentaje > 75 && porcentaje < 99):
+            resultado = hora + ' horas ';
+            div = '<div><h6 class="text-sm mb-0"><i class="fa fa-clock text-warning fa-lg me-2" aria-hidden="true"></i>'+resultado +'</h6></div>';
+            break;
+          case (porcentaje < 60):
+            resultado = hora + ' horas ';
+            div = '<div><h6 class="text-sm mb-0"><i class="fa fa-clock text-danger fa-lg me-2" aria-hidden="true"></i>'+resultado +'</h6></div>';
+            break;
+          default:
+            resultado = hora + ' horas ';
+            div = '<div><h6 class="text-sm mb-0"><i class="fa fa-clock text-warning fa-lg me-2" aria-hidden="true"></i>'+resultado +'</h6></div>';
+        }
+        return div;
       }
     },
     {
-      title: "Salida",
+      title: "Correcto",
       field: "correcto",
-      halign:"left",
+      halign:"center",
       sortable: true,
-      align: "left",
+      align: "center",
       width:"20",
       formatter: function(value, row) {
-        var hora = row.correcto;
-        var divHora = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+hora +'</h6></div>';
+        var correcto = row.correcto;
+        var resultado = "";
+        if (correcto == "si"){
+          resultado = '<i class="fa fa-check-circle text-success fa-lg me-2" aria-hidden="true"></i>';
+
+        }else{
+          resultado = '<i class="fa fa-times-circle text-danger fa-lg me-2" aria-hidden="true"></i>';
+        }
+
+        var divHora = '<div><h6 class="text-sm mb-0">'+resultado +'</h6></div>';
         return divHora ;
       }
     },
@@ -220,7 +240,7 @@ $("#informe_empleados").bootstrapTable({
     //   title: "",
     //   field: "Acciones",
     //   align: "center",
-    //   visible:(admin == "True" || director == "True" ),
+    //   visible:(admintrador == "True" || director == "True" ),
     //   formatter: function (value, row) {
 
     //     var botonVer = '<a href="/private/timetrackpro/tarjeta/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
@@ -231,6 +251,10 @@ $("#informe_empleados").bootstrapTable({
     // },
   ],
   search: true,
+  showRefresh: true,
+  sortName: "dia",
+  sortOrder: "asc",
+
   
 
   
@@ -266,7 +290,7 @@ $("#informe_empleados").bootstrapTable({
     // cambiar la url de la tabla
     $("#informe_empleados").bootstrapTable('refreshOptions', {url: nuevaUrl});
     // cambiar el titulo de la pagina
-    tituloPagina.innerHTML = "Informe de asistencia desde "+fechaInicio+" hasta "+fechaFin;
+    tituloPagina.innerHTML = "Informe diario de asistencia desde "+fechaInicio+" hasta "+fechaFin;
 
   }
 

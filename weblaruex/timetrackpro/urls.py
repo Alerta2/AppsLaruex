@@ -55,6 +55,7 @@ urlpatterns = [
     path('private/timetrackpro/datos-registro-empleados/', datosRegistroEmpleados , name='datos-registro-empleados'),
     path('private/timetrackpro/obtener-registro-semanal-empleados/', obtenerRegistroSemanalEmpleados , name='obtener-registro-semanal-empleados'),
     path('private/timetrackpro/datos-registro-semanal-empleados/', datosRegistroSemanalEmpleados , name='datos-registro-semanal-empleados'),
+    path('private/timetrackpro/pruebas/', pruebas , name='pruebas'),
     #path('private/timetrackpro/datos-registro-empleados/<str:listEmpleados>/<slug:fechaInicio>/<slug:fechaFin>', datosRegistroUsuario , name='datos-registro-empleados'),
 
     # información de los empleados del Laruex

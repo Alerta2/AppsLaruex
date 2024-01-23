@@ -626,8 +626,60 @@ def datosRegistroSemanalEmpleados(request):
     informe = calcularHorasSemanales(usuarios, fechaInicio, fechaFin)
     return JsonResponse(list(informe), safe=False)
 
+def comprobarJornadaEmpleado(idUsuario,fechaInicio, fechaFin=None):
+    if fechaFin is None:
+        fechaFin = fechaInicio
+    jornadaLaboral = 37.5
+    # compruebo si el usuario tiene una jornada definida
+    empleado = Empleados.objects.using("timetrackpro").filter(id=idUsuario)[0]
+    # comprubo si existe una jornada para el empleado donde la fecha de inicio sea mayor o igual que la fechaInicio y la fecha de fin sea null
+    if RelJornadaEmpleados.objects.using("timetrackpro").order_by('-id').filter(id_empleado=empleado, fecha_inicio__lte=fechaInicio, fecha_fin__isnull=True).exists():
+        jornada = RelJornadaEmpleados.objects.using("timetrackpro").order_by('id').filter(id_empleado=empleado, fecha_inicio__lte=fechaInicio, fecha_fin__isnull=True)[0]
+        jornadaLaboral = jornada.horas_semanales
+    elif RelJornadaEmpleados.objects.using("timetrackpro").order_by('-id').filter(id_empleado=empleado, fecha_inicio__lte=fechaInicio, fecha_fin__gte=fechaFin).exists():
+        jornada = RelJornadaEmpleados.objects.using("timetrackpro").order_by('id').filter(id_empleado=empleado, fecha_inicio__lte=fechaInicio, fecha_fin__gte=fechaFin)[0]
+        jornadaLaboral = jornada.horas_semanales
+    else:
+        jornadaLaboral = 37.5
+    return jornadaLaboral
+
+def comprobarPermisosEmpleado(idUsuario, fechaInicio, fechaFin=None):
+    if fechaFin is None:
+        fechaFin = fechaInicio    
+    empleado = Empleados.objects.using("timetrackpro").filter(id=idUsuario)[0]
+    estadosAceptadosPermisos = [18,20,21]
+    permisos = "No hay permisos ni ausencias solicitados para este dia"
+    asuntosPropios = "No hay asuntos propios solicitados para este dia"
+    vacaciones = "No hay vacaciones solicitadas para este dia"
+    # compruebo si el usuario ha solicitado alguna ausencia para ese dia
+    if PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaInicio, estado__id__in=estadosAceptadosPermisos).exists():
+        permisos = "El empleado tiene una ausencia solicitada para este dia"
+    if AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaInicio, estado__id=11).exists():
+        asuntosPropios = "El empleado tiene un asunto propio solicitado para este dia"
+    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaInicio, estado__id=11).exists():
+        vacaciones = "El empleado tiene dias de vacaciones solicitados para este dia"
+    return permisos, asuntosPropios, vacaciones
+
+
+def pruebas(request):
+    idEmpleado = Empleados.objects.using("timetrackpro").filter(id=9)[0]
+    fechaInicio = date(2023, 5, 3)
+    fechaFin =  None
+    jornada = comprobarJornadaEmpleado(idEmpleado.id, fechaInicio, fechaFin)
+    print("jornada: ", jornada)
+    if isinstance(jornada, float):
+        jornadaLaboral = jornada
+    elif isinstance(jornada, dict) and 'get' in jornada:
+        jornadaLaboral = jornada.get('get')('x')
+    else:
+        jornadaLaboral=jornada
+    # Devuelve una respuesta HTTP adecuada, por ejemplo:
+    return HttpResponse(jornadaLaboral)
+    #return jornada
     
-def calcularHoras (usuarios, fechaInicio, fechaFin):
+def calcularHoras(usuarios, fechaInicio, fechaFin):
+
+        # obtener la jornada del empleado
     '''
         Función que se encarga de calcular las horas de los usuarios que se le pasan por parámetro.
         @param usuarios: Lista de usuarios a los que se les calcularán las horas.
@@ -638,6 +690,7 @@ def calcularHoras (usuarios, fechaInicio, fechaFin):
     # linea de informe ejemplo
     # {"empleado": 1, "dia": dd/mm/yyyy, "horas": 7, "correcto": "si", "observaciones": "", fichajes: 2}
     informe = []
+    jornadaLaboral = None
     # sumo un dia a la fecha fin
     fechaFin = fechaFin + timedelta(days=1)
 
@@ -648,10 +701,21 @@ def calcularHoras (usuarios, fechaInicio, fechaFin):
     for e in empleados:
         dias = registros.filter(id_empleado__id=e["id_empleado"]).values('hora__date').distinct()
         empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e["id_empleado"])[0]
+
         for d in dias:
+            # obtener la jornada del empleado
+            jornada = comprobarJornadaEmpleado(empleado.id_usuario.id, d["hora__date"])
+            if isinstance(jornada, float):
+                jornadaLaboral = jornada
+            elif isinstance(jornada, dict) and 'get' in jornada:
+                jornadaLaboral = jornada.get('get')('x')
+            else:
+                jornadaLaboral=jornada
+
             dia_siguiente = d["hora__date"]+timedelta(days=1)
             registrosDiaEmpleado = registros.filter(id_empleado__id=e["id_empleado"], hora__range=(d["hora__date"],dia_siguiente)).all()
             # aquí podríamos comprobar cuando el usuario no tienen ningun registro ese día si tiene alguna justificacion para ajustar
+            permisos, asuntosPropios, vacaciones = comprobarPermisosEmpleado(empleado.id_usuario.id, d["hora__date"])
             #print("Empleado: ",e["id_empleado"], d["hora__date"], len(registrosDiaEmpleado))
             if len(registrosDiaEmpleado)%2 == 0:
                 horas = 0
@@ -665,10 +729,10 @@ def calcularHoras (usuarios, fechaInicio, fechaFin):
                         horas = horas + (r.hora - auxHoras).total_seconds()/3600
                         tramo = 0
                 # comprobar justificaciones para ajustar las horas del dia
-                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos})
+                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones})
             else:
                 fichajesHechos = registrosDiaEmpleado.values_list('hora__time', flat=True)
-                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos})
+                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones})
     return informe
 
 def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
