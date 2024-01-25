@@ -7,7 +7,7 @@
     <div class="col-12">
       <div class="card mb-4">
         <div class="card-header pb-0">
-          <h3 id="tituloPagina" class="text-center text-gradient text-primary" >Informe diario de asistencia</h3>
+          <h1 id="tituloPagina" class="text-center text-gradient text-primary" >Informe diario de asistencia</h1>
         </div>
         <div class="card-body pt-0 pb-2">
           <div class="table-responsive p-2">
@@ -282,7 +282,11 @@ $("#informe_empleados").bootstrapTable({
     
     var empleados = $('#inputEmpleados').val();
     var fechaInicio = document.getElementById("fechaInicio").value;
+    fechaInicio = fechaInicio.split("-")[2] + "/" + fechaInicio.split("-")[1] + "/" + fechaInicio.split("-")[0];
+
     var fechaFin = document.getElementById("fechaFin").value;
+    fechaFin = fechaFin.split("-")[2] + "/" + fechaFin.split("-")[1] + "/" + fechaFin.split("-")[0];
+
     // cerrar el modal
     $('#modalEmpleados').trigger('click');
     // nueva url

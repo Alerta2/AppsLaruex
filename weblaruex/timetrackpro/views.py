@@ -71,7 +71,20 @@ excluidos = ["Prueba", "Pruebas", "prueba", "pruebas", "PRUEBA", "PRUEBAS", "Usu
 navBar = NavBar.objects.using("timetrackpro").values()
 
 
+# The above code is defining a function called "home" that takes a parameter called "request".
+# However, the code is incomplete and there are three hash symbols ("
 def home(request):
+    """
+    The function `home` renders a specific HTML template based on the user's role and provides
+    information about remaining and requested vacation days.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the method used (GET, POST,
+    etc.), and any data sent with the request
+    :return: a rendered HTML template based on the user's role. If the user is an administrator, it
+    returns the "home-admin.html" template. If the user is a director, it returns the "home.html"
+    template. Otherwise, it also returns the "home.html" template.
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     diasPropiosConsumidos = 3
@@ -90,21 +103,19 @@ def home(request):
         "diasPropiosSolicitados":diasPropiosSolicitados,
         "diasVacacionesSolicitados":diasVacacionesSolicitados,
     }
-    if administrador:
-        return render(request,"home-admin.html",infoVista)
-    elif director:
-        return render(request,"home.html",infoVista)
-    else:
-        return render(request,"home.html",infoVista)
+    return render(request,"home.html",infoVista)
     # guardo los datos en un diccionario
 
 
-    return render(request,"home.html",infoVista)
-
-'''
-    Vista que indica que no se ha encontrado la página
-'''
 def noEncontrado(request):
+    """
+    The function "noEncontrado" renders a 404.html template with some additional information.
+    
+    :param request: The request object represents the HTTP request that the user made. It contains
+    information about the user's request, such as the URL, headers, and any data sent with the request
+    :return: a rendered HTML template called "404.html" with the dictionary "infoVista" as the context
+    data.
+    """
     
     # guardo los datos en un diccionario
     infoVista = {
@@ -156,6 +167,17 @@ def ups(request, mensaje=None):
     return render(request,"ups.html",infoVista)
 
 def habilitaciones(request):     
+    """
+    The function "habilitaciones" renders a template with data for displaying a list of enabled features
+    and employees with enabled features, and also checks if the user is an administrator.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the requested URL, and any data
+    sent with the request
+    :return: The code is returning a response based on the user's permissions. If the user is an
+    administrator, it will render the "habilitaciones.html" template with the provided context data. If
+    the user is not an administrator, it will redirect to the "sin-permiso" URL.
+    """
     alerta = request.session.pop('alerta', None)
     # guardo los datos en un diccionario
     administrador = esAdministrador(request.user.id)
@@ -178,6 +200,16 @@ def habilitaciones(request):
         return redirect('timetrackpro:sin-permiso')
     
 def agregarHabilitacion(request):
+    """
+    The function "agregarHabilitacion" adds a new "Habilitacion" object to the database if the user is
+    an administrator and the "nombreHabilitacion" does not already exist.
+    
+    :param request: The "request" parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the method used (GET or POST),
+    and any data sent with the request
+    :return: a redirect to either the 'timetrackpro:habilitaciones' URL or the
+    'timetrackpro:sin-permiso' URL.
+    """
     administrador = esAdministrador(request.user.id)
     if administrador:
         if request.method == 'POST':
@@ -200,8 +232,17 @@ def agregarHabilitacion(request):
     else:
         return redirect('timetrackpro:sin-permiso')
     
-
+@login_required
 def asociarHabilitacion(request):
+    
+    """
+    This function associates employees with a specific authorization in a time tracking system.
+    
+    :param request: The request object contains information about the current HTTP request, such as the
+    user making the request, the method used (GET or POST), and any data submitted with the request
+    :return: The code is returning a redirect to either the 'timetrackpro:habilitaciones' URL or the
+    'timetrackpro:sin-permiso' URL.
+    """
     administrador = esAdministrador(request.user.id)
     if administrador:
         if request.method == 'POST':
@@ -228,8 +269,18 @@ def asociarHabilitacion(request):
     else:
         return redirect('timetrackpro:sin-permiso')
 
-
+@login_required
 def modificarHabilitacion(request):
+    """
+    The function `modificarHabilitacion` modifies the name of a habilitacion object if the user is an
+    administrator.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the method used (GET or POST),
+    and any data sent with the request
+    :return: a redirect to either 'timetrackpro:habilitaciones' or 'timetrackpro:sin-permiso' depending
+    on the conditions.
+    """
     administrador = esAdministrador(request.user.id)
     if administrador:
         if request.method == 'POST':
@@ -241,8 +292,19 @@ def modificarHabilitacion(request):
         return redirect('timetrackpro:habilitaciones')
     else:
         return redirect('timetrackpro:sin-permiso')
-    
+
+
+@login_required
 def eliminarHabilitacion(request):
+    """
+    This function deletes a "Habilitacion" object if the user is an administrator.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    user. It contains information such as the user's session, the HTTP method used (GET, POST, etc.),
+    and any data sent with the request
+    :return: a redirect to either the 'timetrackpro:habilitaciones' URL or the
+    'timetrackpro:sin-permiso' URL.
+    """
     administrador = esAdministrador(request.user.id)
     if administrador:
         if request.method == 'POST':
@@ -255,6 +317,15 @@ def eliminarHabilitacion(request):
 
 @login_required
 def tarjetasAcceso(request):
+    """
+    The function "tarjetasAcceso" checks if the user is an administrator or director, retrieves inactive
+    access cards from the database, paginates the results, and returns the necessary data for the view.
+    
+    :param request: The request object represents the HTTP request that the user made. It contains
+    information about the user, the requested URL, and any data that was sent with the request
+    :return: a rendered HTML template called "tarjetasAcceso.html" along with a dictionary of data
+    called "infoVista".
+    """
     admin = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     # obtengo los datos necesarios para la vista
@@ -283,6 +354,15 @@ def tarjetasAcceso(request):
 
 @login_required
 def datosTarjetasAccesoActivas(request):
+    """
+    The function "datosTarjetasAccesoActivas" retrieves active access cards from the database and
+    returns them as a JSON response.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the HTTP method used (GET,
+    POST, etc.), and any data sent with the request
+    :return: a JSON response containing a list of active access cards.
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     tarjetasActivas = []
@@ -292,6 +372,15 @@ def datosTarjetasAccesoActivas(request):
 
 @login_required   
 def datosTarjetasAccesoInactivas(request):
+    """
+    The function "datosTarjetasAccesoInactivas" retrieves inactive access cards from the database and
+    returns them as a JSON response.
+    
+    :param request: The "request" parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the requested URL, and any data
+    sent with the request
+    :return: a JSON response containing a list of inactive access cards.
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     tarjetasInactivas = []
@@ -313,6 +402,17 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 @login_required
 def datosDjangoUsers(request):
+    """
+    The function "datosDjangoUsers" retrieves a list of employees from a database and returns it as a
+    JSON response if the user is an administrator, otherwise it redirects to a permission denied page.
+    
+    :param request: The request object represents the HTTP request made by the client. It contains
+    information such as the user making the request, the HTTP method used, and any data sent with the
+    request
+    :return: The function `datosDjangoUsers` returns a JSON response containing a list of employee data
+    if the user is an administrator. If the user is not an administrator, it redirects to the
+    'sin-permiso' URL.
+    """
     administrador = esAdministrador(request.user.id)
     if administrador:
         empleados = AuthUserTimeTrackPro.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
@@ -323,6 +423,14 @@ def datosDjangoUsers(request):
 
 @login_required
 def agregarTarjetaAcceso(request):
+    """
+    The function "agregarTarjetaAcceso" adds a new access card to the system, including the card details
+    and an optional image.
+    
+    :param request: The request object contains information about the current HTTP request, such as the
+    user making the request and any data sent with the request
+    :return: a redirect to the 'timetrackpro:tarjetas-de-acceso' URL.
+    """
     administrador = esAdministrador(request.user.id)
     # obtengo los datos necesarios para la vista    
     if request.method == 'POST' and administrador:
@@ -360,6 +468,19 @@ def agregarTarjetaAcceso(request):
 
 @login_required
 def verTarjetaAcceso(request, id):
+    """
+    The function "verTarjetaAcceso" checks if the user is an administrator or director, and if so, it
+    retrieves the necessary data for the view and renders the "tarjeta.html" template with the data. If
+    the user is not an administrator or director, it redirects to the "sin-permiso" page.
+    
+    :param request: The request object represents the HTTP request that the user made to access the
+    view. It contains information such as the user's session, the HTTP method used (GET, POST, etc.),
+    and any data submitted with the request
+    :param id: The "id" parameter is the unique identifier of a specific TarjetaAcceso (Access Card)
+    object. It is used to retrieve the details of that particular access card from the database
+    :return: either a rendered HTML template with the necessary data for the view, or it is redirecting
+    to another page if the user does not have the necessary permissions.
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
 
@@ -382,6 +503,17 @@ def verTarjetaAcceso(request, id):
  
 @login_required
 def editarTarjetaAcceso(request):
+    """
+    The function `editarTarjetaAcceso` is used to edit a card access record in a database, with various
+    fields being updated based on the user's input.
+    
+    :param request: The request object contains information about the current HTTP request, such as the
+    user making the request, the method used (GET or POST), and any data sent with the request
+    :return: a redirect to different views depending on the conditions. If the request method is POST
+    and the user is an administrator, it redirects to the 'ver-tarjeta-acceso' view with the edited
+    tarjeta's ID as a parameter. If the user is not an administrator, it redirects to the 'ups' view
+    with a message indicating that the user does not have permission to edit
+    """
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST':
         if administrador:
@@ -480,6 +612,16 @@ def editarTarjetaAcceso(request):
 
 
 def infoConfigTarjetasAcceso(request):
+    """
+    The function "infoConfigTarjetasAcceso" renders a template with information for configuring access
+    cards, including the navigation bar, user role, and current route.
+    
+    :param request: The request object represents the HTTP request that the server receives from the
+    client. It contains information such as the user making the request, the HTTP method used (GET,
+    POST, etc.), and any data sent with the request
+    :return: a rendered HTML template called "infoConfigTarjetasAcceso.html" with the data stored in the
+    "infoVista" dictionary.
+    """
     administrador = esAdministrador(request.user.id)
 
     # guardo los datos en un diccionario
@@ -493,6 +635,17 @@ def infoConfigTarjetasAcceso(request):
 
 @login_required
 def registrosInsertados(request):
+    """
+    The function "registrosInsertados" retrieves and displays inserted records for administrators and
+    directors.
+    
+    :param request: The request object represents the HTTP request that the server receives from the
+    client. It contains information such as the user making the request, the HTTP method used (GET,
+    POST, etc.), and any data sent with the request
+    :return: a rendered HTML template with the data needed for the view. The data includes the
+    navigation bar, a boolean value indicating if the user is an administrator, a list of inserted
+    records, and the current route.
+    """
         # guardo los datos en un diccionario
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -512,6 +665,17 @@ def registrosInsertados(request):
 
 @login_required
 def datosRegistrosInsertados(request):
+    """
+    The function "datosRegistrosInsertados" retrieves inserted records from a database and returns them
+    as a JSON response.
+    
+    :param request: The "request" parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the requested URL, and any data
+    sent with the request
+    :return: a JSON response containing a list of dictionaries. Each dictionary represents a record of
+    inserted journal entries and includes the following fields: 'id', 'seccion', 'mes', 'year',
+    'fecha_lectura', 'insertador__first_name', 'insertador__last_name', and 'ruta'.
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     registros = []
@@ -521,9 +685,56 @@ def datosRegistrosInsertados(request):
 
 
 
+@login_required
+def relacionesEmpleados(request):
+    """
+    La función "relacionesEmpleados" comprueba si el usuario es un administrador o un director, y si es
+    así, recupera los datos necesarios para la vista y renderiza la plantilla "relaciones-empleados.html"
+    con los datos. Si el usuario no es un administrador o un director, redirige a la página "sin-permiso".
+    :param request: El objeto "request" representa la solicitud HTTP que el usuario hizo para acceder a
+    la vista. Contiene información como la sesión del usuario, el método HTTP utilizado (GET, POST, etc.)
+    y cualquier dato enviado con la solicitud.
+    :return: una plantilla HTML renderizada con los datos necesarios para la vista. Los datos incluyen la
+    barra de navegación, un valor booleano que indica si el usuario es un administrador, una lista de
+    registros insertados y la ruta actual.
+
+    """
+
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    if administrador or director:
+        infoVista = {
+            "navBar":navBar,
+            "administrador":administrador,
+            "rutaActual": "Relación empleados",
+        }
+        return render(request,"relaciones-empleados.html",infoVista)
+    else:
+        return redirect('timetrackpro:sin-permiso')
+
+@login_required
+def datosRelacionesEmpleados(request):
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    empleados = []
+    if administrador or director:
+        empleados = RelEmpleadosUsuarios.objects.using("timetrackpro").values('id','id_usuario__id', 'id_usuario__nombre', 'id_usuario__apellidos', 'id_usuario__img', 'id_usuario__dni', 'id_usuario__fecha_nacimiento', 'id_usuario__telefono', 'id_usuario__telefono2', 'id_usuario__email','id_usuario__email2', 'id_usuario__extension', 'id_usuario__puesto', 'id_usuario__direccion', 'id_usuario__info_adicional', 'id_usuario__fecha_alta_app', 'id_usuario__fecha_baja_app', 'id_empleado__id', 'id_empleado__nombre', 'id_empleado__turno', 'id_empleado__horas_maxima_contrato', 'id_empleado__en_practicas', 'id_empleado__maquina_laboratorio', 'id_empleado__maquina_alerta2', 'id_empleado__maquina_departamento', 'id_auth_user__id', 'id_auth_user__first_name', 'id_auth_user__last_name', 'id_tarjeta_acceso', 'id_tarjeta_acceso__nombre', 'id_tarjeta_acceso__apellidos', 'id_tarjeta_acceso__dni', 'id_tarjeta_acceso__id_tarjeta', 'id_tarjeta_acceso__fecha_alta', 'id_tarjeta_acceso__fecha_baja', 'id_tarjeta_acceso__imagen', 'id_tarjeta_acceso__acceso_laboratorios', 'id_tarjeta_acceso__acceso_cpd', 'id_tarjeta_acceso__acceso_alerta2', 'id_tarjeta_acceso__activo')
+    return JsonResponse(list(empleados), safe=False)
+
+
+
 
 @login_required
 def obtenerRegistroEmpleados(request):
+    """
+    The function "obtenerRegistroEmpleados" retrieves employee records and renders them in a template
+    for an attendance report.
+    
+    :param request: The request object contains information about the current HTTP request, such as the
+    user making the request, the method used (GET or POST), and any data sent with the request
+    :return: a rendered HTML template with the information needed to display the employee registration
+    report.
+    """
 
     administrador = esAdministrador(request.user.id)
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
@@ -535,11 +746,19 @@ def obtenerRegistroEmpleados(request):
         "empleados":list(empleados),
         "rutaActual": "Informe de asistencia empleados",
     }
-    return render(request,"informeRegistroUsuario.html",infoVista)
+    return render(request,"informe-registro-usuario.html",infoVista)
 
 
 @login_required
 def obtenerRegistroSemanalEmpleados(request):
+    """
+    The function "obtenerRegistroSemanalEmpleados" renders a dashboard view with information about
+    employee attendance.
+    
+    :param request: The request object contains information about the current HTTP request, such as the
+    user making the request, the method used (GET or POST), and any data sent with the request
+    :return: a rendered HTML template called "dashboard.html" with the context variable "infoVista".
+    """
 
     administrador = esAdministrador(request.user.id)
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
@@ -551,82 +770,118 @@ def obtenerRegistroSemanalEmpleados(request):
         "empleados":list(empleados),
         "rutaActual": "Informe de asistencia empleados",
     }
-    return render(request,"informeRegistroUsuario.html",infoVista)
+    return render(request,"informe-registro-semanal-usuario.html",infoVista)
 
 @login_required
 def datosRegistroEmpleados(request):
+    """
+    La función "datosRegistroEmpleados" recupera los datos de registro de los empleados en función de
+    los parámetros proporcionados.
+    :param request: El objeto "request" es un objeto que representa la solicitud HTTP realizada por el
+    cliente. Contiene información como el método de solicitud, las cabeceras y los parámetros de la
+    consulta. En este código, se utiliza para recuperar los parámetros de la consulta utilizando el
+    método "GET".
+    :return: una respuesta JSON que contiene la variable "informe", que es el resultado de llamar a la  
+    función "calcularHoras" con los parámetros "usuarios", "fechaInicio" y "fechaFin".
+
+    """
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
     mesPrevio = datetime.now().month
     yearActual = datetime.now().year
     if mesPrevio == 1:
         mesPrevio = 12
         yearActual = yearActual - 1
-    usuarios = []
-    print("listEmpleados: ", request.GET.get("listEmpleados"))
 
-    if request.GET.get("listEmpleados") != None:
-        usuarios = request.GET.get("listEmpleados").split("_")
-    else: 
-        usuarios = EmpleadosMaquina.objects.using("timetrackpro").values_list('id', flat=True)
+    usuarios = []
+    informe = []
     if request.GET.get("fechaInicio") != None:
         fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%Y-%m-%d')
     else:
-        # fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
-        fechaInicio = "2023-05-01"
+        fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
         fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')
-
-        print('\033[91m'+'fechaInicio: ' + '\033[92m', fechaInicio)
 
     if request.GET.get("fechaFin") != None:
         fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%Y-%m-%d')
     else:
         ultimoDiaMes = calendar.monthrange(yearActual, mesPrevio)  
-        # fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
-        fechaFin = "2023-05-31"
+        fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
         fechaFin = datetime.strptime(fechaFin, '%Y-%m-%d')
+    if administrador or director:
+        if request.GET.get("listEmpleados") != None:
+            usuarios = request.GET.get("listEmpleados").split("_")
+        else: 
+            usuarios = EmpleadosMaquina.objects.using("timetrackpro").values_list('id', flat=True)
+    else:
+        usuario = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        usuarios.append(usuario.id_empleado.id)
 
-        print('\033[91m'+'fechaFin: ' + '\033[92m', fechaFin)
     informe = calcularHoras(usuarios, fechaInicio, fechaFin)
     return JsonResponse(list(informe), safe=False)
 
 
-
-
 @login_required
 def datosRegistroSemanalEmpleados(request):
+    """
+    La función "datosRegistroSemanalEmpleados" recupera los datos de registro de los empleados en función
+    de los parámetros proporcionados.
+    :param request: El objeto "request" es un objeto que representa la solicitud HTTP realizada por el
+    cliente. Contiene información como el método de solicitud, las cabeceras y los parámetros de la
+    consulta. En este código, se utiliza para recuperar los parámetros de la consulta utilizando el
+    método "GET".
+    :return: una respuesta JSON que contiene la variable "informe", que es el resultado de llamar a la
+    función "calcularHorasSemanal" con los parámetros "usuarios", "fechaInicio" y "fechaFin".
+    
+    """
+
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
     mesPrevio = datetime.now().month
     yearActual = datetime.now().year
     if mesPrevio == 1:
         mesPrevio = 12
         yearActual = yearActual - 1
     usuarios = []
-    print("listEmpleados: ", request.GET.get("listEmpleados"))
 
-    if request.GET.get("listEmpleados") != None:
-        usuarios = request.GET.get("listEmpleados").split("_")
-    else: 
-        usuarios = EmpleadosMaquina.objects.using("timetrackpro").values_list('id', flat=True)
     if request.GET.get("fechaInicio") != None:
         fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%Y-%m-%d')
     else:
-        # fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
-        fechaInicio = "2023-05-01"
+        fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
         fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')
 
-        print('\033[91m'+'fechaInicio: ' + '\033[92m', fechaInicio)
 
     if request.GET.get("fechaFin") != None:
         fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%Y-%m-%d')
     else:
         ultimoDiaMes = calendar.monthrange(yearActual, mesPrevio)  
-        # fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
-        fechaFin = "2023-05-31"
+        fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
         fechaFin = datetime.strptime(fechaFin, '%Y-%m-%d')
 
-        print('\033[91m'+'fechaFin: ' + '\033[92m', fechaFin)
+    if administrador or director:
+
+        if request.GET.get("listEmpleados") != None:
+            usuarios = request.GET.get("listEmpleados").split("_")
+        else: 
+            usuarios = EmpleadosMaquina.objects.using("timetrackpro").values_list('id', flat=True)
+    else:
+        usuario = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        usuarios.append(usuario.id_empleado.id)            
     informe = calcularHorasSemanales(usuarios, fechaInicio, fechaFin)
     return JsonResponse(list(informe), safe=False)
 
 def comprobarJornadaEmpleado(idUsuario,fechaInicio, fechaFin=None):
+    """
+    The function `comprobarJornadaEmpleado` checks the work schedule of an employee based on their ID
+    and a given date range, and returns the number of weekly working hours.
+    
+    :param idUsuario: The id of the user or employee for whom you want to check the work schedule
+    :param fechaInicio: The starting date for which you want to check the employee's work schedule
+    :param fechaFin: The parameter "fechaFin" is an optional parameter that represents the end date of
+    the period for which you want to check the employee's work schedule. If no end date is provided, it
+    defaults to the same value as the start date (fechaInicio)
+    :return: the value of the variable "jornadaLaboral", which represents the number of weekly working
+    hours for the employee.
+    """
     if fechaFin is None:
         fechaFin = fechaInicio
     jornadaLaboral = 37.5
@@ -644,48 +899,96 @@ def comprobarJornadaEmpleado(idUsuario,fechaInicio, fechaFin=None):
     return jornadaLaboral
 
 def comprobarPermisosEmpleado(idUsuario, fechaInicio, fechaFin=None):
+    """
+    The function `comprobarPermisosEmpleado` checks if an employee has requested any permissions,
+    personal matters, or vacations for a given date range and returns the details along with the number
+    of days for each category.
+    
+    :param idUsuario: The parameter "idUsuario" represents the ID of the user or employee for whom we
+    want to check the permissions
+    :param fechaInicio: The parameter "fechaInicio" represents the start date for which you want to
+    check the employee's permissions
+    :param fechaFin: The parameter "fechaFin" is an optional parameter that represents the end date for
+    checking permissions. If it is not provided, the function will use the same value as "fechaInicio"
+    (start date) for checking permissions
+    :return: The function `comprobarPermisosEmpleado` returns a tuple containing the following values:
+    """
     if fechaFin is None:
         fechaFin = fechaInicio    
     empleado = Empleados.objects.using("timetrackpro").filter(id=idUsuario)[0]
     estadosAceptadosPermisos = [18,20,21]
-    permisos = "No hay permisos ni ausencias solicitados para este dia"
-    asuntosPropios = "No hay asuntos propios solicitados para este dia"
-    vacaciones = "No hay vacaciones solicitadas para este dia"
+    diasPermisos = 0;
+    diasAsuntosPropios = 0;
+    diasVacaciones = 0;
+    permisos = "No hay permisos ni ausencias solicitados para la fecha seleccionada"
+    asuntosPropios = "No hay asuntos propios solicitados para la fecha seleccionada"
+    vacaciones = "No hay vacaciones solicitadas para la fecha seleccionada"
     # compruebo si el usuario ha solicitado alguna ausencia para ese dia
-    if PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaInicio, estado__id__in=estadosAceptadosPermisos).exists():
-        permisos = "El empleado tiene una ausencia solicitada para este dia"
-    if AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaInicio, estado__id=11).exists():
-        asuntosPropios = "El empleado tiene un asunto propio solicitado para este dia"
-    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaInicio, estado__id=11).exists():
-        vacaciones = "El empleado tiene dias de vacaciones solicitados para este dia"
-    return permisos, asuntosPropios, vacaciones
+    if PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin, estado__id__in=estadosAceptadosPermisos).exists():
+        permisos = "El empleado tiene una ausencia solicitada para la fecha seleccionada"
+        # cuento los dias de ausencia solicitados por el empleado
+        diasPermisos = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin, estado__id__in=estadosAceptadosPermisos).count()
+    if AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin, estado__id=11).exists():
+        asuntosPropios = "El empleado tiene un asunto propio solicitado para la fecha seleccionada"
+        # cuanto los dias de asuntos propios solicitados por el empleado
+        diasAsuntosPropios = AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin, estado__id=11).count()
+    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin, estado__id=11).exists():
+        vacaciones = "El empleado tiene dias de vacaciones solicitados para la fecha seleccionada"
+        # cuento los dias de vacaciones solicitados por el empleado
+        diasVacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin, estado__id=11).count()
+    return permisos, asuntosPropios, vacaciones, diasPermisos, diasAsuntosPropios, diasVacaciones
 
+def comprobarFestivos(fechaInicio, fechaFin=None):
+    """
+    The function `comprobarFestivos` checks for holidays between two given dates.
+    
+    :param fechaInicio: The parameter "fechaInicio" represents the start date for which you want to
+    check if it is a holiday or not
+    :param fechaFin: The parameter "fechaFin" is an optional parameter that represents the end date for
+    checking holidays. If no value is provided for "fechaFin", it defaults to the value of "fechaInicio"
+    :return: the number of holidays between the given start and end dates.
+    """
+    if fechaFin is None:
+        fechaFin = fechaInicio
+    festivos = 0
+
+    if fechaInicio == fechaFin:
+        if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio=fechaInicio).exists():
+            festivos = 1
+    else:
+        if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio).exists():        
+            # cuento los dias de festivos restando la fecha fin a la fecha inicio
+            festivo = FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio)[0]
+            if festivo.fecha_fin <= fechaFin:
+                festivos = (festivo.fecha_fin - festivo.fecha_inicio).days + 1
+            else:
+                festivos = (fechaFin - festivo.fecha_inicio).days + 1
+
+    if festivos < 0:
+        festivos = 0
+    return festivos
 
 def pruebas(request):
     idEmpleado = Empleados.objects.using("timetrackpro").filter(id=9)[0]
-    fechaInicio = date(2023, 5, 3)
-    fechaFin =  None
-    jornada = comprobarJornadaEmpleado(idEmpleado.id, fechaInicio, fechaFin)
-    print("jornada: ", jornada)
-    if isinstance(jornada, float):
-        jornadaLaboral = jornada
-    elif isinstance(jornada, dict) and 'get' in jornada:
-        jornadaLaboral = jornada.get('get')('x')
-    else:
-        jornadaLaboral=jornada
+    fechaInicio = date(2023, 5, 15)
+    fechaFin =  date(2023, 5, 21)
     # Devuelve una respuesta HTTP adecuada, por ejemplo:
-    return HttpResponse(jornadaLaboral)
+    festivos = comprobarFestivos(fechaInicio, fechaFin)
+    return HttpResponse(festivos)
     #return jornada
-    
-def calcularHoras(usuarios, fechaInicio, fechaFin):
 
-        # obtener la jornada del empleado
-    '''
-        Función que se encarga de calcular las horas de los usuarios que se le pasan por parámetro.
-        @param usuarios: Lista de usuarios a los que se les calcularán las horas.
-        @param fechaInicio: Fecha de inicio del cálculo.
-        @param fechaFin: Fecha de fin del cálculo.
-    '''
+def calcularHoras(usuarios, fechaInicio, fechaFin):
+    """
+    The function "calcularHoras" calculates the number of hours worked by employees within a given date
+    range and generates a report.
+    
+    :param usuarios: A list of user IDs for whom you want to calculate the hours
+    :param fechaInicio: The starting date for calculating the hours
+    :param fechaFin: The parameter "fechaFin" represents the end date for calculating the hours. It is
+    the date until which the hours will be calculated
+    :return: a list of dictionaries containing information about the calculated hours for each employee
+    and day within the specified date range.
+    """
 
     # linea de informe ejemplo
     # {"empleado": 1, "dia": dd/mm/yyyy, "horas": 7, "correcto": "si", "observaciones": "", fichajes: 2}
@@ -696,13 +999,13 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
 
     registros = Registros.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
     # agrupo los registros por semana 
-    registrosSemanales = registros.annotate(semana=ExtractWeek('hora')).order_by('semana')
-    empleados = registrosSemanales.values('id_empleado').distinct()
-    for e in empleados:
-        dias = registros.filter(id_empleado__id=e["id_empleado"]).values('hora__date').distinct()
-        empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e["id_empleado"])[0]
+    
+    for e in usuarios:
+        dias = registros.filter(id_empleado__id=e).values('hora__date').distinct()
+        empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e)[0]
 
         for d in dias:
+            print("calculo para empleado", empleado.id_usuario.nombre, empleado.id_usuario.apellidos, "dia: ", d["hora__date"])
             # obtener la jornada del empleado
             jornada = comprobarJornadaEmpleado(empleado.id_usuario.id, d["hora__date"])
             if isinstance(jornada, float):
@@ -713,10 +1016,10 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
                 jornadaLaboral=jornada
 
             dia_siguiente = d["hora__date"]+timedelta(days=1)
-            registrosDiaEmpleado = registros.filter(id_empleado__id=e["id_empleado"], hora__range=(d["hora__date"],dia_siguiente)).all()
+            registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d["hora__date"],dia_siguiente)).all()
             # aquí podríamos comprobar cuando el usuario no tienen ningun registro ese día si tiene alguna justificacion para ajustar
-            permisos, asuntosPropios, vacaciones = comprobarPermisosEmpleado(empleado.id_usuario.id, d["hora__date"])
-            #print("Empleado: ",e["id_empleado"], d["hora__date"], len(registrosDiaEmpleado))
+            permisos, asuntosPropios, vacaciones, diasPermisos, diasAsuntosPropios, diasVacaciones = comprobarPermisosEmpleado(empleado.id_usuario.id, d["hora__date"])
+            festivo = comprobarFestivos(d["hora__date"])
             if len(registrosDiaEmpleado)%2 == 0:
                 horas = 0
                 tramo = 0
@@ -729,36 +1032,60 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
                         horas = horas + (r.hora - auxHoras).total_seconds()/3600
                         tramo = 0
                 # comprobar justificaciones para ajustar las horas del dia
-                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones})
+                informe.append({"empleado": e, "dia": d["hora__date"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivo": festivo})
             else:
                 fichajesHechos = registrosDiaEmpleado.values_list('hora__time', flat=True)
-                informe.append({"empleado": e["id_empleado"], "dia": d["hora__date"], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones})
+                informe.append({"empleado": e, "dia": d["hora__date"], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivo": festivo})
     return informe
 
 def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
+    """
+    The function "calcularHorasSemanales" calculates the weekly working hours for a list of employees
+    within a specified date range.
+    
+    :param usuarios: A list of user IDs for which you want to calculate the weekly hours
+    :param fechaInicio: The starting date for calculating the weekly hours
+    :param fechaFin: The parameter "fechaFin" represents the end date of the time period for which you
+    want to calculate the weekly hours
+    :return: a list of dictionaries, where each dictionary represents a report for a specific employee
+    and week. The dictionary contains information such as the employee ID, week, total hours worked,
+    whether the calculation is correct or not, any observations, number of recorded shifts, and
+    additional details about the employee and week.
+    """
     # linea de informe ejemplo
     # {"empleado": 1, "semana": dd al dd MM de YYYY, "horas": 37.5, "correcto": "si", "observaciones": "", fichajes: 2}
     informe = []
     # sumo un dia a la fecha fin
     fechaFin = fechaFin + timedelta(days=1)
     registros = Registros.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
-    empleados = registros.values('id_empleado').distinct()
-    for e in empleados:
-        semanas = registros.filter(id_empleado__id=e["id_empleado"]).annotate(semana=ExtractWeek('hora')).values('semana').distinct()
-        empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e["id_empleado"])[0]
+    
+    for e in usuarios:
+        semanas = registros.filter(id_empleado__id=e).annotate(semana=ExtractWeek('hora')).values('semana').distinct()
+        empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e)[0]
         #obtengo las horas por dias y las agrupo por semana.
         for s in semanas:
-            dias = registros.filter(id_empleado__id=e["id_empleado"], hora__week=s["semana"]).values('hora__date').distinct()
+            dias = registros.filter(id_empleado__id=e, hora__week=s["semana"]).values('hora__date').distinct()
             year = dias[0]["hora__date"].year
             # obtengo todos los dias de esa semana 
             inicioSemana, finSemana = obtenerFechaSemana(year, s["semana"])            
             horas = 0
             diasErrores = []
             diasFichados = 0
+            jornada = comprobarJornadaEmpleado(empleado.id_usuario.id, inicioSemana, finSemana)
+            if isinstance(jornada, float):
+                jornadaLaboral = jornada
+            elif isinstance(jornada, dict) and 'get' in jornada:
+                jornadaLaboral = jornada.get('get')('x')
+            else:
+                jornadaLaboral=jornada
+            permisos, asuntosPropios, vacaciones, diasPermisos, diasAsuntosPropios, diasVacaciones = comprobarPermisosEmpleado(empleado.id_usuario.id, inicioSemana, finSemana)
+            festivos = comprobarFestivos(inicioSemana, finSemana)
+        
             for d in dias:
                 # comprubeo si el dia tiene un numero par de registros
                 dia_siguiente = d["hora__date"]+timedelta(days=1)
-                registrosDiaEmpleado = registros.filter(id_empleado__id=e["id_empleado"], hora__range=(d["hora__date"],dia_siguiente)).all()
+                registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d["hora__date"],dia_siguiente)).all()
+
                 if len(registrosDiaEmpleado)%2 == 0:
                     tramo = 0
                     auxHoras = 0
@@ -774,13 +1101,24 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
                     diasErrores.append(d["hora__date"])
             # si hay dias con errores, los añado al informe
             if len(diasErrores) > 0:                
-                informe.append({"empleado": e["id_empleado"], "semana": s["semana"], "horas": horas, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": diasFichados, "diasErrores": diasErrores, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana})
+                informe.append({"empleado": e, "semana": s["semana"], "horas": horas, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": diasFichados, "diasErrores": diasErrores, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
             else:
-                informe.append({"empleado": e["id_empleado"], "semana": s["semana"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": diasFichados, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana})
+                informe.append({"empleado": e, "semana": s["semana"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": diasFichados, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
     return informe
 
 
 def obtenerFechaSemana(year, week):
+    """
+    The function `obtenerFechaSemana` takes a year and week number as input and returns the start and
+    end dates of that week.
+    
+    :param year: The year parameter represents the year for which you want to obtain the date range of a
+    specific week
+    :param week: The week parameter represents the week number within the year. It can be any integer
+    value from 1 to 52 (or 53 in some cases)
+    :return: The function `obtenerFechaSemana` returns a tuple containing the start and end dates of a
+    given week in a given year.
+    """
     # Assuming ISO week starts from Monday
     start_of_week = datetime.strptime(f'{year}-W{week}-1', "%Y-W%W-%w").date()
     end_of_week = start_of_week + timedelta(days=6)
@@ -788,11 +1126,24 @@ def obtenerFechaSemana(year, week):
     return start_of_week, end_of_week
 
 def quitarAcentos(cadena):
+    """
+    The function "quitarAcentos" removes accents from a given string.
+    :param cadena: The parameter "cadena" represents a string that may contain accented characters
+    :return: a string with all the accents removed from the input string.
+    """
     return ''.join((c for c in unicodedata.normalize('NFD', cadena) if unicodedata.category(c) != 'Mn'))
 
 
 
 def convertirFormatoDateTime(datoFecha):
+    """
+    The function `convertirFormatoDateTime` takes a date and time string in either the format
+    'YYYY-MM-DD HH:MM:SS' or 'DD/MM/YYYY HH:MM:SS' and converts it to the format 'YYYY-MM-DD HH:MM:SS'.
+    
+    :param datoFecha: The parameter "datoFecha" is a string representing a date and time in either the
+    format "YYYY-MM-DD HH:MM:SS" or "DD/MM/YYYY HH:MM:SS"
+    :return: a string in the format '%Y-%m-%d %H:%M:%S'.
+    """
     try:
         # Intenta convertir la fecha y hora al formato deseado
         fechaHora = datetime.strptime(datoFecha, '%Y-%m-%d %H:%M:%S')
@@ -809,6 +1160,18 @@ def convertirFormatoDateTime(datoFecha):
 
 @login_required
 def verRegistro(request, id):
+    """
+    The function "verRegistro" checks if the user is an administrator or director, retrieves a record
+    from the database, processes a file, and renders a template with the record information if the user
+    has permission.
+    
+    :param request: The request object represents the HTTP request that the server receives from the
+    client. It contains information about the request, such as the method (GET or POST), headers, and
+    user session
+    :param id: The "id" parameter is the ID of the record that you want to retrieve and display. It is
+    used to filter the RegistrosJornadaInsertados objects and retrieve the specific record with that ID
+    :return: either a rendered HTML template or a redirect to another view, depending on the conditions.
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     registro = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=id)[0]
@@ -833,20 +1196,11 @@ def verRegistro(request, id):
                 campos = linea.split('\t')
                 # Obtener los valores de los campos (reemplaza con los nombres correctos)
                 id_empleado = campos[0].lstrip('0')
-                empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=id_empleado)[0]
                 nombre = campos[1]
+                empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(nombre=nombre)[0]
                 hora = convertirFormatoDateTime(campos[3])
                 # Comprobar si en la base de datos existen registros con el mismo id_archivo_leido
-                if Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).exists():
-                    registrosYaInsertados = Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).values()
-                    for r in registrosYaInsertados:
-                        if r["id_empleado"] == empleado.id and r["hora"] == hora:
-                            continue
-                        else:
-                            # Si no existe, crea un nuevo registro en la base de datos
-                            nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
-                            nuevoRegistro.save()
-                else:
+                if not Registros.objects.using("timetrackpro").filter(id_archivo_leido=id, id_empleado=empleado.id, hora=hora).exists():
                     # Si no existe, crea un nuevo registro en la base de datos
                     nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
                     nuevoRegistro.save()
@@ -868,6 +1222,18 @@ def verRegistro(request, id):
 
 @login_required
 def actulizarRegistro(request, id):
+    """
+    The function `actulizarRegistro` updates a record in a database based on a request and ID, and
+    renders a view with the updated record and related data.
+    
+    :param request: The request object represents the HTTP request that the user made to the server. It
+    contains information such as the user's session, the HTTP method used (GET, POST, etc.), and any
+    data submitted with the request
+    :param id: The `id` parameter is the identifier of the record that needs to be updated. It is used
+    to retrieve the specific record from the database
+    :return: a rendered HTML template with the context data "infoVista" if the user is an administrator.
+    If the user is not an administrator, it redirects to another view with a "mensaje" parameter.
+    """
     administrador = esAdministrador(request.user.id)
     if administrador:
         registro = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=id)[0]
@@ -939,6 +1305,19 @@ def actulizarRegistro(request, id):
 
 @login_required
 def datosRegistro(request, id):
+    """
+    The function "datosRegistro" retrieves data from the "Registros" table based on the user's role and
+    filters.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the method used (GET, POST,
+    etc.), and any data sent with the request
+    :param id: The "id" parameter is the identifier of the file being requested. It is used to filter
+    the records in the "Registros" table based on the "id_archivo_leido" field
+    :return: a JSON response containing a list of records. The records include various fields such as
+    'id', 'id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes',
+    'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     registros = []
@@ -951,6 +1330,20 @@ def datosRegistro(request, id):
 
 @login_required
 def verLineaRegistro(request, id):
+    """
+    The function `verLineaRegistro` checks if the user has permission to view a specific record and
+    renders the record details if they have permission, otherwise it redirects to an error page.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the requested URL, and any data
+    sent with the request
+    :param id: The "id" parameter is the identifier of the specific record or entry in the database that
+    you want to view. It is used to retrieve the corresponding record from the "Registros" table in the
+    "timetrackpro" database
+    :return: either a rendered HTML template with the information of a specific record, or it is
+    redirecting to another page with an error message if the user does not have permission to view the
+    selected record.
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id).values('id_empleado__id')
@@ -976,6 +1369,18 @@ def verLineaRegistro(request, id):
 
 @login_required
 def editarLineaRegistro(request, id):
+    """
+    The function `editarLineaRegistro` allows an administrator to edit a specific line of a record in a
+    TimeTrackPro application.
+    
+    :param request: The request object contains information about the current HTTP request, such as the
+    user making the request, the method used (GET or POST), and any data submitted with the request
+    :param id: The `id` parameter is the identifier of the record that needs to be edited. It is used to
+    retrieve the specific record from the database
+    :return: a redirect to either the 'ver-linea-registro' view with the specified id parameter or the
+    'ups' view with a specified error message if the user does not have permission to edit the selected
+    record.
+    """
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
         registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
@@ -994,6 +1399,19 @@ def editarLineaRegistro(request, id):
 
 @login_required
 def eliminarLineaRegistro(request, id):
+    """
+    The function `eliminarLineaRegistro` deletes a record from a database table and saves the deleted
+    record in another table.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the method used (GET or POST),
+    and any data sent with the request
+    :param id: The `id` parameter is the identifier of the record that needs to be deleted from the
+    database
+    :return: a redirect to either the 'timetrackpro:ver-registro' view with the 'id' parameter set to
+    the id of the 'archivoModificado' object, or a redirect to the 'timetrackpro:ups' view with the
+    'mensaje' parameter set to "No tienes permiso para eliminar el registro seleccionado."
+    """
     registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
     archivoModificado = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=registro.id_archivo_leido.id)[0]
     administrador = esAdministrador(request.user.id)
@@ -1022,6 +1440,16 @@ def eliminarLineaRegistro(request, id):
 
 @login_required
 def verMisErroresNotificados(request):
+    """
+    The function "verMisErroresNotificados" renders a template called "mis-errores-notificados.html"
+    with some additional information.
+    
+    :param request: The "request" parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the HTTP method used (GET,
+    POST, etc.), and any data sent with the request
+    :return: a rendered HTML template called "mis-errores-notificados.html" with the context data
+    "infoVista".
+    """
         
     infoVista = {
         "navBar":navBar,
@@ -1032,6 +1460,15 @@ def verMisErroresNotificados(request):
 
 @login_required
 def datosMisErroresNotificados(request):
+    """
+    The function `datosMisErroresNotificados` retrieves error data based on the user's role and returns
+    it as a JSON response.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the requested URL, and any data
+    sent with the request
+    :return: a JSON response containing a list of errors.
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     idUsuario = request.user.id
@@ -1045,26 +1482,37 @@ def datosMisErroresNotificados(request):
 
 @login_required
 def verErroresNotificados(request, id=None):
-    idFilter = None
+    """
+    The function `verErroresNotificados` retrieves a list of notified errors from a database and renders
+    them in a template.
     
-    if (id is None):
-        errores = ErroresRegistroNotificados.objects.using("timetrackpro").values()
-    else:
-        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=id).values()
-        idFilter = id
-    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the HTTP method used (GET,
+    POST, etc.), and any data sent with the request
+    :param id: The "id" parameter is an optional parameter that represents the ID of an employee. If the
+    "id" parameter is provided, the function will filter the errors based on that employee's ID. If the
+    "id" parameter is not provided, the function will retrieve all errors
+    :return: a rendered HTML template with the context data "infoVista".
+    """
     infoVista = {
         "navBar":navBar,
         "administrador":esAdministrador(request.user.id),
-        "errores":list(errores),
-        "idFilter":idFilter,
-        "rutaActual": "Errores notificados",
+        "rutaActual": "Errores al fichar notificados",
     }
     return render(request,"errores-registrados.html",infoVista)
 
 
 @login_required
 def verErroresNotificadosPendientes(request):
+    """
+    The function "verErroresNotificadosPendientes" renders a template called
+    "errores-registrados-pendientes.html" with some additional information.
+    
+    :param request: The request object contains information about the current HTTP request, such as the
+    user making the request and any data sent with the request
+    :return: a rendered HTML template called "errores-registrados-pendientes.html" with the context
+    variable "infoVista".
+    """
     administrador = esAdministrador(request.user.id)
     infoVista = {
         "navBar":navBar,
@@ -1073,14 +1521,41 @@ def verErroresNotificadosPendientes(request):
     }
     return render(request,"errores-registrados-pendientes.html",infoVista)
 
+@login_required
 def datosErroresNotificadosPendientes(request):
+    """
+    La función `datosErroresNotificadosPendientes` recupera los datos de los errores notificados
+    pendientes de revisión y los devuelve como una respuesta JSON.
+    :param request: La variable `request` es un objeto que representa la solicitud HTTP realizada por
+    el cliente. Contiene información como el usuario que realiza la solicitud, la URL solicitada y
+    cualquier dato enviado con la solicitud.
+    :return: una respuesta JSON que contiene una lista de errores.
+    """
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    errores = []
+    if administrador or director:
+        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(estado=estadosErrores['Pendiente']).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre') 
+    else:
+        idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=idEmpleado, estado=estadosErrores['Pendiente']).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre')
+
     # obtengo los festivos registrados en la base de datos
-    errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(estado=estadosErrores['Pendiente']).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre') 
+
     # devuelvo la lista en formato json
     return JsonResponse(list(errores), safe=False)
 
 @login_required
 def notificarErrorEnFichaje(request):
+    """
+    The function `notificarErrorEnFichaje` is a view function in Django that handles the notification of
+    errors in employee time tracking.
+    
+    :param request: The request object represents the HTTP request that the server receives from the
+    client
+    :return: a redirect to the 'timetrackpro:ver-errores-notificados' view with the parameter
+    'id=idEmpleadoMaquina'.
+    """
     
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
     administrador = esAdministrador(request.user.id)
@@ -1116,6 +1591,18 @@ def notificarErrorEnFichaje(request):
 
 @login_required
 def verErrorRegistroNotificado(request, id):
+    """
+    The function `verErrorRegistroNotificado` checks if the user is an administrator, director, or the
+    employee who registered the error, and then renders a template with the error details if they have
+    permission, otherwise it redirects to an error page.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the requested URL, and any data
+    sent with the request
+    :param id: The "id" parameter is the ID of the error notification that you want to view
+    :return: either a rendered HTML template with the necessary data or a redirect to another page with
+    an error message.
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
@@ -1139,6 +1626,17 @@ def verErrorRegistroNotificado(request, id):
 
 @login_required
 def modificarEstadoErrorRegistroNotificado(request, id):
+    """
+    The function modifies the error state and rejection reason of a notified registration error, and
+    redirects to view the updated error.
+    
+    :param request: The request object contains information about the current HTTP request, such as the
+    user making the request, the method used (GET or POST), and any data sent with the request
+    :param id: The `id` parameter is the unique identifier of the `ErroresRegistroNotificados` object
+    that needs to be modified
+    :return: a redirect to the 'ver-error-registro-notificado' view with the specified id as a
+    parameter.
+    """
     error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id)[0]
     administrador = esAdministrador(request.user.id)
     if administrador:
@@ -1155,6 +1653,17 @@ def modificarEstadoErrorRegistroNotificado(request, id):
 
 @login_required
 def editarErrorRegistroNotificado(request, id):
+    """
+    The function `editarErrorRegistroNotificado` allows an administrator or director to edit an error in
+    the notified registry.
+    
+    :param request: The request object contains information about the current HTTP request, such as the
+    user making the request, the method used (GET or POST), and any data sent with the request
+    :param id: The `id` parameter is the identifier of the error record that needs to be edited
+    :return: a redirect to either the 'timetrackpro:ver-error-registro-notificado' view with the
+    specified id, or to the 'timetrackpro:ups' view with a message indicating that the user does not
+    have permission to edit the selected error.
+    """
     error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id)[0]
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -1173,6 +1682,19 @@ def editarErrorRegistroNotificado(request, id):
 
 @login_required
 def eliminarErrorRegistroNotificado(request, id):
+    """
+    The function `eliminarErrorRegistroNotificado` deletes an error from the database if the user is an
+    administrator, otherwise it redirects to an error page.
+    
+    :param request: The request object represents the HTTP request that the user made. It contains
+    information about the user, the requested URL, and any data that was sent with the request
+    :param id: The "id" parameter is the unique identifier of the error to be deleted from the
+    "ErroresRegistroNotificados" table in the "timetrackpro" database
+    :return: a redirect response. If the user is an administrator, it redirects to the
+    'timetrackpro:ver-errores-registrados' URL. If the user is not an administrator, it redirects to the
+    'timetrackpro:ups' URL with a message indicating that the user does not have permission to delete
+    the selected error.
+    """
     administrador = esAdministrador(request.user.id)
     if administrador:
         error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id)[0]
@@ -1183,18 +1705,48 @@ def eliminarErrorRegistroNotificado(request, id):
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para eliminar el error seleccionado.")
 
 def datosErroresNotificados(request, id=None):
+    """
+    La función `datosErroresNotificados` recupera los datos de los errores notificados de una base de
+    datos y los devuelve como una respuesta JSON.
+
+    :param request: El parámetro `request` es un objeto que representa la solicitud HTTP realizada por
+    el cliente. Contiene información como el usuario que realiza la solicitud, el método utilizado
+    (GET, POST, etc.) y cualquier dato enviado con la solicitud
+    :param id: El parámetro "id" es un parámetro opcional que representa el ID de un empleado. Si se
+    proporciona el parámetro "id", la función filtrará los errores en función del ID de ese empleado. Si
+    no se proporciona el parámetro "id", la función recuperará todos los errores
+    :return: una respuesta JSON que contiene una lista de errores.
+
+    """
     # obtengo los festivos registrados en la base de datos
     errores = []
-    if id == None:
-        errores = ErroresRegistroNotificados.objects.using("timetrackpro").values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre')
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
 
+    if administrador or director:
+
+        if id == None:
+            errores = ErroresRegistroNotificados.objects.using("timetrackpro").values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre')
+
+        else:
+            errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=id).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre') 
     else:
-        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=id).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre') 
+        idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=idEmpleado).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre')
     # devuelvo la lista en formato json
     return JsonResponse(list(errores), safe=False)
 
 
 def insertarRegistroManual(request):
+    """
+    The function `insertarRegistroManual` is used to insert a manual record into a database and redirect
+    to a specific page.
+    
+    :param request: The request object represents the HTTP request that the server receives from the
+    client. It contains information such as the user making the request, the method used (GET or POST),
+    and any data sent with the request
+    :return: The code is returning a rendered HTML template with the context data "infoVista".
+    """
     administrador = esAdministrador(request.user.id)
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
 
@@ -1224,6 +1776,17 @@ def insertarRegistroManual(request):
 
 @login_required
 def agregarRegistro(request):
+    """
+    The function `agregarRegistro` adds a new record to a database table if the user is an administrator
+    and redirects to the appropriate page based on the user's role.
+    
+    :param request: The request object contains information about the current HTTP request, such as the
+    user making the request, the method used (GET or POST), and any data submitted with the request
+    :return: a redirect response to different views based on the user's role and the request method. If
+    the user is an administrator and the request method is POST, it redirects to the 'verRegistro' view
+    with the newly created record's ID. If the user is an administrator and the request method is not
+    POST, it redirects to the 'registros-insertados' view. If the user
+    """
     administrador = esAdministrador(request.user.id)
     director= esDirector(request.user.id)
     if administrador:
@@ -1260,6 +1823,16 @@ def agregarRegistro(request):
 
 @login_required
 def empleados(request):
+    """
+    The function "empleados" retrieves employee data from a database and renders it in a template for
+    display.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the HTTP method used (GET,
+    POST, etc.), and any data sent with the request
+    :return: a rendered HTML template called "empleados.html" with the data stored in the "infoVista"
+    dictionary.
+    """
     # obtengo los datos necesarios para la vista
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -1290,14 +1863,34 @@ El usuario debe estar autenticado.
 
 -------------------------------------------'''
 def datosEmpleados(request):
+    """
+    The function "datosEmpleados" retrieves employee data from a database and returns it as a JSON
+    response.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the HTTP method used (GET,
+    POST, etc.), and any data sent with the request
+    :return: a JSON response containing a list of employee data.
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     empleados = []
-    if not administrador or director:
+    if administrador or director:
         empleados = RelEmpleadosUsuarios.objects.using("timetrackpro").values('id','id_usuario__id', 'id_usuario__nombre', 'id_usuario__apellidos', 'id_usuario__img', 'id_usuario__dni', 'id_usuario__fecha_nacimiento', 'id_usuario__telefono', 'id_usuario__telefono2', 'id_usuario__email','id_usuario__email2', 'id_usuario__extension', 'id_usuario__puesto', 'id_usuario__direccion', 'id_usuario__info_adicional', 'id_usuario__fecha_alta_app', 'id_usuario__fecha_baja_app', 'id_empleado__id', 'id_empleado__nombre', 'id_empleado__turno', 'id_empleado__horas_maxima_contrato', 'id_empleado__en_practicas', 'id_empleado__maquina_laboratorio', 'id_empleado__maquina_alerta2', 'id_empleado__maquina_departamento', 'id_auth_user__id', 'id_auth_user__first_name', 'id_auth_user__last_name', 'id_auth_user__is_active', 'id_auth_user__is_superuser', 'id_auth_user__is_staff', 'id_auth_user__username', 'id_auth_user__password', 'id_auth_user__last_login', 'id_auth_user__date_joined')
     return JsonResponse(list(empleados), safe=False)
 
 def agregarUsuario(request):
+    """
+    The function "agregarUsuario" is used to add a new user to the application, with various fields such
+    as name, email, phone number, etc.
+    
+    :param request: The request object represents the HTTP request that the browser sends to the server.
+    It contains information such as the user's session, the HTTP method used (GET or POST), and any data
+    submitted with the request
+    :return: either a redirect to the "ver-empleado" page with the ID of the newly created user, or a
+    redirect to the "ups" page with a message indicating that the user does not have permission to add a
+    user.
+    """
     
     falta_tarjeta = True
     # obtengo los datos necesarios para la vista
@@ -1379,6 +1972,16 @@ def agregarUsuario(request):
 
 @login_required
 def usuariosMaquina(request):
+    """
+    The function "usuariosMaquina" retrieves data about machine users and renders it in a template for
+    display.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the HTTP method used (GET,
+    POST, etc.), and any data sent with the request
+    :return: a rendered HTML template called "usuariosMaquina.html" with the data stored in the
+    "infoVista" dictionary.
+    """
         # obtengo los datos necesarios para la vista
     administrador = esAdministrador(request.user.id)
 
@@ -1395,6 +1998,17 @@ def usuariosMaquina(request):
     return render(request,"usuariosMaquina.html",infoVista)
 
 def datosUsuariosMaquina(request):
+    """
+    The function "datosUsuariosMaquina" retrieves data of users from a machine and returns it as a JSON
+    response.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the HTTP method used (GET,
+    POST, etc.), and any data sent with the request
+    :return: a JSON response containing a list of user data for the "EmpleadosMaquina" model. The user
+    data includes fields such as "id", "nombre", "turno", "horas_maxima_contrato", "en_practicas",
+    "maquina_laboratorio", "maquina_alerta2", and "maquina_departamento".
+    """
     administrador = esAdministrador(request.user.id)
     director =  esDirector(request.user.id)
     usersMaquina=[]
@@ -1405,6 +2019,16 @@ def datosUsuariosMaquina(request):
 
 @login_required
 def agregarUsuarioMaquina(request):
+    """
+    The function "agregarUsuarioMaquina" adds a new user to the system if the current user is an
+    administrator or director.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    user. It contains information such as the user's session, the HTTP method used (GET or POST), and
+    any data submitted with the request
+    :return: a redirect to either the 'timetrackpro:usuarios-maquina' URL or the 'timetrackpro:ups' URL
+    with a message if the user does not have permission to add a user.
+    """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     if administrador or director:
@@ -1469,6 +2093,13 @@ def agregarUsuarioMaquina(request):
 
 
 def verUsuarioMaquina(request, id):
+    '''
+    La funcion "verUsuarioMaquina" obtiene los datos de un usuario de la maquina de control de asistencia y los muestra en una plantilla para su visualizacion.
+
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del usuario de la maquina que se desea ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verUsuarioMaquina.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     # declaro las variables que voy a usar
@@ -1578,6 +2209,14 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 @login_required
 def verEmpleado(request, id):
+    '''
+    La funcion "verEmpleado" obtiene los datos de un empleado y los muestra en una plantilla para su visualizacion.
+    
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del empleado que se desea ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verEmpleado.html" con los datos necesarios para la vista
+
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     usuario = Empleados.objects.using("timetrackpro").filter(id=id)[0]
@@ -1636,6 +2275,11 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 @login_required
 def asociarUsuario(request):
+    '''
+    La funcion "asociarUsuario" permite asociar las cuentas de los usuarios de la aplicacion con los empleados registrados en las maquinas de control de asistencia, ademas de asociar la tarjeta de acceso y la informacion de la cuenta de django.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "asociar-empleados.html" con los datos necesarios para la vista    
+    '''
     usuariosApp = Empleados.objects.using("timetrackpro").values()
     administrador = esAdministrador(request.user.id)
     # datos de los empleados registrados en las máquinas de control de asistencia
@@ -1698,6 +2342,7 @@ def asociarUsuario(request):
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para asociar un usuario.")
 
 
+
 '''-------------------------------------------
                                 Módulo: editarAsociarUsuario
 - Descripción: 
@@ -1709,6 +2354,12 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 @login_required
 def editarAsociarUsuario(request, id):
+    '''
+    La funcion "editarAsociarUsuario" permite editar las relacion de usario en maquinas de registro, tarjeta de acceso, usuario de django y usuario de la aplicación (datos de contacto del usuario).
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del usuario de la aplicacion que se desea editar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "editar-asociar-empleados.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     if administrador:
         
@@ -1774,19 +2425,14 @@ def editarAsociarUsuario(request, id):
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para editar la asociación del usuario.")
 
 
-'''-------------------------------------------
-                                Módulo: verEmpleado
-
-- Descripción: 
-Obtener los datos de un empleado en concreto.
-
-- Precondiciones:
-El usuario debe estar autenticado.
-
-- Postcondiciones:
-
--------------------------------------------'''
+@login_required
 def editarEmpleado(request, id):
+    '''
+    La funcion "editarEmpleado" permite editar los datos de un empleado en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del empleado que se desea editar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "editar-empleado.html" con los datos necesarios para la vista
+    '''
     
     usuario = Empleados.objects.using("timetrackpro").filter(id=id)[0]
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=usuario)[0]
@@ -1954,6 +2600,12 @@ def editarEmpleado(request, id):
 
 @login_required
 def festivos(request, year=None):
+    '''
+    La funcion "festivos" obtiene los festivos registrados en la base de datos y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los festivos
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "festivos.html" con los datos necesarios para la vista
+    '''
     festivos = None
     administrador = esAdministrador(request.user.id)
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
@@ -1976,6 +2628,12 @@ def festivos(request, year=None):
 
 
 def datosFestivosCalendario(request, year=None):
+    '''
+    La funcion "datosFestivosCalendario" obtiene los festivos registrados en la base de datos y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los festivos
+    :return: un objeto "JsonResponse" que contiene los datos de los festivos en formato json    
+    '''
     # obtengo los festivos registrados en la base de datos
     festivos = []
     if year == None:
@@ -2002,6 +2660,13 @@ def datosFestivosCalendario(request, year=None):
 
 @login_required
 def agregarJornada(request, year=None):
+    '''
+    La funcion "agregarJornada" permite agregar una jornada laboral a un empleado en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los festivos
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "jornadas.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     if administrador or director:
@@ -2040,6 +2705,12 @@ def agregarJornada(request, year=None):
 
 @login_required
 def verJornada(request, id):
+    '''
+    La funcion "verJornada" obtiene los datos de una jornada laboral en concreto y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de la jornada laboral que se desea ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-jornada.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     jornada = RelJornadaEmpleados.objects.using("timetrackpro").filter(id=id)[0]
     
@@ -2056,6 +2727,13 @@ def verJornada(request, id):
 
 @login_required
 def eliminarJornada(request, id):
+    '''
+    La funcion "eliminarJornada" permite eliminar una jornada laboral en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de la jornada laboral que se desea eliminar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "jornadas.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
         jornada = RelJornadaEmpleados.objects.using("timetrackpro").filter(id=id)[0]
@@ -2066,6 +2744,13 @@ def eliminarJornada(request, id):
 
 @login_required
 def editarJornada(request, id):
+    '''
+    La funcion "editarJornada" permite editar los datos de una jornada laboral en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de la jornada laboral que se desea editar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "editar-jornada.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
         jornada = RelJornadaEmpleados.objects.using("timetrackpro").filter(id=id)[0]
@@ -2080,6 +2765,11 @@ def editarJornada(request, id):
 
 @login_required
 def datosFestivosVacacionesEmpleado(request):
+    '''
+    La funcion "datosFestivosVacacionesEmpleado" obtiene los festivos y las vacaciones de un empleado en concreto y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :return: un objeto "JsonResponse" que contiene los datos de los festivos y las vacaciones en formato json
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
 
@@ -2124,6 +2814,11 @@ def datosFestivosVacacionesEmpleado(request):
 
 @login_required
 def vacacionesSolicitadas(request):
+    '''
+    La funcion "vacacionesSolicitadas" obtiene las vacaciones solicitadas por un empleado en concreto y las muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "vacaciones-solicitadas.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
 
@@ -2146,6 +2841,11 @@ def vacacionesSolicitadas(request):
 
 @login_required
 def datosVacacionesSolicitadas(request, year=None):
+    '''
+    La funcion "datosVacacionesSolicitadas" obtiene las vacaciones solicitadas por un empleado en concreto y las muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :return: un objeto "JsonResponse" que contiene los datos de las vacaciones en formato json
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     if year == None:
@@ -2162,6 +2862,11 @@ def datosVacacionesSolicitadas(request, year=None):
     return JsonResponse(list(vacaciones),safe=False)
 
 def datosCambioVacacionesSolicitadas(request, year=None):
+    '''
+    La funcion "datosCambioVacacionesSolicitadas" obtiene los cambios de vacaciones solicitados por un empleado en concreto y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :return: un objeto "JsonResponse" que contiene los datos de los cambios de vacaciones en formato json
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     if year == None:
@@ -2182,6 +2887,11 @@ def datosCambioVacacionesSolicitadas(request, year=None):
 
 @login_required
 def datosCalendarioVacacionesSolicitadas(request):
+    '''
+    La funcion "datosCalendarioVacacionesSolicitadas" obtiene las vacaciones solicitadas por un empleado en concreto y las muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :return: un objeto "JsonResponse" que contiene los datos de las vacaciones en formato json
+    '''
     # obtengo los festivos registrados en la base de datos
     festivos = FestivosTimetrackPro.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
 
@@ -2231,6 +2941,13 @@ Devuelve un listado festivos para ese año y mes concretros
 -------------------------------------------'''
 @login_required
 def calendarioFestivos(request, mes=None, year=None):
+    '''
+    La funcion "calendarioFestivos" obtiene los festivos registrados en la base de datos y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param mes: El parametro "mes" es el mes del que se quieren obtener los festivos
+    :param year: El parametro "year" es el año del que se quieren obtener los festivos
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "calendarioFestivos.html" con los datos necesarios para la vista
+    '''
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     administrador = esAdministrador(request.user.id)
     # current_url = request.path[1:]
@@ -2279,6 +2996,11 @@ def calendarioFestivos(request, mes=None, year=None):
 
 @login_required
 def agregarFestivo(request):
+    '''
+    La funcion "agregarFestivo" permite agregar un festivo en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "festivos.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST':
         nombre = request.POST.get("nombre_festividad")
@@ -2301,6 +3023,11 @@ def agregarFestivo(request):
     return redirect('timetrackpro:festivos-year', year=datetime.now().year)
 
 def agregarFestivoCalendario(request):
+    '''
+    La funcion "agregarFestivoCalendario" permite agregar un festivo en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion,el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "festivos.html" con los datos necesarios para la vista
+    '''
     if request.method == 'POST':
         nombre = request.POST.get("nombre_festividad_seleccionada")
         idTipo = request.POST.get("tipo_festividad_seleccionada")
@@ -2318,6 +3045,13 @@ def agregarFestivoCalendario(request):
 
 @login_required
 def editarFestivo(request, id):
+    '''
+    La funcion "editarFestivo" permite editar los datos de un festivo en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion,el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del festivo que se desea editar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "editarFestivo.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     festivo = FestivosTimetrackPro.objects.using("timetrackpro").filter(id=id)[0]
@@ -2349,6 +3083,12 @@ def editarFestivo(request, id):
 
 @login_required
 def eliminarFestivo(request, id):
+    '''
+    La funcion "eliminarFestivo" permite eliminar un festivo en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticionel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del festivo que se desea eliminar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "eliminarFestivo.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     # current_url = request.path[1:]
@@ -2370,63 +3110,16 @@ def eliminarFestivo(request, id):
     }
     return render(request,"eliminarFestivo.html",{})
 
-@login_required
-def erroresRegistro(request, mes=None):
-    administrador = esAdministrador(request.user.id)
-    festivos = None
-    tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
-    if mes == None:
-        festivos = FestivosTimetrackPro.objects.using("timetrackpro").order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
-    else:
-        festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=mes).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
-    # current_url = request.path[1:]
-    
-    infoVista = {
-        "navBar":navBar,
-        "administrador":administrador,
-        "festivos":list(festivos),
-        "mes":mes, 
-        "tipoFestivos":list(tipoFestivos)
-    }
-    return render(request,"festivos.html",infoVista)
-
-
-'''-------------------------------------------
-                                Módulo: erroresRegistroEmpleado
-
-- Descripción: 
-Permite visualizar a los empleados que han tenido algún error en el registro de su jornada laboral.
-
-- Precondiciones:
-El usuario debe estar autenticado.
-Puede filtrar por año, mes y empleado.
-
-- Postcondiciones:
-Devuelve un listado de errores de registro de jornada laboral en función del filtro que se ha introducido por la url.
-
--------------------------------------------'''
-def erroresRegistroEmpleado(request, idEmpleado, year=None, mes=None):
-    id = idEmpleado
-    festivos = None
-    tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
-    if mes == None:
-        festivos = FestivosTimetrackPro.objects.using("timetrackpro").order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
-    else:
-        festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=mes).order_by('-fecha_inicio').values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
-    # current_url = request.path[1:]
-    
-    infoVista = {
-        "navBar":navBar,
-        "administrador":True,
-        "festivos":list(festivos),
-        "mes":mes, 
-        "tipoFestivos":list(tipoFestivos)
-    }
-    return render(request,"festivos.html",infoVista)
 
 
 def verVacacionesSeleccionadas(request, id):
-    
+    '''
+    La funcion "verVacacionesSeleccionadas" obtiene las vacaciones seleccionadas por un empleado en concreto y las muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de las vacaciones que se desean ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verVacacionesSeleccionadas.html" con los datos necesarios para la vista
+
+    '''
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'empleado__id','fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos', 'estado__id','estado__nombre','estado')[0]
     empleado = Empleados.objects.using("timetrackpro").filter(id=vacaciones["empleado__id"])[0]
 
@@ -2452,6 +3145,12 @@ def verVacacionesSeleccionadas(request, id):
 
 @login_required
 def verVacacionesSeleccionadas(request, id):
+    '''
+    La funcion "verVacacionesSeleccionadas" obtiene las vacaciones seleccionadas por un empleado en concreto y las muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de las vacaciones que se desean ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verVacacionesSeleccionadas.html" con los datos necesarios para la vista
+    '''
     
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'empleado__id','fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos', 'estado__id','estado__nombre','estado')[0]
     empleado = Empleados.objects.using("timetrackpro").filter(id=vacaciones["empleado__id"])[0]
@@ -2478,7 +3177,12 @@ def verVacacionesSeleccionadas(request, id):
 
 @login_required
 def verCambioVacacionesSeleccionadas(request, id):
-
+    '''
+    La funcion "verCambioVacacionesSeleccionadas" obtiene los cambios de vacaciones seleccionados por un empleado en concreto y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de los cambios de vacaciones que se desean ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verCambioVacacionesSeleccionadas.html" con los datos necesarios para la vista
+    '''
     vacaciones = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id).values('id','solicitante', 'solicitante__id', 'solicitante__nombre', 'solicitante__apellidos', 'id_periodo_cambio', 'fecha_inicio_actual' , 'fecha_fin_actual', 'dias_actuales_consumidos', 'fecha_inicio_nueva', 'fecha_fin_nueva', 'dias_nuevos_consumidos','motivo_solicitud', 'estado', 'estado__id','motivo_rechazo', 'fecha_solicitud','id_periodo_cambio__tipo_vacaciones__nombre' )[0]
     empleado = Empleados.objects.using("timetrackpro").filter(id=vacaciones["solicitante__id"])[0]
 
@@ -2503,6 +3207,12 @@ def verCambioVacacionesSeleccionadas(request, id):
 
 @login_required
 def modificarVacaciones(request, id):
+    '''
+    La funcion "modificarVacaciones" permite modificar los datos de unas vacaciones en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de las vacaciones que se desean modificar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "modificarVacaciones.html" con los datos necesarios para la vista
+    '''
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
     administrador = esAdministrador(request.user.id)
     
@@ -2518,6 +3228,13 @@ def modificarVacaciones(request, id):
 
 @login_required
 def cambiarEstadoVacaciones(request, id):
+    '''
+    La funcion "cambiarEstadoVacaciones" permite cambiar el estado de unas vacaciones en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de las vacaciones que se desean modificar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verVacacionesSeleccionadas.html" con los datos necesarios para la vista
+    '''
+
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -2535,6 +3252,11 @@ def cambiarEstadoVacaciones(request, id):
     
 @login_required
 def eliminarVacaciones(request):
+    '''
+    La funcion "eliminarVacaciones" permite eliminar unas vacaciones en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion 
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitarVacaciones.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     if administrador:
         if request.method == 'POST':
@@ -2547,6 +3269,13 @@ def eliminarVacaciones(request):
 
 @login_required
 def modificarCambioVacaciones(request, id):
+    '''
+    La funcion "modificarCambioVacaciones" permite modificar los datos de un cambio de vacaciones en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del cambio de vacaciones que se desean modificar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "modificarCambioVacaciones.html" con los datos necesarios para la vista
+
+    '''
     cambioVacaciones = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
     administrador = esAdministrador(request.user.id)
     
@@ -2562,6 +3291,12 @@ def modificarCambioVacaciones(request, id):
 
 @login_required
 def cambiarEstadoCambioVacaciones(request, id):
+    '''
+    La funcion "cambiarEstadoCambioVacaciones" permite cambiar el estado de un cambio de vacaciones en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del cambio de vacaciones que se desean modificar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verCambioVacacionesSeleccionadas.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     cambioVacaciones = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
@@ -2586,6 +3321,12 @@ def cambiarEstadoCambioVacaciones(request, id):
     
 @login_required
 def eliminarCambioVacaciones(request):
+    '''
+    La funcion "eliminarCambioVacaciones" permite eliminar un cambio de vacaciones en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitarVacaciones.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     if administrador:
         if request.method == 'POST':
@@ -2599,6 +3340,11 @@ def eliminarCambioVacaciones(request):
  
 @login_required
 def modificarAsuntosPropios(request):
+    '''
+    La funcion "modificarAsuntosPropios" permite modificar los datos de un asunto propio en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "modificarAsuntosPropios.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
         id = request.POST.get("id_asunto")
@@ -2623,6 +3369,12 @@ def modificarAsuntosPropios(request):
     
 @login_required
 def cambiarEstadoAsuntosPropios(request, id=None):
+    '''
+    La funcion "cambiarEstadoAsuntosPropios" permite cambiar el estado de un asunto propio en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verAsuntosPropiosSeleccionados.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     if request.method == 'POST' and (administrador or director):
@@ -2642,6 +3394,11 @@ def cambiarEstadoAsuntosPropios(request, id=None):
 
 @login_required
 def eliminarAsuntosPropios(request, id=None):
+    '''
+    La funcion "eliminarAsuntosPropios" permite eliminar un asunto propio en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitarAsuntosPropios.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     if request.method == 'POST' and (administrador or director):
@@ -2655,6 +3412,12 @@ def eliminarAsuntosPropios(request, id=None):
 
 @login_required
 def solicitarModificarAsuntosPropios(request):
+    '''
+    La funcion "solicitarModificarAsuntosPropios" permite solicitar la modificacion de un asunto propio en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitarModificarAsuntosPropios.html" con los datos necesarios para la vista
+    '''
+
     # guardo los datos en un diccionario
     if request.method == 'POST':
         # obtenemos los datos del empleado
@@ -2690,6 +3453,7 @@ def perfil(request):
     return render(request,"profile.html",{"navBar":navBar, })
 
 def dashBoard(request):
+
     infoVista = {
         "navBar":navBar,
         "administrador":esAdministrador(request.user.id),
@@ -2725,6 +3489,12 @@ def signUp(request):
 
 @login_required
 def datosListaPermisos(request, year=None):
+    '''
+    La funcion "datosListaPermisos" obtiene los datos de los permisos de vacaciones de un año en concreto y los devuelve en formato json.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los permisos de vacaciones
+    :return: un objeto "JsonResponse" que contiene los datos de los permisos de vacaciones en formato json
+    '''
     # obtengo los datos necesarios para la vista
     if year == None:
         year = datetime.now().year
@@ -2735,6 +3505,12 @@ def datosListaPermisos(request, year=None):
 
 @login_required
 def listaPermisos(request, year=None):
+    '''
+    La funcion "listaPermisos" obtiene los permisos de vacaciones de un año en concreto y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los permisos de vacaciones
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "permisos.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     if year == None:
         year = datetime.now().year
@@ -2752,6 +3528,13 @@ def listaPermisos(request, year=None):
 
 @login_required
 def agregarPermiso(request, year=None):
+    '''
+    La funcion "agregarPermiso" permite agregar un permiso de vacaciones a la base de datos.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los permisos de vacaciones
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "agregar-permisos.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
 
@@ -2840,6 +3623,12 @@ def agregarPermiso(request, year=None):
 
 @login_required        
 def verPermiso(request, id):
+    '''
+    La funcion "verPermiso" obtiene los datos de un permiso de vacaciones en concreto y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del permiso de vacaciones que se desean ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verPermiso.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     permiso = PermisosVacaciones.objects.using("timetrackpro").filter(id=id)[0]
     # guardo los datos en un diccionario
@@ -2853,6 +3642,11 @@ def verPermiso(request, id):
 
 
 def editarPermiso(request):
+    '''
+    La funcion "editarPermiso" permite editar los datos de un permiso de vacaciones en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "editarPermiso.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
         id = request.POST.get("id_permiso")
@@ -2926,6 +3720,11 @@ def editarPermiso(request):
 
 @login_required
 def eliminarPermiso(request):
+    '''
+    La funcion "eliminarPermiso" permite eliminar un permiso de vacaciones en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "permisos.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
         id = request.POST.get("id_permiso_eliminar")
@@ -2945,6 +3744,11 @@ def eliminarPermiso(request):
 -------------------------------------------'''
 @login_required
 def datosListaPermisosRetribuidos(request):
+    '''
+    La funcion "datosListaPermisosRetribuidos" obtiene los datos de los permisos retribuidos de vacaciones y los devuelve en formato json.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "JsonResponse" que contiene los datos de los permisos retribuidos de vacaciones en formato json
+    '''
     # obtengo los datos necesarios para la vista
     permisos = PermisosRetribuidos.objects.using("timetrackpro").values('id', 'cod_uex', 'nombre', 'tipo__id', 'tipo__nombre', 'dias', 'habiles_o_naturales', 'solicitud_dias_naturales_antelacion', 'pas', 'pdi')
 
@@ -2953,6 +3757,11 @@ def datosListaPermisosRetribuidos(request):
 
 @login_required
 def listaPermisosRetribuidos(request):
+    '''
+    La funcion "listaPermisosRetribuidos" obtiene los permisos retribuidos de vacaciones y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "permisos-retribuidos.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     infoVista = {
         "navBar":navBar,
@@ -2964,6 +3773,13 @@ def listaPermisosRetribuidos(request):
 
 @login_required
 def agregarPermisoRetribuido(request, year=None):
+    '''
+    La funcion "agregarPermisoRetribuido" permite agregar un permiso retribuido a la base de datos.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los permisos retribuidos de vacaciones
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "agregar-permisos-retribuidos.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     if administrador or director:
@@ -3008,6 +3824,12 @@ def agregarPermisoRetribuido(request, year=None):
    
 @login_required
 def verPermisoRetribuido(request, id):
+    '''
+    La funcion "verPermisoRetribuido" obtiene los datos de un permiso retribuido en concreto y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del permiso retribuido que se desean ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-permiso-retribuido.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     permiso = PermisosRetribuidos.objects.using("timetrackpro").filter(id=id)[0]
@@ -3025,6 +3847,12 @@ def verPermisoRetribuido(request, id):
 
 @login_required
 def eliminarPermisoRetribuido(request):
+    '''
+    La funcion "eliminarPermisoRetribuido" permite eliminar un permiso retribuido en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "permisos-retribuidos.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
         id = request.POST.get("id_permiso_eliminar")
@@ -3044,6 +3872,11 @@ def eliminarPermisoRetribuido(request):
 
 @login_required
 def editarPermisoRetribuido(request):
+    '''
+    La funcion "editarPermisoRetribuido" permite editar los datos de un permiso retribuido en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "editarPermisoRetribuido.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     
     if request.method == 'POST' and administrador:
@@ -3093,6 +3926,11 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 @login_required
 def insertarRegistroManualMensual(request):
+    '''
+    La funcion "insertarRegistroManualMensual" permite agregar un registro manual de la jornada laboral de un empleado a la base de datos.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "insertar-registro-mensual.html" con los datos necesarios para la vista
+    '''
     festivos = FestivosTimetrackPro.objects.using("timetrackpro").values()
     administrador = esAdministrador(request.user.id)
     # guardo los datos en un diccionario
@@ -3106,6 +3944,12 @@ def insertarRegistroManualMensual(request):
 
 @login_required
 def solicitarAsuntosPropios(request, year=None):
+    '''
+    La funcion "solicitarAsuntosPropios" permite solicitar un asunto propio a la base de datos.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los asuntos propios
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitar-asuntos-propios.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
@@ -3189,6 +4033,12 @@ def solicitarAsuntosPropios(request, year=None):
 
 @login_required
 def solicitarPermisosRetribuidos(request, year=None):
+    '''
+    La funcion "solicitarPermisosRetribuidos" permite solicitar un permiso retribuido a la base de datos.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los permisos retribuidos
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitar-permisos-retribuidos.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
@@ -3261,6 +4111,12 @@ def solicitarPermisosRetribuidos(request, year=None):
 
 @login_required
 def solicitarPermisoRetribuidoCalendario(request, year=None):
+    '''
+    La funcion "solicitarPermisoRetribuidoCalendario" permite solicitar un permiso retribuido a la base de datos desde el calendario de la vista "solicitar-permisos-retribuidos.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los permisos retribuidos
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitar-permisos-retribuidos.html" con los datos necesarios para la vista
+    '''
     if request.method == 'POST':
         permisos = PermisosYAusenciasSolicitados.objects.using("timetrackpro").values()
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
@@ -3289,6 +4145,13 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
 
 @login_required
 def datosAsuntosPropiosEmpleados(request, year=None):
+    '''
+    La funcion "datosAsuntosPropiosEmpleados" obtiene los datos de los asuntos propios de los empleados y los devuelve en formato json.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los asuntos propios
+    :return: un objeto "JsonResponse" que contiene los datos de los asuntos propios de los empleados en formato json
+    '''
+
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     idUser = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
@@ -3307,6 +4170,12 @@ def datosAsuntosPropiosEmpleados(request, year=None):
 
 @login_required
 def datosAsuntosPropiosSolicitados(request, year=None):
+    '''
+    La funcion "datosAsuntosPropiosSolicitados" obtiene los datos de los asuntos propios solicitados por un empleado en concreto y los devuelve en formato json.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los asuntos propios
+    :return: un objeto "JsonResponse" que contiene los datos de los asuntos propios solicitados por un empleado en concreto en formato json
+    '''
     user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
     empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
     diasSolicitados = []
@@ -3318,6 +4187,12 @@ def datosAsuntosPropiosSolicitados(request, year=None):
 
 @login_required   
 def datosPermisosRetribuidosEmpleados(request, year=None):
+    '''
+    La funcion "datosPermisosRetribuidosEmpleados" obtiene los datos de los permisos retribuidos de vacaciones de los empleados y los devuelve en formato json.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los permisos retribuidos de vacaciones
+    :return: un objeto "JsonResponse" que contiene los datos de los permisos retribuidos de vacaciones de los empleados en formato json
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     permisosEmpleados = []
@@ -3330,6 +4205,12 @@ def datosPermisosRetribuidosEmpleados(request, year=None):
 
 @login_required
 def datosPermisosRetribuidosSolicitados(request, year=None):
+    '''
+    La funcion "datosPermisosRetribuidosSolicitados" obtiene los datos de los permisos retribuidos de vacaciones solicitados por un empleado en concreto y los devuelve en formato json.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los permisos retribuidos de vacaciones
+    :return: un objeto "JsonResponse" que contiene los datos de los permisos retribuidos de vacaciones solicitados por un empleado en concreto en formato json
+    '''
     user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
     empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
     permisosSolicitados = []
@@ -3342,6 +4223,12 @@ def datosPermisosRetribuidosSolicitados(request, year=None):
 
 @login_required
 def verSolicitudPermisosRetribuidos(request, id=None):
+    '''
+    La funcion "verSolicitudPermisosRetribuidos" obtiene los datos de un permiso retribuido en concreto y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del permiso retribuido que se desean ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-solicitud-permisos-retribuidos.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     if not request.POST:
@@ -3379,6 +4266,12 @@ def verSolicitudPermisosRetribuidos(request, id=None):
 
 @login_required
 def cambiarEstadoSolicitudPermisoRetribuido(request, id=None):
+    '''
+    La funcion "cambiarEstadoSolicitudPermisoRetribuido" permite cambiar el estado de un permiso retribuido en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del permiso retribuido que se desean cambiar el estado
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-solicitud-permisos-retribuidos.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     if request.method == 'POST' and (administrador or director):
@@ -3399,6 +4292,12 @@ def cambiarEstadoSolicitudPermisoRetribuido(request, id=None):
 
 @login_required
 def eliminarSolicitudPermisoRetribuido(request, id=None):
+    '''
+    La funcion "eliminarSolicitudPermisoRetribuido" permite eliminar un permiso retribuido en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del permiso retribuido que se desean eliminar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitar-permisos-retribuidos.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
         if id == None:
@@ -3414,6 +4313,12 @@ def eliminarSolicitudPermisoRetribuido(request, id=None):
 
 @login_required
 def justicarSolicitudPermisosRetribuidos(request, id=None):
+    '''
+    La funcion "justicarSolicitudPermisosRetribuidos" permite justificar un permiso retribuido en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del permiso retribuido que se desean justificar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-solicitud-permisos-retribuidos.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     # obtengo los datos necesarios para la vista    
@@ -3443,6 +4348,13 @@ def justicarSolicitudPermisosRetribuidos(request, id=None):
 
 @login_required
 def descargarSolicitudPermisosRetribuidos(request, id):
+    '''
+    La funcion "descargarSolicitudPermisosRetribuidos" permite descargar el justificante de un permiso retribuido en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del permiso retribuido del que se desean descargar el justificante
+    :return: un objeto "FileResponse" que contiene el justificante del permiso retribuido en concreto
+    '''
+
     permiso = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]
         
     administrador = esAdministrador(request.user.id)
@@ -3458,6 +4370,13 @@ def descargarSolicitudPermisosRetribuidos(request, id):
 
 @login_required
 def actualizarJustificanteSolicitudPermisosRetribuidos(request, id):
+    '''
+    La funcion "actualizarJustificanteSolicitudPermisosRetribuidos" permite actualizar el justificante de un permiso retribuido en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del permiso retribuido del que se desean actualizar el justificante
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-solicitud-permisos-retribuidos.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     direccion = esDirector(request.user.id)
     if administrador or direccion:
@@ -3484,6 +4403,11 @@ def actualizarJustificanteSolicitudPermisosRetribuidos(request, id):
 
 @login_required
 def modificarSolicitudPermisoRetribuido(request):
+    '''
+    La funcion "modificarSolicitudPermisoRetribuido" permite modificar un permiso retribuido en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-solicitud-permisos-retribuidos.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     
     if administrador:
@@ -3507,6 +4431,11 @@ def modificarSolicitudPermisoRetribuido(request):
 
 @login_required
 def solicitarVacaciones(request):
+    '''
+    La funcion "solicitarVacaciones" permite solicitar vacaciones a la base de datos desde la vista "solicitar-vacaciones.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitar-vacaciones.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     estados = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1).values()
     periodosVacaciones = TipoVacaciones.objects.using("timetrackpro").values()
@@ -3585,6 +4514,11 @@ def solicitarVacaciones(request):
 
 @login_required
 def solicitarModificarVacaciones(request):
+    '''
+    La funcion "solicitarModificarVacaciones" permite solicitar modificar un periodo de vacaciones a la base de datos desde la vista "solicitar-vacaciones.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitar-vacaciones.html" con los datos necesarios para la vista
+    '''
     # guardo los datos en un diccionario
     if request.method == 'POST':
         # obtenemos los datos del empleado
@@ -3612,6 +4546,11 @@ def solicitarModificarVacaciones(request):
 
 @login_required
 def solicitudes(request):
+    '''
+    La funcion "solicitudes" permite mostrar las solicitudes de vacaciones, asuntos propios y permisos retribuidos de un empleado en concreto en la vista "solicitudes.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitudes.html" con los datos necesarios para la vista
+    '''
     # guardo los datos en un diccionario
     infoVista = {
         "navBar":navBar,
@@ -3624,6 +4563,12 @@ def solicitudes(request):
 
 @login_required
 def verSolicitudAsuntosPropios(request, id=None):
+    '''
+    La funcion "verSolicitudAsuntosPropios" obtiene los datos de un asunto propio en concreto y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del asunto propio que se desean ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-solicitud-asuntos-propios.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     if id is not None:
         solicitud = AsuntosPropios.objects.using("timetrackpro").filter(id=id)[0]    
@@ -3653,6 +4598,13 @@ def verSolicitudAsuntosPropios(request, id=None):
 
 @login_required
 def datosCalendarioAsuntosPropios(request, year=None):
+    '''
+    La funcion "datosCalendarioAsuntosPropios" obtiene los datos de los asuntos propios de un empleado en concreto y los devuelve en formato json.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los asuntos propios
+    :return: un objeto "JsonResponse" que contiene los datos de los asuntos propios de un empleado en concreto en formato json
+    '''
+
     admin = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     # obtengo los festivos registrados en la base de datos
@@ -3715,6 +4667,12 @@ def datosCalendarioAsuntosPropios(request, year=None):
 
 @login_required
 def agregarAsuntosPropiosCalendario(request):
+    '''
+    La funcion "agregarAsuntosPropiosCalendario" permite agregar un asunto propio a la base de datos desde la vista "solicitar-asuntos-propios.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitar-asuntos-propios.html" con los datos necesarios para la vista
+    '''
+
     if request.method == 'POST':
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
@@ -3754,6 +4712,12 @@ def agregarAsuntosPropiosCalendario(request):
 
 
 def notificarIncidencias(request):
+    '''
+    La funcion "notificarIncidencias" permite notificar una incidencia a la base de datos desde la vista "notificar-incidencias.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "notificar-incidencias.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     # guardo los datos en un diccionario
     infoVista = {
@@ -3781,7 +4745,11 @@ def notificarIncidencias(request):
 
 @login_required
 def notificarProblemas(request):
-    
+    '''
+    La funcion "notificarProblemas" permite notificar un problema a la base de datos desde la vista "notificar-problemas.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "notificar-problemas.html" con los datos necesarios para la vista
+    '''    
     administrador = esAdministrador(request.user.id)
     # guardo los datos en un diccionario
     infoVista = {
@@ -3795,7 +4763,12 @@ def notificarProblemas(request):
 
 
 @login_required
-def notificarDatosErroneos(request):    
+def notificarDatosErroneos(request):  
+    '''
+    La funcion "notificarDatosErroneos" permite notificar datos erroneos a la base de datos desde la vista "notificar-incidencias.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "notificar-incidencias.html" con los datos necesarios para la vista
+    '''  
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
     administrador = esAdministrador(request.user.id)
     # guardo los datos en un diccionario
@@ -3825,7 +4798,11 @@ def notificarDatosErroneos(request):
 
 @login_required
 def notificarErroresApp(request):
-    
+    '''
+    La funcion "notificarErroresApp" permite notificar errores en la aplicación a la base de datos desde la vista "notificar-incidencias.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "notificar-incidencias.html" con los datos necesarios para la vista
+    '''    
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
     administrador = esAdministrador(request.user.id)
     # guardo los datos en un diccionario
@@ -3855,6 +4832,11 @@ def notificarErroresApp(request):
 
 @login_required
 def problemasNotificados(request):
+    '''
+    La funcion "problemasNotificados" permite mostrar los problemas notificados por los empleados en la vista "problemas-notificados.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "problemas-notificados.html" con los datos necesarios para la vista
+    '''
     infoVista = {
         "navBar":navBar,
         "administrador":esAdministrador(request.user.id),
@@ -3866,8 +4848,13 @@ def problemasNotificados(request):
 
 @login_required   
 def datosProblemasNotificados(request, tipo=None, estado=None):
-    print('\033[91m'+'estado: ' + '\033[92m', estado)
-    print('\033[91m'+'tipo: ' + '\033[92m', tipo)
+    '''
+    La funcion "datosProblemasNotificados" obtiene los datos de los problemas notificados por los empleados y los devuelve en formato json.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param tipo: El parametro "tipo" es el tipo de problema que se desea obtener
+    :param estado: El parametro "estado" es el estado del problema que se desea obtener
+    :return: un objeto "JsonResponse" que contiene los datos de los problemas notificados por los empleados en formato json
+    '''
     if tipo is None or tipo == "Todos":
         tipo = ["1", "2"]
     if estado is None or estado == "0":
@@ -3880,6 +4867,13 @@ def datosProblemasNotificados(request, tipo=None, estado=None):
 
 @login_required
 def verIncidencia(request, id):
+    '''
+    La funcion "verIncidencia" obtiene los datos de una incidencia en concreto y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de la incidencia que se desean ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-incidencia.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     incidencia = ProblemasDetectadosTimeTrackPro.objects.using("timetrackpro").filter(id=id)[0]
     infoVista = {
@@ -3895,6 +4889,13 @@ def verIncidencia(request, id):
 
 @login_required
 def cambiarEstadoIncidencia(request, id):
+    '''
+    La funcion "cambiarEstadoIncidencia" permite cambiar el estado de una incidencia en concreto en la base de datos desde la vista "ver-incidencia.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de la incidencia que se desean ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-incidencia.html" con los datos necesarios para la vista
+    '''
+
     administrador = esAdministrador(request.user.id)
     if administrador:
         if request.method == 'POST':
@@ -3913,6 +4914,12 @@ def cambiarEstadoIncidencia(request, id):
 
 @login_required
 def eliminarIncidencia(request, id):
+    '''
+    La funcion "eliminarIncidencia" permite eliminar una incidencia en concreto de la base de datos desde la vista "ver-incidencia.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de la incidencia que se desean ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-incidencia.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
         incidencia = ProblemasDetectadosTimeTrackPro.objects.using("timetrackpro").filter(id=id)[0]
@@ -3922,7 +4929,11 @@ def eliminarIncidencia(request, id):
 
 @login_required
 def jornadas(request):
-
+    '''
+    La funcion "jornadas" permite mostrar las jornadas de los empleados en la vista "jornadas-empleados.html".
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "jornadas-empleados.html" con los datos necesarios para la vista
+    '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
 
@@ -3948,6 +4959,12 @@ def jornadas(request):
 
 @login_required
 def datosJornadas(request):
+    '''
+    La funcion "datosJornadas" obtiene los datos de las jornadas de los empleados y los devuelve en formato json.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :return: un objeto "JsonResponse" que contiene los datos de las jornadas de los empleados en formato json
+    '''
+
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     jornadas=[]
@@ -3969,19 +4986,15 @@ def datosJornadas(request):
         return JsonResponse(list(jornadas), safe=False)
     else:
         return redirect('timetrackpro:ups', mensaje="No tiene permisos para ver esta página")
-'''-------------------------------------------
-                                Módulo: subirDocumento
-
-- Descripción: 
 
 
-- Precondiciones:
-El usuario debe estar autenticado.
-
-- Postcondiciones:
-
--------------------------------------------'''
 def subirDocumento(f, destino):
+    '''
+    La funcion "subirDocumento" permite subir un documento a la base de datos desde la vista "subir-documento.html".
+    :param f: El parametro "f" es el documento que se desea subir
+    :param destino: El parametro "destino" es el destino donde se desea guardar el documento
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "subir-documento.html" con los datos necesarios para la vista
+    '''
     with open(destino, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)

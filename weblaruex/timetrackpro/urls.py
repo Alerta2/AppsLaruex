@@ -66,6 +66,8 @@ urlpatterns = [
     path('private/timetrackpro/editar-empleado/<slug:id>/', editarEmpleado , name='editar-empleado'),
 
     # información de los usuarios del sistema
+    path('private/timetrackpro/relaciones-empleados/', relacionesEmpleados , name='relaciones-empleados'),
+    path('private/timetrackpro/datos-relaciones-empleados/', datosRelacionesEmpleados , name='datos-relaciones-empleados'),
     path('private/timetrackpro/asociar-usuario/', asociarUsuario , name='asociar-usuario'),
     path('private/timetrackpro/editar-asociar-usuario/<slug:id>/', editarAsociarUsuario , name='editar-asociar-usuario'),
 
@@ -88,11 +90,7 @@ urlpatterns = [
     path('private/timetrackpro/agregar-festivo-desde-calendario/', agregarFestivoCalendario , name='agregar-festivo-desde-calendario'),
     path('private/timetrackpro/agregar-festivo/<slug:id>/', editarFestivo , name='editar-festivo'),
     path('private/timetrackpro/agregar-festivo/<slug:id>/', eliminarFestivo , name='eliminar-festivo'),
-
-    # información relacionada con los empleados
-    path('private/timetrackpro/errores-en-registros/<slug:mes>/', erroresRegistro , name='errores-en-registros'),
-    path('private/timetrackpro/errores-en-registros/<slug:idEmpleado>/<slug:year>/<slug:mes>/', erroresRegistroEmpleado , name='errores-en-registros-empleado'),
-
+    
     #Permisos
     path('private/timetrackpro/lista-permisos/', listaPermisos , name='lista-permisos'),
     path('private/timetrackpro/lista-permisos/<slug:year>/', listaPermisos , name='lista-permisos'),
@@ -171,7 +169,6 @@ urlpatterns = [
     path('private/timetrackpro/editar-permiso-retribuido/', editarPermisoRetribuido , name='editar-permiso-retribuido'),
     path('private/timetrackpro/eliminar-permiso-retribuido/', eliminarPermisoRetribuido , name='eliminar-permiso-retribuido'),
 
-    
     #Solicitud de permisos retribuidos 
     path('private/timetrackpro/solicitar-permisos-retribuidos/', solicitarPermisosRetribuidos , name='solicitar-permisos-retribuidos'),
     path('private/timetrackpro/solicitar-permisos-retribuidos/<slug:year>/', solicitarPermisosRetribuidos , name='solicitar-permisos-retribuidos'),
@@ -211,6 +208,5 @@ urlpatterns = [
     path('private/timetrackpro/datos-jornadas/', datosJornadas , name='datos-jornadas'),
     path('private/timetrackpro/eliminar-jornada/<slug:id>/', eliminarJornada , name='eliminar-jornada'),
     path('private/timetrackpro/editar-jornada/<slug:id>/', editarJornada , name='editar-jornada'),
-
 
 ]
