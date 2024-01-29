@@ -1,0 +1,283 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+
+
+<div class="row">
+  <div class="col-lg-12">
+    {% if administrador %}
+    <div class="pb-0  d-flex justify-content-start " style="background-color: transparent;">
+      <div class="row">
+        <div class="col">
+          <button class="botonLink" data-toggle="modal" data-target="#modalAgregarFestivo">
+            <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+            <div class="text text-xs">Agregar festivo</div>
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row my-3">
+  <div class="col-lg-4 col-md-4 mb-md-0 mb-4">
+    <div class="card">
+      <div class="card-header pb-0 mb-0">
+        <h5>Información de interes  <i class="fa-duotone fa-comment-exclamation fa-fade text-danger" style="--fa-animation-duration: 2s;"></i></h5>
+      </div>
+      <div class="card-body pb-0 mb-0">
+          <p class="text-center text-md">
+            Durante el periodo de vacaciones fijado por la Uex, en el LARUEX estará la persona de guardia, el
+            informático de guardia y el técnico de laboratorio de apoyo de guardia.
+            <a class="btn btn-outline-primary btn-md mb-0 me-3 mt-4" target="_blank" href="{% url 'timetrackpro:calendario-festivos' %}"><i class="fa-solid fa-calendar me-sm-1"></i>Ver festivos desde calendario
+            </a>
+          </p>
+          
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-8 col-md-8 mb-md-0">
+    <div class="card">
+      <div class="card-header pb-0">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="d-flex justify-content-start">
+              <h5>Calendario Vaciones LARUEX
+              </h5><a class="ms-2" data-bs-toggle="información sobre leyendas de color" data-bs-placement="bottom"
+                title="Información sobre las leyendas de color de los festivos" data-toggle="modal" data-target="#modalInfoLeyenda">
+                <i class="fa-solid fa-info fa-lg btn bg-gradient-leyenda"></i>
+              </a>
+
+            </div>
+            {% if year %}
+            <p class="text-md mb-0">
+              <i class="fa-duotone fa-calendar-days text-info" aria-hidden="true"></i>
+              <span class="font-weight-bold ms-1">Año {{year}}</span>
+            </p>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+      {% if festivos %}
+      <div class="card-body px-0 pb-2">
+        <div class="table-responsive ms-3 me-3">
+          <table class="table align-items-center mb-0 ">
+            <thead>
+              <tr>
+                <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">Fecha</th>
+                <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2">Festividad</th>
+                <th class="text-uppercase text-secondary text-sm font-weight-bolder opacity-7 ps-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for festivo in festivos %}
+              <tr>
+                <td>
+                  {% if festivo.fecha_inicio == festivo.fecha_fin %}
+                  <div>
+                    <span class="text-md font-weight-bold">{{festivo.fecha_inicio|date:"d"}}
+                      {{festivo.fecha_inicio|date:"N"}}</span>
+                  </div>
+                  {% else %}
+
+                  <div>
+                    <span class="text-md font-weight-bold">{{festivo.fecha_inicio|date:"d"}} </span>
+                    <span class="text-md font-weight-bold">-</span>
+                    <span class="text-md font-weight-bold">{{festivo.fecha_fin|date:"d"}} 
+                      {{festivo.fecha_fin|date:"N"}}</span>
+                  </div>
+                  {% endif %}
+                </td>
+                <td>
+                      <div class="d-flex justify-content-start">
+                        <i class="fa-solid fa-party-horn fa-lg me-3 {{festivo.tipo_festividad__color}}"></i>
+                        <h6 class="mb-0 text-md">{{festivo.nombre}}</h6>
+                      </div>
+                </td>
+                <td>
+                  
+                  <div class="dropdown">
+                    <a class="cursor-pointer" id="opcionesFestivos" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="fa fa-ellipsis-v text-secondary"></i>
+                    </a>
+                    <ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="opcionesFestivos">
+                      <li><a class="dropdown-item border-radius-md" href="{% url 'timetrackpro:solicitudes' %}">Editar Festivo</a></li>
+                      <li><a class="dropdown-item border-radius-md" href="javascript:;">Eliminar Festivo</a></li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% else %}
+      <div class="card-body">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="d-flex justify-content-center">
+              <h5>No hay festivos registrados</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<div id="modalInfoLeyenda" class="modal fade modal-sm" tabindex="-1" role="dialog" aria-labelledby="modalInfoLeyenda"
+  aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Leyenda de colores</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% for tipo in tipoFestivos %}
+        <p class="text-xl">
+          <i class="fa-solid fa-party-horn {{tipo.color}}" aria-hidden="true"></i>
+          <span class="font-weight-bold ms-1">{{tipo.nombre}}</span>
+        </p>
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalAgregarFestivo" tabindex="-1" role="dialog" class="modal fade modal-lg"
+  aria-labelledby="modalAgregarFestivo" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    
+    <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:agregar-festivo' %}" method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Agregar festivo</h5>
+            <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row d-flex justify-content-center" id="rowMultiple">
+              <div class="col-xl-6" id="colMultiple">
+                <label>¿La festividad abarca varios días?</label>
+                <select class="form-control" aria-label="Nombre en el dispositivo" id="varios_dias"
+                  aria-describedby="text-addon" >
+                  <option selected hidden>Indique si o no</option>
+                  <option value="0">No</option>
+                  <option value="1">Si</option>
+                </select>
+              </div>
+            </div>
+            <div class="row" id="divFormularioFestivos" hidden>
+              <input class="form-control" type="text" id="year" name="year" hidden>
+              <div class="col-xl-6">
+                <label>Inicio</label>
+                <div class="">
+                  <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                    aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" onchange="obtenerFecha()">
+                </div>
+              </div>
+              <div class="col-xl-6" id="inputFechaFin">
+                <label>Fin</label>
+                <div class="">
+                  <input type="date" class="form-control" aria-label="Fecha final de la festividad"
+                    aria-describedby="text-addon" name="fecha_fin" id="fecha_fin">
+                </div>
+              </div>
+            </div>
+            <div class="row" id="divFormularioFestivos2" hidden>
+              <div class="col-xl-6">
+                <label>Festividad</label>
+                <input type="text" class="form-control" placeholder="Nombre de la festividad"
+                  aria-label="Nombre de la festividad" id="nombre_festividad" name="nombre_festividad"
+                  aria-describedby="text-addon">
+              </div>
+              <div class="col-xl-6">
+                <label>Tipo de festividad</label>
+                <select class="form-control" aria-label="Tipo de la festividad" id="tipo_festividad" name="tipo_festividad"
+                  aria-describedby="text-addon">
+                  <option selected hidden>Seleccione el tipo</option>
+                  {% for t in tipoFestivos %}
+                  <option value="{{t.id}}">{{t.nombre}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            {% if user.is_authenticated %}
+            <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+            {% endif %}
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          </div>
+      </div>
+    
+    </form>
+  </div>
+</div>
+
+<script>
+
+  function mostrarFormularioOculto() {
+    // get value of selected  element in select box
+    
+  }
+
+
+  document.getElementById("varios_dias").addEventListener(
+  "change",
+  () => {
+    var festivoMultiple = document.getElementById("varios_dias").value;
+    var divFestivo = document.getElementById("divFormularioFestivos");
+    var divFestivo2 = document.getElementById("divFormularioFestivos2");
+    let colMultiple = document.getElementById("colMultiple");
+    let rowMultiple = document.getElementById("rowMultiple");
+    var inputFechaFin = document.getElementById("inputFechaFin");
+
+    // se muestra el div con el formulario de festivos
+    divFestivo.removeAttribute("hidden");
+    divFestivo2.removeAttribute("hidden");
+
+    if (festivoMultiple == "0") {
+      // se oculta el input de fecha fin
+      inputFechaFin.style.display = "none";   
+    }
+     
+    colMultiple.style.display = "none"; 
+    rowMultiple.style.display = "none"; 
+  },
+  false,
+);
+
+  function obtenerFecha() {
+    var fecha = document.getElementById("fecha_inicio").value;
+    var fecha_fin = document.getElementById("fecha_fin");
+    var inputYear = document.getElementById("year");
+    var year = fecha.substring(0, 4);
+
+    fecha_fin.value = fecha;
+    inputYear.value = year;
+  }
+
+
+</script>
+
+
+{% endblock %}

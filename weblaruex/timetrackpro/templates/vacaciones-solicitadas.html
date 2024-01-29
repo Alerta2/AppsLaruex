@@ -1,0 +1,355 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+
+{% block imports %}
+
+    <!-- fullcalendar-->
+  <!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.9/index.global.min.js'></script> -->
+  <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" />
+  <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar.js' %}"></script>
+  <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar_es.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_mesual.css' %}" />
+
+
+    <!-- disponible para configuración servidor-->
+    <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
+{% endblock %}
+{% block content %}
+
+  <div class="row d-flex justify-content-center">
+    <div class="col-6">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h5>Vacaciones solicitadas</h5>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          
+          <div class="table-responsive mx-3">
+
+            <table  id="tabla_vacaciones" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-6 ">
+        <div class="d-block shadow-xl border-radius-xl">
+          <div class="row ">
+            <div class="col m-3">
+
+              <div id="calendarioMensual">
+              </div>
+            </div>
+
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalCambiarEstado" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalCambiarEstado"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modificar el estado de la solicitud</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioCambiarEstado" action="/private/timetrackpro/cambiar-estado-vacaciones/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Nuevo estado</label>
+              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
+                
+                <option value="9" {% if vacaciones.estado__id == 9 %} selected {% endif %}>Pendiente</option>
+                <option value="10" {% if vacaciones.estado__id == 10 %} selected {% endif %}>Rechazado</option>
+                <option value="11" {% if vacaciones.estado__id == 11 %} selected {% endif %}>Aceptado</option>
+              </select>
+            </div>
+            
+          </div>
+          <div class="row" id="rowMotivo" >
+            <div class="col-xl-8 mx-auto my-2"  >
+              <label class="text-sm" id="labelMotivo">Motivo del cambio de estado </label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el error" aria-label="Indique el motivo por el que se ha modificado el error" id="motivo" name="motivo" aria-describedby="text-addon"></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonModificar" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+  <script>
+      
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarDiv = document.getElementById('calendarioMensual');
+    var initialDate = '{{initialDate}}';
+    var calendar = new FullCalendar.Calendar(calendarDiv, {
+      initialDate: initialDate, // will be parsed as local
+      themeSystem: 'bootstrap5',
+      events: "{% url 'timetrackpro:datos-calendario-vacaciones-solicitadas' %}",
+      //eventColor: '#20c997', // color de los eventos
+      height: 650, // indico el maximo de alto que puede tener el calendario
+      locale: 'es', // el idioma del calendario
+      handleWindowResize: true, // si se puede redimensionar el calendario
+      initialView: 'dayGridMonth', // la vista inicial del calendario
+      buttonText: { // los textos de los botones
+        today: 'Hoy',
+        month: 'Mes',
+        day: 'Día',
+      }, 
+      headerToolbar: { // la barra superior donde se encuentra el titulo y los botones
+        left: 'prev,next',
+        center: 'title',
+        right:'today',
+      },
+      // Esta función se ejecutará cuando se haga clic en un día en el calendario         
+      dateClick: function(info) {
+        // se obtiene la fecha seleccionada
+        const meses = {
+            "01": "Enero",
+            "02": "Febrero",
+            "03": "Marzo",
+            "04": "Abril",
+            "05": "Mayo",
+            "06": "Junio",
+            "07": "Julio",
+            "08": "Agosto",
+            "09": "Septiembre",
+            "10": "Octubre",
+            "11": "Noviembre",
+            "12": "Diciembre",
+          };
+        // se obtiene la fecha seleccionada
+        var dia = info.dateStr.substring(8, 10);
+        dia = dia.replace(/^0+/, '');
+        var mes = meses[info.dateStr.substring(5, 7)];
+        var year = info.dateStr.substring(0, 4);
+        
+        // se muestra el modal para agregar el festivo
+        var label = document.getElementById("tituloModalAgregarDesdeCalendario");
+        label.innerHTML = "Agregar festivo el día " + dia + " de " + mes + " del " + year;
+
+        // se obtiene el año actual
+        var yearActual = document.getElementById("year_actual");
+        yearActual.value = year;
+
+        var fechaInicio = document.getElementById("fecha_inicio_seleccionada");
+        fechaInicio.value = info.dateStr;
+        // modifico el index del calendario
+       // se muestra el modal
+        $('#modalAgregarFestivoDesdeCalendario').modal('show');
+      
+        },
+    });
+    calendar.render(); // renderizo el calendario
+    calendar.updateSize(); // actualizo el tamaño del calendario
+
+
+
+
+  });
+  
+
+  
+  function mostrarTextArea (){
+    if($('#estado').val() == 10){
+      
+      $('#botonModificar').attr('disabled', true);
+      $('#rowMotivo').show();
+      $('#motivo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+    }else{
+      
+      $('#botonModificar').attr('disabled', false);
+      
+      $('#rowMotivo').hide();
+    }
+  }
+
+  $("#tabla_vacaciones").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-vacaciones-solicitadas' %}",
+    cache: false, 
+
+    columns: [
+      {
+        title: "Empleado",
+        field: "empleado__nombre",
+
+        halign:"left",
+        sortable: true,
+        align: "left",
+        width:"30",
+        formatter: function(value, row) {
+          var nombreEmpleado = row.empleado__nombre;
+          var apellidos = row.empleado__apellidos;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombreEmpleado +" "+ apellidos+'</h6></div>';
+          return div;
+        }
+      },
+      {
+        title: "Inicio",
+        field: "fecha_inicio",
+        align: "center",
+        width:"40",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_inicio;
+
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },{
+        title: "Fin",
+        field: "fecha_inicio",
+        align: "center",
+        width:"40",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_fin;
+
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Fecha de solicitud",
+        field: "hora",
+        align: "center",
+        width:"40",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_solicitud;
+
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+          // obtengo la hora
+          var hora = fechaLectura.split("T")[1].split("Z")[0];
+          hora = hora.split(":")[0] + ":" + hora.split(":")[1];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha + ' '+ hora+'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Estado",
+        align: "center",
+        width:"40",
+        sortable: true,
+        field: "estado",
+        formatter: function(value, row) {
+          var estado = row.estado;
+          var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
+          
+          if (estado == 10)
+          var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+
+          if (estado == 11)
+          var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
+
+          if (estado == 12)
+            var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
+          
+          return div;
+        }
+      },
+      {
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          administrador = '{{administrador}}';
+          director = '{{director}}';
+
+          var botonVer = '<a href="/private/timetrackpro/ver-vacaciones-seleccionadas/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+
+          var botonCambiarEstado = '<a href="" title="Agregar Stock" data-toggle="modal" data-target="#modalCambiarEstado" onclick="$('+"'#formularioCambiarEstado').attr('action', '/private/timetrackpro/cambiar-estado-vacaciones/"+ row.id +"/');"+'" class="mx-1"><i class="fa-solid fa-flag"></i></a>';
+          if (administrador == "True" || director == "True" )
+            return botonVer + botonCambiarEstado;
+          else
+            return botonVer;
+                  
+
+        },
+      },
+    ],
+    search: true,
+    filterControl: true,
+
+    
+  });
+  </script>
+{% endblock %}

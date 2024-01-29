@@ -1,0 +1,352 @@
+
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+
+{% block content %}
+<div class="row d-flex justify-content-end">
+  <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-8">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Días asuntos propios restantes</p>
+              <h5 class="font-weight-bolder mb-0">
+                {{diasPropiosRestantes}}
+                {% if diasPropiosSolicitados != 0 %}
+                <span class="text-danger text-sm font-weight-bolder">-{{diasPropiosSolicitados}}</span>
+                {% endif %}
+              </h5>
+            </div>
+          </div>
+          <div class="col-4 text-end">
+            <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+              <i class="ni ni-paper-diploma text-lg opacity-10" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-8">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Días de vacaciones restantes</p>
+              <h5 class="font-weight-bolder mb-0">
+                {{diasVacacionesRestantes}}
+                {% if diasVacacionesSolicitados != 0 %}
+                <span class="text-danger text-sm font-weight-bolder">-{{diasVacacionesSolicitados}}</span>
+                {% endif %}
+              </h5>
+            </div>
+          </div>
+          <div class="col-4 text-end">
+            <div class="icon icon-shape bg-gradient-dark shadow text-center border-radius-md">
+              <i class="ni ni-cart text-lg opacity-10" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row mt-4 mx-0">
+  <div class="col-lg-4">
+    <div class="card w-90">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover  background-timetrackpro-festivos h-100">
+        <span class="mask bg-gradient-success"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Festivos</h5>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="{% url 'timetrackpro:festivos' %}">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-permisos h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Permisos Uex</h5>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="{% url 'timetrackpro:lista-permisos-retribuidos' %}">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  {% if administrador or director %}
+  <div class="col-lg-4">
+    <div class="card w-90">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-card h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Incidencias</h5>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" target="_blank" href="{% url 'timetrackpro:listado-incidencias' %}">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+<div class="row mt-5 mx-0">
+  <div class="col-lg-6">
+    <div class="card w-90">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-informe-jornada h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Informes</h5>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" data-target="#modalPanelControl" data-toggle="modal">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-errores h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Solicitudes</h5>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" data-target="#modalSolicitudes" data-toggle="modal">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% if administrador or director %}
+<div class="row mt-5 mx-0">
+  <div class="col-lg-6">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-empleados h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Empleados</h5>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" data-target="#modalAccionesEmpleados" data-toggle="modal">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card w-90 ">
+      <div class="overflow-hidden position-relative border-radius-lg bg-cover background-timetrackpro-card h-100">
+        <span class="mask bg-gradient-dark"></span>
+        <div class="card-body position-relative z-index-1 d-flex flex-column h-100">
+          <h5 class="text-white font-weight-bolder mb-4 pt-2">Tarjetas de acceso</h5>
+          <a class="text-white text-sm font-weight-bold mb-0 icon-move-right mt-auto" href="{% url 'timetrackpro:tarjetas-de-acceso' %}">
+            Acceder
+            <i class="fas fa-arrow-right text-sm ms-1" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+</div>
+{% endif %}
+
+  <div class="modal fade" id="modalAccionesEmpleados" tabindex="-1" role="dialog" aria-labelledby="modalAccionesEmpleadosTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-body p-0">
+          <div class="card card-plain mx-2">
+            <div class="card-header pb-0 text-left">
+                <h3 class="font-weight-bolder text-primary text-gradient">¿Qué quieres ver?</h3>
+                <p class="mb-0">Selecciona un opción</p>
+            </div>
+            <div class="card-body pb-3">
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100mb-0" onclick="redirigir(1)">Lista de empleados</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(2)">Lista de Empleados maquinas</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(3)">Jornadas de los empleados</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(4)">Relacion usuarios empleados</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(5)">Habilitaciones de los empleados</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalPanelControl" tabindex="-1" role="dialog" aria-labelledby="modalPanelControlTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-body p-0">
+          <div class="card card-plain mx-2">
+            <div class="card-header pb-0 text-left">
+                <h3 class="font-weight-bolder text-primary text-gradient">¿Qué quieres ver?</h3>
+                <p class="mb-0">Selecciona un opción</p>
+            </div>
+            <div class="card-body pb-3">
+              {% if administrador or director %}
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mb-0" onclick="redirigir(6)">Registros de las maquinas</button>
+                </div>
+              </div>
+              {% endif %}
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 {% if administrador or director %} mt-4 {% endif %}mb-0" onclick="redirigir(7)">Informe asistencias por días</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(8)">Informe asistencias por semanas</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(9)">Errores de asistencia notificados</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalSolicitudes" tabindex="-1" role="dialog" aria-labelledby="modalSolicitudesTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-body p-0">
+          <div class="card card-plain mx-2">
+            <div class="card-header pb-0 text-left">
+                <h3 class="font-weight-bolder text-primary text-gradient">¿Qué quieres ver?</h3>
+                <p class="mb-0">Selecciona un opción</p>
+            </div>
+            <div class="card-body pb-3">
+              {% if administrador %}
+
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mb-0" onclick="redirigir(10)">Lista de Permisos reconocidos por la Uex</button>
+                </div>
+              </div>
+              {% endif %}
+            
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(11)">Solicitudes de dias de asuntos propios</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(12)">Solicitudes de vacaciones</button>
+                </div>
+              </div>
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(13)">Solicitudes de permisos y ausencias</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function redirigir(opcion) {
+      switch (opcion) {
+      case 1:
+        // abrir en una nueva pestaña
+
+        //window.location.href = "{% url 'timetrackpro:empleados' %}";
+        window.open("{% url 'timetrackpro:empleados' %}", "_blank");
+
+        break;
+      case 2:
+        window.open("{% url 'timetrackpro:usuarios-maquina' %}", "_blank");
+
+        break;
+      case 3:
+        window.open("{% url 'timetrackpro:jornadas' %}", "_blank");
+
+        break;
+      case 4:
+        window.open("{% url 'timetrackpro:relaciones-empleados' %}", "_blank");
+        break;
+      case 5:
+        window.open("{% url 'timetrackpro:habilitaciones' %}", "_blank");
+        break;
+      case 6:
+        window.open("{% url 'timetrackpro:registros-insertados' %}", "_blank");
+        break;
+      case 7:
+        window.open("{% url 'timetrackpro:obtener-registro-empleados' %}", "_blank");
+        break;
+      case 8:
+        window.open("{% url 'timetrackpro:obtener-registro-semanal-empleados' %}", "_blank");
+        break;
+      case 9:
+        window.open("{% url 'timetrackpro:ver-errores-notificados' %}", "_blank");
+        break;
+      case 10:
+        window.open("{% url 'timetrackpro:lista-permisos-retribuidos' %}", "_blank");
+        break;
+      case 11:
+        window.open("{% url 'timetrackpro:solicitar-asuntos-propios' %}", "_blank");
+        break;
+      case 12:
+        window.open("{% url 'timetrackpro:solicitar-vacaciones' %}", "_blank");
+        break;
+      case 13:
+        window.open("{% url 'timetrackpro:solicitar-permisos-retribuidos' %}", "_blank");
+        break;
+        
+      case 'Mangoes':
+      case 'Papayas':
+        console.log('Mangoes and papayas are $2.79 a pound.');
+        // Expected output: "Mangoes and papayas are $2.79 a pound."
+        break;
+      default:
+        console.log(`Sorry, we are out of ${expr}.`);
+    }
+    }
+    </script>
+{% endblock %}
+
+

@@ -1,0 +1,224 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+  <div class="row d-flex justify-content-center">
+    <div class="col-12 col-xl-4 d-flex align-items-center">
+        <div class="d-block shadow-xl border-radius-xl">
+
+          <img src="{% static 'img/timetrackpro/secciones/habilitaciones.webp' %}" alt="img-blur-shadow" class="img-fluid shadow border-radius-xl h-75">
+        </div>
+    </div>
+    <div class="col-12 col-xl-4">
+      {% if not userDjango%}
+        <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+          <div class="row">
+            <div class="col">
+             <button class="botonAdd" data-toggle="modal" data-target="#modalAgregarHabilitacion">             
+              <div class="sign-btn-add"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Nueva Habilitación</div>
+            </button>
+            </div>
+            <div class="col">
+            <button class="botonLink" data-toggle="modal" data-target="#modalAsociarHabilitacionEmpleado">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-link fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Asociar Habilitación</div>
+            </button>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+        
+      <div class="card">
+        <div class="card-header pb-0 p-3">
+          <h6 class="mb-1"><i class="icon-danger font-weight-bold fa-solid fa-exclamation fa-xl me-2" title="no tiene asociado usuario, tarjeta o usuario de la app"></i>Información</h6>
+        </div>
+        
+        <div class="card-body pt-1 p-3" >
+          <p class="text-sm text-center"><strong class="text-dark ">Desde esta sección se pueden crear habilitaciones y asociarlas a los usuarios de la aplicación. </strong></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 mt-4">
+      <div class="card mb-4">
+        <div class="card-header pb-0 p-3">
+          <h4>Habilitaciones asociadas</h4>
+        </div>
+        <div class="card-body p-3 ">
+          <div class="row">
+            {% for h in habilitaciones %}
+            <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+              <div class="card card-blog card-plain">
+                <div class="card-body px-1 pb-0">
+                  <h5>{{h.nombre}}</h5>
+                  <p class="mb-4 text-sm">Nombre de los empleados con esta habilitación.</p>
+                  <ul class="list-group">
+                    {% for e in empleadosHabilitados %}
+                      <li class="list-group-item border-0 px-0 font-weight-bold">
+                        {% if e.id_habilitacion == h.id%}
+                        <i class="fa-solid fa-user me-2"></i>
+                        {{e.id_auth_user__first_name}} {{e.id_auth_user__last_name}}
+                        {% endif %}
+                      </li> 
+                    {% endfor %} 
+                  </ul>
+                  
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="modalAsociarHabilitacionEmpleado" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAsociarHabilitacionEmpleado"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Asociar habilitacion a empleados</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        <form id="formularioAsociarHabilitacion" action="{% url 'timetrackpro:asociar-habilitacion' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row d- justify-content-center">
+            <div class="col-xl-10">
+              <label class="text-sm">Habilitación</label>
+              <input id="inputHabilitacion" list="habilitaciones"  class="form-select">
+              <input type="number" id="habilitacionSeleccionada" name="habilitacionSeleccionada"  class="form-control"  hidden>
+              <datalist id="habilitaciones" >
+                  {% for h in habilitaciones %}
+                    <option data-id="{{ h.id }}">{{ h.nombre }}</option>
+                  {% endfor %}
+              </datalist>
+            </div>
+          </div>
+          <div class="row" >
+            <div class="col-xl-10">
+              <table  id="tabla_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <input type="text" id="idEmpleadoSeleccionado" name="idEmpleadoSeleccionado" hidden>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary">Guardar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+  <div id="modalAgregarHabilitacion" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAgregarHabilitacion"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Añadir una nueva habilitación</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioAgregarHabilitacion" action="{% url 'timetrackpro:agregar-habilitacion' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row  d-flex justify-content-center">
+            <div class="col-xl-10">
+              <label class="text-sm">Nombre de la habilitación</label>
+              <input type="text" class="form-control" name="nombreHabilitacion" id="nombreHabilitacion" >
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+<script>
+$("#tabla_empleados").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/timetrackpro/datos-django-users",
+    cache: false, 
+    columns: [
+    {
+        title: "",
+        field:"state",
+        checkbox:"true",
+      },
+      {
+
+        title: "Nombre",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombre = row.first_name +" "+ row.last_name;
+          var ruta = row.ruta;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombre+'</h6></div>';
+          return div;
+        }
+      },
+    ],
+    search: true,
+    
+  });
+  var empleadosSeleccionados = "";
+  $('#tabla_empleados').on('check.bs.table', function (e, row) {
+    var id = row.id;
+    // agregar el id al input cada vez que se seleccione un empleado
+    empleadosSeleccionados += id + "#";
+
+    console.log('El ID seleccionado es :', id);
+    $('#idEmpleadoSeleccionado').val(empleadosSeleccionados);
+  });
+
+  // si se deselecciona un empleado, se elimina el id del input
+  $('#tabla_empleados').on('uncheck.bs.table', function (e, row) {
+    var id = row.id;
+    // agregar el id al input cada vez que se seleccione un empleado
+    empleadosSeleccionados = empleadosSeleccionados.replace(id + "#", "");
+    console.log('El ID seleccionado es :', id);
+    $('#idEmpleadoSeleccionado').val(empleadosSeleccionados);
+  });
+
+  document.getElementById('inputHabilitacion').addEventListener('input', function() {
+        const inputText = this.value;
+        const datalist = document.getElementById('habilitaciones');
+        const options = datalist.getElementsByTagName('option');
+        const habilitacionSeleccionada = document.getElementById('habilitacionSeleccionada');
+
+        for (const option of options) {
+            if (option.textContent === inputText) {
+                const selectedOptionId = option.getAttribute('data-id');
+                habilitacionSeleccionada.value = selectedOptionId;
+
+                console.log('ID de la opción seleccionada:', selectedOptionId);
+                break;
+            }
+        }
+    });
+  </script>
+
+{% endblock %}

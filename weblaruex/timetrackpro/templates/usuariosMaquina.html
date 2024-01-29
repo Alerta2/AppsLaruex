@@ -1,0 +1,260 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h5>Usuarios de la máquina
+
+            <a href="{% url 'timetrackpro:agregar-usuario' %}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Agregar un nuevo usuario a la máquina" data-toggle="modal" data-target="#modalAgregarUsuarioMaquina">
+              <i class="fa-solid fa-user-plus ps-2"></i>
+            </a>
+          </h5>
+          
+            
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="table-responsive p-0 mx-4">
+            <table id="tabla_usuarios_maquina" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
+    data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+    data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+    data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-row-style="rowStyle"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalAgregarUsuarioMaquina" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAgregarUsuarioMaquina"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Agregar usuario a la máquina</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioAgregarUsuarioMaquina" action="{% url 'timetrackpro:agregar-usuario-maquina' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}         
+            <div class="row">
+              <div class="col-xl-2">
+                <label>ID</label>
+                <input type="text" class="form-control" placeholder="ID en el dispositivo"
+                  aria-label="Nombre en el dispositivo" id="id_empleado_maquina" name="id_empleado_maquina"
+                  aria-describedby="text-addon" id="id_empleado_maquina" name="id_empleado_maquina" >
+              </div>
+              <div class="col-xl-4">
+                <label>Nombre</label>
+                <input type="text" class="form-control" placeholder="Nombre en el dispositivo"
+                  aria-label="Nombre en el dispositivo" id="nombre_empleado_maquina" name="nombre_empleado_maquina"
+                  aria-describedby="text-addon">
+              </div>
+              <div class="col-xl-4">
+                <label>¿Empleado en prácticas?</label>
+                <div class="form-switch ps-1 my-2">
+                  <input class="form-check-input ms-auto" type="checkbox" id="en_practicas" name="en_practicas">
+                </div>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-xl-3">
+                <label>Turno</label>
+                <select class="form-control" aria-label="Nombre en el dispositivo" id="turno_empleado"
+                  name="turno_empleado" aria-describedby="text-addon">
+                  <option value="Sin asignar" selected hidden>Sin asignar</option>
+                  <option value="Mañana">Mañana</option>
+                  <option value="Tarde">Tarde</option>
+                  <option value="Turno Partido">Turno Partido</option>
+                </select>
+              </div>
+              <div class="col-xl-3">
+                <label>Jornada Máxima</label>
+                <input class="form-control" type="number" step="0.5" min="0" max="37.5" id="jornada_maxima_empleado"
+                  name="jornada_maxima_empleado" placeholder="máximo 37,5 Horas">
+              </div>
+              <div class="col-xl-3">
+                <label>Número de huellas</label>
+                <input class="form-control" type="number" step="1" min="1" max="3" id="huellas_registradas"
+                  name="huellas_registradas" placeholder="máximo 3" >
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-xl-12">
+                <label class="d-inline">Dispositivos donde puede fichar</label>
+                <div class="d-inline form-switch ps-0">
+                  <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">Alerta2</label>
+                  <input class="form-check-input ms-auto" type="checkbox" id="maquina_alerta2" name="maquina_alerta2"> 
+                </div>
+                <div class="d-inline form-switch ps-0">
+                  <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">Laboratorio</label>
+                  <input class="form-check-input ms-auto" type="checkbox" id="maquina_laboratorio" name="maquina_laboratorio">
+                </div>
+                <div class="d-inline form-switch ps-0">
+                  <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">Departamento</label>
+
+                  <input class="form-check-input ms-auto" type="checkbox" id="maquina_departamento" name="maquina_departamento">
+                </div>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-xl-6">
+                
+                <label class="d-inline">Se le permite fichar con PIN</label>
+                <div class="d-inline form-switch ps-0">
+
+                  <input class="form-check-input ms-3" type="checkbox" id="permite_pin" name="permite_pin"> 
+                </div>
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-xl-6">
+                
+                <label class="d-inline">Es administrador del dispositivo</label>
+                <div class="d-inline form-switch ps-0">
+
+                  <input class="form-check-input ms-3" type="checkbox" id="es_administrador" name="es_administrador"> 
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary">Guardar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    $("#tabla_usuarios_maquina").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/timetrackpro/datos-usuarios-maquina",
+    cache: false, 
+    columns: [
+      {
+        title: "Empleado",
+        field: "id",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombre = row.nombre;
+          var id_usuario = row.id;
+          var divIcono = '<div class="col-2 "><h6 class="mb-0 text-sm"><i class="fa-solid fa-user fa-xl pe-2"></i></h6></div>';
+          var divDatos = '<div class="col-10"><h6 class="mb-0 text-sm">'+ nombre +'</h6><p class="text-xs text-secondary mb-0">ID: '+ id_usuario +'</p></div>';
+          var div = '<div class="row d-flex align-items-center">'+ divIcono + divDatos+'</div>';
+          return div;
+        }
+      },
+      {
+        
+        title: "Turno",
+        field: "turno",
+        align: "center",
+        formatter: function(value, row) {
+          var turno = row.turno;
+          var div = ""
+          if (turno == null){
+            var div = '<div class="text-secondary text-sm font-weight-bold"> Sin asignar </div>';
+          }else{
+            var div = '<div class="text-sm font-weight-bold">'+ turno +'</div>';
+          }
+          return div;
+        }
+      },
+      {
+        
+        title: "Jornada máxima",
+        field: "horas_maxima_contrato",
+        align: "center",
+        formatter: function(value, row) {
+          var jornada = row.horas_maxima_contrato;
+          var div = '<div class="text-secondary text-sm font-weight-bold">'+jornada +' Horas / Semana</div>'
+          return div;
+        }
+      },
+      {
+        title: "Donde puede fichar",
+        field: "",
+        align: "left",
+        halign:"center",
+        formatter: function(value, row) {
+          var maquinaA2 = row.maquina_alerta2;
+          var maquinaDep = row.maquina_departamento;
+          var maquinaLab = row.maquina_laboratorio;
+
+          var divA2 = ""
+          var divDep = ""
+          var divLab = ""
+
+          if (maquinaA2 == 1){
+            divA2 = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Alerta2</span></div>';
+          }else{
+            divA2 = '<div><i class="fa fa-check text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Alerta2</span></div>';
+          }
+          if (maquinaDep == 1){
+            divDep = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Departamento</span></div>';
+          }else{
+            divDep = '<div><i class="fa fa-check text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Departamento</span></div>';
+          }
+          if (maquinaLab == 1){
+            divLab = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Laboratorio</span></div>';
+          }else{
+            divLab = '<div><i class="fa fa-check text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> Laboratorio</span></div>';
+          }
+          var div = '<div class="ms-4">'+divA2+divDep+divLab+'</div>';
+          // var div = divA2+divDep+divLab;
+
+          return div;
+        }
+      },
+      {
+        title: "Tipo de empleado",
+        field: "en_practicas",
+        align: "center",
+        formatter: function(value, row) {
+          var tipo = row.en_practicas;
+          var div = ""
+         
+          if (tipo == 1){
+            div = '<div><span class="badge badge-xs bg-gradient-info">En prácticas</span></div>';
+          }else{
+            div = '<div><span class="badge badge-xs bg-gradient-dark">Empleado</span></div>';
+          }
+          return div;
+        }
+      },{
+        title: "Acciones",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+
+                  
+        var botonVer = '<a href="/private/timetrackpro/ver-usuario-maquina/' + row.id + '/" class="mx-1" title="Abrir" style="color:#68B29E"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+        return botonVer;
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+
+</script>
+
+
+{% endblock %}

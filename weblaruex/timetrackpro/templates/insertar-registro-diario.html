@@ -1,0 +1,110 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+<h3 class="font-weight-bolder text-info text-gradient">Hola {{request.user.first_name}} {{request.user.last_name}}</h3>
+<p class="mb-4" id="textSeleccionado">Rellena el siguiente formulario para notificar un error al fichar.</p>  
+
+
+  <div class="page-header min-vh-75">
+       
+    <div class="container"> 
+  
+      <form action="{% url 'timetrackpro:insertar-registro-manual' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="row">
+          <div class="col-8 mx-auto">
+            <div class="card bg-gradient-dark" id="mesYearDiv">
+              <div class="card-body">
+                <div class="row">
+                  <div class="mb-3">
+                    <input type="number" class="form-control" id="idEmpleado" name="idEmpleado" value="{{request.user.id}}" aria-label="Año al que aplica" aria-describedby="text-addon" hidden>                  
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col mb-3">
+
+                    <label class="col-form-label text-white">Empleado</label>
+  
+                    <select class="form-control" aria-label="Nombre en el dispositivo" id="empleado_maquina"
+                    name="empleado_maquina" aria-describedby="text-addon" {% if not administrador %} disabled {% endif %}
+                    >
+                    {% for empleado in empleados %}
+                      <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
+                    {% endfor %}
+                    </select>
+                    </div>
+                  <div class="col mb-3">
+
+                  <label class="col-form-label text-white">Fecha y hora</label>
+
+                  <input class="form-control" type="datetime-local" id="hora" name="hora" value="{{registro.hora|date:'Y-m-d H:i' }}" required>
+                  </div>
+                  
+
+
+                </div>
+                <div class="row">
+                  <div class="mb-3">
+
+                  <label class="col-form-label text-white">Motivo de la solicitud</label>
+
+                  <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Indique el motivo de la solicitud" id="motivoError" name="motivoError" aria-describedby="text-addon" rows="4" required></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="mx-auto pb-3">
+
+                <button class="btn btn-outline-white  p-2 mx-2 mb-0" type="button" data-bs-toggle="tooltip" data-bs-placement="top" title="Notificar error" id="notificarError">
+                  Notificar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
+      <div class="row" id="cardFormulario" hidden>
+        <div class="col-lg-11">
+          <div class="card">
+            <div class="card-header pb-0 text-left">
+ 
+            </div>
+            <div class="card-body">
+              
+                  <input type="number" class="form-control" id="dias" name="dias" aria-label="Año al que aplica" aria-describedby="text-addon" hidden>
+
+              <div id="divFormGenerado"></div>
+
+                <div class="text-center">
+                  <button type="submit" value="submit" class="btn bg-gradient-info w-100 mt-4 mb-0">Guardar</button>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </form>
+    </div>
+  </div>
+
+<script>
+
+    // compruebo si en textarea de motivoEliminación hay algo escrito
+  // si hay algo escrito, habilito el boton de guardar
+  // si no hay nada escrito, deshabilito el boton de guardar
+  $(document).ready(function(){
+    $('#motivoError').keyup(function(){
+      if($(this).val().length > 10)
+        $('#notificarError').attr('disabled', false);
+    })
+  });
+
+
+
+ </script>
+
+
+{% endblock %}

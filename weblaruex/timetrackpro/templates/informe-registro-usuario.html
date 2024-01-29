@@ -1,0 +1,303 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h1 id="tituloPagina" class="text-center text-gradient text-primary" >Informe diario de asistencia</h1>
+        </div>
+        <div class="card-body pt-0 pb-2">
+          <div class="table-responsive p-2">
+            
+              <div id="toolbar" class="pt-0" >
+                <div class="row my-auto">
+                  <div class="col my-auto">
+                    <label class="text-sm" ></label>
+                    <button class="btn btn-outline-primary" type="button" data-toggle="modal" data-target="#modalEmpleados">
+                    Empleados
+                  </button>
+          
+                  </div>
+                  <div class="col ">
+                    <label class="text-sm" >Fecha</label>
+                    <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" aria-describedby="text-addon">
+                  </div>
+                  <div class="col ">
+                    <label class="text-sm" >Fecha Fin</label>
+                    <input type="date" class="form-control" id="fechaFin" name="fechaFin" aria-describedby="text-addon">
+                  </div>
+                  <div class="col">
+                    <button type="submit" value="submit" class="btn bg-gradient-primary btn-round w-100 mt-4 mb-0" onclick="filtrarTabla()">Filtrar</button>
+
+                    <input type="text" id="inputEmpleados" name="inputEmpleados" hidden>
+
+                  </div>
+                </div>
+
+              </div>
+                
+            <table  id="informe_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal con listado de Empleados -->
+<div class="modal fade" id="modalEmpleados" tabindex="-1" role="dialog" aria-labelledby="modalEmpleadosLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEmpleadosLabel">Seleccionar Empleados</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <button class="dropdown-item" type="button" id="todosEmpleados" >
+            <input type="checkbox" id="checkTodosEmpleados" onclick="marcarTodos()">
+            Seleccionar todos
+          </button>
+          {% for empleado in empleados %}
+          <button class="dropdown-item" type="button" id="empleadosModalExtra" >
+            <input type="checkbox" value="{{empleado.id}}" name="empleadosModalExtra">
+            {{empleado.nombre}}
+          </button>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cerrarEmpleados">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="obtenerSeleccionados()">Guardar Selecionados</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script>
+    function marcarTodos(){
+      var empleados = document.getElementsByName("empleadosModalExtra");
+      if (checkTodosEmpleados.checked) {
+        // recorro la lista de empleados y los marco todos
+        for (var i = 0; i < empleados.length; i++) {
+          empleados[i].checked = true;
+          console.log(empleados[i].value);
+        }
+      } else {
+        // recorro la lista de empleados y los desmarco todos
+        for (var i = 0; i < empleados.length; i++) {
+          empleados[i].checked = false;
+        }
+      }
+    }
+    function obtenerSeleccionados(){
+      // recorro la lista empleadosModalExtra
+      var empleados = document.getElementsByName("empleadosModalExtra");
+      // recorro la lista de empleados y los guardo separados por #
+      var empleadosSeleccionados = "";
+      for (var i = 0; i < empleados.length; i++) {
+        if (empleados[i].checked){
+          empleadosSeleccionados += empleados[i].value + "_";
+        }
+      }
+      // elimino el ultimo #
+      empleadosSeleccionados = empleadosSeleccionados.slice(0, -1);
+      // guardo los empleados seleccionados en el input
+      document.getElementById("inputEmpleados").value = empleadosSeleccionados;
+      console.log(document.getElementById("inputEmpleados").value);
+      // cierro el modal
+      $('#modalEmpleados').trigger('click');
+    }
+
+$("#informe_empleados").bootstrapTable({
+  method: "get",
+  locale: navigator.language,
+  url: "{% url 'timetrackpro:datos-registro-empleados' %}",
+  cache: false, 
+  columns: [
+    {
+      title: "Nombre",
+      field: "nombreEmpleado",
+      halign:"left",
+      sortable: true,
+      align: "left",
+      width:"5",
+      formatter: function(value, row) {
+        var jornada = row.jornada;
+        var nombre = row.nombreEmpleado;
+        var divNombre = '<div><h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+nombre +' </h6><h6 class="text-sm mb-0 text-secondary"> Jornada: '+jornada +' horas semanales </h6></div>';
+        return divNombre ;
+      }
+    },{
+      title: "Fecha",
+      field: "dia",
+      align: "center",
+      width:"10",
+      sortable: true,
+      formatter: function(value, row) {
+        const mes = {
+          "01": "Ene",
+          "02": "Feb",
+          "03": "Mar",
+          "04": "Abr",
+          "05": "May",
+          "06": "Jun",
+          "07": "Jul",
+          "08": "Ago",
+          "09": "Sep",
+          "10": "Oct",
+          "11": "Nov",
+          "12": "Dic",
+        };
+        // obtengo la fecha de lectura
+        var fechaLectura = row.dia;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+          var div = '<div><h6 class="text-sm mb-0"><i class="fa fa-calendar text-secondary fa-lg me-2" aria-hidden="true"></i>'+fecha +'</h6></div>';          
+          //var div = '<span class="text-xs font-weight-bold">'+ fecha +'</span>';
+          return div;
+      }
+    },
+    {
+      title: "Entrada",
+      field: "row.horas",
+      halign:"left",
+      sortable: true,
+      align: "left",
+      width:"20",
+      formatter: function(value, row) {
+        var hora = row.horas;
+        var jornada = row.jornada;
+        var permisos = row.permisos;
+        var vacaciones = row.vacaciones;
+        var asuntosPropios = row.asuntosPropios;
+        var jornadaDiaria = jornada / 5;
+        jornadaDiaria = Math.round(jornadaDiaria * 100) / 100;
+        
+        hora = Math.round(hora * 100) / 100;
+        var resultado = "";
+        div = "";
+        // calcular el porcentaje de completado
+        var porcentaje = (hora / jornadaDiaria)*100;
+        porcentaje = Math.round(porcentaje * 100) / 100;
+
+        switch (true) {
+          case (hora == 0):
+            resultadoPermisos = '<h6 class="text-sm mb-0">'+permisos +'</h6>';
+            resultadoVacaciones = '<h6 class="text-sm mb-0">'+vacaciones +'</h6>';
+            resultadoAsuntosPropios = '<h6 class="text-sm mb-0">'+asuntosPropios +'</h6>';
+            resultado = row.observaciones + ' (nº de fichajes:' + row.fichajes + ')' +'\n';
+            div = '<div><h6 class="text-sm mb-0"><i class="fa fa-clock text-secondary fa-lg me-2" aria-hidden="true"></i>'+resultado +'</h6>'+ resultadoPermisos+ resultadoVacaciones +resultadoAsuntosPropios+ '</div>';
+            break;   
+          case (porcentaje > 99):
+            resultado = hora + ' horas ';
+            div = '<div><h6 class="text-sm mb-0 "><i class="fa fa-clock fa-lg me-2 text-success" aria-hidden="true"></i>'+resultado +'</h6></div>';
+            break;
+          case (porcentaje > 75 && porcentaje < 99):
+            resultado = hora + ' horas ';
+            div = '<div><h6 class="text-sm mb-0"><i class="fa fa-clock text-warning fa-lg me-2" aria-hidden="true"></i>'+resultado +'</h6></div>';
+            break;
+          case (porcentaje < 60):
+            resultado = hora + ' horas ';
+            div = '<div><h6 class="text-sm mb-0"><i class="fa fa-clock text-danger fa-lg me-2" aria-hidden="true"></i>'+resultado +'</h6></div>';
+            break;
+          default:
+            resultado = hora + ' horas ';
+            div = '<div><h6 class="text-sm mb-0"><i class="fa fa-clock text-warning fa-lg me-2" aria-hidden="true"></i>'+resultado +'</h6></div>';
+        }
+        return div;
+      }
+    },
+    {
+      title: "Correcto",
+      field: "correcto",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      width:"20",
+      formatter: function(value, row) {
+        var correcto = row.correcto;
+        var resultado = "";
+        if (correcto == "si"){
+          resultado = '<i class="fa fa-check-circle text-success fa-lg me-2" aria-hidden="true"></i>';
+
+        }else{
+          resultado = '<i class="fa fa-times-circle text-danger fa-lg me-2" aria-hidden="true"></i>';
+        }
+
+        var divHora = '<div><h6 class="text-sm mb-0">'+resultado +'</h6></div>';
+        return divHora ;
+      }
+    },
+    // {
+    //   title: "",
+    //   field: "Acciones",
+    //   align: "center",
+    //   visible:(admintrador == "True" || director == "True" ),
+    //   formatter: function (value, row) {
+
+    //     var botonVer = '<a href="/private/timetrackpro/tarjeta/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+    //     return botonVer;
+
+    //   },
+    // },
+  ],
+  search: true,
+  showRefresh: true,
+  sortName: "dia",
+  sortOrder: "asc",
+
+  
+
+  
+});
+  function filtrarTabla(){
+    if (document.getElementById("fechaInicio").value == ""){
+      // mostrar un dialogo de error
+      alert("Debe ingresar una fecha de inicio");
+      alert.title = "Error";
+
+      return false;
+    }
+    if (document.getElementById("fechaFin").value == ""){
+      alert("Debe ingresar una fecha de fin");
+      return false;
+    }
+
+    var tituloPagina = document.getElementById("tituloPagina");
+    fechaInicio = document.getElementById("fechaInicio").value;
+    fechaFin = document.getElementById("fechaFin").value;
+    if (fechaInicio > fechaFin){
+      alert("La fecha de inicio debe ser menor a la fecha de fin");
+      return false;
+    }
+    
+    var empleados = $('#inputEmpleados').val();
+    var fechaInicio = document.getElementById("fechaInicio").value;
+    fechaInicio = fechaInicio.split("-")[2] + "/" + fechaInicio.split("-")[1] + "/" + fechaInicio.split("-")[0];
+
+    var fechaFin = document.getElementById("fechaFin").value;
+    fechaFin = fechaFin.split("-")[2] + "/" + fechaFin.split("-")[1] + "/" + fechaFin.split("-")[0];
+
+    // cerrar el modal
+    $('#modalEmpleados').trigger('click');
+    // nueva url
+    var nuevaUrl = "{% url 'timetrackpro:datos-registro-empleados' %}?listEmpleados="+empleados+"&fechaInicio="+fechaInicio+"&fechaFin="+fechaFin;
+    // cambiar la url de la tabla
+    $("#informe_empleados").bootstrapTable('refreshOptions', {url: nuevaUrl});
+    // cambiar el titulo de la pagina
+    tituloPagina.innerHTML = "Informe diario de asistencia desde "+fechaInicio+" hasta "+fechaFin;
+
+  }
+
+// Función para filtrar la tabla por fecha
+  </script>
+{% endblock %}

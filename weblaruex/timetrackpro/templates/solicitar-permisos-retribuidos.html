@@ -1,0 +1,741 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block imports %}
+  <!-- fullcalendar-->
+<!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.9/index.global.min.js'></script> -->
+<link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" />
+<script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar.js' %}"></script>
+<script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar_es.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_mesual.css' %}" />
+  <!-- disponible para configuración servidor-->
+  <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
+{% endblock %}
+{% block content %}
+
+  <div class="row d-flex justify-content-center">
+    <div class="col-12 col-xl-5">
+        <div class="d-block shadow-xl border-radius-xl">
+          <div class="row ">
+            <div class="col m-3">
+
+              <div id="calendarioMensual">
+              </div>
+            </div>
+
+          </div>
+      </div>
+    </div>
+    <div class="col-12 col-xl-7">
+      {% if not userDjango%}
+      <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+        <div class="row">
+          <div class="col">
+          <button class="botonLink" data-toggle="modal" data-target="#modalSolicitarPermisoRetribuido">    
+            
+            <div class="sign-Btn-link">
+              <i class="fa-solid fa-plus fa-lg " style="color: #ffffff;"></i>
+          </div>
+            <div class="text text-sm">Solicitar días</div>
+          </button>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if administrador or director %}
+      <div class="card">
+        <div class="card-header pb-0 p-3">
+          <div class="row">
+            <div class="col-md-8 d-flex align-items-center">
+              <div class="row">
+                <h5 class="mb-2">
+                  Permisos solicitados por los empleados
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body pt-0 p-3" >
+          <div class="table-responsive ms-3 me-3">
+            <table id="permisos_retribuidos_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+          </div>
+        </div>
+      </div>
+        
+      {% endif %}
+
+      {% if not director %}
+      <div class="card mt-2">
+        <div class="card-header pb-0 p-3">
+          <div class="row">
+            <div class="col-md-8 d-flex align-items-center">
+              <div class="row">
+                <h5 class="mb-2">
+                  Permisos solicitados 
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body pt-0 p-3" >
+          <div class="table-responsive ms-3 me-3">
+            <table  id="permisos_retribuidos_solicitados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  <div id="modalSolicitarPermisoRetribuido" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalSolicitarPermisoRetribuido"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Solicitar días de asuntos propios</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioSolicitarAsuntosPropios" action="{% url 'timetrackpro:solicitar-permisos-retribuidos' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-6">
+              <label class="col-form-label">Fecha de inicio</label>
+              <div class="">
+                <input type="date" class="form-control" aria-label="Fecha inicial de las vacaciones"
+                  aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_solicitados')">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            
+            <div class="col-xl-6 mt-2"   >
+              <input type="number" class="form-control" name="dias_solicitados" id="dias_solicitados"  min="1" required hidden>
+
+              <button type="button" class="btn btn-primary " id="botonMostarColumnaOculta" onclick="mostrarColumnaOculta(this.id, 'colFechaFin' )">Solicitar varios dias</button>
+              <div class="" id="colFechaFin" hidden>
+                <label class="col-form-label">Fecha de fin</label>
+
+                <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
+                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_solicitados')">
+              </div>  
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-6 mt-2">
+              <label class="text-sm">Permisos</label>
+              <input id="inputPermisos" list="permisosRetribuidos"  class="form-select">
+              <input type="number" id="id_permiso" name="id_permiso"  class="form-control"  hidden>
+              <datalist id="permisosRetribuidos">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="guardarSolicitarAsuntosPropios" disabled>Guardar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+  <! -- Modal Solicitar Permiso Retribuido desde el calendario -->
+  <div id="modalSolicitarPermisoDesdeCalendario" tabindex="-1" role="dialog" class="modal fade modal-lg"
+    aria-labelledby="modalSolicitarPermisoDesdeCalendario" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:solicitar-permiso-rertibuido-desde-calendario' %}" method="POST"
+      enctype="multipart/form-data">
+      {% csrf_token %}
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="tituloModalAgregarDesdeCalendario"></h5>
+              <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <input class="form-control" type="text" id="year_actual" name="year_actual" hidden>
+                <div class="col-xl-6">
+                  <label class="col-form-label">Fecha de inicio</label>                  
+                  <div class="">
+                    <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                      aria-describedby="text-addon" name="fecha_inicio_calendario" id="fecha_inicio_calendario" onchange="calcularDias('fecha_inicio_calendario','fecha_fin_calendario', 'dias_solicitados_seleccionados')">
+                  </div>
+                </div>
+                <div class="col-xl-6">
+                  <label class="col-form-label">Fecha de Fin</label>                  
+                  <div class="">
+                    <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                      aria-describedby="text-addon" name="fecha_fin_calendario" id="fecha_fin_calendario"  onchange="calcularDias('fecha_inicio_calendario','fecha_fin_calendario', 'dias_solicitados_seleccionados')">
+                      <input type="number" class="form-control" name="dias_solicitados_seleccionados" id="dias_solicitados_seleccionados"  min="1" hidden >
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xl-12 col-md-12">
+                      <label class="text-sm">Permisos</label>
+                      <input id="inputPermisosCalendario" list="permisosRetribuidosCalendario"  class="form-select">
+                      <input type="number" id="id_permiso_calendario" name="id_permiso_calendario"  class="form-control"  hidden>
+                      <datalist id="permisosRetribuidosCalendario">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
+                </div>
+              </div>
+            </div>
+            
+            <div class="modal-footer">
+              {% if user.is_authenticated %}
+              <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+              {% endif %}
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
+            </div>
+        </div>
+      
+      </form>
+    </div>
+  </div>
+
+
+  <div id="modalAddJustificante" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+
+          <h5 class="modal-title" id="TituloModal"><strong>Agregar justificante</strong> </h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <form id="formularioModalAddJustificante" action="/private/timetrackpro/justificar-solicitud-permisos-retribuidos/0/" method="POST"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row" id="rowImagen" hidden>
+              <div class="col d-flex justify-content-center">
+                <img class="w-30 rounded" id="imagenPrevia" src="" alt="" >
+
+              </div>
+            </div>
+
+            <div class="row mt-2 mb-2" id="labelImagenSeleccionada" hidden>
+              <div class="col d-flex justify-content-center">
+                  <div class="my-auto d-flex align-items-center ">
+
+                  <i class="fa-duotone fa-circle-check fa-4x" style="--fa-primary-color: #2ab24c; --fa-secondary-color: #2ab24c;"></i>           
+                  <label class="col-form-label text-muted" id="nombreImagenSeleccionada"></label>
+                  
+                  </div>
+              </div>
+            </div>
+            <div class="row container mb-2" id="selectorImagen">
+              <div class="col d-flex justify-content-center">
+                
+                <a href=""  title="subir-imagen" data-toggle="modal"  ><i id="iconoInput" class="fa-duotone fa-file-plus fa-4x"></i></a>
+        
+
+                <input type="file" id="justificante" name="justificante" accept="image/*"
+                onchange="previsualizarImagen()" style="display:none">
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              {% if user.is_authenticated %}
+              <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+              {% endif %}
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+
+  function mostrarColumnaOculta(id, columna){
+    console.log(id)
+    console.log(columna)
+    // Ocultar el botón
+    document.getElementById(id).hidden = true;
+    // Mostrar la columna específica
+    document.getElementById(columna).hidden = false;
+  }
+
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarDiv = document.getElementById('calendarioMensual');
+    var initialDate = '{{initialDate}}';
+    var calendar = new FullCalendar.Calendar(calendarDiv, {
+      initialDate: initialDate, // will be parsed as local
+      themeSystem: 'bootstrap5',
+      events: "{% url 'timetrackpro:datos-calendario-asuntos-propios' %}",      
+      eventTextColor: '#2f5d6e', // color del texto de los eventos
+      height: 650, // indico el maximo de alto que puede tener el calendario
+      locale: 'es', // el idioma del calendario
+      handleWindowResize: true, // si se puede redimensionar el calendario
+      initialView: 'dayGridMonth', // la vista inicial del calendario
+      buttonText: { // los textos de los botones
+        today: 'Hoy',
+        month: 'Mes',
+        day: 'Día',
+      }, 
+      headerToolbar: { // la barra superior donde se encuentra el titulo y los botones
+        left: 'prev,next',
+        center: 'title',
+        right:'today',
+      },
+      // Esta función se ejecutará cuando se haga clic en un día en el calendario         
+      dateClick: function(info) {
+        // se obtiene la fecha seleccionada
+        const meses = {
+            "01": "Enero",
+            "02": "Febrero",
+            "03": "Marzo",
+            "04": "Abril",
+            "05": "Mayo",
+            "06": "Junio",
+            "07": "Julio",
+            "08": "Agosto",
+            "09": "Septiembre",
+            "10": "Octubre",
+            "11": "Noviembre",
+            "12": "Diciembre",
+          };
+        // se obtiene la fecha seleccionada
+        var dia = info.dateStr.substring(8, 10);
+        dia = dia.replace(/^0+/, '');
+        var mes = meses[info.dateStr.substring(5, 7)];
+        var year = info.dateStr.substring(0, 4);
+
+        // se muestra el modal para agregar el festivo
+        var label = document.getElementById("tituloModalAgregarDesdeCalendario");
+        label.innerHTML = "Solicitar " + dia + " de " + mes + " del " + year + " como día de asuntos propios";
+
+        // se obtiene el año actual
+        var yearActual = document.getElementById("year_actual");
+        yearActual.value = year;
+
+        var fechaInicio = document.getElementById("fecha_inicio_calendario");
+        fechaInicio.value = info.dateStr;
+
+        var fechaFin = document.getElementById("fecha_fin_calendario");
+        fechaFin.value = info.dateStr;
+
+        var diasConsumidos = document.getElementById("dias_solicitados_seleccionados");
+        diasConsumidos.value = 1;
+        
+        // modifico el index del calendario
+        // se muestra el modal
+        $('#modalSolicitarPermisoDesdeCalendario').modal('show');
+        },
+    });
+    calendar.render(); // renderizo el calendario
+    calendar.updateSize(); // actualizo el tamaño del calendario
+  });
+
+  function calcularDias(inicio, fin, dias_solicitados){
+    fecha_inicio = document.getElementById(inicio).value;
+    fecha_fin = document.getElementById(fin).value;
+    // comparo si la fecha de inicio es mayor a la fecha de fin
+    if (fecha_fin == ""){
+      fecha_fin = fecha_inicio;
+      document.getElementById(fin).value = fecha_inicio;
+    }
+    dias_solicitados = document.getElementById(dias_solicitados);
+    botonGuardarSolicitar = document.getElementById("guardarSolicitarAsuntosPropios");
+    botonGuardarModificar = document.getElementById("guardarModificarAsuntosPropios");
+
+    if (fecha_inicio > fecha_fin && fecha_fin != ""){
+      alert("La fecha de inicio no puede ser mayor a la fecha de fin");
+      document.getElementById(inicio).value = "";
+      document.getElementById(fin).value = "";
+      dias_solicitados.value = "";
+    }
+    else{
+      // obtener la diferencia en dias entre las dos fechas
+      var fecha1 = new Date(fecha_inicio);
+      var fecha2 = new Date(fecha_fin);
+      var diff = fecha2.getTime() - fecha1.getTime();
+      var dias = diff / (1000 * 60 * 60 * 24);
+      dias = dias + 1;
+      dias_solicitados.value = dias;
+      botonGuardarSolicitar.removeAttribute("disabled");
+      botonGuardarModificar.removeAttribute("disabled");
+    }
+  }
+
+  function mostrarInfo(){ 
+    // obtengo el id de las vacaciones que desea modificar
+    var idSelect = document.getElementById("vacaciones_modificar").value;
+
+    // obtengo los campos de fecha inicio y fin actual
+    var fechaInicioActual = document.getElementById("fechaActualInicio");
+    var fechaFinActual = document.getElementById("fechaActualFin");
+    var divFechaInicioActual = document.getElementById("divFechaInicioActual");
+    divFechaInicioActual.removeAttribute("hidden");
+    var divFechaFinActual = document.getElementById("divFechaFinActual");
+    divFechaFinActual.removeAttribute("hidden");
+
+    var diasActualesConsumidos = document.getElementById("divDiasActualesConsumidos");
+    divDiasActualesConsumidos.removeAttribute("hidden");
+    var diasConsumidosActuales = document.getElementById("dias_actuales_consumidos");
+
+    // se obtiene la lista de vacaciones
+    var mylist = JSON.parse(document.getElementById('listaAsuntos').textContent);
+
+    for (var i = 0; i < mylist.length; i++) {
+      if ( mylist[i].id == parseInt(idSelect)) {
+        fechaInicioActual.value = mylist[i].fecha_inicio;
+        fechaInicioActual.setAttribute("readonly", true);
+        fechaFinActual.value = mylist[i].fecha_fin;
+        fechaFinActual.setAttribute("readonly", true);
+        diasConsumidosActuales.value = mylist[i].dias_solicitados;
+        diasConsumidosActuales.setAttribute("readonly", true);
+        
+        console.log(mylist[i]);
+      }
+    }
+  }
+
+  // forzar cierre del modal
+  function forzarCierre(){
+    $('#modalSolicitarPermisoDesdeCalendario').modal('hide');
+  }
+
+  $("#permisos_retribuidos_empleados").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-permisos-retribuidos-empleados' year=currentYear %}",
+    cache: false, 
+    columns: [
+      {
+        title: "Empleado",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombre = row.empleado__nombre +" "+ row.empleado__apellidos;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombre+'</h6></div>';
+          return div;
+        }
+      },    
+      {
+        title: "Fecha inicio",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_inicio;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },{
+        title: "Fecha fin",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_fin;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Días",
+        align: "center",
+        formatter: function(value, row) {
+          var dias = row.dias_solicitados;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Estado",
+        align: "center",
+        formatter: function(value, row) {
+          var estado = row.estado;
+          var div= '<span class="badge badge-sm bg-gradient-dark text-wrap">Sin justificar</span>';
+          if (estado == 19)
+            var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+          if (estado == 20)
+            var div = '<span class="badge badge-sm bg-gradient-info">Aceptada</span>';
+          if (estado == 21)
+            var div = '<span class="badge badge-sm bg-gradient-success">Justificada</span>';
+          
+          return div;
+        }
+      },
+      {
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          var estado = row.estado;
+
+          var botones = "";
+          var botonAddJustificante = '<a href="" title="Añadir justificante" data-toggle="modal" data-target="#modalAddJustificante" onclick="$('+"'#formularioModalAddJustificante').attr('action', '/private/timetrackpro/justificar-solicitud-permisos-retribuidos/"+ row.id +"/');"+'" class="mx-1"><i class="fa-duotone fa-file-plus fa-lg"></i></a>';
+
+          var botonVer = '<a href="/private/timetrackpro/ver-solicitud-permisos-retribuidos/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+          var botonDescargar = '<a href="/private/timetrackpro/descargar-solicitud-permisos-retribuidos/' + row.id + '/" class="mx-1 text-sm" title="descargar justificante" download><i class="fa-solid fa-download fa-lg entrar"></i></a>';
+
+          switch (estado) {
+            case 18:
+              botones = botonAddJustificante + botonVer;
+              break;
+            case 21:
+              botones = botonDescargar + botonVer;
+              break;
+            default:
+              botones = botonVer;
+              break;
+          }
+          return botones;
+                  
+
+        },
+      },
+    ],
+    search: true,
+  });
+
+
+  $("#permisos_retribuidos_solicitados").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-permisos-retribuidos-solicitados' year=currentYear %}",
+    cache: false, 
+    columns: [
+      {
+        title: "Empleado",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombre = row.empleado__nombre +" "+ row.empleado__apellidos;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombre+'</h6></div>';
+          return div;
+        }
+      },    
+      {
+        title: "Fecha inicio",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_inicio;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },      {
+        title: "Fecha fin",
+        field: "fecha_fin",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_fin;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Días",
+        align: "center",
+        formatter: function(value, row) {
+          var dias = row.dias_solicitados;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Estado",
+        align: "center",
+        formatter: function(value, row) {
+          var estado = row.estado;
+          var div= '<span class="badge badge-sm bg-gradient-dark text-wrap">Sin justificar</span>';
+          if (estado == 19)
+            var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+          if (estado == 20)
+            var div = '<span class="badge badge-sm bg-gradient-info">Aceptada</span>';
+          if (estado == 21)
+            var div = '<span class="badge badge-sm bg-gradient-success">Justificada</span>';
+          return div;
+        }
+      },
+      {
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          var estado = row.estado;
+          var botonAddJustificante = '<a href="" title="Añadir justificante" data-toggle="modal" data-target="#modalAddJustificante" onclick="$('+"'#formularioModalAddJustificante').attr('action', '/private/timetrackpro/justificar-solicitud-permisos-retribuidos/"+ row.id +"/');"+'" class="mx-1"><i class="fa-duotone fa-file-plus fa-lg"></i></a>';
+
+          var botonVer = '<a href="/private/timetrackpro/ver-solicitud-permisos-retribuidos/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          if (estado == 18)
+            return botonVer + botonAddJustificante;
+          else
+            return botonVer;
+
+
+        },
+      },
+    ],
+    search: true,
+  });
+  
+  document.getElementById('inputPermisos').addEventListener('input', function() {
+      const inputText = this.value;
+      const datalist = document.getElementById('permisosRetribuidos');
+      const options = datalist.getElementsByTagName('option');
+      const id_permiso = document.getElementById('id_permiso');
+
+      for (const option of options) {
+        option.textContent.replace(/\s/g, '');
+          if (option.textContent === inputText) {
+              const selectedOptionId = option.getAttribute('data-id');
+              id_permiso.value = selectedOptionId;
+              break;
+          }
+      }
+  });
+
+  document.getElementById('inputPermisosCalendario').addEventListener('input', function() {
+      const inputText = this.value;
+      const datalist = document.getElementById('permisosRetribuidosCalendario');
+      const options = datalist.getElementsByTagName('option');
+      const id_permiso = document.getElementById('id_permiso_calendario');
+
+      for (const option of options) {
+        console.log("----hge dafdas---")
+        option.textContent.replace(/\s/g, '');
+          if (option.textContent === inputText) {
+              const selectedOptionId = option.getAttribute('data-id');
+              id_permiso.value = selectedOptionId;
+              break;
+          }
+      }
+  });
+
+// JavaScript para activar el input cuando se hace clic en el enlace
+document.querySelector("a[title='subir-imagen']").addEventListener("click", function (e) {
+e.preventDefault(); // Evita que el enlace redireccione
+document.getElementById("justificante").click(); // Simula un clic en el input
+});
+
+function previsualizarImagen() {
+  var archivoInput = document.getElementById('justificante');
+  var imagenPrevia = document.getElementById('imagenPrevia');
+  var rowImagen = document.getElementById('rowImagen');
+  var selector = document.getElementById('selectorImagen');
+  var etiqueta = document.getElementById('labelImagenSeleccionada');
+  var nombreImagen = document.getElementById('nombreImagenSeleccionada');
+  var iconoInput = document.getElementById('iconoInput');
+  if (archivoInput.files && archivoInput.files[0]) {
+    var lector = new FileReader();
+
+    lector.onload = function(e) {
+      rowImagen.removeAttribute("hidden");
+      imagenPrevia.src = e.target.result;
+      imagenPrevia.style.display = 'block';
+    }
+    selector.style.display = 'none';
+    //eliminar atributo hidden de la etiqueta
+    etiqueta.removeAttribute("hidden");
+    nombreImagen.innerHTML = archivoInput.files[0].name;
+
+    lector.readAsDataURL(archivoInput.files[0]);
+
+    iconoInput.setAttribute("hidden", "true");
+  } else {
+    imagenPrevia.src = '';
+    imagenPrevia.style.display = 'none';
+  }
+}
+
+
+
+</script>
+
+{% endblock %}

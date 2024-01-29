@@ -1,0 +1,363 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+  <div class="row d-flex justify-content-center">
+    
+    <h3 class="text-info text-gradient">Días de asuntos propios solicitado</h3>
+    <h4 class="text-secondary">Solicitado: {{solicitud.fecha_solicitud}}</h4>
+    <div class="col-12 col-xl-8">
+      {% if administrador %}
+        <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+          <div class="row">
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalEditar">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-pen fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Editar</div>
+            </button>
+            </div>
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalCambiarEstado">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-sign-hanging fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Cambiar estado</div>
+            </button>
+            </div>
+            
+            <div class="col">
+              <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarAsuntosPropios">             
+               <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
+               <div class="text text-sm">Eliminar</div>
+             </button>
+             </div>
+          </div>
+        </div>
+        
+      {% endif %}
+        
+
+      <div class="row">
+        <div class="col">
+
+          <div class="card ">
+            <div class="card-header pb-0 p-3">
+            </div>
+            <div class="card-body pt-0 p-3">
+              <ul class="list-group font-weight-bold">
+                <!-- 1- Pendiente, 2 Rechazado, 3 - Aceptado -->
+                {% if solicitud.estado.id == 9 %}
+                <li class="list-group-item border-0 ps-0 text-lg text-info d-flex justify-content-end"><i class="fa-duotone fa-sign-hanging me-2"></i> Pendiente</li>
+                {% elif solicitud.estado.id == 10 %}
+                <li class="list-group-item border-0 ps-0 text-lg text-danger d-flex justify-content-end"><i class="fa-duotone fa-sign-hanging me-2"></i> Rechazado</li>
+                {% elif solicitud.estado.id == 11 %}
+                <li class="list-group-item border-0 ps-0 text-lg text-success d-flex justify-content-end"><i class="fa-duotone fa-sign-hanging me-2"></i> Aceptada</li>
+                {% else %}
+                <li class="list-group-item border-0 ps-0 text-lg text-warning d-flex justify-content-end"><i class="fa-duotone fa-sign-hanging me-2"></i> Cambio solicitado</li>
+                {% endif %}
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{solicitud.empleado.nombre}} {{solicitud.empleado.apellidos}}</li>
+                
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{solicitud.fecha_inicio|date:"d M Y"}} - {{solicitud.fecha_fin|date:"d M Y"}}</li>    
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% if solicitud.recuperable == 1 %}
+        <div class="col">
+
+          <div class="card ">
+            <div class="card-header pb-0 p-3">
+            </div>
+            <div class="card-body pt-0 p-3">
+              <ul class="list-group font-weight-bold">
+                
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-success">Recuperable</span></li>
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><strong>Descripción de recuparación</strong><p>{{solicitud.descripcion}}</p></li>
+   
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="col">
+          <div class="card ">
+            <div class="card-header pb-0 p-3">
+            </div>
+            <div class="card-body pt-0 p-3">
+              <ul class="list-group font-weight-bold">
+                
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><strong>Tareas a sustituir</strong><p>{% if solicitud.tareas_a_sustituir %}{{solicitud.tareas_a_sustituir}}{% else %} -- {% endif %}</p></li>
+
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><strong>Sustituto</strong><p>{% if solicitud.sustituto %}{{solicitud.sustituto.nombre}} {{solicitud.sustituto.apellidos}}{% else %} -- {% endif %}</p></li>
+                
+    
+              </ul>
+            </div>
+          </div>
+  
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalEditar" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEditar"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar solicitud asuntos propios</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioModificarSolicitud" action="{% url 'timetrackpro:modificar-asuntos-propios' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="number" class="form-control" name="id_asunto" id="id_asunto" value="{{solicitud.id|safe}}" min="1" required hidden>
+          <div class="row">
+            <div class="col-xl-6">
+              <label class="col-form-label">Fecha de inicio</label>
+                <input type="date" class="form-control" aria-label="Fecha inicial de las vacaciones" aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" value="{{solicitud.fecha_inicio|safe}}" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
+            </div>
+            
+            <div class="col-xl-6 mt-2"   >
+              <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos" value="{{solicitud.dias_consumidos|safe}}" min="1" required hidden >
+
+                <label class="col-form-label">Fecha de fin</label>
+
+                <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
+                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" value="{{solicitud.fecha_fin|safe}}" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6 col-md-4">
+              <label for="recuperable" class="col-form-label">¿Es recuperable?</label>
+                <select class="form-control" id="recuperable" name="recuperable">
+                  <option value="0" {% if solicitud.recuperable == 0 %} selected {% endif %}>No</option> 
+                  <option value="1" {% if solicitud.recuperable == 1 %} selected {% endif %}>Si</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-4">
+              <label for="sustituto" class="col-form-label">Sustituto</label>
+                <input id="inputSustituto" list="sustitutos" {% if solicitud.sustituto.id != None %} value="{{solicitud.sustituto.nombre}} {{solicitud.sustituto.apellidos}}" {% else %} value="Ninguno" {% endif %} class="form-select">
+                
+              <input type="number" id="sustituto" name="sustituto"  class="form-control" {% if solicitud.sustituto.id != None %} value="{{solicitud.sustituto.id}}" {% else %} value="0" {% endif %} hidden>
+
+              <datalist id="sustitutos">
+                {% for s in sustitutos %}
+                <option data-id="{{s.id}}" selected>{{s.nombre}} {{s.apellidos}}</option>
+                {% endfor %}
+              </datalist>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label class="col-form-label">Tareas a sustituir</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique las tareas que deben ser sustituidas." id="tareas_a_sustituir" name="tareas_a_sustituir" aria-describedby="text-addon">{{solicitud.tareas_a_sustituir}}</textarea>
+              </div>
+            </div>
+          </div>
+          <div class="row" id="descripcionRecuperacion" hidden>
+            <div class="col" >
+              <label class="col-form-label">Descripcion de recuparación</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique como va a recuperar los días solicitados." id="descripcion" name="descripcion" aria-describedby="text-addon">{{solicitud.descripcion}}</textarea>
+              </div>
+            </div>
+          </div>
+        </div> 
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonEditar">Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalCambiarEstado" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalCambiarEstado"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Aceptar o rechazar el solicitud</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarEstadoAsuntosPropios" action="{% url 'timetrackpro:cambiar-estado-asuntos-propios' id=solicitud.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Nuevo estado</label>
+              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
+                
+                <option value="9" {% if solicitud.estado.id == 9 %} selected {% endif %}>Pendiente</option>
+                <option value="10" {% if solicitud.estado.id == 10 %} selected {% endif %}>Rechazado</option>
+                <option value="11" {% if solicitud.estado.id == 11 %} selected {% endif %}>Aceptado</option>
+              </select>
+            </div>
+            
+          </div>
+          <div class="row"  id="rowMotivo">
+            <div class="col-xl-8 mx-auto my-2">
+              <label class="text-sm" id="labelMotivo">Motivo</label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el error" aria-label="Indique el motivo por el que se rechaza" id="motivo" name="motivo" aria-describedby="text-addon"></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonModificar" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalEliminarAsuntosPropios" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEliminarAsuntosPropios"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar solicitud</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarEstadoAsuntosPropios" action="{% url 'timetrackpro:eliminar-asuntos-propios' id=solicitud.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+
+            <div class="col-xl-8 mx-auto my-2" >
+              <h6>¿Está seguro/a de eliminar la solicitud?</h6>
+              <span>{{solicitud.empleado.nombre}} {{solicitud.empleado.apellidos}} - {{solicitud.fecha_inicio|date:'d' }} de {{solicitud.fecha_inicio|date:'M' }} de {{solicitud.fecha_inicio|date:'Y' }} a {{solicitud.fecha_fin|date:'d' }} de {{solicitud.fecha_fin|date:'M' }} de {{solicitud.fecha_fin|date:'Y' }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonEliminar">Eliminar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+
+  function mostrarTextArea (){
+    if($('#estado').val() == 10){
+      $('#botonModificar').attr('disabled', true);
+      $('#rowMotivo').show();
+      $('#motivo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+    }else{
+      
+      $('#botonModificar').attr('disabled', false);
+      
+      $('#rowMotivo').hide();
+    }
+  }
+
+
+
+
+    // compruebo si en textarea de motivoEliminación hay algo escrito
+  // si hay algo escrito, habilito el boton de guardar
+  // si no hay nada escrito, deshabilito el boton de guardar
+  $(document).ready(function(){
+    $('#motivoEliminacion').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonEliminar').attr('disabled', false);
+    })
+  });
+
+
+  function calcularDias(inicio, fin, dias_consumidos){
+    console.log(inicio, fin, dias_consumidos);
+    fecha_inicio = document.getElementById(inicio).value;
+    fecha_fin = document.getElementById(fin).value;
+    dias_consumidos = document.getElementById(dias_consumidos);
+
+    if (fecha_inicio > fecha_fin){
+      alert("La fecha de inicio no puede ser mayor que la fecha de fin");
+      document.getElementById(inicio).value = "";
+      document.getElementById(fin).value = "";
+    }
+
+    // obtener la diferencia en dias entre las dos fechas
+    var fecha1 = new Date(fecha_inicio);
+    var fecha2 = new Date(fecha_fin);
+    var diff = fecha2.getTime() - fecha1.getTime();
+    var dias = diff / (1000 * 60 * 60 * 24);
+    dias = dias + 1;
+    if (dias > 6){
+      alert("No se pueden solicitar más de 6 días de asuntos propios");
+      document.getElementById(inicio).value = "";
+      document.getElementById(fin).value = "";
+    }else{
+      dias_consumidos.value = dias;
+    }
+  }
+
+  document.getElementById('inputSustituto').addEventListener('input', function() {
+        const inputText = this.value;
+        const datalist = document.getElementById('sustitutos');
+        const options = datalist.getElementsByTagName('option');
+        const sustitutoSeleccionado = document.getElementById('sustituto');
+        for (const option of options) {
+            if (option.textContent === inputText) {
+                const selectedOptionId = option.getAttribute('data-id');
+                sustitutoSeleccionado.value = selectedOptionId;
+                console.log('ID de la opción seleccionada:', selectedOptionId);
+                break;
+            }
+        }
+    });
+
+  // comprobamos si el asunto propio es recuperable
+  // si es recuperable, mostramos el textarea para que el empleado indique como va a recuperar los días
+  // si no es recuperable, ocultamos el textarea
+  $(document).ready(function(){
+    var rowDescripcion = document.getElementById('descripcionRecuperacion');
+    if($('#recuperable').val() == 1){
+      rowDescripcion.hidden = false;
+    }else{
+      rowDescripcion.hidden = true;
+    }
+  });
+
+  $('#recuperable').change(function(){
+    var rowDescripcion = document.getElementById('descripcionRecuperacion');
+    if($('#recuperable').val() == 1){
+      rowDescripcion.hidden = false;
+    }else{
+      rowDescripcion.hidden = true;
+    }
+  });
+
+  
+
+</script>
+{% endblock %}

@@ -1,0 +1,161 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block imports %}
+
+
+{% endblock %}
+
+
+
+{% block content %}
+
+  <div class="page-header min-vh-75">
+    <div class="container filaForm">
+      <div class="row">
+        <div class="col-lg-9 col-xl-9">
+          <div class="row">
+            <div class="col col-11">
+              <div class="card card-plain">
+                <div class="card-header pb-0 text-left bg-transparent">
+                  <h3 class="font-weight-bolder text-info text-gradient">Relación de información de los empleados</h3>
+                  <p class="mb-0">Selecciona la información del empleado en los diferentes campos</p>
+                </div>
+                <div class="card-body">
+                  <table  id="relacion-empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-xl-2" >
+            <div class="oblique position-absolute top-0 h-100 d-lg-block d-none me-n8 ">
+              <div class="oblique-image bg-cover position-absolute fixed-top ms-auto h-100 z-index-0 ms-n8 background-timetrackpro-asociarEmpleados">
+              </div>
+            </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+var admin = "{{ administrador }}";
+$("#relacion-empleados").bootstrapTable({
+  method: "get",
+  locale: navigator.language,
+  url: "{% url 'timetrackpro:datos-relaciones-empleados' %}",
+  cache: false, 
+  columns: [{
+      title: "Empleado",
+      field: "empleado",
+      align: "left",
+      width:"5",
+      sortable: true,
+      formatter: function(value, row) {
+        var nombre = row.id_usuario__nombre;
+        var apellidos = row.id_usuario__apellidos;
+        var textNombre = "";
+        textNombre = '<h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+nombre + " "+ apellidos +'</h6>';
+
+        var divNombre = '<div>'+textNombre +'</div>';
+        return divNombre ;
+      }
+    },
+    {
+      title: "ID de empleado",
+      field: "hora",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      formatter: function(value, row) {
+        var nombre = row.id_usuario__id;
+        var textNombre = "";
+        textNombre = '<h6 class="text-sm mb-0">'+nombre +'</h6>';
+
+        var divNombre = '<div>'+textNombre +'</div>';
+        return divNombre ;
+      }
+    },
+    {
+      title: "ID en máquinas",
+      field: "hora",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      formatter: function(value, row) {
+        var nombre = row.id_empleado__id;
+        var textNombre = "";
+        textNombre = '<h6 class="text-sm mb-0">'+nombre +'</h6>';
+
+        var divNombre = '<div>'+textNombre +'</div>';
+        return divNombre ;
+      }
+    },
+    {
+      title: "ID en aplicaciones",
+      field: "hora",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      formatter: function(value, row) {
+        var nombre = row.id_auth_user__id;
+        var textNombre = "";
+        textNombre = '<h6 class="text-sm mb-0">'+nombre +'</h6>';
+
+        var divNombre = '<div>'+textNombre +'</div>';
+        return divNombre ;
+      }
+    },
+    {
+      title: "ID en tarjetas",
+      field: "hora",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      formatter: function(value, row) {
+        var nombre = row.id_tarjeta_acceso;
+        if (nombre == null){
+          nombre = "Sin tarjeta";
+        }
+        var textNombre = "";
+        textNombre = '<h6 class="text-sm mb-0">'+nombre +'</h6>';
+
+        var divNombre = '<div>'+textNombre +'</div>';
+        return divNombre ;
+      }
+    },{
+      title: "",
+      field: "Acciones",
+      align: "center",
+      visible:(admin == "True" || director == "True" ),
+      formatter: function (value, row) {
+
+        var botonVer = '<a href="/private/timetrackpro/editar-asociar-usuario/' + row.id_usuario__id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+        return botonVer;
+
+      },
+    },
+
+  ],
+
+  search: true,
+  pagination: true,
+  rowStyle: function(row, index) {
+    if (row.id_usuario__fecha_baja_app) {
+      // Si el valor de 'correcto' es 'no', devuelve un objeto con estilo rojo
+      return { 
+        classes: 'bg-table-danger text-white' ,
+    };
+    }
+    // De lo contrario, devuelve un objeto vacío (sin cambio de estilo)
+    return {};
+  },
+
+});
+</script>
+
+{% endblock %}

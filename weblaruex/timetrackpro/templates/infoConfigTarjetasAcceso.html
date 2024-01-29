@@ -1,0 +1,186 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+<h3 class="font-weight-bolder text-dark text-gradient">Configuración Tarjetas de acceso</h3>
+
+  <div class="row d-flex justify-content-center">
+    <div class="col-12 col-xl-4 d-flex align-items-center">
+        <div class="d-block shadow-xl border-radius-xl">
+
+          <img src="{% static 'img/timetrackpro/usuarios/not_found.jpeg' %}" alt="img-blur-shadow" class="img-fluid shadow border-radius-xl h-75">
+        </div>
+    </div>
+    <div class="col-12 col-xl-4">
+        <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+          <div class="row">
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalAsociarUsuario">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-link fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Asociar Usuario</div>
+            </button>
+            </div>
+          </div>
+        </div>
+        
+
+      <div class="card">
+        <div class="card-header pb-0 p-3">
+                <h6 class="mb-2">
+                  <i class="fa-solid fa-print text-primary text-gradient text-lg "></i>
+                    Impresora          
+                </h6>
+
+        </div>
+        
+        <div class="card-body pt-0 p-3" >
+            <p class="text-sm text-center mt-2">
+              La impresora <strong>siempre</strong> va a necesitar que se introduzcan <strong> más de 3 tarjetas </strong> para realizar la impresión.
+            </p>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header pb-0 p-3">
+          <h6 class="mb-2">
+            <i class="fa-solid fa-fingerprint text-primary text-gradient text-lg "></i>
+              Crosscheck          
+          </h6>
+        </div>
+        <div class="card-body pt-0 p-3">
+          <p class="text-sm text-center mt-2">
+            Los números necesarios para dar de alta una tarjeta en el software Crosschex, son los que aparecen en el reverso de la tarjeta, ignorando los ceros, como se observa en la imagen.
+
+            La impresora <strong>siempre</strong> va a necesitar que se introduzcan <strong> más de 3 tarjetas </strong> para realizar la impresión.
+          </p>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header pb-0 p-3">
+          
+          <div class="row">
+            <div class="col-md-8 d-flex align-items-center">
+              <div class="row">
+                
+                <h6 class="mb-2">
+                  Tarjeta de acceso 
+                </h6>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body pt-0 p-3">
+          <p class="text-md">
+            
+            <i class="text-success text-gradient text-md font-weight-bold fa-solid fa-address-card"></i>
+            <strong class="text-success"></strong>
+
+            <i class="text-danger text-gradient text-sm font-weight-bold fa-solid fa-address-card"></i>
+            <strong class="text-danger"></strong>
+
+            
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 mt-4">
+      <div class="card mb-4">
+        <div class="card-header pb-0 p-3">
+          <h4>Accesos y permisos</h4>
+        </div>
+        <div class="card-body p-3 ">
+          <div class="row">
+            <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+              <div class="card card-blog card-plain">
+                <div class="card-body px-1 pb-0">
+                  <h5>Fichar</h5>
+                  <p class="mb-4 text-sm">Maquinas donde el empleado puede registrar la entrada y salida de su jornada laboral.</p>
+                  <ul class="list-group">
+
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" >                       
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >Laboratorio</label>
+                        </div>                
+                      </div>
+                    </li> 
+
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox">                       
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >Alerta2</label>
+                        </div>
+                      </div>
+                    </li> 
+
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" >
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >Departamento</label>
+                        </div>
+                      </div>
+                    </li> 
+                    
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+              <div class="card card-blog card-plain">
+                <div class="card-body px-1 pb-0">
+                  <h5>Acceso a instalaciones</h5>
+                  <p class="mb-4 text-sm">Localizaciones con acceso restringido a las que el usuario tiene acceso.</p>
+                  <ul class="list-group">
+                    
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" >                       
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >Laboratorio</label>
+                        </div>                
+                      </div>
+                    </li> 
+
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" >                       
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >Alerta2</label>
+                        </div>                
+                      </div>
+                    </li> 
+
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" >                       
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >CPD</label>
+                        </div>                
+                      </div>
+                    </li> 
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+              <div class="card card-blog card-plain">
+                <div class="card-body px-1 pb-0">
+                  <h5>Permisos de Django</h5>
+                  <p class="mb-4 text-sm">Permisos propios de las aplicaciones Django que tiene el usuario, esto no se corresponde con las habilitaciones</p>
+            
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+{% endblock %}

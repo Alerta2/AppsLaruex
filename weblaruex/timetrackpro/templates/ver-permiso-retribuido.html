@@ -1,0 +1,325 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+
+<div class="row d-flex justify-content-center">
+  <h3 class="font-weight-bolder text-dark text-gradient">Información sobre permiso código {{permiso.cod_uex}}</h3>
+</div>
+{% if not userDjango%}
+<div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+
+  {% if administrador %}
+  <div class="row">
+    <div class="col">
+      <button class="botonLink" data-toggle="modal" data-target="#modalEditarPermiso">
+        <div class="sign-Btn-link"><i class="fa-solid fa-edit fa-lg" style="color: #ffffff;"></i></div>
+        <div class="text text-sm">Editar datos</div>
+      </button>
+    </div>
+    <div class="col">
+      <button class="botonLinkEliminar" data-toggle="modal" data-target="#modalEliminarPermiso">
+        <div class="sign-Btn-link"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
+        <div class="text text-sm">Eliminar permiso</div>
+      </button>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+{% endif %}
+<div class="row d-flex justify-content-end">
+  <div class="col-xl-2 col-sm-4 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-12">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">¿Quién se beneficia?</p>
+              <h5 class="font-weight-bolder mb-0">
+                {% if permiso.pas == 1%}
+                <i class="fa-solid fa-check text-success fa-lg" aria-hidden="true"></i>
+                {% else %}
+                <i class="fa-solid fa-xmark fa-lg text-danger" aria-hidden="true"></i>
+                {% endif %}
+                PAS
+
+                {% if permiso.pdi == 1%}
+                <i class="fa-solid fa-check text-success fa-lg ms-2" aria-hidden="true"></i>
+                {% else %}
+                <i class="fa-solid fa-xmark fa-lg text-danger ms-2" aria-hidden="true"></i>
+
+                {% endif %}
+                PDI
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-9">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Código permiso Uex</p>
+              <h5 class="font-weight-bolder mb-0">{{permiso.cod_uex}}
+              </h5>
+            </div>
+          </div>
+          <div class="col-3 text-end">
+            <div class="icon icon-shape bg-gradient-dark shadow text-center border-radius-md">
+              <i class="fa-solid fa-barcode fa-2xl mt-2" aria-hidden="true" style="color: #ced4da;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-9">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Duración en días</p>
+              <h5 class="font-weight-bolder mb-0">
+                {% if permiso.dias == 999 %}
+                Consultar con recursos humanos
+                {% else %}
+                {{permiso.dias}} días {{permiso.habiles_o_naturales}}
+                {% endif %}
+              </h5>
+            </div>
+          </div>
+          <div class="col-3 text-end">
+            <div class="icon icon-shape bg-gradient-dark shadow text-center border-radius-md">
+              <i class="fa-kit fa-solid-calendar-days-user fa-xl" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-8">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Fecha límite para notificarlo</p>
+              <h5 class="font-weight-bolder mb-0">
+                {% if permiso.solicitud_dias_naturales_antelacion == 0 %}
+                Notificación inmediata
+                {% else %}
+                {{permiso.solicitud_dias_naturales_antelacion}} días naturales
+                {% endif %}
+              </h5>
+            </div>
+          </div>
+          <div class="col-4 text-end">
+            <div class="icon icon-shape bg-gradient-dark shadow text-center border-radius-md">
+              <i class="fa-solid fa-envelope fa-2xl mt-2" aria-hidden="true" style="color: #ced4da;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row d-flex justify-content-center">
+
+  <div class="col-12 col-xl-4">
+    <div class="card mt-4">
+      <div class="card-header pb-0 p-3">
+        <h6 class="mb-2">
+          <span class="badge badge-xs bg-gradient-dark">{{permiso.tipo.nombre}}</span>
+        </h6>
+      </div>
+      <div class="card-body  p-3">
+        <p class="text-md text-wrap text-center">
+          {{permiso.nombre|safe}}
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<div id="modalEditarPermiso" tabindex="-1" role="dialog" class="modal fade modal-lg"
+  aria-labelledby="modalEditarPermiso" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modificar permiso con código {{permiso.cod_uex}}</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form id="formularioEditarPermiso" action="{% url 'timetrackpro:editar-permiso-retribuido' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-4">
+              <label>Código Uex</label>
+              <input type="text" class="form-control" id="id_permiso" name="id_permiso" value="{{permiso.id}}" hidden>
+              <input type="text" class="form-control" placeholder="400.1" aria-label="400.1"
+                aria-describedby="text-addon" id="cod_uex" name="cod_uex" value="{{permiso.cod_uex}}">
+            </div>
+            <div class="col-xl-4">
+              <label>Tipo</label>
+              <select class="form-control" aria-label="Tipo de permiso" id="tipo_permiso" name="tipo_permiso"
+                aria-describedby="text-addon">
+                <option value="1" {% if permiso.tipo.id == 1 %} selected {% endif %}>Permisos</option>
+                <option value="2" {% if permiso.tipo.id == 2 %} selected {% endif %}>Permisos con duración inespecífica
+                </option>
+                <option value="3" {% if permiso.tipo.id == 3 %} selected {% endif %}>Reducción de jornada</option>
+                <option value="4" {% if permiso.tipo.id == 4 %} selected {% endif %}>Ausencia</option>
+              </select>
+            </div>
+            <div class="col-xl-4">
+              <label>Periodo para la notificación</label>
+              <select class="form-control" aria-label="Periodo para la notificación" id="dias_antelacion"
+                name="dias_antelacion" aria-describedby="text-addon">
+                <option value="0" {% if permiso.solicitud_dias_naturales_antelacion == 0 %} selected {% endif %}>
+                  Inmediatamente</option>
+                <option value="7" {% if permiso.solicitud_dias_naturales_antelacion == 7 %} selected {% endif %}>7 días
+                  antes</option>
+                <option value="15" {% if permiso.solicitud_dias_naturales_antelacion == 15 %} selected {% endif %}>15 días
+                  antes</option>
+                <option value="30" {% if permiso.solicitud_dias_naturales_antelacion == 30 %} selected {% endif %}>30 días
+                  antes</option>
+              </select>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-xl-12">
+              <label>Nombre</label>
+              <textarea type="text" class="form-control" placeholder="Agrege la información adicional del empleado"
+                aria-label="Información adicional del empleado" id="nombre_permiso" name="nombre_permiso"
+                aria-describedby="text-addon">{{permiso.nombre}}</textarea>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-xl-3">
+              <label>Días</label>
+              <input class="form-control" type="number" step="1" min="0" max="999" id="dias_concedidos"
+                value="{{permiso.dias|safe}}" name="dias_concedidos" placeholder="máximo 999">
+            </div>
+            <div class="col-xl-6">
+              <div class="d-flex mt-5 mb-0">
+                <div class="form-check form-check-inline ">
+                  <input class="form-check-input" type="radio" name="naturales" id="naturales"
+                    onchange="changeSelected('habiles')" {% if permiso.habiles_o_naturales == "Naturales" %}  checked {% endif %}>
+                  <label class="custom-control-label" for="naturales">Naturales</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="habiles" id="habiles"
+                    onchange="changeSelected('naturales')" {% if permiso.habiles_o_naturales == "Hábiles" %}  checked {% endif %}>
+                  <label class="custom-control-label" for="habiles">Hábiles</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-xl-12">
+              <label class="d-inline">Personal beneficiado</label>
+              <div class="d-inline form-switch ps-0">
+                <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">PAS</label>
+                <input class="form-check-input ms-auto" type="checkbox" id="pas" name="pas" {% if permiso.pas == 1 %} checked {% endif %}>
+              </div>
+              <div class="d-inline form-switch ps-0">
+                <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0 d-inline">PDI</label>
+                <input class="form-check-input ms-auto" type="checkbox" id="pdi" name="pdi" {% if permiso.pdi == 1 %} checked {% endif %}>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        {% if user.is_authenticated %}
+        <button type="submit" value="submit" id="botonGuardar" class="btn bg-gradient-primary">Guardar</button>
+        {% endif %}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="modalEliminarPermiso" tabindex="-1" role="dialog" class="modal fade modal-lg"
+  aria-labelledby="modalEliminarPermiso" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Eliminar permiso con código {{permiso.cod_uex}}</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form id="formularioEditarPermiso" action="{% url 'timetrackpro:eliminar-permiso-retribuido' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="text" class="form-control" id="id_permiso_eliminar" name="id_permiso_eliminar"
+            value="{{permiso.id}}" hidden>
+
+          <div class="row">
+            <div class="col-xl-12 text-center">
+              <strong class="text-lg">¿Está seguro que desea eliminar el permiso con código
+                {{permiso.cod_uex}}?</strong>
+              <p class="text-danger font-italic text-sm mt-2">Recuerda que al eliminar el permiso se eliminarán todas
+                las solicitudes asociadas a este permiso</p>
+            </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        {% if user.is_authenticated %}
+        <button type="submit" value="submit" class="btn bg-gradient-danger">Eliminar</button>
+        {% endif %}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    $("#acreditable").click(function () {
+      if ($("#acreditable").is(':checked')) {
+        $("#docNecesaria").removeAttr("hidden");
+        $("#documentacion_permiso").attr("required", true);
+      } else {
+        $("#docNecesaria").attr("hidden", true);
+        $("#documentacion_permiso").attr("required", false);
+      }
+    });
+  });
+  function changeSelected(button) {
+    document.getElementById(button).checked = false;
+  }
+
+  // comprobamos si el textarea tiene contenido mayor a 5 caracteres si tiene contenido el boton guardar está habilitado de lo contrario está deshabilitado quiero que se compruebe cada vez que se modifique el textarea. 
+  $(document).ready(function () {
+    $("#nombre_permiso").keyup(function () {
+      if ($("#nombre_permiso").val().length > 5) {
+        $("#botonGuardar").removeAttr("disabled");
+      } else {
+        $("#botonGuardar").attr("disabled", true);
+      }
+
+    });
+  });
+
+
+
+</script>
+
+{% endblock %}
