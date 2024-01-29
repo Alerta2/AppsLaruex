@@ -1,0 +1,288 @@
+/*Calendario*/
+#calendarioAnual {
+    width: 100%;
+    height: 100%;
+}
+.fc-daygrid-day-number{
+  color: #30a898;
+  font-weight: bold;
+  font-size: 20px;
+  text-transform: capitalize;
+}
+.fc-daygrid-day-number:hover{
+  color: #135b51;
+  font-weight: bold;
+  font-size: 20px;
+  text-transform: capitalize;
+  text-decoration: none;
+}
+
+.fc-theme-standard .fc-scrollgrid{
+  border-color: transparent;
+  background-color: transparent;
+}  
+
+.fc-theme-standard td,
+  .fc-theme-standard th {
+    border-color: transparent;
+    background-color: transparent;
+  }
+
+  .fc-daygrid-day-frame {
+    /* color: #30a898; */
+    font-weight: bold;
+    font-size: 20px;
+    text-transform: capitalize;
+  }
+  
+  
+  table[role="presentation"]  tr[role="row"] th[role="columnheader"]{
+    border-color: transparent;
+    background-color: transparent;
+    /* background-color: #30a898; */
+    border-bottom: 3px solid #676d6c34; /* Ajusta el color y el grosor según tus preferencias */
+  }
+  
+ 
+/*Marca el día actual */
+  .fc-day-today{
+    border-color: transparent;
+    border-radius: 10px;
+    /* background-color: #30a8984e !important; */
+    background-color: #30a8983b !important;
+    /* background-color: #30a898; */
+  }
+
+
+  .fc-col-header-cell-cushion{
+    border-radius: 10px;
+    background-color: transparent;
+    background-color: rgba(252, 252, 252, 0.689);
+    color: #30a898;
+    font-weight: bold;
+    font-size: 20px;
+    /* text-transform: capitalize; */
+  }
+  
+  
+  
+  tbody[role="rowgroup"] tr[role="row"] td[role="gridcell"]{
+    border-color: transparent;
+    background-color: transparent;
+    font-size: 20px;
+    text-transform: capitalize;
+
+  }
+
+  /*Margen de la celda con el día y los eventos */
+
+  .fc-daygrid-day-top{
+    margin-right: 5%;
+  }
+  .fc-daygrid-day-events{
+    margin: 0% 5%;
+
+  }
+
+  /* Diseño de los botones prev y next*/
+
+  button[class="fc-prev-button fc-button fc-button-primary"]{
+    border: transparent !important;
+    background-color: transparent !important;
+    color: #30a898 !important;
+    margin: 0px 5px 0px 5px !important;
+
+    box-shadow:rgba(48, 168, 152, 0.725) -3px 0px 10px !important;
+    }
+
+  button[class="fc-prev-button fc-button fc-button-primary"]:hover{
+    border: transparent !important; 
+    background-color: #30a8989e !important;
+    color: #fff !important;
+    margin: 0px 5px 0px 5px !important;
+
+    box-shadow:rgb(48, 168, 152, 0.725) -3px 2px 6px !important;
+  }
+
+  button[class="fc-next-button fc-button fc-button-primary"]{
+    border: transparent !important;
+    background-color: transparent !important;
+    color: #30a898 !important;
+    box-shadow:rgb(48, 168, 152, 0.725) 3px 0px 10px !important;
+    }
+
+  button[class="fc-next-button fc-button fc-button-primary"]:hover{
+    border: transparent !important; 
+    background-color: #30a8989e !important;
+    color: #fff !important;
+    box-shadow:rgb(48, 168, 152, 0.725) 3px 2px 6px !important;
+  }
+
+    /* Diseño de los botones Hoy*/
+
+    button[class="fc-dayGridMonth-button fc-button fc-button-primary"]{
+      border: transparent !important;
+      background-color: transparent !important;
+      color: #30a898 !important;
+      margin: 0px 0px 0px 5px !important;
+  
+      box-shadow:rgb(48, 168, 152, 0.725) 1px 0px 10px !important;
+    
+    }
+
+    button[class="fc-dayGridMonth-button fc-button fc-button-primary"]:hover{
+     
+      border: transparent !important; 
+      background-color: #30a8989e !important;
+      color: #fff !important;
+      box-shadow:rgb(48, 168, 152, 0.725) 3px 2px 6px !important;
+    
+    }
+    
+
+
+
+button[class="fc-timeGridWeek-button fc-button fc-button-primary"]{
+  border: transparent !important;
+  background-color: transparent !important;
+  color: #30a898 !important;
+  margin: 0px 0px 0px 5px !important;
+
+  box-shadow:rgb(48, 168, 152, 0.725) 1px 0px 10px !important;
+
+}
+
+
+
+button[class="fc-timeGridWeek-button fc-button fc-button-primary"]:hover{
+ 
+  border: transparent !important; 
+  background-color: #30a8989e !important;
+  color: #fff !important;
+  box-shadow:rgb(48, 168, 152, 0.725) 3px 2px 6px !important;
+
+}
+button[class="fc-timeGridWeek-button fc-button fc-button-primary fc-button-active"]{
+  border: transparent !important; 
+  background-color: #30a8989e !important;
+  color: #fff !important;
+  box-shadow:rgb(48, 168, 152, 0.725) 3px 2px 6px !important;
+  margin: 0px 5px 0px 5px !important;
+  
+}
+
+
+button[class="fc-timeGridDay-button fc-button fc-button-primary"]{
+  border: transparent !important;
+  background-color: transparent !important;
+  color: #30a898 !important;
+  margin: 0px 5px 0px 5px !important;
+  box-shadow:rgb(48, 168, 152, 0.725) 1px 0px 10px !important;
+
+}
+
+button[class="fc-timeGridDay-button fc-button fc-button-primary"]:hover{
+  border: transparent !important; 
+  background-color: #30a8989e !important;
+  color: #fff !important;
+  box-shadow:rgb(48, 168, 152, 0.725) 3px 2px 6px !important;
+  margin: 0px 5px 0px 5px !important;
+}
+button[class="fc-timeGridDay-button fc-button fc-button-primary fc-button-active"]{
+  border: transparent !important; 
+  background-color: #30a8989e !important;
+  color: #fff !important;
+  box-shadow:rgb(48, 168, 152, 0.725) 3px 2px 6px !important;
+  margin: 0px 5px 0px 5px !important;
+  
+}
+
+button[class="fc-dayGridMonth-button fc-button fc-button-primary fc-button-active"]{
+  border: transparent !important; 
+  background-color: #30a8989e !important;
+  color: #fff !important;
+}
+
+
+.fc .fc-button:focus {
+  outline: 0 !important;
+  box-shadow:rgb(48, 168, 152, 0.725) 3px 2px 6px !important;
+  background-color: #30a8989e !important;
+  color: #fff !important;
+  border: transparent !important;
+  margin: 0px 5px 0px 5px !important;
+}
+
+
+/* botones customizados calendario */
+
+button[class="fc-myCustomButton-button fc-button fc-button-primary"]{
+  border: transparent !important;
+  background-color: transparent !important;
+  color: #30a898 !important;
+  margin: 0px 5px 0px 10px !important;
+  box-shadow:rgb(48, 168, 152, 0.725) 0px 0px 10px !important;
+}
+
+
+button[class="fc-myCustomButton-button fc-button fc-button-primary"]:hover{
+
+  border: transparent !important;
+  background-color: #30a898 !important;
+  color: #fff !important;
+  margin: 0px 5px 0px 10px !important;
+}
+
+button[class="fc-myCustomButton-button fc-button fc-button-primary"]:disabled{
+
+  border: transparent !important;
+  background-color: #30a898 !important;
+  color: #fff !important;
+  margin: 0px 5px 0px 10px !important;
+  
+}
+
+/* boton hoy */
+
+button[class="fc-today-button fc-button fc-button-primary"]{  
+  border: transparent !important;
+  background-color: #ffffff !important;
+  color: #30a898 !important;
+  box-shadow:rgb(48, 168, 152, 0.725) 0px 0px 10px !important;
+  
+}
+
+button[class="fc-today-button fc-button fc-button-primary"]:disabled{
+  border: transparent !important;
+  background-color: #30a898c8 !important;
+  color: #fff !important;
+  
+}
+
+button[class="fc-today-button fc-button fc-button-primary"]:hover:enabled{  
+  border: transparent !important;
+  background-color: #30a898 !important;
+  color: #fff !important;
+  
+}
+
+
+/* Fondo del calendario  */
+.fc-daygrid-body{
+  background-image: url('../../../../static/niceAdminAssets/img/laruex.png');
+  background-repeat: no-repeat;
+  background-position: 50% 0;
+  background-size: contain;
+}
+.fc-daygrid-body::after {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(255,255,255,0.92); 
+  z-index:-1;
+}
+
+

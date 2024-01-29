@@ -1,83 +1,22 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
 
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
+
 {% block content %}
-<style>
-  hr {
-    height: 10px;
-    width: 20%;
-    margin: auto;
-    background-color: rgb(5, 215, 243);
-    color: rgb(5, 215, 243);
-  }
 
-  .add:hover {
-    color: #ce8312;
-  }
-
-  .descargaPDF:hover {
-    color: #ce8312;
-  }
-
-  .agregarFormacion:hover {
-    color: #064061;
-  }
-
-  /* estilo añadirFichero PDF*/
-  .addFicheroPDF {
-    color: rgb(161, 16, 32);
-  }
-
-  .addFicheroPDF:hover {
-    color: rgb(99, 10, 20);
-  }
-
-    /* estilo añadirFichero PDF*/
-    .addFicheroActualizado {
-    color: #0a9663;
-  }
-
-  /* ===============================
-  *  Estilo del las pestañas
-  =================================*/
-
-  .nav-tabs-bordered .nav-link {
-    margin-bottom: -2px;
-    border: none;
-    color: #2c384e;
-  }
-
-  .nav-tabs-bordered .nav-link.active {
-    background-color: #fff;
-    color: #4154f1;
-    border-bottom: 2px solid #4154f1;
-  }
-
-  .nav-tabs {
-    --bs-nav-tabs-border-color: #dee2e6;
-    --bs-nav-tabs-border-radius: 0.375rem;
-    --bs-nav-tabs-link-hover-border-color: #e9ecef #e9ecef #dee2e6;
-    --bs-nav-tabs-link-active-color: #495057;
-    --bs-nav-tabs-link-active-bg: #fff;
-    --bs-nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
-    border-bottom: var(--bs-nav-tabs-border-width) solid var(--bs-nav-tabs-border-color);
-  }
-
-  .profile .profile-actualizar label {
-    font-weight: 600;
-    color: rgba(1, 41, 112, 0.6);
-}
-</style>
-
-
-<!-- breadcrumb   -->
 <div class="card-body">
   <nav>
-    <h5 class="card-title">{{curriculum.id_usuario__first_name}} {{curriculum.id_usuario__last_name}} 
+    <h5 class="card-title">{{curriculum.id_usuario__first_name}} {{curriculum.id_usuario__last_name}}
       {% if request.user.id == curriculum.id_usuario__id or administrador %}
       <a href="" title="Añadir Documento" class="mx-1" data-toggle="modal" data-target="#modalFormularioAgregarDocumentos"
         style="color: #ee9b00"><i class="fa-duotone fa-square-plus fa-lg add"></i></a>
-        <a href=""  title="Agregar formaciones" data-toggle="modal" data-target="#modalFormularioAgregarFormaciones" style="color: #005F73"><i class="fa-duotone fa-books-medical fa-lg agregarFormacion"></i></a>
+      <a href=""  title="Agregar formaciones" data-toggle="modal" data-target="#modalFormularioAgregarFormaciones" style="color: #005F73"><i class="fa-duotone fa-books-medical fa-lg agregarFormacionCurriculum"></i></a>
+      
       {% endif %}
     </h5>
     <ol class="breadcrumb" style="background-color:#fff !important">
@@ -124,7 +63,7 @@
             {% else %}
               <a href="\private/docLaruex/descargarZipCurriculum" class="mx-1" title="Descargar formaciones" style="color: #005F73">
             {% endif %}
-            <i class="fa-duotone fa-books fa-2x agregarFormacion"></i></a>
+            <i class="fa-duotone fa-books fa-2x agregarFormacionCurriculum"></i></a>
           </h6>
           {% endif %}
         </div>
@@ -145,10 +84,12 @@
               <button class="nav-link active" data-bs-toggle="tab"
                 data-bs-target="#profile-overview">Información</button>
             </li>
+            {% if request.user.id == curriculum.id_usuario__id or administrador or direccion %}
             <li class="nav-item">
               <button class="nav-link" data-bs-toggle="tab"
                 data-bs-target="#profile-actualizar">Actualizar Curriculum </button>
             </li>
+            {% endif %}
             {% if administrador %}
             <li class="nav-item">
               <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Editar datos de
@@ -228,7 +169,7 @@
 
               <!-- Edit Form -->
               <form id="formularioActualizarCurriculum"
-                action="/private/docLaruex/editarObjeto/{{curriculum.id__id}}/" method="POST"
+                action="/private/docLaruex/editarObjeto/{{curriculum.id}}/" method="POST"
                 enctype="multipart/form-data">
                 {% csrf_token %}
 
@@ -417,6 +358,7 @@
   </div>
 </section>
 
+{% if request.user.id == curriculum.id_usuario__id or administrador or direccion %}
 
 <!-- ===================== Separación Formaciones ===================== -->
 <div class="section-title">
@@ -524,6 +466,7 @@
     </div>
   </div>
 </section>
+{% endif %}
 
 
 <!-- ===================== Formulario agregar Formaciones ===================== -->
@@ -549,14 +492,12 @@
                 <div class="form-group">
                   <label for="fechaInicioFormacion">Fecha de Inicio</label>
                   <input type="date" id="fechaInicioFormacion" name="fechaInicioFormacion" class="form-control"
-                    required />
+                    />
                 </div>
-
-
               </div>
               <div class="col">
                 <div class="form-group">
-                  <label for="fechaFinFormacion">Fecha de Finalización</label>
+                  <label for="fechaFinFormacion">Fecha de Finalización*</label>
                   <input type="date" id="fechaFinFormacion" name="fechaFinFormacion" class="form-control" required />
                 </div>
               </div>
@@ -564,7 +505,7 @@
                 <div class="form-group">
                   <label for="horasFormacion">Horas</label>
                   <input type="number" step="0.5" class="form-control" id="horasFormacion" name="horasFormacion"
-                    data-rule="required" placeholder="0" />
+                   placeholder="0" />
                 </div>
               </div>
             </div>
@@ -580,14 +521,13 @@
             <div class="row">
               <div class="col">
                 <div class="form-group">
-                  <label for="descripcionFormacion">Descripción del Equipo</label>
+                  <label for="descripcionFormacion">Descripción de la formación</label>
                   <textarea type="text" class="form-control" id="descripcionFormacion"
                     placeholder="Introduzca aquí los objetivos de la formación." rows="5" name="descripcionFormacion"
                     data-rule="required"></textarea>
                 </div>
               </div>
             </div>
-
             <div class="row d-flex justify-content-center">
               <div class="col-md-auto" id="adjuntoNoEditable">
                 <div class="form-group">
@@ -601,13 +541,9 @@
                   <spam class="text-center"><strong id="mostrarNombreFormacion"><br></strong>
                     <spam id="formacion-name"></spam>
                   </spam>
-
                 </div>
               </div>
-
             </div>
-
-
             <div class="modal-footer">
               <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal">
                 Cerrar
@@ -632,15 +568,13 @@
   <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="TituloModalDocumento">Añadir Contrato</h5>
+        <h5 class="modal-title" id="TituloModalDocumento">Añadir Documentos Asociados</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <form id="modalFormularioAgregarDocumentos"
-          action="/private/docLaruex/agregarArchivo/" method="POST"
-          enctype="multipart/form-data">
+        <form id="formularioAgregarDocumentos" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           <div id="formularioDocumento" class="divFormularioDocumentos">
             <div class="row" hidden>
@@ -672,9 +606,11 @@
                   <label for="sobreNombreDocumento">Tipo de Documento</label>
                   <select class="form-select" data-rule="required" id="sobreNombreDocumento" name="sobreNombreDocumento"
                     onchange="mostrarTitulo(this.value)">
-                    <option value="1">Contrato de trabajo </option>
+                    <option selected hidden></option>
+                    <option value="1">Contrato de trabajo</option>
                     <option value="2">Contrato de confidencialidad </option>
                     <option value="3">Investigación </option>
+                    <option value="4">Habilitaciones </option>
                   </select>
                 </div>
               </div>
@@ -683,7 +619,7 @@
 
               <div class="col" hidden>
                 <div class="form-group">
-                  <input type="text" class="form-control" id="tipoDocumento" name="tipoDocumento" data-rule="required" readonly style="display: none;"  />
+                  <input type="text" class="form-control" id="tipoDocumento" name="tipoDocumento" value="6" data-rule="required" readonly style="display: none;"  />
                   <input type="text" class="form-control" id="habilitacion" name="habilitacion" data-rule="required" readonly
                     value="{{curriculum.id__id_habilitacion}}" style="display: none;" />
                 </div>
@@ -700,14 +636,14 @@
               <div class="col-3">
                 <div class="form-group">
                   <label for="fechaActualizacion" id="tituloFechainicioContrato">Fecha de Inicio</label>
-                  <input type="date" class="form-control" id="fechaActualizacion" name="fechaActualizacion" onchange="cambiarFechaInicio()"/>
+                  <input type="date" class="form-control" id="fechaActualizacion" name="fechaActualizacion" onchange="cambiarFechaInicio()" required/>
                 </div>
               
               </div>
               <div class="col-3">
                 <div class="form-group">
                   <label for="fechaFinContrato" id="tituloFechaFinContrato">Fecha de finalización</label>
-                  <input type="date" class="form-control" id="fechaFinContrato" name="fechaFinContrato" onchange="cambiarFechaFin()" />
+                  <input type="date" class="form-control" id="fechaFinContrato" name="fechaFinContrato" onchange="cambiarFechaFin()" required/>
                 </div>
               </div>
 
@@ -743,12 +679,12 @@
 
 
             <div class="modal-footer">
-              <button id="cerrar" type="button" class="btn btn-secondary" data-dismiss="modal" onclick="crearAviso('agregarAñadirDocumentoCerrar', 'No se ha podido agregar ningun documento asociado {{ curriculum.id__nombre }}', 'alert-warning', 3000)">
+              <button id="cerrarAgregarDocumento" type="button" class="btn btn-secondary" data-dismiss="modal" >
                 Cerrar
               </button>
               <button id="reset" type="reset" class="btn btn-secondary" hidden>
               </button>
-              <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('agregarDocumentoGuardar', 'Nuevo documento asociado a {{ curriculum.id__nombre }}', 'alert-success', 3000)">
+              <button type="submit" value="submit" class="btn btn-primary">
                 Guardar
               </button>
             </div>
@@ -855,7 +791,30 @@ function cerrarModal(){
     return i;
   }
 
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioAgregarDocumentos").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarArchivo/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        crearAviso('objetoGuardar', 'Documento agregado con éxito', 'alert-success', 2000);
+        $('#formularioAgregarDocumentos').trigger('reset');
+        $('#cerrarAgregarDocumento').trigger('click');
+        location.reload(true);
 
+      }
+    });
+  });
 
   // cambiamos la funcionalidad del boton submit del formulario
   $("#formularioEditarContacto").submit(function (e) {
@@ -927,9 +886,14 @@ function cerrarModal(){
         align: "center",
         formatter: function (value, row) {
           var fecha = new Date(row.fecha_inicio);
-          return (
-            $.datepicker.formatDate("dd-mm-yy", fecha)
-          );
+          console.log(fecha, typeof(fecha));
+          if (row.fecha_inicio == null){
+            return "--";
+          }else{
+            return (
+              $.datepicker.formatDate("dd-mm-yy", fecha)
+            );
+          }
         },
       },
       {
@@ -992,6 +956,7 @@ function cerrarModal(){
         title: "Nombre",
         field: "id_relacionado__nombre",
         align: "center",
+        sortable: "true",
       }, {
         title: "Acciones",
         field: "action",
@@ -1023,6 +988,7 @@ function cerrarModal(){
     ],
     search: true,
     sortOrder: "desc",
+    
   });
 
 
@@ -1113,23 +1079,20 @@ function cerrarModal(){
 
 
   function mostrarTitulo(value) {
-
+    
+    var fechaInicioSeleccionada = document.getElementById("fechaActualizacion");
+    var fechaFinSeleccionada = document.getElementById("fechaFinContrato");
     if (value == "1") {
-      var fechaInicioSeleccionada = document.getElementById("fechaInicioContrato");
-      var fechaInicio = fechaInicioSeleccionada.value;
-      console.log(fechaInicio)
-
-      var prueba =  $("#fechaFinContrato").datepicker('getDate');
-      console.log("value: ", prueba)
-      var fechaFinSeleccionada = document.getElementById("fechaFinContrato");
-      var fechaFin = fechaFinSeleccionada.value;
-
-      $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + fechaInicio + " a " + fechaFin + " de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
-      $("#tituloObjetoNombre").html("Añadir Contrato de Trabajo");
+      fechaInicioSeleccionada.required = true;
+      fechaFinSeleccionada.required = true;
       $("#TituloModalDocumento").html("Añadir Contrato de Trabajo");
+      $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + "de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
+
       $("#tipoDocumento").val('6');
       
     } else if (value == "2") {
+      fechaInicioSeleccionada.required = true;
+      fechaFinSeleccionada.required = false;
       $("#tituloObjetoNombre").html("Añadir Contrato de Confidencialidad");
       $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + "de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
       
@@ -1138,13 +1101,26 @@ function cerrarModal(){
       
       $("#tipoDocumento").val('6');
     } else if (value == "3") {
+      fechaInicioSeleccionada.required = false;
+      fechaFinSeleccionada.required = true;
       $("#tituloObjetoNombre").html("Añadir Investigación");
       
       $("#TituloModalDocumento").html("Añadir Investigación");
       $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + " - " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
       
       $("#tipoDocumento").val('9');
-    } else {
+    }  else if (value == "4") {
+
+      // hacer que la fecha no sea obligatoria
+      fechaInicioSeleccionada.required = false;
+      fechaFinSeleccionada.required = false;
+      $("#tituloObjetoNombre").html("Añadir Habilitaciones");
+      
+      $("#TituloModalDocumento").html("Añadir Habilitaciones");
+      $("#nombreObjeto").val($("#sobreNombreDocumento option:selected").text() + "de " + "{{ curriculum.id_usuario__first_name }}" + " " + "{{ curriculum.id_usuario__last_name }} ");
+      
+      $("#tipoDocumento").val('10');
+    }else {
       $("#tituloObjetoNombre").html("Añadir Documento");
     }
   }

@@ -640,7 +640,8 @@ def agregarNoticia(request):
 
         #agregamos la imagen de la noticia
         if request.FILES.get('imagenNoticiaAgregar') is not None:
-            ruta = settings.STATIC_ROOT + 'news/' + str(nuevaNoticia.id) + '.' + request.FILES['imagenNoticiaAgregar'].name.split('.')[-1]    
+            # en local ruta = settings.STATIC_ROOT + 'news/' + str(nuevaNoticia.id) + '.' + request.FILES['imagenNoticiaAgregar'].name.split('.')[-1]
+            ruta = settings.STATIC_ROOT + 'img/news/' + str(nuevaNoticia.id) + '.' + request.FILES['imagenNoticiaAgregar'].name.split('.')[-1]    
             subirDocumento(request.FILES['imagenNoticiaAgregar'], ruta)
             nuevaNoticia.img_portada = str(nuevaNoticia.id) + '.' + request.FILES['imagenNoticiaAgregar'].name.split('.')[-1]
             nuevaNoticia.save(using='default')

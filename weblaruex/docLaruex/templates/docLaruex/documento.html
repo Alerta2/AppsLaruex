@@ -1,48 +1,13 @@
-{% extends "base/base_docLaruex.html" %} {% load static %} {% block content %}
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
 
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
 
-<style>
+{% endblock %}
 
-    /*===========================
-    Otros CSS
-  ===========================*/
-  
-
-  hr {
-      height: 10px;
-      width: 20%;
-      margin: auto;
-      background-color: rgb(5, 215, 243);
-      color: rgb(5, 215, 243);
-    }
-
-  .descargaWord:hover {
-    color: #064061;
-  }
-
-  .modificarObjeto:hover {
-    color: #bb3e03;
-  }
-
-
-  .descargaPDF:hover {
-    color: #ce8312;
-  }
-    
-  .enviarNotificacion:hover {
-    color: #064061;
-  }
-
-    /* estilo añadirFichero PDF*/
-    .addFicheroPDF {
-    color: rgb(161, 16, 32);
-  }
-
-  .addFicheroPDF:hover {
-    color: rgb(99, 10, 20);
-  }
-
-</style>
+{% block content %}
 
 
 <!-- ============= breadcrumb ============= -->
@@ -908,6 +873,10 @@ aria-hidden="true">
           var objeto = '{{documento.id_doc.id}}';
           var rol = "{{rol}}";   
           var admin = '{{administrador}}';  
+          var propietario = row.id_relacionado__propietario;
+          var empleado = '{{request.user.id}}';
+          console.log("propietario", propietario)
+          console.log("empleado", empleado)
 
           var botonDescargarPDF = '<a href="/private/docLaruex/consultarArchivo/' + row.id_relacionado + '/' + '" class="mx-1" title="Descargar" download><i class="fa-solid fa-file-pdf fa-lg" style="color:#A11020"></i></a>';
           var botonDescargarExcel = '<a href="/private/docLaruex/consultarArchivo/' + row.id_relacionado + '/' + '" class="mx-1" title="Descargar" download><i class="fa-duotone fa-file-excel fa-lg" style="color:#128C33"></i></a>';
@@ -942,22 +911,41 @@ aria-hidden="true">
               return (botonVer  + botonDescargarPDF + botonEditar + botonEliminarReferencia) 
             }
           }else{
-            
-            if (row.id__ruta && row.id__ruta_editable){
-              if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
-                return (botonVer + botonDescargarPDF + botonDescargarExcel)
+            if (propietario == null || propietario == empleado){
+              if (row.id__ruta && row.id__ruta_editable){
+                if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
+                  return (botonVer + botonDescargarPDF + botonDescargarExcel)
+                }else{
+                  return (botonVer + botonDescargarPDF + botonDescargarEditable)
+                }
+              }else if (!row.id__ruta && row.id__ruta_editable){
+                if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
+                  return (botonVer  + botonDescargarExcel)
+                }else{
+                  return (botonVer + botonDescargarEditable)
+                }
               }else{
-                return (botonVer + botonDescargarPDF + botonDescargarEditable)
+                return (botonVer  + botonDescargarPDF)
               }
-            }else if (!row.id__ruta && row.id__ruta_editable){
-              if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
-                return (botonVer  + botonDescargarExcel)
-              }else{
-                return (botonVer + botonDescargarEditable)
-              }
+
             }else{
-              return (botonVer  + botonDescargarPDF)
+              if (row.id__ruta && row.id__ruta_editable){
+                if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
+                  return (botonVer)
+                }else{
+                  return (botonVer)
+                }
+              }else if (!row.id__ruta && row.id__ruta_editable){
+                if(extension_ruta_editable  == "xlsx" || extension_ruta_editable == "xls"){
+                  return (botonVer)
+                }else{
+                  return (botonVer)
+                }
+              }else{
+                return (botonVer)
+              }
             }
+
           }
         },
       },

@@ -1,0 +1,256 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
+{% block content %}
+
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Mantenimientos asociados a {{objeto.nombre}}</h5>
+</div>
+
+
+
+
+
+<div class="section my-2">
+  <table id="tabla_mantenimientos_asociados" data-toggle="table" data-search="true" data-show-columns="true"
+  data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+  data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+  data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
+  </table>
+</div>
+
+<script>
+  
+
+  var objeto = "{{objeto.id}}";
+  var url = "/private/docLaruex/datosMantenimientosAsociados/" + objeto + "/";
+  $('#tabla_mantenimientos_asociados').bootstrapTable({
+    //--/" + tipoEvento +"/
+        method: 'get',
+        url: url,
+        cache: false,
+        columns: [{
+            title: 'Nombre',
+            field: 'id_evento__nombre',
+            align: "center"
+        }, {
+            title: 'Tipo',
+            field: 'id_evento__tipo_evento__nombre',
+            align: "center"
+        }, {
+            title: 'Procedimiento asociado',
+            field: 'id_evento__procedimiento_asociado__id_doc__nombre',
+            align: "center"
+        },{
+            title: 'Próximo mantenimiento',
+            field: 'fecha_proximo_mantenimiento',
+            align: "center",
+            formatter: function (value, row) {
+
+              const mes = {
+                "01": "Ene",
+                "02": "Feb",
+                "03": "Mar",
+                "04": "Abr",
+                "05": "May",
+                "06": "Jun",
+                "07": "Jul",
+                "08": "Ago",
+                "09": "Sep",
+                "10": "Oct",
+                "11": "Nov",
+                "12": "Dic",
+              };
+                var fecha = new Date(row.fecha_proximo_mantenimiento);
+                fechaFormateada = $.datepicker.formatDate('dd-mm-yy', fecha);
+                
+                // formateo la fecha para conseguir día mes y año
+                dia = fechaFormateada.split("-")[0];
+                if (dia.length > 1 && dia[0] == "0"){
+                    // elimino el 0 del día
+                    dia = dia[1];
+                }
+                var nuevaFecha = dia + " " + mes[fechaFormateada.split("-")[1]] + " de " + fechaFormateada.split("-")[2];
+                return nuevaFecha;
+            }
+        }, {
+            title: 'Periodicidad',
+            field: 'id_evento__periodicidad',
+            align: "center",
+            formatter: function (value, row) {
+                var periodicidad = row.id_evento__periodicidad__cantidad + " " + row.id_evento__periodicidad__unidad ;
+                return periodicidad;
+            }
+        }, {
+            title: "Acciones",
+            field: "action",
+            align: "center",
+            formatter: function (value, row) {
+              var botonVerTarea = '<a href="/private/docLaruex/verTarea/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
+
+
+
+              return botonVerTarea;
+                
+            }
+        },
+        ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'fecha_verificacion',
+        sortOrder: 'desc',
+
+    });
+
+
+  
+    
+ // tabla de objetos 
+ 
+    // tatbla de elementos seleccionados
+    $("#tabla_objetos").bootstrapTable({
+    
+    locale: navigator.language,
+    url:"/private/docLaruex/equiposUbicacionesDatos" ,
+    cache: false,
+    singleSelect: true,
+    columns: [
+      {
+        title: "",
+        field:"state",
+        checkbox:"true",
+      },{
+        title: "Códigos",
+        id: "codigos", // "id" necesario para ocultar la columna
+        field: "codigos",
+        halign:"left",
+        align: "left", 
+        width:"200",
+        formatter: function (value, row) {
+          // icono del código de barras
+          var code = '<div class="col-auto"><h6 class="my-auto"><i class="fa-solid fa-barcode fa-lg" style="color:#032525"></i></h6></div>';
+          // obtengo y formateo la fecha de alta
+          var fecha = new Date(row.fecha_alta).getFullYear().toString().slice(-2);
+
+          // obtengo los códigos de la ubicación y del equipo
+          var codUex = row.cod_uex;
+          var codLaruex = row.cod_laruex;
+
+          var infoCodigoLaruex = "Laruex: "+ codLaruex + "/" + fecha;
+          var infoCodigoUex = "Uex: "+ codUex;
+          
+          var infoTotal = '<div class="row d-flex justify-content-start align-items-center">'+ code + '<div class="col-auto ">'+ '<div class="row"><p class="text-xs text-secondary mb-0">'+ infoCodigoLaruex +'</p></div>' + '<div class="row "><p class="text-xs text-secondary mb-0">'+ infoCodigoUex +'</p></div>' +'</div></div>';
+
+          if (row.id__tipo != 'Ubicacion'){
+            if (row.cod_uex != 0){
+              if (codUex == codLaruex){
+                infoCodigoLaruex = '';
+              }
+            }else{
+              infoCodigoUex = '';
+
+            } 
+            
+            var infoTotal = '<div class="row d-flex justify-content-start align-items-center ">'+ code + '<div class="col-auto">'+ '<div class="row"><p class="text-xs text-secondary mb-0">'+ infoCodigoLaruex +'</p></div>' + '<div class="row"><p class="text-xs text-secondary mb-0">'+ infoCodigoUex +'</p></div>' +'</div></div>';
+            return infoTotal;
+          }
+        },
+      },{
+        title: "Nombre",
+        field: 'id__nombre',
+        id: "nombre", // "id" necesario para ocultar la columna
+        field: "nombre",
+        halign:"left",
+        align: "left",
+        formatter: function (value, row) {
+          // declaro los iconos 
+          var icono = '<i class="fa-duotone fa-boxes-stacked me-2 fa-lg" style="color:#032525"></i>';
+          var ubicacionPadre = "";
+
+
+          if (row.id__tipo == 'Ubicacion'){
+            icono = '<i class="fa-duotone fa-building me-2 fa-lg" style="color:#032525"></i>';
+            // obtengo el nombre de la ubicación
+            if (row.id__padre){
+              // obtengo el nombre de la ubicación padre si existe
+              ubicacionPadre = "[" + row.id__padre__nombre +"] ";
+            }
+          }
+          
+          
+          // obtengo el nombre del equipo o la ubicacion
+          var nombre = row.id__nombre;
+          var informacion = '<div>'+ icono + " " + ubicacionPadre + " " + nombre+ '</div>'
+          return informacion;
+
+          
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+  $('#tabla_objetos').on('check.bs.table', function (e, row) {
+    var id = row.id;
+    $('#idObjeto').val(id);
+    console.log('El ID seleccionado es :', id);
+  });
+
+
+
+  function filtrarFormato() {
+  
+    //obtener el valor del select de procedimiento
+    var procedimiento = document.getElementById("procedimiento");
+    var divFormatoPlantilla = document.getElementById("divFormatoPlantilla");
+    if (procedimiento.value != "0"){
+      console.log("HE ENTRADO");
+      divFormatoPlantilla.style.display = "block"; // mostrar el div
+      
+      console.log(procedimiento.value);
+
+      // obtener la lista de formatos del procedimiento seleccionado que se encuentra en la url private/docLaruex/formatoDatosFiltrados/<str:procedimiento>/
+      var url = "/private/docLaruex/formatoDatosFiltrados/" + procedimiento.value + "/";
+      // guardar el resultado de la lista de datos obtenidos en la views.py
+      var listaFormatos = $.get(url, function (data) {
+        console.log(data);
+        // obtener el select de formatos
+        var formatoPlantilla = document.getElementById("formatoPlantilla");
+        // limpiar el select de formatos
+        formatoPlantilla.innerHTML = "";
+
+        // recorrer la lista de formatos obtenidos
+        for (var i = 0; i < data.length; i++) {
+          // crear un option con el nombre del formato
+          var option = document.createElement("option");
+          option.text = data[i].id_doc__nombre + " " + data[i].titulo;
+          option.value = data[i].id_doc;
+          // agregar el option al select de formatos
+          formatoPlantilla.appendChild(option);
+        }
+        // crear un option vacio
+        var option = document.createElement("option");
+        // agregar el texto vacio al option
+        option.text = "Ninguno";
+        option.value = "0";
+        // agregar el option vacio al select de formatos
+        formatoPlantilla.appendChild(option);
+      });
+    }
+    else{
+      divFormatoPlantilla.style.display = "none"; // mostrar el div
+    }
+  }
+
+</script>
+
+{% endblock %}
