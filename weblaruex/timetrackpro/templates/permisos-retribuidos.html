@@ -34,14 +34,16 @@
         </div>
         <div class="card-body px-0 pt-0 pb-2">
           <div class="table-responsive p-0 mx-4">
-            
-       <div id="toolbar">
+            {% if administrador or director %}
+            <div id="toolbar">
 
-        <button class="botonLink" data-toggle="modal" data-target="#modalAgregarPermiso">
-          <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
-          <div class="text text-sm">Agregar permiso</div>
-        </button>
-      </div>
+              <button class="botonLink" data-toggle="modal" data-target="#modalAgregarPermiso">
+                <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+                <div class="text text-sm">Agregar permiso</div>
+              </button>
+            </div>
+            {% endif %}
+
             <table id="tabla_permisos_retribuidos" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
     data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
     data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"

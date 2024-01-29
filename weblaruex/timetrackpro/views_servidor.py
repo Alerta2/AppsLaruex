@@ -697,6 +697,7 @@ def relacionesEmpleados(request):
     :return: una plantilla HTML renderizada con los datos necesarios para la vista. Los datos incluyen la
     barra de navegación, un valor booleano que indica si el usuario es un administrador, una lista de
     registros insertados y la ruta actual.
+
     """
 
     administrador = esAdministrador(request.user.id)
@@ -795,13 +796,13 @@ def datosRegistroEmpleados(request):
     usuarios = []
     informe = []
     if request.GET.get("fechaInicio") != None:
-        fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%Y-%m-%d')
+        fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%d/%m/%Y')
     else:
         fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
         fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')
 
     if request.GET.get("fechaFin") != None:
-        fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%Y-%m-%d')
+        fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%d/%m/%Y')
     else:
         ultimoDiaMes = calendar.monthrange(yearActual, mesPrevio)  
         fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
@@ -843,14 +844,14 @@ def datosRegistroSemanalEmpleados(request):
     usuarios = []
 
     if request.GET.get("fechaInicio") != None:
-        fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%Y-%m-%d')
+        fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%d/%m/%Y')
     else:
         fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
         fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')
 
 
     if request.GET.get("fechaFin") != None:
-        fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%Y-%m-%d')
+        fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%d/%m/%Y')
     else:
         ultimoDiaMes = calendar.monthrange(yearActual, mesPrevio)  
         fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
@@ -1175,7 +1176,6 @@ def verRegistro(request, id):
     director = esDirector(request.user.id)
     registro = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=id)[0]
     maquina = MaquinaControlAsistencia.objects.using("timetrackpro").filter(nombre__icontains=registro.seccion)[0]
-    empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
 
     ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_NUEVO + registro.ruta
     ruta_leido = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + registro.ruta
@@ -1213,7 +1213,6 @@ def verRegistro(request, id):
             "administrador":administrador,
             "registro":registro,
             "rutaActual":"Registros insertados" + " / " + str(registro.seccion) + " / " + str(registro.mes) + " / " + str(registro.year),
-            "empleados":empleados,
         }
         return render(request,"verRegistro.html",infoVista)
     else:
@@ -1303,7 +1302,7 @@ def actualizarRegistro(request, id):
         return render(request,"verRegistro.html",infoVista)
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para actualizar el registro seleccionado.")
-
+    
 @login_required
 def datosRegistro(request, id):
     """
@@ -1383,7 +1382,7 @@ def agregarLineaRegistro(request):
             id_archivo_leido = registro
             nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=remoto, modificado=modificado, id_archivo_leido=id_archivo_leido)
             nuevoRegistro.save(using='timetrackpro')
-            return redirect('timetrackpro:ver-registro', id=registro.id)
+
 
 
 @login_required
@@ -1513,10 +1512,9 @@ def verErroresNotificados(request, id=None):
     "id" parameter is not provided, the function will retrieve all errors
     :return: a rendered HTML template with the context data "infoVista".
     """
-    administrador = esAdministrador(request.user.id)
     infoVista = {
         "navBar":navBar,
-        "administrador":administrador,
+        "administrador":esAdministrador(request.user.id),
         "rutaActual": "Errores al fichar notificados",
     }
     return render(request,"errores-registrados.html",infoVista)
@@ -1629,7 +1627,7 @@ def verErrorRegistroNotificado(request, id):
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id).values('id','id_empleado','id_empleado__id','id_empleado__id_usuario__id','id_empleado__id_usuario__nombre','id_empleado__id_usuario__apellidos', 'hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica')[0]
+    error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id).values('id','id_empleado','id_empleado__id','id_empleado__id', 'hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica')[0]
     # compruebo si el empleado que ha notificado el error es el mismo que el que lo ha registrado
     if administrador or director or error['id_empleado__id'] == empleado.id_empleado.id:
         # guardo los datos en un diccionario
@@ -2814,7 +2812,7 @@ def datosFestivosVacacionesEmpleado(request):
     if administrador or director:
         vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado','empleado__nombre','empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
     else:
-        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario, year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado','empleado__nombre','empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
+        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(estado=estadoAceptado, empleado=usuario, year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado','empleado__nombre','empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
 
     # creo una lista vacía para guardar los datos de los festivos
     salidaFestivos = []

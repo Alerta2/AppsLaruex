@@ -22,6 +22,17 @@
                   <p class="mb-0">Selecciona la información del empleado en los diferentes campos</p>
                 </div>
                 <div class="card-body">
+                  
+              {% if administrador %}
+              <div id="toolbar">
+
+                <button class="botonLink" onclick="irA(1)">
+                  <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+                  <div class="text text-sm">Asociar relación</div>
+                </button>
+              </div>
+              {% endif %}
+
                   <table  id="relacion-empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
 
                 </div>
@@ -156,6 +167,20 @@ $("#relacion-empleados").bootstrapTable({
   },
 
 });
+
+
+function irA(opcion) {
+  switch (opcion) {
+      case 1:
+        // abrir en una nueva pestaña
+        //window.location.href = "{% url 'timetrackpro:empleados' %}";
+        window.open("{% url 'timetrackpro:asociar-usuario' %}", "_blank");
+
+        break;
+      default:
+        break;
+  }
+}
 </script>
 
 {% endblock %}

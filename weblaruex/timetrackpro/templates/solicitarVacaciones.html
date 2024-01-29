@@ -601,9 +601,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
   });
-  
-
-
 
   function calcularDias(inicio, fin, dias_consumidos){
     fecha_inicio = document.getElementById(inicio).value;
@@ -612,17 +609,23 @@ document.addEventListener('DOMContentLoaded', function() {
     botonGuardarSolicitar = document.getElementById("guardarSolicitarVacaciones");
     botonGuardarModificar = document.getElementById("guardarModificarVacaciones");
 
-    // comparo si la fecha de inicio es mayor a la fecha de fin
-    if (fecha_inicio > fecha_fin){
-      alert("La fecha de inicio no puede ser mayor a la fecha de fin");
-      document.getElementById(inicio).value = "";
-      document.getElementById(fin).value = "";
-    }
-    else{
-      botonGuardarSolicitar.removeAttribute("disabled");
-      botonGuardarModificar.removeAttribute("disabled");
-    }
+    // solo hago la comprobación si las dos fechas están rellenas
+    // comprobar que la fecha fin este rellena
+    
+    if (fecha_inicio != "" && fecha_fin != ""){
+      
+      if (fecha_inicio > fecha_fin){
+        alert("La fecha de inicio no puede ser mayor a la fecha de fin");
+        document.getElementById(inicio).value = "";
+        document.getElementById(fin).value = "";
+      }
+      else{
+        botonGuardarSolicitar.removeAttribute("disabled");
+        botonGuardarModificar.removeAttribute("disabled");
+      }
 
+
+    }
     // obtener la diferencia en dias entre las dos fechas
     var fecha1 = new Date(fecha_inicio);
     var fecha2 = new Date(fecha_fin);

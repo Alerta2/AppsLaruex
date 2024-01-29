@@ -31,9 +31,14 @@
                     <select class="form-control" aria-label="Nombre en el dispositivo" id="empleado_maquina"
                     name="empleado_maquina" aria-describedby="text-addon" {% if not administrador %} disabled {% endif %}
                     >
+                    {% if administrador %} 
                     {% for empleado in empleados %}
                       <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
                     {% endfor %}
+                    {% else %}
+                    <option value="{{ empleadoActual.id_empleado.id }}">{{ empleadoActual.id_empleado.nombre }}</option>
+
+                   {% endif %}
                     </select>
                     </div>
                   <div class="col mb-3">
