@@ -1,162 +1,13 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
 
+{% endblock %}
 {% block content %}
 
-<style>
-  ul.pagination li .page-link {
-    background-color: rgb(255, 255, 255) !important;
-    color: rgb(41, 68, 87);
 
-  }
-
-  ul.pagination li.active .page-link {
-    background-color: rgb(41, 68, 87) !important;
-    border-color: rgb(41, 68, 87) !important;
-  }
-
-  ul.pagination li .page-link:hover {
-    filter: brightness(85%);
-
-  }
-
-
-  ul.pagination li.active .page-link:hover {
-    filter: brightness(120%);
-
-  }
-
-  .btn-light {
-    color: rgb(41, 68, 87);
-  }
-
-  th {
-    color: rgb(41, 68, 87);
-  }
-
-  table {
-    width: auto;
-    height: auto;
-    font-size: auto;
-    padding: auto;
-    margin: auto;
-  }
-
-  #flechas {
-    width: auto;
-    height: auto;
-  }
-
-  /* --------------------------------
-  *  ESTILO DE LOS BOTONES
-  -----------------------------------*/
-  .add:hover {
-    color: #ce8312;
-  }
-
-  .duplicar:hover {
-    color: #005f73;
-  }
-
-  .eliminar:hover {
-    color: #9b2226;
-  }
-
-  .mover:hover {
-    color: #001219;
-  }
-
-  .print:hover {
-    color: #001219;
-  }
-
-  /*  3 estilo del campo añadir archivo*/
-  .addFichero {
-    color: rgb(9, 58, 65);
-  }
-
-  .addFichero:hover {
-    color: rgb(133, 198, 228);
-  }
-
-
-  .addFichero:hover {
-    color: rgb(133, 198, 228);
-  }
-
-  /* estilo añadirFichero PDF*/
-  .addFicheroPDF {
-    color: rgb(161, 16, 32);
-  }
-
-  .addFicheroPDF:hover {
-    color: rgb(99, 10, 20);
-  }
-
-  .enviarNotificacion:hover {
-    color: #064061;
-  }
-
-  /* estilo añadirFichero PDF*/
-  .addFoto {
-    color: #064061;
-  }
-
-  .addFoto:hover {
-    color: #397fa7;
-  }
-
-    .okFoto {
-    color: #25bd71;
-  }
-
-  .file-upload {
-    border: 1px solid #ccc;
-    display: inline-block;
-    padding: 6px 12px;
-    cursor: pointer;
-  }
-
-  /* ===============================
-  *  Estilo del los botones
-  =================================*/
-
-  .agregarFormacion:hover {
-    color: #032031;
-  }
-
-  .descargaPDF:hover {
-    color: #c36d0b;
-  }
-
-  .eliminar:hover {
-    color: #4f0208;
-  }
-
-  .retirarStockUbicacion:hover {
-    color: #042e37;
-  }
-
-  .entrar:hover {
-    color: #195746;
-  }
-
-  .modificarObjeto:hover {
-    color: #bb3e03;
-  }
-
-
-  .generarQR {
-    --fa-primary-color: #6a3c90;
-    --fa-secondary-color: #6a3c90;
-  }
-
-  .generarQR:hover {
-    --fa-primary-color: #c7a9e0;
-    --fa-secondary-color: #9875b5;
-    ;
-  }
-</style>
 
 <!-- breadcrumb   -->
 
@@ -193,35 +44,65 @@
 <section class="section dashboard d-flex justify-content-center">
   <div class="row">
     <div class="col-lg-4 col-md-6 col-12 my-auto">
-      {% if tarea %}
-      <!-- Código Laruex Card -->
-      <div class="card info-card revenue-card">
-        <div class="card-body">
-          <div class="d-flex align-items-center">
 
-            <div class="ps-3 text-center">
-              {% if registro.estado__id == 1 %}
-              <h6>Próximo mantenimiento</h6>
-              <h2 style="color:#005f73"><i class="fa-duotone fa-clock fa-beat fa-lg me-2"
-                  style="color: #005f73;"></i><strong>{{tarea.fecha_proximo_mantenimiento|date}}</strong></h2>
-              {% elif registro.estado__id == 2 %}
-              <h6>Cuidado, mantenimiento a punto de cumplir</h6>
+          {% if registros %}
+          <div id="carouselTareasProgramadas" class="carousel slide" data-ride="carousel">
+            <div class="card " style="background-color: #19292fda; border-radius: 5px;">
+              <div class="card-body">
 
-              <h2 style="color:#bb3e03"><i class="fa-duotone fa-clock fa-beat fa-lg me-2"
-                  style="color: #bb3e03;"></i><strong>{{tarea.fecha_proximo_mantenimiento|date}}</strong></h2>
+                  <ol class="carousel-indicators my-2">
+                    {% for i in itemsRegistros %}
+                    <li data-target="#carouselTareasProgramadas" data-slide-to="{{i}}" {%if i == 0 %} class="active" {% endif %}></li>
+                    {% endfor %}
+                  </ol>
+                    <div class="carousel-inner text-center">
+                      {% for r in registros %}
+                      <div class="carousel-item {% if forloop.first %} active {% endif %}  ">
+                        {% if r.estado == 1 %}
+                        
+                          <h2 style="color:#08ca76"><strong>Próximo mantenimiento</strong></h2>
+                          <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                          <h2 style="color:#08ca76"><i class="fa-solid fa-calendar-days fa-beat me-2"
+                            style="color: #08ca76;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
+                        {% elif r.estado == 2 %}
+                          <h2 style="color:#ffd622"><strong>Cuidado, mantenimiento a punto de cumplir</strong></h2>
+                          <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                          <h2 style="color:#ffd622"><i class="fa-solid fa-calendar-days fa-beat me-2"
+                            style="color: #ffd622;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
 
-              {% elif registro.estado__id == 4 %}
-              <h6 class="my-2">¡Alerta!, mantenimiento fuera de plazo</h6>
-              <h2 style="color:#ae2012"><i class="fa-duotone fa-clock fa-beat fa-lg me-2"
-                  style="color: #ae2012;"></i><strong>{{tarea.fecha_proximo_mantenimiento|date}}</strong></h2>
-              {% else %}
-              <h6 class="my-2"><strong>Mantenimiento cancelado</strong></h3>
-                {% endif %}
+                          {% elif r.estado == 4 %}
+                          
+                          <h2 style="color:#ff2222"><strong>¡Alerta!, mantenimiento fuera de plazo</strong></h2>
+                          <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                          <h2 style="color:#ff2222"><i class="fa-solid fa-calendar-days fa-beat me-2"
+                            style="color: #ff2222;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
+                          {% elif r.estado == 5 %}
+                          <h2 style="color:#e5500c"><strong>Mantenimiento Cancelado</strong></h2>
+                          <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                          {% else %}
+                          <h2 class="text-white"><strong>Sin mantenimiento asignado</strong></h3>
+
+                          {% endif %}
+                      </div>
+                      {% endfor %}
+                    </div>
+
+                  
+
+
+                </div>
+              </div>
+              <a class="carousel-control-prev" href="#carouselTareasProgramadas" role="button" data-slide="prev" style="background-color: transparent !important;">
+                <i class="fa-solid fa-angle-left fa-2x me-4" style="color: #ffffff7b;"></i>
+              </a>
+              <a class="carousel-control-next" href="#carouselTareasProgramadas" role="button" data-slide="next" style="background-color: transparent !important;">
+                <i class="fa-solid fa-angle-right fa-2x ms-4" style="color: #ffffff7b;"></i>
+
+              </a>
             </div>
-          </div>
-        </div>
-      </div><!-- Código Laruex Card -->
-      {% endif %}
+          
+          {% endif %}
+
       <!-- Fecha de alta Card -->
       <div class="card info-card revenue-card">
         <div class="card-body">
@@ -443,8 +324,8 @@
                 <a href="/private/docLaruex/generarQR/{{ request.build_absolute_uri }}/{{ equipo.cod_laruex}}"
                   title="GenerarQR"><i class="fa-duotone fa-barcode-read generarQR mx-2 fa-2x"></i></a>
 
-                {% if tarea %}
-                <a href="/private/docLaruex/verTarea/{{tarea.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento"
+                {% if registros %}
+                <a href="/private/docLaruex/verMantenimientosAsociados/{{equipo.id.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento"
                   style="color:#511f31"><i class="fa-duotone fa-screwdriver-wrench fa-2x enviarNotificacion"></i></a>
                 {% endif %}
               </div>
@@ -469,7 +350,7 @@
                         class="fa-solid fa-square-plus add fa-2x"></i></a>
 
                     <a href="" class="mx-1" title="Duplicar" data-toggle="modal" data-target="#modalDuplicarEquipo"
-                      style="color:#005f73"><i class="fa-duotone fa-copy agregarFormacion fa-2x"></i></a>
+                      style="color:#005f73"><i class="fa-duotone fa-copy duplicarEquipo fa-2x"></i></a>
 
                     <a href="https://www.unex.es/organizacion/servicios-universitarios/servicios/servicio_gestion_economica/documentos/seccion-de-patrimonio/formularios"
                       target="_blank" title="Acceso a formularios de la uex para altas y bajas de equipos"><img
@@ -519,7 +400,7 @@
                 {% endif %}
 
                 <div class="activity-content"><a
-                    href="\private/docLaruex/verObjeto/{{ historico.id_ubicacion__id__id }}" style="color:#005f73">{{ historico.id_ubicacion__id__nombre }}</a></div>
+                    href="\private/docLaruex/verObjeto/{{ historico.id_ubicacion__id__id }}" style="color:#005f73">{{historico.id_ubicacion__id__nombre }}</a></div>
               </div>
               {% else %}
               <div class="activity-item d-flex">
@@ -550,7 +431,7 @@
                 <i class="fa-solid fa-info"></i>
               </div>
               <div class="ps-3">
-                <span class="text-dark medium pt-1 fw-bold" style="white-space: pre-line;">{{ equipo.descripcion}}</span>
+                <span class="text-dark medium pt-1 fw-bold" style="white-space: pre-line;">{{equipo.descripcion}}</span>
               </div>
             </div>
 
@@ -660,7 +541,7 @@
   <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="TituloModal">Notas del {{ equipo.id.nombre }}</h5>
+        <h5 class="modal-title" id="TituloModal">Notas de {{ equipo.id.nombre }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -796,7 +677,7 @@
                 <div class="form-group">
                   <select class="form-select" data-rule="required" id="habilitacionAddDocumento" name="habilitacion"
                     style="display: none;">
-                    <option value="{{equipo.id.id_habilitacion.id}}" >
+                    <option value="{{equipo.id.id_habilitacion.id}}">
                       {{equipo.id.id_habilitacion.titulo}}
                     </option>
                   </select>
@@ -1098,8 +979,7 @@
   <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title" id="TituloModal" style=" color: rgb(41, 68, 87);"><strong>Dar de baja equipo {{
-            equipo.cod_laruex }}/{{ equipo.fecha_alta|date:"Y"}}</strong></h4>
+        <h4 class="modal-title" id="TituloModal" style=" color: rgb(41, 68, 87);"><strong>Dar de baja equipo {{ equipo.cod_laruex }}/{{ equipo.fecha_alta|date:"Y"}}</strong></h4>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -1235,8 +1115,11 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="ratio ratio-16x9">
-          <img src="{% get_media_prefix %}/archivos/{{equipo.id.tipo}}/{{ equipo.id.ruta }}" title="Imagen"
-            allowfullscreen></img>
+          
+          <!-- <img src="{% get_media_prefix %}/archivos/{{equipo.id.tipo}}/{{ equipo.id.ruta }}" title="Imagen"
+            allowfullscreen></img> -->
+            <img src="{% get_media_prefix %}/archivos/{{equipo.id.tipo}}/{{ equipo.id.ruta }}" title="Imagen"
+              allowfullscreen></img>
         </div>
       </div>
     </div>
@@ -1293,13 +1176,13 @@
     nombreFoto.innerHTML = value;
 
     icono = document.getElementById('iconoFotoUpload');
-    
-    icono.classList.remove("fa-duotone","fa-image", "addFoto");
+
+    icono.classList.remove("fa-duotone", "fa-image", "addFoto");
     console.log(icono);
-    icono.classList.add("fa-duotone","fa-circle-check", "okFoto");
+    icono.classList.add("fa-duotone", "fa-circle-check", "okFoto");
 
     document.getElementById('mostrarNombreFotoEquipo').style.display = 'none';
-    }
+  }
 
   // ===================== Tabla con lista de notificaciones =====================
   $("#tabla_notificaciones").bootstrapTable({
@@ -1375,7 +1258,7 @@
       },
     ],
     search: true,
-    sortName: "id",
+    sortName: "fecha",
     sortOrder: "desc",
   });
 

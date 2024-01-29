@@ -1,82 +1,13 @@
 {% extends "base/base_docLaruex.html" %}
-{% load static %}
+{% load static %}  
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
 
 {% block content %}
 
-<style>
-
-  
-  /* ===============================
-  *  Estilo del los botones
-  =================================*/
-  
-  .agregarFormacion:hover {
-    color: #032031;
-  }
-  
-  .descargaPDF:hover {
-    color: #c36d0b;
-  }
-  .retirarStock:hover{
-    color: #492160;
-  }
-  .retirarStockUbicacion:hover{
-    color: #042e37;
-  }
-  .entrar:hover{
-    color: #195746;
-  }
-
-  
-
-  
-  .enviarNotificacion:hover {
-    color: #064061;
-  }
-  
-  ul.pagination li .page-link {
-    background-color: rgb(255, 255, 255) !important;
-    color: rgb(41, 68, 87);
-
-  }
-
-  ul.pagination li.active .page-link {
-    background-color: rgb(41, 68, 87) !important;
-    border-color: rgb(41, 68, 87) !important;
-  }
-
-  ul.pagination li .page-link:hover {
-    filter: brightness(85%);
-
-  }
-
-
-  ul.pagination li.active .page-link:hover {
-    filter: brightness(120%);
-
-  }
-
-  .btn-light {
-    color: rgb(41, 68, 87);
-  }
-
-  th {
-    color: rgb(41, 68, 87);
-  }
-
-  table {
-    width: auto;
-    height: auto;
-    font-size: auto;
-    padding: auto;
-    margin: auto;
-  }
-
-  #flechas {
-    width: auto;
-    height: auto;
-  }
-</style>
 
 <!-- breadcrumb  y botones -->
 <div class="card-body">
@@ -348,7 +279,8 @@
         </button>
       </div>
       <div class="modal-body">
-        <form id="formularioAddStock" action="/private/docLaruex/agregarStock" method="POST"
+        <form id="formularioAddStock" action="{% url 'docLaruex:docLaruexAgregarStock' %}
+        " method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
@@ -395,7 +327,7 @@
               <div class="form-group">
                 <label for="cantidad">Cantidad</label>
                 <input type="number" step="0.25" class="form-control" id="cantidad" placeholder="4,25" name="cantidad"
-                  data-rule="required" />
+                  data-rule="required" min="0"/>
               </div>
             </div>
             <div class="col-3">
@@ -414,7 +346,7 @@
               <div class="form-group">
                 <label for="minCantidad">Cantidad Mínima</label>
                 <input type="number" step="0.25" class="form-control" id="minCantidad" placeholder="4,25" name="minCantidad"
-                  data-rule="required" />
+                  data-rule="required" min="0" />
               </div>
             </div>
             <div class="col">
@@ -485,7 +417,7 @@
             <div class="col-6">
               <div class="form-group">
                 <label for="cantidadAgregada">Cantidad</label>
-                <input type="number" step="0.5" class="form-control" id="cantidadAgregada" name="cantidadAgregada"
+                <input type="number" step="0.5" class="form-control" min="0" id="cantidadAgregada" name="cantidadAgregada"
                   data-rule="required" placeholder="0" required/>
               </div>
             </div>
@@ -537,7 +469,7 @@
                 <div class="form-group">
                   <label for="cantidadRetirada">Cantidad</label>
                   <input type="number" step="0.5" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
-                    data-rule="required" placeholder="0" required/>
+                    data-rule="required" placeholder="0" min="0" required/>
                 </div>
               </div>
               <div class="col-3">
@@ -611,8 +543,8 @@
               <div class="col-3">
                 <div class="form-group">
                   <label for="cantidadRetirada">Cantidad</label>
-                  <input type="number" step="0.5" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
-                    data-rule="required" placeholder="0" required/>
+                  <input type="number" step="0.5" class="form-control" id="cantidadRetiradaUbicacion" name="cantidadRetirada"
+                    data-rule="required" placeholder="0" min="0" required/>
                 </div>
               </div>
               <div class="col-3">
@@ -700,13 +632,13 @@
             <div class="col-5">
               <div class="form-group">
                 <label for="cantidadAgregadaProveedor">Cantidad</label>
-                <input type="number" step="0.01" class="form-control" id="cantidadAgregadaProveedor" name="cantidadAgregadaProveedor" data-rule="required" placeholder="0,01" required/>
+                <input type="number" step="0.01" class="form-control" id="cantidadAgregadaProveedor" name="cantidadAgregadaProveedor" data-rule="required" placeholder="0,01" min="0" required/>
               </div>
             </div>
             <div class="col-5">
               <div class="form-group">
                 <label for="costeAgregarStockProveedor">Precio</label>
-                <input type="number" step="0.01" class="form-control" id="costeAgregarStockProveedor" name="costeAgregarStockProveedor" data-rule="required" placeholder="0,01" required/>
+                <input type="number" step="0.01" min="0" class="form-control" id="costeAgregarStockProveedor" name="costeAgregarStockProveedor" data-rule="required" placeholder="0,01" required/>
               </div>
             </div>
           </div>
@@ -727,137 +659,6 @@
 </div>
 </div><!-- END formulario Agregar Stock Proveedor-->
 
-<!-- ============= FORMULARIO Retirar Stock ============= -->
-<!-- formulario retirar stock  -->
-<div id="modalRetirarStock" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title" id="TituloModalRetirarStock"><strong>Retirar Stock </strong> </h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <form id="formularioModalRetirarStock" action="/private/docLaruex/retirarStock/0/" method="POST"
-          enctype="multipart/form-data">
-          {% csrf_token %}
-          <!-- indica el tipo de objeto se que va a añadir -->
-            <div class="row">
-              <div class="col-3">
-                <div class="form-group">
-                  <label for="fechaRetirada">Fecha de Retirada</label>
-                  <input type="date" id="fechaRetirada" name="fechaRetirada" class="form-control" required/>
-                </div>
-              </div>
-              <div class="col-3">
-                <div class="form-group">
-                  <label for="cantidadRetirada">Cantidad</label>
-                  <input type="number" step="0.5" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
-                    data-rule="required" placeholder="0" required/>
-                </div>
-              </div>
-              <div class="col-3">
-                <div class="form-group">
-                  <label for="empleadoQueRetira">Empleado</label>
-                  <select class="form-select"  id="empleadoQueRetira" name="empleadoQueRetira">
-                    {% for empleado in empleados %}
-                    <option data-tokens="{{empleado.first_name}}" value="{{empleado.id}}">
-                      {{empleado.first_name}} {{empleado.last_name}}
-                    </option>
-                    {% endfor %}
-                  </select>
-                </div>
-  
-              </div>
-            </div>
-
-          <div class="modal-footer">
-            <button id="cerrarRetirarStock" type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancel" name="cancel" onclick="crearAviso('cambiarUbicacionEquipoCerrar', 'No se ha podido cambiar de ubicación el equipo {{ equipo.id.nombre }}', 'alert-warning', 3000)">Cancelar</button>
-            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('cambiarUbicacionEquipoGuardar', 'Equipo {{ equipo.id.nombre }} cambiado de ubicación', 'alert-success', 3000)">
-              Guardar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-</div><!-- END formulario retirar Stock  -->
-
-<!-- ============= FORMULARIO Retirar Stock de Ubicación ============= -->
-<!-- formulario retirar stock Ubicación  -->
-<div id="modalRetirarStockUbicacion" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title" id="TituloModalRetirarStockUbicacion"><strong>Retirar Stock a otra Ubicacion</strong></h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <form id="formularioModalRetirarStockUbicacion" action="/private/docLaruex/retirarStockUbicacion/0/" method="POST"
-          enctype="multipart/form-data">
-          {% csrf_token %}
-          <!-- indica el tipo de objeto se que va a añadir -->
-            <div class="row">
-              <div class="col-3">
-                <div class="form-group">
-                  <label for="fechaRetirada">Fecha de Retirada</label>
-                  <input type="date" id="fechaRetirada" name="fechaRetirada" class="form-control" required/>
-                </div>
-              </div>
-              <div class="col-3">
-                <div class="form-group">
-                  <label for="cantidadRetirada">Cantidad</label>
-                  <input type="number" step="0.5" class="form-control" id="cantidadRetirada" name="cantidadRetirada"
-                    data-rule="required" placeholder="0" required/>
-                </div>
-              </div>
-              <div class="col-3">
-                <div class="form-group">
-                  <label for="empleadoQueRetira">Empleado</label>
-                  <select class="form-select"  id="empleadoQueRetira" name="empleadoQueRetira">
-                    {% for empleado in empleados %}
-                    <option data-tokens="{{empleado.first_name}}" value="{{empleado.id}}">
-                      {{empleado.first_name}} {{empleado.last_name}}
-                    </option>
-                    {% endfor %}
-                  </select>
-                </div>
-              </div>
-              <div class="col-3">
-                <div class="form-group">
-                  <label for="nuevaUbicacion">Ubicacion</label>
-                  <select class="form-select"  id="nuevaUbicacion" name="nuevaUbicacion">
-                    {% for ubicacion in ubicaciones %}
-                    <option data-tokens="{{ubicacion.id}}" value="{{ubicacion.id}}">{% if ubicacion.id__padre %} [{{ ubicacion.id__padre__nombre}}] {% endif %} {{ubicacion.id__nombre}}
-                    </option>
-                    {% endfor %}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-          <div class="modal-footer">
-            <button id="cerrarRetirarStockUbicacion" type="button" class="btn btn-secondary" data-dismiss="modal"  id="cancel" name="cancel" onclick="crearAviso('cambiarUbicacionEquipoCerrar', 'No se ha podido cambiar de ubicación el equipo {{ equipo.id.nombre }}', 'alert-warning', 3000)">Cancelar</button>
-            <button type="submit" value="submit" class="btn btn-primary" onclick="crearAviso('cambiarUbicacionEquipoGuardar', 'Equipo {{ equipo.id.nombre }} cambiado de ubicación', 'alert-success', 3000)">
-              Guardar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-</div><!-- END formulario retirar Stock Ubicación  -->
 
 
 <script type="text/javascript">
@@ -932,9 +733,10 @@
 
               var agregarStockProveedor = '<a href="" title="Agregar Stock nuevo Proveedor" data-toggle="modal" data-target="#modalAgregarStockProveedor" onclick="$('+"'#formularioModalAgregarStockProveedor').attr('action', '/private/docLaruex/agregarUnidadesStockProveedor/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-lg agregarFormacion"></i></a>';
 
-              var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/');"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
+              var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/'); document.getElementById('cantidadRetirada').max ="+ row.cantidad +";"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
 
-              var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
+                
+              var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/'); document.getElementById('cantidadRetiradaUbicacion').max ="+ row.cantidad +";"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
 
               if (admin == 'True'){
                 return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion +editarItem);
@@ -956,6 +758,11 @@
       url: "/private/docLaruex/listadoStockMinimoDatos",
       cache: false,
       columns: [{
+        title: 'Cantidad',
+        field: 'cantidad',
+        align: "center",
+        sortable: "true",
+      },{
           title: 'Artículo',
           field: 'item',
           align: "center",
@@ -1001,9 +808,10 @@
 
             var agregarStockProveedor = '<a href="" title="Agregar Stock nuevo Proveedor" data-toggle="modal" data-target="#modalAgregarStockProveedor" onclick="$('+"'#formularioModalAgregarStockProveedor').attr('action', '/private/docLaruex/agregarUnidadesStockProveedor/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-lg agregarFormacion"></i></a>';
 
-            var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/');"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
+            var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/'); document.getElementById('cantidadRetirada').max ="+ row.cantidad +";"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
 
-            var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
+                
+            var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/'); document.getElementById('cantidadRetiradaUbicacion').max ="+ row.cantidad +";"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
 
             if (admin == 'True'){
               return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion +editarItem);
@@ -1025,6 +833,11 @@
         url: "/private/docLaruex/listadoStockFueraDatos",
         cache: false,
         columns: [  {
+            title: 'Cantidad',
+            field: 'cantidad',
+            align: "center",
+            sortable: "true",
+        },{
             title: 'Artículo',
             field: 'item',
             align: "center",
@@ -1065,9 +878,10 @@
 
               var agregarStockProveedor = '<a href="" title="Agregar Stock nuevo Proveedor" data-toggle="modal" data-target="#modalAgregarStockProveedor" onclick="$('+"'#formularioModalAgregarStockProveedor').attr('action', '/private/docLaruex/agregarUnidadesStockProveedor/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-lg agregarFormacion"></i></a>';
 
-              var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/');"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
+              var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/'); document.getElementById('cantidadRetirada').max ="+ row.cantidad +";"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
 
-              var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
+                
+              var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/'); document.getElementById('cantidadRetiradaUbicacion').max ="+ row.cantidad +";"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
 
               if (admin == 'True'){
                 return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion +editarItem);
@@ -1144,9 +958,10 @@
 
           var agregarStockProveedor = '<a href="" title="Agregar Stock nuevo Proveedor" data-toggle="modal" data-target="#modalAgregarStockProveedor" onclick="$('+"'#formularioModalAgregarStockProveedor').attr('action', '/private/docLaruex/agregarUnidadesStockProveedor/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-user-plus fa-lg agregarFormacion"></i></a>';
 
-          var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/');"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
+          var retirarStock = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStock" onclick="$('+"'#formularioModalRetirarStock').attr('action', '/private/docLaruex/retirarStock/"+ row.id +"/'); document.getElementById('cantidadRetirada').max ="+ row.cantidad +";"+'" class="mx-1" style="color: #9768b2"><i class="fa-duotone fa-share-from-square fa-lg retirarStock"></i></a>';
 
-          var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/');"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
+                
+          var retirarStockUbicacion = '<a href="" title="Retirar Stock" data-toggle="modal" data-target="#modalRetirarStockUbicacion" onclick="$('+"'#formularioModalRetirarStockUbicacion').attr('action', '/private/docLaruex/retirarStockUbicacion/"+ row.id +"/'); document.getElementById('cantidadRetiradaUbicacion').max ="+ row.cantidad +";"+'" class="mx-1" style="color: #005F73"><i class="fa-duotone fa-dolly fa-lg retirarStockUbicacion"></i></a>';
 
           if (admin == 'True'){
             return ( verStock + agregarStock + agregarStockProveedor + retirarStock +  retirarStockUbicacion +editarItem);

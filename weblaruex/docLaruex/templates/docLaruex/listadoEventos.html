@@ -1,103 +1,13 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
+
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
 {% block content %}
 
-
-<style>
-  /*--------------------------------------------------------------
-# Tabla
---------------------------------------------------------------*/
-ul.pagination li .page-link {
-    background-color: rgb(255, 255, 255) !important;
-    color: rgb(41, 68, 87);
-
-  }
-
-  ul.pagination li.active .page-link {
-    background-color: rgb(41, 68, 87) !important;
-    border-color: rgb(41, 68, 87) !important;
-  }
-
-  ul.pagination li .page-link:hover {
-    filter: brightness(85%);
-
-  }
-
-  ul.pagination li.active .page-link:hover {
-    filter: brightness(120%);
-
-  }
-
-  .btn-light {
-    color: rgb(41, 68, 87);
-  }
-
-  th {
-    color: rgb(41, 68, 87);
-  }
-  /*--------------------------------------------------------------
-# Ir a Eventos
---------------------------------------------------------------*/
-.cta {
-position: relative;
-margin: auto;
-padding: 12px 18px;
-transition: all 0.2s ease;
-border: none;
-background: none;
-}
-
-.cta:before {
-content: "";
-position: absolute;
-top: 0;
-left: 0;
-display: block;
-border-radius: 50px;
-background: #d4e4e2;
-width: 45px;
-height: 45px;
-transition: all 0.3s ease;
-}
-
-.cta span {
-position: relative;
-font-family: "Ubuntu", sans-serif;
-font-size: 18px;
-font-weight: 700;
-letter-spacing: 0.05em;
-color: #087B6C;
-}
-
-
-
-.cta:hover:before {
-width: 100%;
-background: #d4e4e2;
-}
-
-.cta:active {
-transform: scale(0.95);
-}
-
-
-.form-check-input:checked {
-    background-color: #087B6C;
-    border-color: #087B6C;
-}
-
-.form-check-input:focus {
-    outline: 0;
-    box-shadow: 0 0 0 0.25rem rgba(16, 223, 161, 0.432);
-}
-.select:hover{
-  color: #94d2bd;
-}
-
-.agregarFormacion:hover{
-  color: #ca6702;
-}
-</style>
 
 <!-- breadcrumb   -->
 <div class="card-body">
@@ -111,6 +21,8 @@ transform: scale(0.95);
       </ol>
   </nav>
 </div>
+
+
 
 <div class="row d-flex justify-content-center" >
   <div class="col-auto my-auto " style="background-color: #d4e4e2;">
@@ -132,12 +44,13 @@ transform: scale(0.95);
     </div>
   </div>
   <div class="col-auto">
-    <button class="cta" title="Filtrar seledccionados" onclick="enviarSeleccionados()">
+    <button class="cta" title="Filtrar seleccionados" onclick="enviarSeleccionados()">
       <span>Filtrar</span>
     </button>
   </div>
 
 </div>
+
 
 <div class="section my-2">
   <button class="cta " title="Agregar un evento" data-target="#modalAgregarEvento" data-toggle="modal">
@@ -318,12 +231,27 @@ transform: scale(0.95);
       <div class="modal-body">
         <div class="row">
           <div class="col">
-            <p>La estructura de datos debe ser en formato JSON, ejemplo:</p>
+            <strong>Ejemplo de estructura en formato JSON para definir un evento:</strong>
             <pre>
               <code>
                 {
-                  "string": "Hola mundo",
-                  "boolean": true,
+                  "Fecha_actual": "date",
+                  "Hora": "time",
+                  "importe": "float",
+                  "nombre": "string",
+                  "Realizado": "boolean",
+                  "prueba":"select",
+                  "prueba_opciones": ["Opción 1", "Opción 2", "Opción 3"]
+                }
+              </code>
+              <strong>Las opciones deben nombrarse con el nombre del select seguido de _opciones</strong>
+
+            </pre>
+            <strong>Definición de diferentes tipos de datos en un JSON:</strong>
+            <pre>
+              <code>
+                {
+                  "string": "Hola mundo",                
                   "null": null,
                   "datetime": "2023-05-10T12:34:56",
                   "date": "2023-05-10",
@@ -419,28 +347,23 @@ aria-hidden="true">
           enctype="multipart/form-data">
           {% csrf_token %}
           
-          <div class="row d-flex justify-content-center">
-            <h5>Seleccione el equipo o ubicación a la que va a asignar la tarea</h5>
+          <div class="row">
+            <div class="col-10 mx-auto my-3">
+                      <h5 class="card-text text-center text-middle fst-italic " style="color: #087B6C;"><i class="fa-duotone fa-circle-info me-2"></i>Seleccione el equipo o ubicación a la que va a asignar la tarea.</h5>
+
+            </div>
           </div>
-          <div class="row d-flex justify-content-center">
+          <div class="row mt-3">
             <div class="col">
-              <div class="row d-flex justify-content-center" >
-                <div class="col-auto my-auto " style="background-color: #d4e4e2;">
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" id="Equipo" value="Equipo">
+              <div id="toolbar" class="my-auto">
+                  <div class="form-check form-check-inline ml-2">
+                    <input class="form-check-input" type="checkbox" id="Equipo" value="Equipo" checked>
                     <label class="form-check-label" for="Equipo">Equipo</label>
                   </div>
                   <div class="form-check form-check-inline">
                     <input class="form-check-input" type="checkbox" id="Ubicacion" value="Ubicacion">
                     <label class="form-check-label" for="Ubicacion">Ubicación</label>
-                  </div>    
-                </div>
-                <div class="col-auto">
-                  <button class="cta" title="Filtrar por selección" onclick="filtrarLista()">
-                    <span>Filtrar</span>
-                  </button>
-                </div>
-              
+                  </div> 
               </div>
               
               <table id="tabla_objetos" data-toggle="table" data-search="true" data-show-columns="true"
@@ -449,6 +372,7 @@ aria-hidden="true">
               data-pagination="true" data-id-field="id" data-page-list="[5, 10, 25, 50, 100, All]" data-toolbar="#toolbar" 
               data-click-to-select="true" data-multiple-select-row="false" data-smart-display="true" data-page-size="3">
               </table>
+
             </div>
           </div>
           <div class="row">
@@ -537,8 +461,6 @@ aria-hidden="true">
     return bool;
 }
   
-
-
   function enviarSeleccionados(){
     var mantenimiento = document.getElementById("mantenimiento");
     var verificacion = document.getElementById("verificacion");
@@ -567,36 +489,64 @@ aria-hidden="true">
     var url = "/private/docLaruex/eventosDatosTipo/"+valores+"/";
     // Actualizar la tabla con los valores seleccionados
     $("#tabla_eventos").bootstrapTable('refresh', {url: url});
-
-
-
     }
 
 
-    function filtrarLista(){
+  // FILTRAR POR EQUIPO O UBICACIÓN
+
+  document.addEventListener("DOMContentLoaded", function() {
+    // Por defecto, seleccionar el checkbox con id "Equipo"
     var equipo = document.getElementById("Equipo");
     var ubicacion = document.getElementById("Ubicacion");
+    equipo.checked = true;
 
+    // Función para actualizar la tabla
+    function actualizarTabla() {
+        var equipo = document.getElementById("Equipo");
+        var ubicacion = document.getElementById("Ubicacion");
+        
+        var valores = [];
 
-    var valores = [];
+        if (equipo.checked == true) {
+          
+            $("#tabla_objetos").bootstrapTable('showColumn', 'codigos');
+            valores.push(equipo.value);
+        }
 
-    if (equipo.checked) {
-      valores.push(equipo.value);
+        if (ubicacion.checked == true) {
+            $("#tabla_objetos").bootstrapTable('hideColumn', 'codigos');
+            // alinear la columna nombre a la izquierda
+            // $("#tabla_objetos").bootstrapTable('getOptions').columns
+            valores.push(ubicacion.value);
+        }
+
+        console.log(valores);
+
+        var url = "/private/docLaruex/equiposUbicacionesDatosFiltro/" + valores.join("/") + "/";
+        // Actualizar la tabla con los valores seleccionados
+        $("#tabla_objetos").bootstrapTable('refresh', { url: url });
     }
 
-    if (ubicacion.checked) {
-      valores.push(ubicacion.value);
-    }
-    
-    console.log(valores)
-    var url = "/private/docLaruex/equiposUbicacionesDatosFiltro/"+valores+"/";
-    // Actualizar la tabla con los valores seleccionados
-    $("#tabla_objetos").bootstrapTable('refresh', {url: url});
+    // Agregar un event listener a cada checkbox para gestionar la selección única
+    equipo.addEventListener("change", function() {
+        if (equipo.checked) {
+            ubicacion.checked = false;
+        }
+        actualizarTabla();
+    });
 
+    ubicacion.addEventListener("change", function() {
+        if (ubicacion.checked) {
+            equipo.checked = false;
+        }
+        actualizarTabla();
+    });
 
+    // Llamar a la función para actualizar la tabla al cargar la página
+    actualizarTabla();
+});
 
-  }
-
+  // FILTRAR POR TIPO DE EVENTO
   function mostrarTiposEventos() {
   // Establecer el valor seleccionado del select
   $('#tiposEventosSelect').val(value);
@@ -649,15 +599,16 @@ aria-hidden="true">
             align: "center",
             formatter: function (value, row) {
 
-              var botonAgregarTarea = '<a href="/private/docLaruex/agregarTarea/' + row.id + '/' + '" class="mx-1" title="Agregar Tarea" data-toggle="modal" data-target="#modalAgregarTarea" onclick="$('+"'#formularioModalAgregarTarea').attr('action', '/private/docLaruex/agregarTarea/"+ row.id +"/');"+'" ><i class="fa-solid fa-plus fa-lg" style="color:#CA6702"></i></a>';
+              var botonAgregarTarea = '<li><a class="dropdown-item border-radius-md" href="/private/docLaruex/agregarTarea/'+ row.id + '/' +'" title="Agregar Tarea" data-toggle="modal" data-target="#modalAgregarTarea" onclick="$('+"'#formularioModalAgregarTarea').attr('action', '/private/docLaruex/agregarTarea/"+ row.id +"/');"+'">Agregar Tarea</a></li>';
 
-              var botonModificarEvento = '<a href="/private/docLaruex/editarEvento/' + row.id + '/" class="mx-1" title="Editar evento"><i class="fa-duotone fa-money-check-pen fa-lg" style="color:#032525" ></i></a>';
+              var botonModificarEvento = '<li><a class="dropdown-item border-radius-md" href="/private/docLaruex/editarEvento/' + row.id + '/" title="Editar evento">Editar Evento</a></li>';
+
+              var botonEliminarEvento = '<li><a class="dropdown-item border-radius-md" href="/private/docLaruex/eliminarEvento/' + row.id + '/' + '" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarEvento" onclick="$('+"'#formularioModalEliminarEvento').attr('action', '/private/docLaruex/eliminarEvento/"+ row.id +"/');"+'">Eliminar Evento</a></li>';
 
 
-              var botonEliminarEvento = '<a href="/private/docLaruex/eliminarEvento/' + row.id + '/' + '" class="mx-1" title="Eliminar Objeto" data-toggle="modal" data-target="#modalEliminarEvento" onclick="$('+"'#formularioModalEliminarEvento').attr('action', '/private/docLaruex/eliminarEvento/"+ row.id +"/');"+'" ><i class="fa-solid fa-x fa-lg" style="color:#AE2012"></i></a>';
+              var dropdownMenu ='<div  class="dropdown float-lg-center "><a href="" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v text-secondary"></i></a><ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">'+ botonAgregarTarea + botonModificarEvento + botonEliminarEvento +'</ul></div>';
 
-              
-                return (botonAgregarTarea + botonModificarEvento + botonEliminarEvento);
+              return dropdownMenu;
                 
             }
         },
@@ -676,6 +627,7 @@ aria-hidden="true">
  
     // tatbla de elementos seleccionados
     $("#tabla_objetos").bootstrapTable({
+    
     locale: navigator.language,
     url:"/private/docLaruex/equiposUbicacionesDatos" ,
     cache: false,
@@ -685,32 +637,72 @@ aria-hidden="true">
         title: "",
         field:"state",
         checkbox:"true",
-      }, {
-        title: "nombre",
-        field: 'id__nombre',
-        align: "center", 
+      },{
+        title: "Códigos",
+        id: "codigos", // "id" necesario para ocultar la columna
+        field: "codigos",
+        halign:"left",
+        align: "left", 
+        width:"200",
         formatter: function (value, row) {
-          if (row.id__tipo== 'Ubicacion'){
-            if (row.id__padre){
+          // icono del código de barras
+          var code = '<div class="col-auto"><h6 class="my-auto"><i class="fa-solid fa-barcode fa-lg" style="color:#032525"></i></h6></div>';
+          // obtengo y formateo la fecha de alta
+          var fecha = new Date(row.fecha_alta).getFullYear().toString().slice(-2);
 
-              return("[" + row.id__padre__nombre +"] "+ row.id__nombre);
+          // obtengo los códigos de la ubicación y del equipo
+          var codUex = row.cod_uex;
+          var codLaruex = row.cod_laruex;
+
+          var infoCodigoLaruex = "Laruex: "+ codLaruex + "/" + fecha;
+          var infoCodigoUex = "Uex: "+ codUex;
+          
+          var infoTotal = '<div class="row d-flex justify-content-start align-items-center">'+ code + '<div class="col-auto ">'+ '<div class="row"><p class="text-xs text-secondary mb-0">'+ infoCodigoLaruex +'</p></div>' + '<div class="row "><p class="text-xs text-secondary mb-0">'+ infoCodigoUex +'</p></div>' +'</div></div>';
+
+          if (row.id__tipo != 'Ubicacion'){
+            if (row.cod_uex != 0){
+              if (codUex == codLaruex){
+                infoCodigoLaruex = '';
+              }
             }else{
-              return(row.id__nombre);
-            }
-          }
-          else{
-            if (row.cod_laruex != '0'){
-              fecha = new Date(row.fecha_alta).getFullYear().toString().slice(-2);
-              return(row.cod_laruex + "/" + fecha);
-            }else{
-              return(row.cod_uex);
-            }
+              infoCodigoUex = '';
+
+            } 
+            
+            var infoTotal = '<div class="row d-flex justify-content-start align-items-center ">'+ code + '<div class="col-auto">'+ '<div class="row"><p class="text-xs text-secondary mb-0">'+ infoCodigoLaruex +'</p></div>' + '<div class="row"><p class="text-xs text-secondary mb-0">'+ infoCodigoUex +'</p></div>' +'</div></div>';
+            return infoTotal;
           }
         },
-      }, {
-        title: "Tipo",
-        field: 'id__tipo',
-        align: "center",
+      },{
+        title: "Nombre",
+        field: 'id__nombre',
+        id: "nombre", // "id" necesario para ocultar la columna
+        field: "nombre",
+        halign:"left",
+        align: "left",
+        formatter: function (value, row) {
+          // declaro los iconos 
+          var icono = '<i class="fa-duotone fa-boxes-stacked me-2 fa-lg" style="color:#032525"></i>';
+          var ubicacionPadre = "";
+
+
+          if (row.id__tipo == 'Ubicacion'){
+            icono = '<i class="fa-duotone fa-building me-2 fa-lg" style="color:#032525"></i>';
+            // obtengo el nombre de la ubicación
+            if (row.id__padre){
+              // obtengo el nombre de la ubicación padre si existe
+              ubicacionPadre = "[" + row.id__padre__nombre +"] ";
+            }
+          }
+          
+          
+          // obtengo el nombre del equipo o la ubicacion
+          var nombre = row.id__nombre;
+          var informacion = '<div>'+ icono + " " + ubicacionPadre + " " + nombre+ '</div>'
+          return informacion;
+
+          
+        },
       },
     ],
     search: true,
@@ -769,7 +761,6 @@ aria-hidden="true">
       divFormatoPlantilla.style.display = "none"; // mostrar el div
     }
   }
-
 
 </script>
 

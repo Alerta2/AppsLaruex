@@ -1,0 +1,132 @@
+  /*--------------------------------------------------------------
+# Tabla
+--------------------------------------------------------------*/
+/* ul.pagination li .page-link {
+  background-color: rgb(255, 255, 255) !important;
+  color: rgb(41, 68, 87);
+
+}
+
+ul.pagination li.active .page-link {
+  background-color: rgb(41, 68, 87) !important;
+  border-color: rgb(41, 68, 87) !important;
+}
+
+ul.pagination li .page-link:hover {
+  filter: brightness(85%) !important;
+
+}
+
+ul.pagination li.active .page-link:hover {
+  filter: brightness(120%) !important;
+
+}
+
+.btn-light {
+  color: rgb(41, 68, 87) !important;
+}
+
+th {
+  color: rgb(41, 68, 87) !important;
+}
+
+
+table {
+  width: auto;
+  height: auto;
+  font-size: auto;
+  padding: auto;
+  margin: auto;
+}
+
+
+#flechas {
+  width: auto;
+  height: auto;
+} */
+
+
+.bootstrap-table .fixed-table-toolbar  {
+  color: #093a41 !important;
+}
+.bootstrap-table .fixed-table-toolbar .bs-bars,
+.bootstrap-table .fixed-table-toolbar .search,
+.bootstrap-table .fixed-table-toolbar .columns {
+  position: relative;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: transparent !important;
+}
+.bootstrap-table .table thead tr{
+  border: transparent !important;
+  background-color: transparent !important;
+}
+.bootstrap-table .table thead th{
+  border-left: transparent !important;
+  border-right: transparent !important;
+}
+.bootstrap-table .table .th-inner{
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: bold;
+  opacity: 0.7;
+  }
+
+.bootstrap-table .table tbody td{
+  border: transparent !important;
+  background-color: transparent !important;
+  font-size: 13px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: bold;
+  color: #171e22b0;
+}
+
+
+
+.bootstrap-table .pagination{
+margin: auto !important;
+/* float: right !important; */
+}
+.bootstrap-table .pagination-info{
+font-size: 0.875rem;
+font-weight: bold;
+opacity: 0.7;
+vertical-align: middle !important;
+
+}
+
+.bootstrap-table .page-list{
+float: right !important;
+vertical-align: middle !important;
+font-size: 0.875rem;
+font-weight: bold;
+opacity: 0.7;
+}
+
+.bootstrap-table .pagination li a.page-link {
+  color: #0c95cb !important;
+  font-weight: bold !important;
+  background-color: transparent !important;
+  border-radius: 0.25rem !important;
+  opacity: 0.9;
+}
+.bootstrap-table .pagination li.active .page-link {
+background-image: linear-gradient(310deg, #158bbd 0%, #01436a 100%);
+color: #fff !important;
+}
+/* footer de la tabla */
+
+.fixed-table-pagination {
+  margin-top: 10px !important;
+}
+
+/* botones de accion de la tabla */
+
+.bootstrap-table .btn  {
+  color: #63828d !important;
+
+}
+
+.bootstrap-table .btn:hover, .bootstrap-table .btn:focus, .bootstrap-table .btn:active, .bootstrap-table .btn.active, .open > .dropdown-toggle.btn:hover, .open > .dropdown-toggle.btn:focus, .open > .dropdown-toggle.btn:active, .open > .dropdown-toggle.btn.active {
+  color: #04506c !important;
+}

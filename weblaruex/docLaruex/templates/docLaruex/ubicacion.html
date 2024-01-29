@@ -1,60 +1,15 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
 
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
+
 {% block content %}
 
-<style>  
-  .enviarNotificacion:hover {
-    color: #064061;
-  }
 
-  .editarObjeto:hover {
-    color: #ca6702;
-  }
-  
-  ul.pagination li .page-link {
-    background-color: rgb(255, 255, 255) !important;
-    color: rgb(41, 68, 87);
-
-  }
-
-  ul.pagination li.active .page-link {
-    background-color: rgb(41, 68, 87) !important;
-    border-color: rgb(41, 68, 87) !important;
-  }
-
-  ul.pagination li .page-link:hover {
-    filter: brightness(85%);
-
-  }
-
-
-  ul.pagination li.active .page-link:hover {
-    filter: brightness(120%);
-
-  }
-
-  .btn-light {
-    color: rgb(41, 68, 87);
-  }
-
-  th {
-    color: rgb(41, 68, 87);
-  }
-
-  table {
-    width: auto;
-    height: auto;
-    font-size: auto;
-    padding: auto;
-    margin: auto;
-  }
-
-  #flechas {
-    width: auto;
-    height: auto;
-  }
-</style>
 
 <!-- breadcrumb   -->
 <div class="card-body">
@@ -65,8 +20,8 @@
         <a href="" title="Asociar Archivo" class="mx-" data-toggle="modal" data-toggle="tooltip"
           data-target="#modalAsociarArchivo" style="color: #0A9396; " download><i class="fa-solid fa-link enlace enviarNotificacion"></i></a>
         
-          {% if tarea %}
-          <a href="/private/docLaruex/verTarea/{{tarea.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento" style="color:#511f31"><i class="fa-duotone fa-screwdriver-wrench enviarNotificacion"></i></a>
+          {% if registros %}
+          <a href="/private/docLaruex/verMantenimientosAsociados/{{ubicacion.id.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento" style="color:#511f31"><i class="fa-duotone fa-screwdriver-wrench enviarNotificacion"></i></a>
           {% endif %}
           <a  class="mx-1" title="editar ubicación" data-target="#modalEditarUbicacion" data-toggle="modal"
           style="color: #bb3e03; align-items: md-center"><i class="fa-duotone fa-money-check-pen editarObjeto"></i></a>  
@@ -163,6 +118,65 @@ aria-hidden="true">
 <section class="section dashboard d-flex justify-content-center row">
     <!-- Info Card -->
     <div class="col col-xs-12 col-sm-12 col-md-5 my-auto">
+      {% if registros %}
+      <div id="carouselTareasProgramadas" class="carousel slide" data-ride="carousel">
+        <div class="card " style="background-color: #19292fda; border-radius: 5px;">
+          <div class="card-body">
+
+              <ol class="carousel-indicators my-2">
+                {% for i in itemsRegistros %}
+                <li data-target="#carouselTareasProgramadas" data-slide-to="{{i}}" {%if i == 0 %} class="active" {% endif %}></li>
+                {% endfor %}
+              </ol>
+                <div class="carousel-inner text-center">
+                  {% for r in registros %}
+                  <div class="carousel-item {% if forloop.first %} active {% endif %}  ">
+                    {% if r.estado == 1 %}
+                    
+                      <h2 style="color:#08ca76"><strong>Próximo mantenimiento</strong></h2>
+                      <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                      <h2 style="color:#08ca76"><i class="fa-solid fa-calendar-days fa-beat me-2"
+                        style="color: #08ca76;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
+                    {% elif r.estado == 2 %}
+                      <h2 style="color:#ffd622"><strong>Cuidado, mantenimiento a punto de cumplir</strong></h2>
+                      <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                      <h2 style="color:#ffd622"><i class="fa-solid fa-calendar-days fa-beat me-2"
+                        style="color: #ffd622;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
+
+                      {% elif r.estado == 4 %}
+                      
+                      <h2 style="color:#ff2222"><strong>¡Alerta!, mantenimiento fuera de plazo</strong></h2>
+                      <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                      <h2 style="color:#ff2222"><i class="fa-solid fa-calendar-days fa-beat me-2"
+                        style="color: #ff2222;"></i><strong>{{r.fecha_programada|date:"j N Y"}}</strong></h2>
+                      {% elif r.estado == 5 %}
+                      <h2 style="color:#e5500c"><strong>Mantenimiento Cancelado</strong></h2>
+                      <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+                      {% else %}
+                      <h2  style="color:#0ccce5"><strong>Sin mantenimiento asignado</strong></h3>
+                      <h3 class="text-white">{{r.evento.id_evento__nombre}}</h3>
+
+
+                      {% endif %}
+                  </div>
+                  {% endfor %}
+                </div>
+
+              
+
+
+            </div>
+          </div>
+          <a class="carousel-control-prev" href="#carouselTareasProgramadas" role="button" data-slide="prev" style="background-color: transparent !important;">
+            <i class="fa-solid fa-angle-left fa-2x me-4" style="color: #ffffff7b;"></i>
+          </a>
+          <a class="carousel-control-next" href="#carouselTareasProgramadas" role="button" data-slide="next" style="background-color: transparent !important;">
+            <i class="fa-solid fa-angle-right fa-2x ms-4" style="color: #ffffff7b;"></i>
+
+          </a>
+        </div>
+      
+      {% endif %}
       <div class="card info-card sales-card">
         <div class="card-body">
           <h5 class="card-title">{{ ubicacion.id.nombre }}</h5>
@@ -195,23 +209,14 @@ aria-hidden="true">
                   style="background-color: #b52121; vertical-align:middle">{{ubicacion.id.id_estado.nombre}}</span>
               {% endif %} </span>
                 </div>
-          </div>
-          <div class="d-flex align-items-center p-2">
-            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center" style="background-color: #b5d8e252;">
-              <i class="bi bi-calendar-event-fill fa-beat" style="color: #18414b; --fa-animation-duration: 2s;"></i>
-            </div>
-            <div class="ps-3">
-              <h5>Próximo Mantenimiento:</h5>
-              <span class="text-info medium pt-10 fw-bold">{{ ubicacion.id.fecha_subida.date }}</span>
-            </div>
-          </div>
-  
+          </div>  
         </div>
   
       </div>
+
     </div><!-- End Info Card -->
     <div class="card col col-xs-12 col-sm-12 col-md-6 ">
-      <div   data-aos="fade-up" class="card-body my-auto">
+      <div data-aos="fade-up" class="card-body d-flex align-items-center">
         <div id="open_map"  class="open-map" style="border:0; width: 100%; height: 350px;"></div>
       </div>
   

@@ -400,6 +400,10 @@ urlpatterns = [
     path('private/docLaruex/calendario/',
          calendario, name='docLaruexCalendario'),
 
+     # muestra los datos para rellanar el calendario
+    path('private/docLaruex/datosCalendario/',
+         datosCalendario, name='docLaruexDatosCalendario'),
+
 
 # ---------------------------------------------------------
 #                         FORMATOS 
@@ -721,7 +725,6 @@ urlpatterns = [
     path('private/docLaruex/editarEvento/<slug:id>/', editarEvento, name='docLaruexEditarEvento'), 
     path('private/docLaruex/equiposUbicacionesDatos', DatosEquiposUbicaciones, name='docLaruexEquiposUbicacionesDatos'),
     path('private/docLaruex/equiposUbicacionesDatosFiltro/<str:tipo>/', DatosEquiposUbicacionesFiltro, name='docLaruexEquiposUbicacionesDatosFiltro'),
-    
     path('private/docLaruex/formatoDatosFiltrados/<slug:procedimiento>/', formatosDatosFiltrados, name='docLaruexFormatosDatosFiltrados'),
     
 # ---------------------------------------------------------
@@ -742,5 +745,11 @@ urlpatterns = [
     path('private/docLaruex/eliminarRegistroTarea/<slug:id>/', eliminarRegistroTarea, name='docLaruexEliminarRegistroTarea'),
     path('private/docLaruex/tareasProximas', tareasProximas, name='docLaruexTareasProximas'),
     path('private/docLaruex/tareasProximasDatos', datosTareasProximas, name='docLaruexTareasProximasDatos'),
+
+    #vista de los mantenimientos asociados al equipo o ubicacion
+
+    path('private/docLaruex/verMantenimientosAsociados/<slug:id>/', verMantenimientosAsociados, name='docLaruexVerMantenimientosAsociados'), 
+    path('private/docLaruex/datosMantenimientosAsociados/<slug:id>/', datosMantenimientosAsociados, name='docLaruexMantenimientosAsociadosDatos'),
+    
 ]
 
