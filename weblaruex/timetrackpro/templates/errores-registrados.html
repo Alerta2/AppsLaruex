@@ -9,7 +9,16 @@
       </div>
       <div class="card-body px-0 pt-0 pb-2">
         <div class="table-responsive p-0">
+          
+
           <div class="mx-4">
+            <div id="toolbar">
+  
+              <button class="botonLink" onclick="irA(2)">
+                <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+                <div class="text text-sm">Notificar error</div>
+              </button>
+            </div>
 
             <table  id="tabla_errores_insertados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
@@ -164,6 +173,18 @@ function mostrarNombreRegistro() {
   } 
 }
 
+function irA(opcion) {
+  switch (opcion) {
+      case 2:
+        // abrir en una nueva pestaña
+        //window.location.href = "{% url 'timetrackpro:empleados' %}";
+        window.open("{% url 'timetrackpro:notificar-error-fichaje' %}", "_blank");
+
+        break;
+      default:
+        break;
+  }
+}
 
 
 

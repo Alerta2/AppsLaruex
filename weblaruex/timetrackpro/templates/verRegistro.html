@@ -10,6 +10,15 @@
         <h4 class="text-secondary">{{registro.mes}} de {{registro.year}}</h4>
       </div>
       <div class="card-body pt-0 pb-2 mx-1">
+        {% if administrador %}
+        <div id="toolbar">
+
+          <button class="botonLink" data-toggle="modal" data-target="#modalAgregarLineaRegistro">
+            <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+            <div class="text text-sm">Agregar fichaje</div>
+          </button>
+        </div>
+        {% endif %}
         <div class="table-responsive p-0">
           <table id="tabla_registros" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
   data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
@@ -20,6 +29,58 @@
     </div>
   </div>
 </div>
+
+<div id="modalAgregarLineaRegistro" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAgregarLineaRegistro"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Insertar un nuevo fichaje</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form id="formularioAgregarRegistro" action="{% url 'timetrackpro:agregar-linea-registro' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group">
+            <input type="text" class="form-control" id="registro" name="registro" data-rule="required" readonly value="{{registro.id}}" hidden />
+          </div>
+          <div class="row d-flex justify-content-center">
+            <div class="col-xl-4 col-lg-4 mb-xl-0 mb-4">
+              <div class="form-group">
+                <label class="col-form-label" for="empleado">Empleado</label>
+                <select class="form-select" data-rule="required" id="empleado" name="empleado">
+                  {% for e in empleados %}
+                  <option value="{{e.id}}">{{e.nombre}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-4 mb-xl-0 mb-4 ">
+              <div class="form-group">
+                <label class="col-form-label" for="hora">Hora</label>
+                <input type="datetime-local" class="form-control" id="hora_registro" name="hora_registro" data-rule="required" />
+              </div>
+            </div>
+          
+          </div>
+
+        
+      </div>
+      <div class="modal-footer">
+        {% if user.is_authenticated  %}
+        <button type="submit" value="submit"  class="btn bg-gradient-primary">Guardar</button>
+        {% endif %}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
 
 <script>
     $("#tabla_registros").bootstrapTable({
