@@ -1371,8 +1371,7 @@ def verLineaRegistro(request, id):
 @login_required
 def agregarLineaRegistro(request):
     administrador = esAdministrador(request.user.id)
-    if administrador:
-        if request.method == 'POST':
+    if administrador and request.method == 'POST':
             registro = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=request.POST.get("registro"))[0]
             maquina = MaquinaControlAsistencia.objects.using("timetrackpro").filter(nombre__icontains=registro.seccion)[0]
             empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=request.POST.get("empleado"))[0]
@@ -1384,6 +1383,8 @@ def agregarLineaRegistro(request):
             nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=remoto, modificado=modificado, id_archivo_leido=id_archivo_leido)
             nuevoRegistro.save(using='timetrackpro')
             return redirect('timetrackpro:ver-registro', id=registro.id)
+    else:
+        return redirect('timetrackpro:ups', mensaje="No tienes permiso para agregar un registro.")
 
 
 @login_required
