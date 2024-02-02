@@ -15,7 +15,11 @@ urlpatterns = [
     path('private/timetrackpro/sin-permiso', sinPermiso ,name='sin-permiso'),
     path('private/timetrackpro/ups', ups ,name='ups'),
     path('private/timetrackpro/ups/<str:mensaje>/', ups ,name='ups'),
+    path('private/timetrackpro/correcto/<str:mensaje>/', correcto ,name='correcto'),
 
+
+    # fichar
+    path('private/timetrackpro/fichar', fichar ,name='fichar'),
     # permisos de la aplicación
     path('private/timetrackpro/habilitaciones', habilitaciones ,name='habilitaciones'),
     path('private/timetrackpro/agregar-habilitacion', agregarHabilitacion ,name='agregar-habilitacion'),
@@ -44,6 +48,13 @@ urlpatterns = [
     path('private/timetrackpro/agregar-registro', agregarRegistro , name='agregar-registro'),
     path('private/timetrackpro/registros-insertados', registrosInsertados , name='registros-insertados'),
     path('private/timetrackpro/datos-registros-insertados', datosRegistrosInsertados , name='datos-registros-insertados'),
+    path('private/timetrackpro/registros-remotos-insertados', registrosRemotosInsertados , name='registros-remotos-insertados'),
+    path('private/timetrackpro/datos-registros-remotos-insertados', datosRegistrosRemotosInsertados , name='datos-registros-remotos-insertados'),
+    path('private/timetrackpro/datos-registros-remotos-insertados/<slug:remoto>/', datosRegistrosRemotosInsertados , name='datos-registros-remotos-insertados'),
+    path('private/timetrackpro/datos-registros-remotos-insertados/<slug:remoto>/<slug:year>/', datosRegistrosRemotosInsertados , name='datos-registros-remotos-insertados'),
+    path('private/timetrackpro/datos-registros-remotos-insertados/<slug:year>/', datosRegistrosRemotosInsertados , name='datos-registros-remotos-insertados'),
+    path('private/timetrackpro/datos-registros-remotos-insertados/<slug:year>/<slug:mes>/', datosRegistrosRemotosInsertados , name='datos-registros-remotos-insertados'),
+    path('private/timetrackpro/datos-registros-remotos-insertados/<slug:remoto>/<slug:year>/<slug:mes>/', datosRegistrosRemotosInsertados , name='datos-registros-remotos-insertados'),
     path('private/timetrackpro/ver-registro/<slug:id>/', verRegistro , name='ver-registro'),
     path('private/timetrackpro/datos-registro/<slug:id>/', datosRegistro , name='datos-registro'),
     path('private/timetrackpro/actualizar-registro/<slug:id>/', actualizarRegistro , name='actualizar-registro'),
