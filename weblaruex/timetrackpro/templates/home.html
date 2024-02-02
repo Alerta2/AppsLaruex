@@ -225,6 +225,13 @@
                   <button type="button" class="btn bg-gradient-dark btn-lg w-100 mb-0" onclick="redirigir(6)">Registros de las maquinas</button>
                 </div>
               </div>
+
+              
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(14)">Registros desde app</button>
+                </div>
+              </div>
               {% endif %}
               <div class="card">
                 <div class="text-center">
@@ -336,11 +343,8 @@
       case 13:
         window.open("{% url 'timetrackpro:solicitar-permisos-retribuidos' %}", "_blank");
         break;
-        
-      case 'Mangoes':
-      case 'Papayas':
-        console.log('Mangoes and papayas are $2.79 a pound.');
-        // Expected output: "Mangoes and papayas are $2.79 a pound."
+      case 14:
+        window.open("{% url 'timetrackpro:registros-remotos-insertados' %}", "_blank");
         break;
       default:
         console.log(`Sorry, we are out of ${expr}.`);

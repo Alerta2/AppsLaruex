@@ -103,6 +103,7 @@ def home(request):
         "diasVacacionesRestantes":diasVacacionesRestantes,
         "diasPropiosSolicitados":diasPropiosSolicitados,
         "diasVacacionesSolicitados":diasVacacionesSolicitados,
+        "alerta":alerta
     }
     return render(request,"home.html",infoVista)
     # guardo los datos en un diccionario
@@ -161,6 +162,28 @@ def ups(request, mensaje=None):
         "TimeTrackProTittle":"TimeTrackPro - Ups permiso",
         "mensaje":msg,
         "rutaActual": "Ups"
+
+
+    }
+
+    return render(request,"ups.html",infoVista)
+
+def correcto(request, mensaje=None):
+    """
+    Vista que se encarga de mostrar la página de "Correcto" cuando un usuario intenta insertar solicitudes con fechas que ya existen en la base de datos.
+    :param request: HttpRequest que representa la solicitud HTTP que se está procesando.
+    :return: HttpResponse que representa la respuesta HTTP resultante.
+    """
+    msg = "Acción realizada correctamente."
+    if mensaje is not None:
+        msg = mensaje
+    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":esAdministrador(request.user.id),
+        "TimeTrackProTittle":"TimeTrackPro - Correcto",
+        "mensaje":msg,
+        "rutaActual": "Ok"
 
 
     }
@@ -654,13 +677,46 @@ def registrosInsertados(request):
     archivos = []
     if administrador or director:
         archivos = RegistrosJornadaInsertados.objects.using("timetrackpro").order_by('year', 'mes').all()
-    infoVista = {
-        "navBar":navBar,
-        "administrador":administrador,
-        "archivos":list(archivos), 
-        "rutaActual": "Registros insertados"
-    }
-    return render(request,"registros-insertados.html",infoVista)
+        infoVista = {
+            "navBar":navBar,
+            "administrador":administrador,
+            "archivos":list(archivos), 
+            "rutaActual": "Registros insertados"
+        }
+        return render(request,"registros-insertados.html",infoVista)
+    else:
+        return redirect('timetrackpro:sin-permiso')
+
+@login_required
+def registrosRemotosInsertados(request):
+    """
+    The function "registrosInsertados" retrieves and displays inserted records for administrators and
+    directors.    
+    :param request: The request object represents the HTTP request that the server receives from the
+    client. It contains information such as the user making the request, the HTTP method used (GET,
+    POST, etc.), and any data sent with the request
+    :return: a rendered HTML template with the data needed for the view. The data includes the
+    navigation bar, a boolean value indicating if the user is an administrator, a list of inserted
+    records, and the current route.
+    """
+    # guardo los datos en un diccionario
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    yearActual = datetime.now().year
+    # obtengo los datos necesarios para la vista
+    archivos = []
+    if administrador or director:
+        archivos = RegistrosJornadaInsertados.objects.using("timetrackpro").order_by('year', 'mes').all()
+        infoVista = {
+            "navBar":navBar,
+            "administrador":administrador,
+            "archivos":list(archivos), 
+            "yearActual":yearActual,
+            "rutaActual": "Registros insertados desde la aplicación"
+        }
+        return render(request,"registros-remotos-insertados.html",infoVista)
+    else:
+        return redirect('timetrackpro:sin-permiso')
 
 
 
@@ -682,6 +738,46 @@ def datosRegistrosInsertados(request):
     registros = []
     if administrador or director:
         registros = RegistrosJornadaInsertados.objects.using("timetrackpro").values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
+    return JsonResponse(list(registros), safe=False)
+
+
+@login_required
+def datosRegistrosRemotosInsertados(request, remoto=None, year=None, mes=None):
+    """
+    La función "datosRegistrosRemotosInsertados" recupera los registros insertados desde la aplicación
+    y los devuelve como una respuesta JSON.
+    :param request: El objeto "request" representa la solicitud HTTP que el usuario hizo para acceder a
+    la vista. Contiene información como la sesión del usuario, el método HTTP utilizado (GET, POST, etc.)
+    y cualquier dato enviado con la solicitud.
+    :param remoto: El parámetro "remoto" es una cadena que indica si los registros insertados son
+    remotos o no. Si el valor es "remoto", se devuelven los registros insertados desde la aplicación.
+    Si el valor es "local", se devuelven los registros insertados localmente.
+    :return: una respuesta JSON que contiene una lista de diccionarios. Cada diccionario representa un
+    registro de entradas de diario insertadas y contiene los siguientes campos: 'id', 'seccion', 'mes',
+    'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', y 'ruta'.
+    """ 
+    if remoto == "2" or remoto == 2:
+        remoto = None
+
+    if year == None:
+        year = datetime.now().year
+
+    if mes == None:
+        #obtengo el ultimo mes
+        if datetime.now().month == 1:
+            mes = 12
+            year = datetime.now().year - 1
+        else:
+            mes = datetime.now().month - 1
+
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    registros = []
+    if administrador or director:
+        if remoto == None:
+            registros = Registros.objects.using("timetrackpro").filter(id_archivo_leido__isnull=True,hora__year=year, hora__month=mes).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
+        else:
+            registros = Registros.objects.using("timetrackpro").filter(id_archivo_leido__isnull=True, remoto=remoto, hora__year=year, hora__month=mes).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
     return JsonResponse(list(registros), safe=False)
 
 
@@ -763,7 +859,6 @@ def obtenerRegistroSemanalEmpleados(request):
     administrador = esAdministrador(request.user.id)
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
-    
     infoVista = {
         "navBar":navBar,
         "administrador":administrador,
@@ -771,6 +866,31 @@ def obtenerRegistroSemanalEmpleados(request):
         "rutaActual": "Informe de asistencia empleados",
     }
     return render(request,"informe-registro-semanal-usuario.html",infoVista)
+
+@login_required
+def fichar(request):
+    empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+    
+    if request.method == 'POST':
+        hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        registro = Registros(id_empleado=empleado.id_empleado, nombre_empleado=empleado.id_empleado.nombre, hora=hora, remoto=1)
+        registro.save(using='timetrackpro')
+        alerta["activa"] = True
+        alerta["tipo"] = "success"
+        alerta["mensaje"] = "Fichaje realizado correctamente."
+        alerta["icono"] = iconosAviso["success"]
+
+        return redirect('timetrackpro:correcto', mensaje='Has fichado correctamente.')
+
+    infoVista = {
+        "navBar":navBar,
+        "rutaActual": "Fichar",
+        "alerta": alerta,
+    }
+    return render(request,"fichar.html",infoVista)
+
+    
+
 
 @login_required
 def datosRegistroEmpleados(request):
@@ -796,13 +916,13 @@ def datosRegistroEmpleados(request):
     usuarios = []
     informe = []
     if request.GET.get("fechaInicio") != None:
-        fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%Y-%m-%d')
+        fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%d/%m/%Y')
     else:
         fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
         fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')
 
     if request.GET.get("fechaFin") != None:
-        fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%Y-%m-%d')
+        fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%d/%m/%Y')
     else:
         ultimoDiaMes = calendar.monthrange(yearActual, mesPrevio)  
         fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
@@ -844,14 +964,14 @@ def datosRegistroSemanalEmpleados(request):
     usuarios = []
 
     if request.GET.get("fechaInicio") != None:
-        fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%Y-%m-%d')
+        fechaInicio = datetime.strptime(request.GET.get("fechaInicio"), '%d/%m/%Y')
     else:
         fechaInicio = str(yearActual) + "-" + str(mesPrevio) + "-01"
         fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')
 
 
     if request.GET.get("fechaFin") != None:
-        fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%Y-%m-%d')
+        fechaFin = datetime.strptime(request.GET.get("fechaFin"), '%d/%m/%Y')
     else:
         ultimoDiaMes = calendar.monthrange(yearActual, mesPrevio)  
         fechaFin = str(yearActual) + "-" + str(mesPrevio) + "-"+str(ultimoDiaMes[1])
@@ -956,25 +1076,57 @@ def comprobarFestivos(fechaInicio, fechaFin=None):
         if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio=fechaInicio).exists():
             festivos = 1
     else:
-        if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio).exists():        
+        if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin).exists():  
             # cuento los dias de festivos restando la fecha fin a la fecha inicio
+            # obtengo todos los festivos que hay entre la fecha de inicio y la fecha de fin
+
             festivo = FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio)[0]
-            if festivo.fecha_fin <= fechaFin:
+
+            if  festivo.fecha_fin <= fechaFin:
+                
                 festivos = (festivo.fecha_fin - festivo.fecha_inicio).days + 1
             else:
                 festivos = (fechaFin - festivo.fecha_inicio).days + 1
 
     if festivos < 0:
         festivos = 0
+
     return festivos
 
+def comprobarFestivosSemanas(fechaInicio, fechaFin=None):
+    # si la fechaFin no existe le asigno la fechaInicio
+    if fechaFin is None:
+        fechaFin = fechaInicio
+    festivos = 0
+    # compruebo si hay algún festivo entre las dos fechas 
+    if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin).exists():
+        festivo = FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin)[0]
+        # obtener diferencia dias entre las fechas
+        # si la fecha de inicio es distinta de la fecha fin
+        fInicio = date(festivo.fecha_inicio.year, festivo.fecha_inicio.month, festivo.fecha_inicio.day)
+        fFin = date(festivo.fecha_fin.year, festivo.fecha_fin.month, festivo.fecha_fin.day)
+        # comparo las fechas de inicio y fin
+        
+        if fFin != fInicio:
+            # obtengo la diferencia de dias entre la fecha de inicio y la fecha de fin
+            # me quedo unicamente con los dias de la fecha de inicio y la fecha de fin y los resto
+            dias = (fFin - fInicio).days + 1
+        else:
+            dias = 1
+        festivos = festivos + dias  
+    return festivos
+
+
 def pruebas(request):
-    idEmpleado = Empleados.objects.using("timetrackpro").filter(id=9)[0]
-    fechaInicio = date(2023, 5, 15)
-    fechaFin =  date(2023, 5, 21)
-    # Devuelve una respuesta HTTP adecuada, por ejemplo:
-    festivos = comprobarFestivos(fechaInicio, fechaFin)
-    return HttpResponse(festivos)
+    empleados = []
+    idEmpleado = Empleados.objects.using("timetrackpro").filter(id=1)[0]
+    empleados.append(idEmpleado.id)
+    fechaInicio = date(2023, 10, 1)
+    fechaFin =  date(2023, 10, 31)
+    calcularHorasSemanales(empleados, fechaInicio, fechaFin)
+        # Devuelve una respuesta HTTP adecuada, por ejemplo:
+    #festivos = comprobarFestivos(fechaInicio, fechaFin)
+    return HttpResponse("festivos: " + str(festivos))
     #return jornada
 
 def calcularHoras(usuarios, fechaInicio, fechaFin):
@@ -1005,7 +1157,6 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
         empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e)[0]
 
         for d in dias:
-            print("calculo para empleado", empleado.id_usuario.nombre, empleado.id_usuario.apellidos, "dia: ", d["hora__date"])
             # obtener la jornada del empleado
             jornada = comprobarJornadaEmpleado(empleado.id_usuario.id, d["hora__date"])
             if isinstance(jornada, float):
@@ -1058,16 +1209,16 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
     # sumo un dia a la fecha fin
     fechaFin = fechaFin + timedelta(days=1)
     registros = Registros.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
-    
     for e in usuarios:
         semanas = registros.filter(id_empleado__id=e).annotate(semana=ExtractWeek('hora')).values('semana').distinct()
         empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e)[0]
+
         #obtengo las horas por dias y las agrupo por semana.
         for s in semanas:
             dias = registros.filter(id_empleado__id=e, hora__week=s["semana"]).values('hora__date').distinct()
             year = dias[0]["hora__date"].year
             # obtengo todos los dias de esa semana 
-            inicioSemana, finSemana = obtenerFechaSemana(year, s["semana"])            
+            inicioSemana, finSemana = obtenerFechaSemana(year, s["semana"])    
             horas = 0
             diasErrores = []
             diasFichados = 0
@@ -1079,7 +1230,8 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
             else:
                 jornadaLaboral=jornada
             permisos, asuntosPropios, vacaciones, diasPermisos, diasAsuntosPropios, diasVacaciones = comprobarPermisosEmpleado(empleado.id_usuario.id, inicioSemana, finSemana)
-            festivos = comprobarFestivos(inicioSemana, finSemana)
+            #festivos = comprobarFestivos(inicioSemana, finSemana)
+            festivos = comprobarFestivosSemanas(inicioSemana, finSemana)
         
             for d in dias:
                 # comprubeo si el dia tiene un numero par de registros
@@ -1183,7 +1335,6 @@ def verRegistro(request, id):
     IdEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
 
     if request.method == 'POST' and administrador:
-        print("-- Entro en el post --")
         if not os.path.isfile(ruta):
             return "El archivo no existe"
         with io.open(ruta, "r", encoding="utf-8") as archivo:
@@ -1262,7 +1413,6 @@ def actualizarRegistro(request, id):
         ruta_leido = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + registro.ruta
 
         if request.method == 'POST':
-            print("-- Entro en el post --")
             if not os.path.isfile(ruta):
                 return "El archivo no existe"
             with open(ruta, "r") as archivo:
@@ -2869,7 +3019,6 @@ def vacacionesSolicitadas(request):
     mes = str(datetime.now().month)
     year = str(datetime.now().year)
     
-    print (year, type(year))
     if len(mes) == 1:
         mes = "0" + str(mes)
 
@@ -2898,7 +3047,6 @@ def datosVacacionesSolicitadas(request, year=None):
     salida = []
     user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
     empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
-    print('\033[91m'+'usuario: ' + '\033[92m', empleado)
 
     if administrador or director:
         vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(estado__in=[9,10,11],year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos')
@@ -4495,7 +4643,6 @@ def solicitarVacaciones(request):
     
     usuario = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
     empleado = Empleados.objects.using("timetrackpro").filter(id=usuario.id_usuario.id)[0]
-    print('\033[91m'+'usuario: ' + '\033[92m', usuario)
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
     mes = str(datetime.now().month)
@@ -4510,7 +4657,6 @@ def solicitarVacaciones(request):
     if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, year=int(datetime.now().year)).exists():
         vacacionesEncontradas = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, year=int(datetime.now().year)).values('id','tipo_vacaciones__nombre', 'year', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado__nombre', 'estado__id','fecha_solicitud', 'tipo_vacaciones__color')
         for v in vacacionesEncontradas:
-            print(v)
             vacaciones.append(v)
 
     if CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(solicitante=empleado,estado__in=EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1, id__in=(9, 10))).exists():
