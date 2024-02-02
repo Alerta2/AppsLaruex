@@ -281,9 +281,9 @@ class PermisosRetribuidos(models.Model):
     cod_uex = models.CharField(max_length=7, blank=True, null=True)
     nombre = models.CharField(max_length=255)
     tipo = models.ForeignKey('TipoPermisosYAusencias', models.DO_NOTHING, db_column='tipo')
-    dias = models.IntegerField()
+    dias = models.IntegerField(blank=True, null=True)
     habiles_o_naturales = models.CharField(max_length=15)
-    solicitud_dias_naturales_antelacion = models.IntegerField()
+    solicitud_dias_naturales_antelacion = models.IntegerField(blank=True, null=True)
     pas = models.IntegerField()
     pdi = models.IntegerField()
 
