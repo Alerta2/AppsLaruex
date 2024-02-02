@@ -1369,9 +1369,19 @@ def verLineaRegistro(request, id):
 
 @login_required
 def agregarLineaRegistro(request):
+    '''
+    La función `agregarLineaRegistro` permite a un administrador agregar una línea de registro a un
+    registro en una aplicación TimeTrackPro.
+    
+    :param request: El objeto `request` contiene información sobre la solicitud HTTP actual, como el
+    usuario que realiza la solicitud, el método utilizado (GET o POST) y cualquier dato enviado con la
+    solicitud
+    :return: una redirección a la vista 'ver-registro' con el parámetro 'id' establecido en el id del
+    objeto 'archivoModificado', o una redirección a la vista 'ups' con el parámetro 'mensaje' establecido
+    en "No tienes permiso para agregar un registro."
+    '''
     administrador = esAdministrador(request.user.id)
-    if administrador:
-        if request.method == 'POST':
+    if administrador and request.method == 'POST':
             registro = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=request.POST.get("registro"))[0]
             maquina = MaquinaControlAsistencia.objects.using("timetrackpro").filter(nombre__icontains=registro.seccion)[0]
             empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=request.POST.get("empleado"))[0]
@@ -1382,6 +1392,9 @@ def agregarLineaRegistro(request):
             id_archivo_leido = registro
             nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=remoto, modificado=modificado, id_archivo_leido=id_archivo_leido)
             nuevoRegistro.save(using='timetrackpro')
+            return redirect('timetrackpro:ver-registro', id=registro.id)
+    else:
+        return redirect('timetrackpro:ups', mensaje="No tienes permiso para agregar un registro.")
 
 
 
@@ -4360,7 +4373,9 @@ def justicarSolicitudPermisosRetribuidos(request, id=None):
 
         permiso = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]
         estado = EstadosSolicitudes.objects.using("timetrackpro").filter(permisos_retribuidos=1, id=21)[0]
-        if permiso.empleado.id == request.user.id or director or administrador:
+        empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        
+        if permiso.empleado.id == empleado.id_usuario.id or director or administrador:
             try: 
                 if request.FILES['justificante']:
                     nombreJustificante = str(permiso.id) + '_justificante.' + request.FILES['justificante'].name.split('.')[-1]
@@ -4697,7 +4712,6 @@ def datosCalendarioAsuntosPropios(request, year=None):
         # recorro los festivos y los guardo en la lista
         for asunto in asuntosPropios:
             # sumar un día a la fecha de fin
-            asunto['fecha_fin'] = asunto['fecha_fin'] + timedelta(days=1)
             # inserto los datos en la lista siguiendo la estructura que requiere el calendario
             salidaAsuntosPropios.append({
                 'id':asunto['id'],
@@ -4724,6 +4738,7 @@ def datosCalendarioAsuntosPropios(request, year=None):
     salida = salidaFestivos + salidaAsuntosPropios + salidaPermisos
     # devuelvo la lista en formato json
     return JsonResponse(salida, safe=False)
+
 
 
 @login_required

@@ -18,6 +18,7 @@ from django.urls import reverse
 import calendar
 from django.db.models import Sum
 from django.db.models.functions import ExtractWeek
+import io
 
 
 
@@ -1185,9 +1186,12 @@ def verRegistro(request, id):
         print("-- Entro en el post --")
         if not os.path.isfile(ruta):
             return "El archivo no existe"
-        with open(ruta, "r") as archivo:
-            archivo.readline()
+        with io.open(ruta, "r", encoding="utf-8") as archivo:
+            primeraLinea = True
             for linea in archivo:
+                if primeraLinea:
+                    primeraLinea = False
+                    continue
                 linea = linea.strip()
                 # Comprobar si la línea está vacía
                 if not linea:
@@ -1370,6 +1374,17 @@ def verLineaRegistro(request, id):
 
 @login_required
 def agregarLineaRegistro(request):
+    '''
+    La función `agregarLineaRegistro` permite a un administrador agregar una línea de registro a un
+    registro en una aplicación TimeTrackPro.
+    
+    :param request: El objeto `request` contiene información sobre la solicitud HTTP actual, como el
+    usuario que realiza la solicitud, el método utilizado (GET o POST) y cualquier dato enviado con la
+    solicitud
+    :return: una redirección a la vista 'ver-registro' con el parámetro 'id' establecido en el id del
+    objeto 'archivoModificado', o una redirección a la vista 'ups' con el parámetro 'mensaje' establecido
+    en "No tienes permiso para agregar un registro."
+    '''
     administrador = esAdministrador(request.user.id)
     if administrador and request.method == 'POST':
             registro = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=request.POST.get("registro"))[0]
@@ -1591,7 +1606,7 @@ def notificarErrorEnFichaje(request):
         "rutaActual": "Notificar error en fichaje",
     }
     if request.method == 'POST':
-        idEmpleadoMaquina = request.POST.get("idEmpleadoMaquina")
+        idEmpleadoMaquina = request.POST.get("empleado_maquina")
 
         empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=idEmpleadoMaquina)[0]
 
@@ -1599,10 +1614,7 @@ def notificarErrorEnFichaje(request):
         motivo = request.POST.get("motivoError")
         estado = 1 # indico que aún esta pendiente de revisar
         hora = request.POST.get("hora")
-        if idEmpleado in request.POST:
-            registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.POST.get("idEmpleado"))[0]
-        else:
-            registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
+        registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
         horaNotificacion = datetime.now()
 
         nuevoErrorRegistrado = ErroresRegistroNotificados(id_empleado=idEmpleado, hora=hora, motivo=motivo, estado=estado, quien_notifica=registrador, hora_notificacion=horaNotificacion)
@@ -1723,7 +1735,7 @@ def eliminarErrorRegistroNotificado(request, id):
     :param id: The "id" parameter is the unique identifier of the error to be deleted from the
     "ErroresRegistroNotificados" table in the "timetrackpro" database
     :return: a redirect response. If the user is an administrator, it redirects to the
-    'timetrackpro:ver-errores-registrados' URL. If the user is not an administrator, it redirects to the
+    'timetrackpro:ver-errores-notificados' URL. If the user is not an administrator, it redirects to the
     'timetrackpro:ups' URL with a message indicating that the user does not have permission to delete
     the selected error.
     """
@@ -1732,7 +1744,7 @@ def eliminarErrorRegistroNotificado(request, id):
         error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id)[0]
         error.delete(using='timetrackpro')
         # guardo los datos en un diccionario
-        return redirect('timetrackpro:ver-errores-registrados')
+        return redirect('timetrackpro:ver-errores-notificados')
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para eliminar el error seleccionado.")
 
@@ -4034,7 +4046,8 @@ def solicitarAsuntosPropios(request, year=None):
             descripcion = request.POST.get("descripcion")
 
         empleadoSustituto = request.POST.get("sustituto")
-        if empleadoSustituto != 0:        
+
+        if empleadoSustituto != "0" and empleadoSustituto != 0:        
             sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0] 
         else:
             sustituto = None
@@ -4276,7 +4289,9 @@ def verSolicitudPermisosRetribuidos(request, id=None):
     empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
     sustitutos = Sustitutos.objects.using("timetrackpro").values('id', 'nombre', 'apellidos')
     permisos = PermisosRetribuidos.objects.using("timetrackpro").values('id', 'cod_uex', 'nombre', 'tipo__id', 'tipo__nombre', 'dias', 'habiles_o_naturales', 'solicitud_dias_naturales_antelacion', 'pas', 'pdi')
-    if solicitud.empleado.id == request.user.id or director or administrador:
+    solicitante = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+
+    if solicitud.empleado.id == solicitante.id_usuario.id or director or administrador:
         # guardo los datos en un diccionario
         infoVista = {
             "navBar":navBar,
@@ -4363,7 +4378,9 @@ def justicarSolicitudPermisosRetribuidos(request, id=None):
 
         permiso = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]
         estado = EstadosSolicitudes.objects.using("timetrackpro").filter(permisos_retribuidos=1, id=21)[0]
-        if permiso.empleado.id == request.user.id or director or administrador:
+        empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        
+        if permiso.empleado.id == empleado.id_usuario.id or director or administrador:
             try: 
                 if request.FILES['justificante']:
                     nombreJustificante = str(permiso.id) + '_justificante.' + request.FILES['justificante'].name.split('.')[-1]
@@ -4700,7 +4717,6 @@ def datosCalendarioAsuntosPropios(request, year=None):
         # recorro los festivos y los guardo en la lista
         for asunto in asuntosPropios:
             # sumar un día a la fecha de fin
-            asunto['fecha_fin'] = asunto['fecha_fin'] + timedelta(days=1)
             # inserto los datos en la lista siguiendo la estructura que requiere el calendario
             salidaAsuntosPropios.append({
                 'id':asunto['id'],
@@ -4757,7 +4773,7 @@ def agregarAsuntosPropiosCalendario(request):
             descripcion = request.POST.get("descripcion_calendario")
 
         empleadoSustituto = request.POST.get("sustituto_calendario")
-        if empleadoSustituto != 0:        
+        if empleadoSustituto != "0" and empleadoSustituto != 0:       
             sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0] 
         else:
             sustituto = None
