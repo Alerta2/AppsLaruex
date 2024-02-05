@@ -222,12 +222,12 @@
         var horasFestivos = festivos * 7.5;
         var vacaciones = row.vacaciones;
         var asuntosPropios = row.asuntosPropios;
-        hora = hora + horasFestivos;
         var permisos = row.diasPermisos;
+        
         var vacaciones = row.diasVacaciones;
         var asuntosPropios = row.diasAsuntosPropios;
-
-
+        
+        hora = hora + horasFestivos + vacaciones * 7.5 + asuntosPropios * 7.5 + permisos * 7.5;
         // redondear a 2 decimales
         hora = Math.round(hora * 100) / 100;
         jornada = row.jornada;
