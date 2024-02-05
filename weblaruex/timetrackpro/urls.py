@@ -17,7 +17,6 @@ urlpatterns = [
     path('private/timetrackpro/ups/<str:mensaje>/', ups ,name='ups'),
     path('private/timetrackpro/correcto/<str:mensaje>/', correcto ,name='correcto'),
 
-
     # fichar
     path('private/timetrackpro/fichar', fichar ,name='fichar'),
     # permisos de la aplicación
@@ -48,6 +47,11 @@ urlpatterns = [
     path('private/timetrackpro/agregar-registro', agregarRegistro , name='agregar-registro'),
     path('private/timetrackpro/registros-insertados', registrosInsertados , name='registros-insertados'),
     path('private/timetrackpro/datos-registros-insertados', datosRegistrosInsertados , name='datos-registros-insertados'),
+    path('private/timetrackpro/datos-registros-insertados/<slug:seccion>/', datosRegistrosInsertados , name='datos-registros-insertados'),
+    path('private/timetrackpro/datos-registros-insertados/<slug:seccion>/<slug:year>/', datosRegistrosInsertados , name='datos-registros-insertados'),
+    path('private/timetrackpro/datos-registros-insertados/<slug:year>/', datosRegistrosInsertados , name='datos-registros-insertados'),
+    path('private/timetrackpro/datos-registros-insertados/<slug:year>/<slug:mes>/', datosRegistrosInsertados , name='datos-registros-insertados'),
+    path('private/timetrackpro/datos-registros-insertados/<slug:seccion>/<slug:year>/<slug:mes>/', datosRegistrosInsertados , name='datos-registros-insertados'),
     path('private/timetrackpro/registros-remotos-insertados', registrosRemotosInsertados , name='registros-remotos-insertados'),
     path('private/timetrackpro/datos-registros-remotos-insertados', datosRegistrosRemotosInsertados , name='datos-registros-remotos-insertados'),
     path('private/timetrackpro/datos-registros-remotos-insertados/<slug:remoto>/', datosRegistrosRemotosInsertados , name='datos-registros-remotos-insertados'),
@@ -56,12 +60,14 @@ urlpatterns = [
     path('private/timetrackpro/datos-registros-remotos-insertados/<slug:year>/<slug:mes>/', datosRegistrosRemotosInsertados , name='datos-registros-remotos-insertados'),
     path('private/timetrackpro/datos-registros-remotos-insertados/<slug:remoto>/<slug:year>/<slug:mes>/', datosRegistrosRemotosInsertados , name='datos-registros-remotos-insertados'),
     path('private/timetrackpro/ver-registro/<slug:id>/', verRegistro , name='ver-registro'),
+    path('private/timetrackpro/eliminar-registro/<slug:id>/', eliminarArchivoRegistro , name='ver-registro'),
     path('private/timetrackpro/datos-registro/<slug:id>/', datosRegistro , name='datos-registro'),
     path('private/timetrackpro/actualizar-registro/<slug:id>/', actualizarRegistro , name='actualizar-registro'),
     path('private/timetrackpro/ver-linea-registro/<slug:id>/', verLineaRegistro , name='ver-linea-registro'),
     path('private/timetrackpro/agregar-linea-registro/', agregarLineaRegistro , name='agregar-linea-registro'),
     path('private/timetrackpro/editar-linea-registro/<slug:id>/', editarLineaRegistro , name='editar-linea-registro'),
     path('private/timetrackpro/eliminar-linea-registro/<slug:id>/', eliminarLineaRegistro , name='eliminar-linea-registro'),
+    path('private/timetrackpro/descargar-fichero-maquina/<slug:id>/', descargarFicheroMaquina , name='descargar-fichero-maquina'),
 
     # información de los registros por cada empleado Laruex
     path('private/timetrackpro/obtener-registro-empleados/', obtenerRegistroEmpleados , name='obtener-registro-empleados'),
