@@ -1649,7 +1649,6 @@ def eliminarLineaRegistro(request, id):
     'mensaje' parameter set to "No tienes permiso para eliminar el registro seleccionado."
     """
     registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
-    archivoModificado = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=registro.id_archivo_leido.id)[0]
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
         idRegistroEliminado = registro.id
@@ -1658,7 +1657,13 @@ def eliminarLineaRegistro(request, id):
         hora = registro.hora
         maquina = registro.maquina
         remoto = registro.remoto
-        idArchivoLeido = archivoModificado
+            
+        if registro.id_archivo_leido != None:
+            archivoModificado = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=registro.id_archivo_leido.id)[0]
+            idArchivoLeido = archivoModificado
+        else:
+            archivoModificado = None
+            idArchivoLeido = None
         fechaEliminacion = datetime.now()
         motivo = request.POST.get("motivoEliminacion")
         registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=int(request.POST.get("registradorEliminacion")))[0]
@@ -1668,9 +1673,11 @@ def eliminarLineaRegistro(request, id):
         nuevoRegistroEliminado.save(using='timetrackpro')
         registro.delete(using='timetrackpro')
 
-
+        if archivoModificado == None:
+            return redirect('timetrackpro:registros-remotos-insertados')
         # guardo los datos en un diccionario
-        return redirect('timetrackpro:ver-registro', id=archivoModificado.id)
+        else:
+            return redirect('timetrackpro:ver-registro', id=archivoModificado.id)
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para eliminar el registro seleccionado.")
 
