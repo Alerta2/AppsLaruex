@@ -573,7 +573,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var calendar = new FullCalendar.Calendar(calendarDiv, {
       initialDate: initialDate, // will be parsed as local
       themeSystem: 'bootstrap5',
-      events: "{% url 'timetrackpro:datos-festivos-vacaciones-empleado' %}",
+      events: "{% url 'timetrackpro:datos-calendario-vacaciones-solicitadas' %}",
       //eventColor: '#20c997', // color de los eventos
       height: 650, // indico el maximo de alto que puede tener el calendario
       locale: 'es', // el idioma del calendario

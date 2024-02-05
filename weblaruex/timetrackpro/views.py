@@ -681,7 +681,8 @@ def registrosInsertados(request):
             "navBar":navBar,
             "administrador":administrador,
             "archivos":list(archivos), 
-            "rutaActual": "Registros insertados"
+            "rutaActual": "Registros insertados",
+            "yearActual":datetime.now().year
         }
         return render(request,"registros-insertados.html",infoVista)
     else:
@@ -721,7 +722,7 @@ def registrosRemotosInsertados(request):
 
 
 @login_required
-def datosRegistrosInsertados(request):
+def datosRegistrosInsertados(request, seccion=None, year=None, mes=None):
     """
     The function "datosRegistrosInsertados" retrieves inserted records from a database and returns them
     as a JSON response.
@@ -733,11 +734,27 @@ def datosRegistrosInsertados(request):
     inserted journal entries and includes the following fields: 'id', 'seccion', 'mes', 'year',
     'fecha_lectura', 'insertador__first_name', 'insertador__last_name', and 'ruta'.
     """
+
+    secciones = {
+        1: "Todos",
+        2: "Alerta2",
+        3: "Departamento",
+        4: "Laboratorios",
+    }
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     registros = []
     if administrador or director:
-        registros = RegistrosJornadaInsertados.objects.using("timetrackpro").values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
+        if seccion == 1 or seccion == None or seccion == "1" or seccion == "Todos":
+            if mes == None:
+                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
+            else:
+                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(year=year, mes=nombreMeses[int(mes)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
+        else:
+            if mes == None:
+                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(seccion=secciones[int(seccion)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
+            else:
+                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(seccion=secciones[int(seccion)], year=year, mes=nombreMeses[int(mes)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
     return JsonResponse(list(registros), safe=False)
 
 
@@ -1352,6 +1369,8 @@ def verRegistro(request, id):
                 # Obtener los valores de los campos (reemplaza con los nombres correctos)
                 id_empleado = campos[0].lstrip('0')
                 nombre = campos[1]
+                # reemplazo los espacios por guiones bajos y lo pongo en mayusculas
+                nombre = nombre.replace(" ", "_").upper()
                 empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(nombre=nombre)[0]
                 hora = convertirFormatoDateTime(campos[3])
                 # Comprobar si en la base de datos existen registros con el mismo id_archivo_leido
@@ -1581,6 +1600,38 @@ def editarLineaRegistro(request, id):
         return redirect('timetrackpro:ver-linea-registro', id=id)
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para editar el registro seleccionado.")
+
+@login_required
+def eliminarArchivoRegistro(request, id):
+    """
+    la función `eliminarArchivoRegistro` elimina un archivo de la base de datos y guarda el registro
+    eliminado en otra tabla.
+    :param request: El objeto `request` es un objeto que representa la solicitud HTTP realizada por el
+    cliente. Contiene información como el usuario que realiza la solicitud, el método utilizado (GET o
+    POST) y cualquier dato enviado con la solicitud
+    :param id: El parámetro `id` es el identificador del registro que necesita ser eliminado de la base
+    de datos
+    :return: una redirección a la vista 'timetrackpro:registros-insertados' si el usuario tiene
+    permisos de administrador, de lo contrario, una redirección a la vista 'timetrackpro:ups' con el
+    parámetro 'mensaje' establecido en "No tienes permiso para eliminar el registro seleccionado."
+    """
+
+    administrador = esAdministrador(request.user.id)
+    if administrador:
+        archivoModificado = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=id)[0]
+        registros = Registros.objects.using("timetrackpro").filter(id_archivo_leido=archivoModificado)
+        # eliminar el fichero de la carpeta de registros insertados
+        ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + archivoModificado.ruta
+        if os.path.isfile(ruta):
+            os.remove(ruta)
+        for r in registros:
+            r.delete(using='timetrackpro')
+        archivoModificado.delete(using='timetrackpro')
+        
+        return redirect('timetrackpro:registros-insertados')
+    else:
+        return redirect('timetrackpro:ups', mensaje="No tienes permiso para eliminar el registro seleccionado.")
+
 
 @login_required
 def eliminarLineaRegistro(request, id):
@@ -3089,6 +3140,7 @@ def datosCalendarioVacacionesSolicitadas(request):
     festivos = FestivosTimetrackPro.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
 
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(estado__in=[9,11,12]).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado','empleado__nombre', 'empleado__apellidos','fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
+    print('\033[91m'+'vacaciones: ' + '\033[92m', vacaciones)
     # creo una lista vacía para guardar los datos de los festivos
     salidaFestivos = []
 
@@ -3103,6 +3155,7 @@ def datosCalendarioVacacionesSolicitadas(request):
             'color':festivo['tipo_festividad__color_calendario']
         })
     salidaVacaciones = [] 
+
     for vacacion in vacaciones:
         salidaVacaciones.append({
             'id':vacacion['id'],
@@ -3111,6 +3164,8 @@ def datosCalendarioVacacionesSolicitadas(request):
             'end':vacacion['fecha_fin'],
             'color':vacacion['tipo_vacaciones__color_calendario']
         })
+    
+    print('\033[91m'+'salidaVacaciones: ' + '\033[92m', salidaVacaciones)
 
     salida = salidaFestivos + salidaVacaciones
     # devuelvo la lista en formato json
@@ -4567,6 +4622,31 @@ def descargarSolicitudPermisosRetribuidos(request, id):
         return FileResponse(open(ruta, 'rb'))
     else:
         return JsonResponse({'status': 'error', 'message': 'El archivo no esta disponible, compruebe que la ruta y el archivo tengan la misma extensión'})
+
+
+@login_required
+def descargarFicheroMaquina(request, id):
+    '''
+    La funcion "descargarSolicitudPermisosRetribuidos" permite descargar el justificante de un permiso retribuido en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del permiso retribuido del que se desean descargar el justificante
+    :return: un objeto "FileResponse" que contiene el justificante del permiso retribuido en concreto
+    '''
+
+    fichero = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=id)[0]
+        
+    administrador = esAdministrador(request.user.id)
+    direccion = esDirector(request.user.id)
+
+    ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + fichero.ruta
+
+    # compruebo si la ruta devuelve algo 
+    if os.path.exists(ruta) and (administrador or direccion):
+        return FileResponse(open(ruta, 'rb'))
+    else:
+        return JsonResponse({'status': 'error', 'message': 'El archivo no esta disponible, compruebe que la ruta y el archivo tengan la misma extensión'})
+
+
 
 @login_required
 def actualizarJustificanteSolicitudPermisosRetribuidos(request, id):
