@@ -110,7 +110,7 @@
     },
     {
       title: "Semana",
-      field: "hora",
+      field: "semana",
       halign: "left",
       sortable: true,
       align: "left",
@@ -304,11 +304,7 @@
       }
     },
     ],
-
-    search: true,
-    sortName: "Semana",
-    sortOrder: "asc",
-
+    
     rowStyle: function (row, index) {
       if (row.correcto && row.correcto.toLowerCase() === "no") {
         // Si el valor de 'correcto' es 'no', devuelve un objeto con estilo rojo
@@ -319,6 +315,14 @@
       // De lo contrario, devuelve un objeto vacío (sin cambio de estilo)
       return {};
     },
+
+    search: true,
+    sortable: true,
+    // ordenar la tabla por la columna semana
+    sortOrder: "asc",
+    // ordenar por mes y año
+    sortName: "semana",
+
 
   });
 

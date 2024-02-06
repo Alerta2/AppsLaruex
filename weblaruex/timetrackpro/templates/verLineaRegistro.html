@@ -118,7 +118,7 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:eliminar-linea-registro' id=registro.id %}" method="POST"
+        <form id="formularioEliminarLineaRegistro" action="{% url 'timetrackpro:eliminar-linea-registro' id=registro.id %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
