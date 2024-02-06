@@ -1166,7 +1166,9 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
     # sumo un dia a la fecha fin
     fechaFin = fechaFin + timedelta(days=1)
 
-    registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
+    registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).order_by("hora").all()
+    # for registro in registros:
+    #     print(registro.id_empleado.id, registro.hora)
     # agrupo los registros por semana 
     
     for e in usuarios:
