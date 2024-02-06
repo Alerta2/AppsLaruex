@@ -348,7 +348,7 @@ class RegistrosManualesControlHorarioNoInsertados(models.Model):
         db_table = 'registros_manuales_control_horario_no_insertados'
 
 
-class Registros(models.Model):
+class RegistrosTimetrackpro(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     id_empleado = models.ForeignKey(EmpleadosMaquina, models.DO_NOTHING, db_column='id_empleado', blank=True, null=True)
     nombre_empleado = models.CharField(max_length=255, blank=True, null=True)
