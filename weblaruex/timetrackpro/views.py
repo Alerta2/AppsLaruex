@@ -3172,7 +3172,7 @@ def datosCalendarioVacacionesSolicitadas(request):
             'id':vacacion['id'],
             'title':vacacion['empleado__nombre'] + " " +vacacion['empleado__apellidos'],
             'start':vacacion['fecha_inicio'],
-            'end':vacacion['fecha_fin'],
+            'end':vacacion['fecha_fin'] + timedelta(days=1),
             'color':vacacion['tipo_vacaciones__color_calendario']
         })
     
