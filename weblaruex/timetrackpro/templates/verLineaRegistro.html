@@ -46,7 +46,7 @@
             
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{registro.nombre_empleado}}</li>
             
-            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{registro.hora|date:"h:i:s"}}</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{registro.hora|date:"H:i:s"}}</li>
             
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{registro.hora|date:"d M Y"}}</li>
             {% if registro.remoto != 1 %}
@@ -118,7 +118,7 @@
         </div>
 
         <div class="modal-body">
-        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:eliminar-linea-registro' id=registro.id %}" method="POST"
+        <form id="formularioEliminarLineaRegistro" action="{% url 'timetrackpro:eliminar-linea-registro' id=registro.id %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
@@ -133,7 +133,7 @@
           </div>
           <div class="row">
             <div class="col-xl-8 mx-auto my-2">
-              <label class="text-sm">Motivo de la modificacion</label>
+              <label class="text-sm">Motivo de la eliminación</label>
               <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Indique el motivo por el que se ha modificado el registro" id="motivoEliminacion" name="motivoEliminacion" aria-describedby="text-addon" required></textarea>
 
             </div>

@@ -131,7 +131,7 @@
             <div class="col-xl-6 mt-2">
               <label class="text-sm">Permisos</label>
               <input id="inputPermisos" list="permisosRetribuidos"  class="form-select">
-              <input type="number" id="id_permiso" name="id_permiso"  class="form-control"  hidden>
+              <input type="number" id="id_permiso" name="id_permiso"  class="form-control" hidden>
               <datalist id="permisosRetribuidos">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
             </div>
           </div>
@@ -185,8 +185,8 @@
                 <div class="col-xl-12 col-md-12">
                       <label class="text-sm">Permisos</label>
                       <input id="inputPermisosCalendario" list="permisosRetribuidosCalendario"  class="form-select">
-                      <input type="number" id="id_permiso_calendario" name="id_permiso_calendario"  class="form-control"  hidden>
-                      <datalist id="permisosRetribuidosCalendario">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
+                      <input type="number" id="id_permiso_calendario" name="id_permiso"  class="form-control" hidden>
+                      <datalist id="permisosRetribuidosCalendario" class="text-sm">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
                 </div>
               </div>
             </div>
@@ -665,38 +665,57 @@
     search: true,
   });
   
-  document.getElementById('inputPermisos').addEventListener('input', function() {
-      const inputText = this.value;
-      const datalist = document.getElementById('permisosRetribuidos');
-      const options = datalist.getElementsByTagName('option');
-      const id_permiso = document.getElementById('id_permiso');
+  function normalizeString(str) {
+    // Elimina espacios en blanco, saltos de línea y caracteres especiales
+    return str.replace(/\s/g, '').replace(/[^\w\s]/gi, '');
+}
 
-      for (const option of options) {
-        option.textContent.replace(/\s/g, '');
-          if (option.textContent === inputText) {
+
+
+  document.getElementById('inputPermisos').addEventListener('input', function() {
+      const nombreSeleccionado = this.value;
+      // busco dentro de la lista de opciones el id del permiso seleccionado
+      const idValue = document.getElementById('id_permiso');
+      // reccorro la lista de opciones
+      for (const option of document.getElementById('permisosRetribuidos').getElementsByTagName('option')) {
+          // obtengo el texto y elimino los espacios en blanco, saltos de linea y caracteres especiales
+          const optionText = normalizeString(option.textContent);
+          // obtengo el texto y elimino los espacios en blanco, saltos de linea y caracteres especiales
+          const nombreSeleccionadoText = normalizeString(nombreSeleccionado);
+          // comparo si el texto seleccionado es igual al texto de la opción
+          if (optionText === nombreSeleccionadoText) {
+              // obtengo el id del permiso seleccionado
               const selectedOptionId = option.getAttribute('data-id');
-              id_permiso.value = selectedOptionId;
+              // asigno el id del permiso seleccionado al input
+              idValue.value = selectedOptionId;
               break;
           }
       }
+
   });
 
   document.getElementById('inputPermisosCalendario').addEventListener('input', function() {
-      const inputText = this.value;
-      const datalist = document.getElementById('permisosRetribuidosCalendario');
-      const options = datalist.getElementsByTagName('option');
-      const id_permiso = document.getElementById('id_permiso_calendario');
-
-      for (const option of options) {
-        console.log("----hge dafdas---")
-        option.textContent.replace(/\s/g, '');
-          if (option.textContent === inputText) {
+      const nombreSeleccionado = this.value;
+      // busco dentro de la lista de opciones el id del permiso seleccionado
+      const idValue = document.getElementById('id_permiso_calendario');
+      // reccorro la lista de opciones
+      for (const option of document.getElementById('permisosRetribuidosCalendario').getElementsByTagName('option')) {
+          // obtengo el texto y elimino los espacios en blanco, saltos de linea y caracteres especiales
+          const optionText = normalizeString(option.textContent);
+          // obtengo el texto y elimino los espacios en blanco, saltos de linea y caracteres especiales
+          const nombreSeleccionadoText = normalizeString(nombreSeleccionado);
+          // comparo si el texto seleccionado es igual al texto de la opción
+          if (optionText === nombreSeleccionadoText) {
+              // obtengo el id del permiso seleccionado
               const selectedOptionId = option.getAttribute('data-id');
-              id_permiso.value = selectedOptionId;
+              // asigno el id del permiso seleccionado al input
+              idValue.value = selectedOptionId;
               break;
           }
       }
+
   });
+
 
 // JavaScript para activar el input cuando se hace clic en el enlace
 document.querySelector("a[title='subir-imagen']").addEventListener("click", function (e) {

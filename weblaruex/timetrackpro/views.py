@@ -1170,12 +1170,12 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
     # agrupo los registros por semana 
     
     for e in usuarios:
-        dias = registros.filter(id_empleado__id=e).values('hora__date').distinct()
+        dias = registros.filter(id_empleado__id=e).order_by("id_empleado", 'hora').values_list('hora__date').distinct()
         empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e)[0]
-
+        dias = list(set(dias))
         for d in dias:
             # obtener la jornada del empleado
-            jornada = comprobarJornadaEmpleado(empleado.id_usuario.id, d["hora__date"])
+            jornada = comprobarJornadaEmpleado(empleado.id_usuario.id, d[0])
             if isinstance(jornada, float):
                 jornadaLaboral = jornada
             elif isinstance(jornada, dict) and 'get' in jornada:
@@ -1183,11 +1183,13 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
             else:
                 jornadaLaboral=jornada
 
-            dia_siguiente = d["hora__date"]+timedelta(days=1)
-            registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d["hora__date"],dia_siguiente)).all()
+            dia_siguiente = d[0]+timedelta(days=1)
+            # hacer que registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d["hora__date"],dia_siguiente)).all() esté ordenado por hora
+
+            registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d[0],dia_siguiente)).all()
             # aquí podríamos comprobar cuando el usuario no tienen ningun registro ese día si tiene alguna justificacion para ajustar
-            permisos, asuntosPropios, vacaciones, diasPermisos, diasAsuntosPropios, diasVacaciones = comprobarPermisosEmpleado(empleado.id_usuario.id, d["hora__date"])
-            festivo = comprobarFestivos(d["hora__date"])
+            permisos, asuntosPropios, vacaciones, diasPermisos, diasAsuntosPropios, diasVacaciones = comprobarPermisosEmpleado(empleado.id_usuario.id, d[0])
+            festivo = comprobarFestivos(d[0])
             if len(registrosDiaEmpleado)%2 == 0:
                 horas = 0
                 tramo = 0
@@ -1200,10 +1202,10 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
                         horas = horas + (r.hora - auxHoras).total_seconds()/3600
                         tramo = 0
                 # comprobar justificaciones para ajustar las horas del dia
-                informe.append({"empleado": e, "dia": d["hora__date"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivo": festivo})
+                informe.append({"empleado": e, "dia": d[0], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivo": festivo})
             else:
                 fichajesHechos = registrosDiaEmpleado.values_list('hora__time', flat=True)
-                informe.append({"empleado": e, "dia": d["hora__date"], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivo": festivo})
+                informe.append({"empleado": e, "dia": d[0], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivo": festivo})
     return informe
 
 def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
@@ -1225,17 +1227,18 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
     informe = []
     # sumo un dia a la fecha fin
     fechaFin = fechaFin + timedelta(days=1)
-    registros = Registros.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
+    registros = Registros.objects.using("timetrackpro").order_by("hora").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
     for e in usuarios:
-        semanas = registros.filter(id_empleado__id=e).annotate(semana=ExtractWeek('hora')).values('semana').distinct()
+        semanas = registros.filter(id_empleado__id=e).annotate(semana=ExtractWeek('hora')).values_list('semana').distinct()
         empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e)[0]
-
+        semanas = list(set(semanas))
         #obtengo las horas por dias y las agrupo por semana.
         for s in semanas:
-            dias = registros.filter(id_empleado__id=e, hora__week=s["semana"]).values('hora__date').distinct()
-            year = dias[0]["hora__date"].year
+            dias = registros.filter(id_empleado__id=e, hora__week=s[0]).values_list('hora__date').distinct()
+            dias = list(set(dias))
+            year = dias[0][0].year
             # obtengo todos los dias de esa semana 
-            inicioSemana, finSemana = obtenerFechaSemana(year, s["semana"])    
+            inicioSemana, finSemana = obtenerFechaSemana(year, s[0])    
             horas = 0
             diasErrores = []
             diasFichados = 0
@@ -1252,8 +1255,8 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
         
             for d in dias:
                 # comprubeo si el dia tiene un numero par de registros
-                dia_siguiente = d["hora__date"]+timedelta(days=1)
-                registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d["hora__date"],dia_siguiente)).all()
+                dia_siguiente = d[0]+timedelta(days=1)
+                registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d[0],dia_siguiente)).all()
 
                 if len(registrosDiaEmpleado)%2 == 0:
                     tramo = 0
@@ -1267,12 +1270,12 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
                             tramo = 0
                     diasFichados = diasFichados + 1
                 else:
-                    diasErrores.append(d["hora__date"])
+                    diasErrores.append(d[0])
             # si hay dias con errores, los añado al informe
             if len(diasErrores) > 0:                
-                informe.append({"empleado": e, "semana": s["semana"], "horas": horas, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": diasFichados, "diasErrores": diasErrores, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
+                informe.append({"empleado": e, "semana": s[0], "horas": horas, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": diasFichados, "diasErrores": diasErrores, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
             else:
-                informe.append({"empleado": e, "semana": s["semana"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": diasFichados, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
+                informe.append({"empleado": e, "semana": s[0], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": diasFichados, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
     return informe
 
 
@@ -1649,7 +1652,6 @@ def eliminarLineaRegistro(request, id):
     'mensaje' parameter set to "No tienes permiso para eliminar el registro seleccionado."
     """
     registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
-    archivoModificado = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=registro.id_archivo_leido.id)[0]
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
         idRegistroEliminado = registro.id
@@ -1658,19 +1660,28 @@ def eliminarLineaRegistro(request, id):
         hora = registro.hora
         maquina = registro.maquina
         remoto = registro.remoto
-        idArchivoLeido = archivoModificado
+            
+        if registro.id_archivo_leido != None:
+            idArchivoLeido = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=registro.id_archivo_leido.id)[0]
+        else:
+            idArchivoLeido = None
         fechaEliminacion = datetime.now()
         motivo = request.POST.get("motivoEliminacion")
         registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=int(request.POST.get("registradorEliminacion")))[0]
 
+        # agrego el registro eliminado a la tabla de registros eliminados
         nuevoRegistroEliminado = RegistrosEliminados(id_registro_eliminado=idRegistroEliminado, id_empleado=idEmpleado, nombre_empleado=nombreEmpleado, hora=hora, maquina=maquina, remoto=remoto, id_archivo_leido=idArchivoLeido, fecha_eliminacion=fechaEliminacion, motivo=motivo, eliminado_por=registrador)
-
         nuevoRegistroEliminado.save(using='timetrackpro')
+        # elimino el registro de la tabla de registros
+
         registro.delete(using='timetrackpro')
+        
 
-
+        if idArchivoLeido == None:
+            return redirect('timetrackpro:registros-remotos-insertados')
         # guardo los datos en un diccionario
-        return redirect('timetrackpro:ver-registro', id=archivoModificado.id)
+        else:
+            return redirect('timetrackpro:ver-registro', id=idArchivoLeido.id)
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para eliminar el registro seleccionado.")
 
@@ -4319,7 +4330,11 @@ def solicitarPermisosRetribuidos(request, year=None):
     if request.method == 'POST':
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
-        idPermiso = request.POST.get("id_permiso")
+        idPermiso = None
+        print("----------------")
+        if "id_permiso" in request.POST:
+            idPermiso = request.POST.get("id_permiso")
+        print('\033[91m'+'idPermiso: ' + '\033[92m', idPermiso)
         codigoPermiso = PermisosRetribuidos.objects.using("timetrackpro").filter(id=idPermiso)[0]
         fechaInicio = request.POST.get("fecha_inicio")
         fechaFin = request.POST.get("fecha_fin")
@@ -4372,7 +4387,7 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
         permisos = PermisosYAusenciasSolicitados.objects.using("timetrackpro").values()
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
-        idPermiso = request.POST.get("id_permiso_calendario")
+        idPermiso = request.POST.get("id_permiso")
         codigoPermiso = PermisosRetribuidos.objects.using("timetrackpro").filter(id=idPermiso)[0]
         fechaInicio = request.POST.get("fecha_inicio_calendario")
         fechaFin = request.POST.get("fecha_fin_calendario")
