@@ -19,6 +19,8 @@ import calendar
 from django.db.models import Sum
 from django.db.models.functions import ExtractWeek
 import io
+import pytz
+from django.utils import timezone
 
 
 
@@ -71,9 +73,73 @@ excluidos = ["Prueba", "Pruebas", "prueba", "pruebas", "PRUEBA", "PRUEBAS", "Usu
 # Defino la barra de navegación
 navBar = NavBar.objects.using("timetrackpro").values()
 
+def calcularVacacionesSolicitadas(idUsuario, year):
+    '''
+    La función se encarga de calcular los días de vacaciones solicitados por un usuario en un año concreto.
+    :param idUsuario: Identificador del usuario del que se quieren calcular los días de vacaciones solicitados.
+    :param year: Año en el que se quieren calcular los días de vacaciones solicitados.
+    :return: Número de días de vacaciones solicitados por el usuario en el año concreto.
+    '''
+    vacacionesSolicitadas = 0
+    estadoSolicitado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoSolicitado).values('dias_consumidos')
+    if vacaciones.exists():
+        for v in vacaciones:
+            vacacionesSolicitadas = vacacionesSolicitadas + v['dias_consumidos']
+    return vacacionesSolicitadas
 
-# The above code is defining a function called "home" that takes a parameter called "request".
-# However, the code is incomplete and there are three hash symbols ("
+
+def calcularVacacionesConsumidas(idUsuario, year):
+    '''
+    La función se encarga de calcular los días de vacaciones consumidos por un usuario en un año concreto.
+    :param idUsuario: Identificador del usuario del que se quieren calcular los días de vacaciones solicitados.
+    :param year: Año en el que se quieren calcular los días de vacaciones solicitados.
+    :return: Número de días de vacaciones consumidos por el usuario en el año concreto.
+    '''
+    vacacionesConsumidas = 0
+    estadoAceptado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=11)[0]
+    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoAceptado).values('dias_consumidos')
+    if vacaciones.exists():
+        for v in vacaciones:
+            vacacionesConsumidas = vacacionesConsumidas + v['dias_consumidos']
+    return vacacionesConsumidas
+
+def calcularAsuntosPropiosSolicitados(idUsuario, year):
+    '''
+    Función que se encarga de calcular los días de asuntos propios solicitados por un usuario en un año concreto.
+    :param idUsuario: Identificador del usuario del que se quieren calcular los días de asuntos propios solicitados.
+    :param year: Año en el que se quieren calcular los días de asuntos propios solicitados.
+    :return: Número de días de asuntos propios solicitados por el usuario en el año concreto.
+    '''
+    asuntosSolicitados = 0
+    estadoSolicitado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+    AsuntosPropiosSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoSolicitado).values('dias_consumidos')
+    
+    if AsuntosPropiosSolicitados.exists():
+        for a in AsuntosPropiosSolicitados:
+            asuntosSolicitados = asuntosSolicitados + a['dias_consumidos']
+    return asuntosSolicitados
+
+def calcularAsuntosPropiosConsumidas(idUsuario, year):
+    # calcular dias de de asuntos propios consumidos
+    '''
+    Función que se encarga de calcular los días de asuntos propios consumidos por un usuario en un año concreto.
+    :param idUsuario: Identificador del usuario del que se quieren calcular los días de asuntos propios consumidos.
+    :param year: Año en el que se quieren calcular los días de asuntos propios consumidos.
+    :return: Número de días de asuntos propios consumidos por el usuario en el año concreto.
+    '''
+    
+    asuntosConsumidos = 0
+    estadoAceptado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=11)[0]
+    AsuntosPropiosAceptados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoAceptado).values('dias_consumidos')
+    
+    if AsuntosPropiosAceptados.exists():
+        for asunto in AsuntosPropiosAceptados:
+            asuntosConsumidos = asuntosConsumidos + asunto['dias_consumidos']
+    
+    return asuntosConsumidos
+
+
 def home(request):
     """
     The function `home` renders a specific HTML template based on the user's role and provides
@@ -88,12 +154,16 @@ def home(request):
     """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
-    diasPropiosConsumidos = 3
+    # calcular cuantos dias de asuntos propios ha consumido durante el año en curso
+    # calcular cuantos dias de vacaciones ha consumido durante el año en curso
+    user = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
+    empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=user)[0]
+    diasPropiosConsumidos = calcularAsuntosPropiosConsumidas(empleado.id_usuario, datetime.now().year)
+    diasPropiosSolicitados = calcularAsuntosPropiosSolicitados(empleado.id_usuario, datetime.now().year)
     diasPropiosRestantes= 6-diasPropiosConsumidos
-    diasPropiosSolicitados = 0
-    diasVacacionesConsumidos = 15
+    diasVacacionesConsumidos = calcularVacacionesConsumidas(empleado.id_usuario, datetime.now().year)
     diasVacacionesRestantes = 30-diasVacacionesConsumidos
-    diasVacacionesSolicitados = 8
+    diasVacacionesSolicitados = calcularVacacionesSolicitadas(empleado.id_usuario, datetime.now().year)
     infoVista = {
         "navBar":navBar,
         "administrador":administrador,
@@ -889,7 +959,9 @@ def fichar(request):
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
     
     if request.method == 'POST':
-        hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # obtener hora actual, hora utc    
+        zona_horaria_espana = pytz.timezone('Europe/Madrid')
+        hora = datetime.now(zona_horaria_espana).strftime("%Y-%m-%d %H:%M:%S")
         registro = RegistrosTimetrackpro(id_empleado=empleado.id_empleado, nombre_empleado=empleado.id_empleado.nombre, hora=hora, remoto=1)
         registro.save(using='timetrackpro')
         alerta["activa"] = True
