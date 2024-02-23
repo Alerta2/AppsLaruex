@@ -4,7 +4,7 @@
 {% block content %}
   <div class="row d-flex justify-content-center">
     
-    <h3 class="text-info text-gradient">Registro erroneo de  {{error.id_empleado__id_usuario__nombre}} {{error.id_empleado__id_usuario__apellidos}}</h3>
+    <h3 class="text-info text-gradient">Registro erroneo de  {{error.id_empleado__nombre}} {{error.id_empleado__apellidos}}</h3>
     <h4 class="text-secondary">{{error.hora|date:"d M Y"}}</h4>
     <div class="col-12 col-xl-4">
       {% if administrador %}
@@ -41,22 +41,22 @@
         <div class="card-body pt-0 p-3">
           
           <ul class="list-group font-weight-bold">
+            <!-- 1- Pendiente, 2 Rechazado, 3 - Aceptado -->
+            {% if error.estado == 1 %}
+            <li class="list-group-item border-0 ps-0 text-lg text-info text-end"><i class="fa-duotone fa-sign-hanging"></i> Pendiente</li>
+            {% elif error.estado == 2 %}
+            <li class="list-group-item border-0 ps-0 text-lg text-danger text-end"><i class="fa-duotone fa-sign-hanging"></i> Rechazado</li>
+            {% else %}
+            <li class="list-group-item border-0 ps-0 text-lg text-success text-end"><i class="fa-duotone fa-sign-hanging"></i> Aceptado</li>
+            {% endif %}
             
-            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{error.id_empleado__id_usuario__nombre}} {{error.id_empleado__id_usuario__apellidos}}</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{error.id_empleado__nombre}} {{error.id_empleado__apellidos}}</li>
             
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{error.hora|date:"H:i:s"}}</li>
             
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{error.hora|date:"d M Y"}}</li>
-
-            <!-- 1- Pendiente, 2 Rechazado, 3 - Aceptado -->
-            {% if error.estado == 1 %}
-            <li class="list-group-item border-0 ps-0 text-lg text-info"><i class="fa-duotone fa-sign-hanging"></i> Pendiente</li>
-            {% elif error.estado == 2 %}
-            <li class="list-group-item border-0 ps-0 text-lg text-danger"><i class="fa-duotone fa-sign-hanging"></i> Rechazado</li>
-            {% else %}
-            <li class="list-group-item border-0 ps-0 text-lg text-success"><i class="fa-duotone fa-sign-hanging"></i> Aceptado</li>
-            {% endif %}
-
+            <hr class="horizontal dark my-3">
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg text-center"></i> {{error.motivo}}</li>
           </ul>
         </div>
       </div>
@@ -85,8 +85,8 @@
               <select class="form-control" name="empleadoModificado" id="empleadoModificado">
                 
               {% for e in empleados %}
-                <option value="{{e.id}}" {% if empleado.id_empleado.id == e.id %} selected {% endif %} >{{e.nombre}} </option>
-                {% endfor %}
+                <option value="{{e.id}}" {% if error.id_empleado == e.id %} selected {% endif %} >{{e.nombre}} </option>
+              {% endfor %}
 
               </select>
               
@@ -95,8 +95,16 @@
           </div>
           <div class="row">
             <div class="col-xl-8 mx-auto my-2">
-              <label class="text-sm" id="labelMotivo">Nueva fecha y hora </label>
+              <label class="text-sm" id="labelHora">Nueva fecha y hora </label>
               <input class="form-control" type="datetime-local" id="hora" name="hora" value="{{error.hora|date:'Y-m-d H:i' }}" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2">
+
+            <label class="text-sm" id="labelMotivo">Nuevo Motivo</label>
+
+            <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Indique el motivo de la solicitud" id="nuevoMotivoError" name="nuevoMotivoError" aria-describedby="text-addon" rows="4" required>{{error.motivo}}</textarea>
             </div>
           </div>
         </div>

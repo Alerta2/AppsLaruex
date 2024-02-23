@@ -5,6 +5,32 @@
 
 {% block content %}
 <div class="row d-flex justify-content-end">
+  {% if diasPropiosRecuperablesConsumidos != 0 %}
+  <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-8">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Días recuperables solicitados</p>
+              <h5 class="font-weight-bolder mb-0">
+                
+                <span class="text-danger text-gradient font-weight-bolder">{{diasPropiosRecuperablesConsumidos}}</span>
+                
+              </h5>
+            </div>
+          </div>
+          <div class="col-4 text-end">
+            <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+              <i class="fa-solid fa-calendar-days fa-xl mt-2" aria-hidden="true" style="color: #fff"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
     <div class="card">
       <div class="card-body p-3">
@@ -284,6 +310,15 @@
                 </div>
               </div>
               {% endif %}
+
+              {% if administrador or director %}
+
+              <div class="card">
+                <div class="text-center">
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(15)">Tabla de Dias totales solicitados</button>
+                </div>
+              </div>
+              {% endif %}
             
               <div class="card">
                 <div class="text-center">
@@ -357,6 +392,11 @@
       case 14:
         window.open("{% url 'timetrackpro:registros-remotos-insertados' %}", "_blank");
         break;
+
+      case 15:
+        window.open("{% url 'timetrackpro:dias-totales-empleados' %}", "_blank");
+        break;
+        
       default:
         console.log(`Sorry, we are out of ${expr}.`);
     }
