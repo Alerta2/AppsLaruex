@@ -118,6 +118,29 @@ color: #94d2bd;
 }
 
 
+.pausa{
+  color: #2a677a;
+}
+
+.pausa:hover {
+  color: #09313d;
+}
+
+.eliminarProceso{
+  color: #c30b0b;
+    /* c30b0b */
+
+}
+
+.eliminarProceso:hover {
+  color: #6e0505;
+}
+.operatividadApp{
+  color: #6a3c90;
+}
+.operatividadApp:hover {
+  color: #c7a9e0;
+}
 
 .generarQR {
   --fa-primary-color: #6a3c90;

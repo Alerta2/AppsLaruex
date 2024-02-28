@@ -751,5 +751,17 @@ urlpatterns = [
     path('private/docLaruex/verMantenimientosAsociados/<slug:id>/', verMantenimientosAsociados, name='docLaruexVerMantenimientosAsociados'), 
     path('private/docLaruex/datosMantenimientosAsociados/<slug:id>/', datosMantenimientosAsociados, name='docLaruexMantenimientosAsociadosDatos'),
     
+
+
+    
+# ---------------------------------------------------------
+#              OPERATIVIDAD DE LAS APLICACIONES 
+# ---------------------------------------------------------
+    path('private/docLaruex/operatividadAplicaciones', operatividadAplicaciones, name='docLaruexOperatividadAplicaciones'),
+    path('private/docLaruex/datosOperatividadAplicaciones', datosOperatividadAplicaciones, name='docLaruexDatosOperatividadAplicaciones'),
+    path('private/docLaruex/eliminarProceso/<str:proceso>/', eliminarProcesoAplicaciones, name='docLaruexEliminarProceso'),
+    path('private/docLaruex/paralizarProceso/<str:proceso>/', paralizarProcesoAplicaciones, name='docLaruexParalizarProceso'),
+
+
 ]
 
