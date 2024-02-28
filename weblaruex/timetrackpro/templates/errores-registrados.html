@@ -48,15 +48,15 @@ $("#tabla_errores_insertados").bootstrapTable({
     columns: [
       {
         title: "Empleado",
-        field: "id_empleado__id_empleado__nombre",
+        field: "id_empleado__nombre",
 
         halign:"left",
         sortable: true,
         align: "left",
         width:"30",
         formatter: function(value, row) {
-          var nombreEmpleado = row.id_empleado__id_empleado__nombre;
-          var id = row.id_empleado__id_empleado__id;
+          var nombreEmpleado = row.id_empleado__nombre;
+          var id = row.id_empleado__id;
           var div = '<div><h6 class="mb-0 text-sm">'+nombreEmpleado+'</h6><p class="text-xs text-secondary mb-0">ID:'+ id +'</p></div>';
           return div;
         }

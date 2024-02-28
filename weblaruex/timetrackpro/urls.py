@@ -228,4 +228,11 @@ urlpatterns = [
     path('private/timetrackpro/eliminar-jornada/<slug:id>/', eliminarJornada , name='eliminar-jornada'),
     path('private/timetrackpro/editar-jornada/<slug:id>/', editarJornada , name='editar-jornada'),
 
+    #dias empleados
+    path('private/timetrackpro/dias-totales-empleados/', diasTotalesEmpleados , name='dias-totales-empleados'),
+    path('private/timetrackpro/dias-totales-empleados/<slug:year>/', diasTotalesEmpleados , name='dias-totales-empleados'),
+    path('private/timetrackpro/datos-dias-totales-empleados/', datosDiasTotalesEmpleados , name='datos-dias-totales-empleados'),
+    path('private/timetrackpro/datos-dias-totales-empleados/<slug:year>/', datosDiasTotalesEmpleados , name='datos-dias-totales-empleados'),
+
+
 ]
