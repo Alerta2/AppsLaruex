@@ -1,0 +1,189 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
+
+{% block content %}
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <h5 class="card-title">Operatividad de las Aplicaciones</h5>
+  <nav>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Operatividad de las Aplicaciones</li>
+    </ol>
+  </nav>
+</div>
+
+
+
+<!-- ============= Tablas ============= -->
+
+<!-- Tabla con lista de fabricantes -->
+
+    <table id="tabla_operatividad_aplicaciones" data-toggle="table" data-search="true" data-show-columns="true"
+      data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+      data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+      data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"   data-detail-view="true" data-detail-formatter="detailFormatter" data-search-accent-neutralise="true">
+    </table>
+
+
+<script type="text/javascript">
+
+  $('#tabla_operatividad_aplicaciones').bootstrapTable({
+    method: 'get',
+    url: "{% url 'docLaruex:docLaruexDatosOperatividadAplicaciones' %}",
+    locale: navigator.language,
+    search: true,
+    cache: false,
+    columns: [{
+      title: 'Aplicación',
+      field: 'nombre',
+      align: "center",
+    },{
+      title: 'Proceso',
+      field: 'nombre_proceso',
+      align: "center",
+    },{
+      title: 'Última Ejecución',
+      field: 'ultima_ejecucion',
+      align: "center",
+      formatter: function (value, row) {
+        const fechaOriginal = row.ultima_ejecucion;
+
+        if (fechaOriginal !== null) {
+          const fecha = new Date(fechaOriginal);
+
+          const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+            timeZone: 'UTC'
+          };
+
+          const fechaFormateada = fecha.toLocaleString('es-ES', options);
+          return fechaFormateada;
+        } else {
+          return "--";
+        }
+
+      },
+
+    },{
+      title: 'Estado',
+      field: 'estado',
+      align: "center",
+      formatter: function (value, row) {
+          var fechaActual = new Date();
+          var icono = '<i class="fa-duotone fa-circle-check fa-xl"  style="--fa-primary-color: #39d553; --fa-secondary-color: #39d553;"></i>';
+          //<i class="fa-sharp fa-regular fa-circle-check" style="color: #90EE90;65e68c; 7be665; 27a53c"></i>
+    
+          if (row.ultima_ejecucion == null){
+            icono =  '<i class="fa-solid fa-triangle-exclamation fa-xl" style="color:#FF0000"></i>';
+          }else{          // obtener fecha y hora actual 
+          var fecha = fechaActual.getDate() + '/' + (fechaActual.getMonth() + 1) + '/' + fechaActual.getFullYear();
+          var hora = fechaActual.getHours() + ':' + fechaActual.getMinutes() + ':' + fechaActual.getSeconds();
+          
+          // obtener fecha y hora de la ultima ejecucion
+          var fechaUltimaEjecucion = row.ultima_ejecucion.split(' ')[0];
+          var horaUltimaEjecucion = row.ultima_ejecucion.split(' ')[1];
+          
+          // comprobar si la fecha y hora de la ultima ejecucion es inferior a la fecha y hora actual
+          if (fecha > fechaUltimaEjecucion) {
+              if ( hora > horaUltimaEjecucion) {
+                  icono =  '<i class="fa-solid fa-triangle-exclamation fa-lg" style="color:#FF0000"></i>';
+              }
+          }
+
+          }      
+
+          return icono;
+
+      }
+    },
+    {
+      title: "",
+      field: "Acciones",
+      id: "Acciones", // "id" necesario para ocultar la columna
+      align: "center",
+      formatter: function (value, row) {
+        var admin = '{{administrador}}';
+        if (admin == 'False') {
+          // ocultar columna Acciones si el usuario no es administrador
+          return '';
+        }
+        var botonParalizarProceso = '<a href="/private/docLaruex/paralizarProceso/' + row.nombre_proceso + '/" class="mx-2 pausa" title="Abrir" ><i class="fa-solid fa-pause fa-xl" ></i></a>';
+        
+        var botonEliminarProceso = '<a href="/private/docLaruex/eliminarProceso/' + row.nombre_proceso + '/' + '" class="mx-1 eliminarProceso" title="Editar"><i class="fa-solid fa-eraser fa-xl"></i></a>';
+        return (botonParalizarProceso + botonEliminarProceso);
+
+      },
+  },],
+  sortName: 'id',
+  sortOrder: 'desc',
+
+  // ocultar columna Acciones si el usuario no es administrador
+  // onLoadSuccess: function (data) {
+  // var admin = '{{administrador}}';
+  // console.log(admin, typeof(admin));
+  //  if (admin == 'True') {
+  //    $('#tabla_operatividad_aplicaciones').bootstrapTable('hideColumn', 'acciones');
+  //  }
+  // }
+
+  });
+
+
+  function detailFormatter(index, row) {
+    var html = []
+    var tiempo = row.segundos_ejecucion
+    var descripcion = row.descripcion
+    // frecuencia de Ejecución
+    if (tiempo > 3600) {
+      tiempo = Math.floor(tiempo / 3600) + ' horas' + Math.floor((tiempo % 3600) / 60) + ' minutos'
+    } else if (tiempo > 60) {
+      tiempo = Math.floor(tiempo / 60) + ' minutos'
+    } else {
+      tiempo = tiempo + ' segundos'
+    }
+    html.push('<p><b>Frecuencia de Ejecución:</b> ' + tiempo + '</p>')
+
+
+    // próxima ejecución
+    if (row.proxima_ejecucion != null) {
+      const fecha = new Date(row.proxima_ejecucion);
+      const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZone: 'UTC'
+      };
+      const fechaFormateada = fecha.toLocaleString('es-ES', options);
+      html.push('<p><b>Próxima ejecución:</b> ' + fechaFormateada + '</p>')
+    }else{
+      html.push('<p><b>Próxima ejecución:</b> -- </p>')
+    }
+
+    // Descripción
+    if (descripcion != null) {
+      html.push('<p><b>Descripción:</b> ' + descripcion + '</p>')
+    }
+    return html.join('')
+  }
+
+</script>
+{% endblock %}

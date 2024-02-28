@@ -25,6 +25,7 @@ from django.db.models import F
 from django.db.models import Max, OuterRef, Subquery
 from django.db.models import Q
 from django.forms.models import model_to_dict
+from calendario_guardias.models import *
 
 
 # crear archivo ZIP
@@ -2096,7 +2097,7 @@ def InfoVerObjeto(request, id):
         habilitacionesUsuario, cargo, rol = comprobarHabilitacion(request.user.id, objeto.id_habilitacion.id)
         formaciones = FormacionCurriculum.objects.using("docLaruex").filter(id_curriculum=id).values('titulo','descripcion','horas','ruta','fecha_inicio','fecha_fin')
         if Curriculum.objects.using("docLaruex").filter(id=id, id_usuario=request.user.id) or (Curriculum.objects.using("docLaruex").filter(id=id) and administrador) or (Curriculum.objects.using("docLaruex").filter(id=id) and direccion):
-            curriculum = Curriculum.objects.using("docLaruex").filter(id=id).values('id','id__id','id_usuario__id', 'id_usuario__first_name', 'id_usuario__last_name', 'id_contacto__id','id_contacto__telefono','id_contacto__telefono_fijo','id_contacto__email','id_contacto__direccion','id_contacto__info_adicional','id_contacto__puesto', 'id_contacto__nombre','id_contacto__extension', 'id__id_habilitacion','id__tipo', 'id__nombre', 'id__tipo','id__ruta').first()
+            curriculum = Curriculum.objects.using("docLaruex").filter(id=id).values('id','id__id','id_usuario__id', 'id_usuario__first_name', 'id_usuario__last_name', 'id_contacto__id','id_contacto__telefono','id_contacto__telefono_fijo','id_contacto__email','id_contacto__direccion','id_contacto__info_adicional','id_contacto__puesto', 'id_contacto__nombre','id_contacto__extension', 'id__id_habilitacion','id__tipo', 'id__nombre', 'id__tipo','id__ruta', 'id__fecha_subida').first()
                  
             media= "/media/archivos"
             return render(
@@ -7531,3 +7532,93 @@ Se retorna una lista de objetos JSON con la información de los usuarios.
 def datosMantenimientosAsociados(request,id):
         mantenimientos = TareasProgramadas.objects.using("docLaruex").filter(id_objeto=id,id_objeto__id_habilitacion__in=comprobarHabilitaciones(request.user.id), id_evento__estado__id=2).values( 'id', 'id_evento', 'id_evento__id', 'id_evento__nombre', 'id_evento__tipo_evento__nombre', 'id_evento__procedimiento_asociado', 'id_evento__procedimiento_asociado__id_doc__nombre', 'fecha_proximo_mantenimiento', 'fecha_ultimo_mantenimiento', 'fecha_inicial','id_objeto', 'id_objeto__id', 'id_objeto__nombre', 'id_objeto__tipo', 'id_evento__periodicidad__id', 'id_evento__periodicidad__cantidad', 'id_evento__periodicidad__unidad')
         return JsonResponse(list(mantenimientos), safe=False)
+
+
+'''------------------------------------------
+                                Módulo: operatividadAplicaciones
+
+- Descripción: 
+Este módulo se encarga de mostrar una lista de aplicaciones que se están ejecutando en el sistema.
+
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+Se muestra la lista de aplicaciones que se están ejecutando en el sistema.
+-------------------------------------------'''
+@login_required
+def operatividadAplicaciones(request):
+    itemsMenu = MenuBar.objects.using("docLaruex").values()    
+    administrador = esAdministrador(request.user.id)
+    return render(request, 'docLaruex/listaOperatividadAplicaciones.html', {"itemsMenu": itemsMenu, "administrador": administrador})
+
+
+'''------------------------------------------
+                                Módulo: DatosOperatividadAplicaciones
+
+- Descripción: 
+Este módulo es utilizado para obtener el listado de procesos que se están ejecutando en el sistema.
+
+- Precondiciones:
+El usuario debe haber iniciado sesión en la aplicación.
+
+- Postcondiciones:
+Devuelve los datos de los fabricantes de equipos en formato JSON.
+
+-------------------------------------------'''
+@login_required
+def datosOperatividadAplicaciones(request):
+
+    apps = MonitorizaApps.objects.using('guardias').order_by('nombre').annotate(proxima_ejecucion = F('proxima_ejecucion_utc'), ultima_ejecucion = F('ultima_ejecucion_utc')).values('nombre','descripcion', 'nombre_proceso', 'proxima_ejecucion', 'ultima_ejecucion', 'segundos_ejecucion', 'num_periodos_alarma', 'ejecutar')
+
+    return JsonResponse(list(apps), safe=False)
+
+
+'''------------------------------------------
+                                Módulo: paralizarProcesoAplicaciones
+
+- Descripción: 
+Este módulo se encarga de paralizar un proceso de la base de datos.
+
+- Precondiciones:
+El usuario debe estar autenticado y ser administrador.
+
+- Postcondiciones:
+Paraliza el proceso de la base de datos y redirige a la página de operatividad de aplicaciones.
+-------------------------------------------'''
+@login_required
+def paralizarProcesoAplicaciones(request, proceso):
+    administrador = esAdministrador(request.user.id)
+    if not administrador:
+        return render(request,"docLaruex/accesoDenegado.html")
+
+    procesoSeleccionado = MonitorizaApps.objects.using('guardias').filter(nombre_proceso=proceso)[0]
+    procesoSeleccionado.ultima_ejecucion_utc = None
+    procesoSeleccionado.proxima_ejecucion_utc = None
+    procesoSeleccionado.save(using='guardias')
+
+    return redirect('docLaruex:docLaruexOperatividadAplicaciones')
+
+
+    '''------------------------------------------
+                                Módulo: eliminarProcesoAplicaciones
+
+- Descripción: 
+Este módulo se encarga de eliminar un proceso de la base de datos.
+- Precondiciones:
+El usuario debe estar autenticado y ser administrador.
+
+- Postcondiciones:
+elimina el proceso de la base de datos y redirige a la página de operatividad de aplicaciones.
+-------------------------------------------'''
+@login_required
+def eliminarProcesoAplicaciones(request, proceso):
+    administrador = esAdministrador(request.user.id)
+    if not administrador:
+        return render(request,"docLaruex/accesoDenegado.html")
+
+    procesoSeleccionado = MonitorizaApps.objects.using('guardias').filter(nombre_proceso=proceso)[0]
+    procesoSeleccionado.delete(using='guardias')
+
+    return redirect('docLaruex:docLaruexOperatividadAplicaciones')
+
