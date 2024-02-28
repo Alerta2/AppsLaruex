@@ -68,10 +68,10 @@
             minute: '2-digit',
             second: '2-digit',
             hour12: false,
-            timeZone: 'UTC'
           };
 
           const fechaFormateada = fecha.toLocaleString('es-ES', options);
+          
           return fechaFormateada;
         } else {
           return "--";
@@ -85,6 +85,7 @@
       align: "center",
       formatter: function (value, row) {
           var fechaActual = new Date();
+          console.log(row.ultima_ejecucion);
           var icono = '<i class="fa-duotone fa-circle-check fa-xl"  style="--fa-primary-color: #39d553; --fa-secondary-color: #39d553;"></i>';
           //<i class="fa-sharp fa-regular fa-circle-check" style="color: #90EE90;65e68c; 7be665; 27a53c"></i>
     
@@ -95,14 +96,13 @@
           var hora = fechaActual.getHours() + ':' + fechaActual.getMinutes() + ':' + fechaActual.getSeconds();
           
           // obtener fecha y hora de la ultima ejecucion
-          var fechaUltimaEjecucion = row.ultima_ejecucion.split(' ')[0];
-          var horaUltimaEjecucion = row.ultima_ejecucion.split(' ')[1];
+          // row.ultima_ejecucion tiene formato  2024-02-28T08:00:00Z y quiero obtener 28/02/2024 08:00:00
+          var fechaUltimaEjecucion = row.ultima_ejecucion.split('T')[0].split('-').reverse().join('/');
+          var horaUltimaEjecucion = row.ultima_ejecucion.split('T')[1].split('Z')[0];
           
           // comprobar si la fecha y hora de la ultima ejecucion es inferior a la fecha y hora actual
-          if (fecha > fechaUltimaEjecucion) {
-              if ( hora > horaUltimaEjecucion) {
-                  icono =  '<i class="fa-solid fa-triangle-exclamation fa-lg" style="color:#FF0000"></i>';
-              }
+          if (fechaUltimaEjecucion == fecha && horaUltimaEjecucion < hora) {
+              icono =  '<i class="fa-solid fa-triangle-exclamation fa-lg" style="color:#FF0000"></i>';
           }
 
           }      
@@ -132,15 +132,6 @@
   sortName: 'id',
   sortOrder: 'desc',
 
-  // ocultar columna Acciones si el usuario no es administrador
-  // onLoadSuccess: function (data) {
-  // var admin = '{{administrador}}';
-  // console.log(admin, typeof(admin));
-  //  if (admin == 'True') {
-  //    $('#tabla_operatividad_aplicaciones').bootstrapTable('hideColumn', 'acciones');
-  //  }
-  // }
-
   });
 
 
@@ -150,7 +141,7 @@
     var descripcion = row.descripcion
     // frecuencia de Ejecución
     if (tiempo > 3600) {
-      tiempo = Math.floor(tiempo / 3600) + ' horas' + Math.floor((tiempo % 3600) / 60) + ' minutos'
+      tiempo = Math.floor(tiempo / 3600) + ' horas'
     } else if (tiempo > 60) {
       tiempo = Math.floor(tiempo / 60) + ' minutos'
     } else {
@@ -170,7 +161,6 @@
         minute: '2-digit',
         second: '2-digit',
         hour12: false,
-        timeZone: 'UTC'
       };
       const fechaFormateada = fecha.toLocaleString('es-ES', options);
       html.push('<p><b>Próxima ejecución:</b> ' + fechaFormateada + '</p>')
