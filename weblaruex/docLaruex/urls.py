@@ -759,8 +759,8 @@ urlpatterns = [
 # ---------------------------------------------------------
     path('private/docLaruex/operatividadAplicaciones', operatividadAplicaciones, name='docLaruexOperatividadAplicaciones'),
     path('private/docLaruex/datosOperatividadAplicaciones', datosOperatividadAplicaciones, name='docLaruexDatosOperatividadAplicaciones'),
-    path('private/docLaruex/eliminarProceso/<str:proceso>/', eliminarProcesoAplicaciones, name='docLaruexEliminarProceso'),
-    path('private/docLaruex/paralizarProceso/<str:proceso>/', paralizarProcesoAplicaciones, name='docLaruexParalizarProceso'),
+    path('private/docLaruex/eliminarProceso/<str:proceso>/<str:nombre>/', eliminarProcesoAplicaciones, name='docLaruexEliminarProceso'),
+    path('private/docLaruex/paralizarProceso/<str:proceso>/<str:nombre>/', paralizarProcesoAplicaciones, name='docLaruexParalizarProceso'),
 
 
 ]
