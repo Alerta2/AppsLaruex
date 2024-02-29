@@ -25,7 +25,7 @@ from django.db.models import F
 from django.db.models import Max, OuterRef, Subquery
 from django.db.models import Q
 from django.forms.models import model_to_dict
-from calendario_guardias.models import *
+from calendario_guardias.models import MonitorizaApps
 
 
 # crear archivo ZIP
@@ -7569,7 +7569,7 @@ Devuelve los datos de los fabricantes de equipos en formato JSON.
 @login_required
 def datosOperatividadAplicaciones(request):
 
-    apps = MonitorizaApps.objects.using('guardias').order_by('nombre').annotate(proxima_ejecucion = F('proxima_ejecucion_utc'), ultima_ejecucion = F('ultima_ejecucion_utc')).values('nombre','descripcion', 'nombre_proceso', 'proxima_ejecucion', 'ultima_ejecucion', 'segundos_ejecucion', 'num_periodos_alarma', 'ejecutar')
+    apps = MonitorizaApps.objects.using('guardias').order_by('nombre').annotate(proxima_ejecucion = F('proxima_ejecucion_utc'), ultima_ejecucion = F('ultima_ejecucion_utc')).values('nombre','descripcion', 'nombre_proceso', 'proxima_ejecucion', 'ultima_ejecucion', 'segundos_ejecucion', 'num_periodos_alarma', 'ejecutar', 'nombre_ejecutable')
 
     return JsonResponse(list(apps), safe=False)
 
@@ -7587,12 +7587,13 @@ El usuario debe estar autenticado y ser administrador.
 Paraliza el proceso de la base de datos y redirige a la página de operatividad de aplicaciones.
 -------------------------------------------'''
 @login_required
-def paralizarProcesoAplicaciones(request, proceso):
+def paralizarProcesoAplicaciones(request, proceso, nombre):
+
     administrador = esAdministrador(request.user.id)
     if not administrador:
         return render(request,"docLaruex/accesoDenegado.html")
 
-    procesoSeleccionado = MonitorizaApps.objects.using('guardias').filter(nombre_proceso=proceso)[0]
+    procesoSeleccionado = MonitorizaApps.objects.using('guardias').filter(nombre_proceso=proceso).filter(nombre_ejecutable=nombre)[0]
     procesoSeleccionado.ultima_ejecucion_utc = None
     procesoSeleccionado.proxima_ejecucion_utc = None
     procesoSeleccionado.save(using='guardias')
@@ -7612,12 +7613,12 @@ El usuario debe estar autenticado y ser administrador.
 elimina el proceso de la base de datos y redirige a la página de operatividad de aplicaciones.
 -------------------------------------------'''
 @login_required
-def eliminarProcesoAplicaciones(request, proceso):
+def eliminarProcesoAplicaciones(request, proceso, nombre):
     administrador = esAdministrador(request.user.id)
     if not administrador:
         return render(request,"docLaruex/accesoDenegado.html")
 
-    procesoSeleccionado = MonitorizaApps.objects.using('guardias').filter(nombre_proceso=proceso)[0]
+    procesoSeleccionado = MonitorizaApps.objects.using('guardias').filter(nombre_proceso=proceso).filter(nombre_ejecutable=nombre)[0]
     procesoSeleccionado.delete(using='guardias')
 
     return redirect('docLaruex:docLaruexOperatividadAplicaciones')

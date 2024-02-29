@@ -36,6 +36,22 @@
 
 <script type="text/javascript">
 
+
+    function compararFechas(fecha1, fecha2) {
+      // Convertir las fechas a objetos Date
+      const fecha1Date = new Date(fecha1);
+      const fecha2Date = new Date(fecha2);
+
+
+      // Si la fecha 1 tiene zona horaria UTC, convertir la fecha 2 a la misma zona horaria
+      if (fecha1.endsWith("Z")) {
+        fecha2Date.setUTCHours(fecha2Date.getHours() - fecha2Date.getTimezoneOffset() / 60);
+      }
+
+      // Comparar las dos fechas
+      return fecha1Date.getTime() - fecha2Date.getTime();
+    }
+
   $('#tabla_operatividad_aplicaciones').bootstrapTable({
     method: 'get',
     url: "{% url 'docLaruex:docLaruexDatosOperatividadAplicaciones' %}",
@@ -84,30 +100,27 @@
       field: 'estado',
       align: "center",
       formatter: function (value, row) {
-          var fechaActual = new Date();
-          console.log(row.ultima_ejecucion);
+          // obtener fecha actual y hora actual con zona horaria UTC
+          const fechaProxima = row.proxima_ejecucion; // Fecha en UTC
+          const fechaActual = new Date();
+          const fechaActualFormateada = fechaActual.toISOString().slice(0, 19);
+
+          //const fechaActualFormateada = fechaActual.toISOString().slice(0, 19);
+
+          console.log(row.proxima_ejecucion, typeof(row.proxima_ejecucion));
+
+          console.log("--",fechaActualFormateada, typeof(fechaActualFormateada));
+
+
           var icono = '<i class="fa-duotone fa-circle-check fa-xl"  style="--fa-primary-color: #39d553; --fa-secondary-color: #39d553;"></i>';
-          //<i class="fa-sharp fa-regular fa-circle-check" style="color: #90EE90;65e68c; 7be665; 27a53c"></i>
-    
-          if (row.ultima_ejecucion == null){
-            icono =  '<i class="fa-solid fa-triangle-exclamation fa-xl" style="color:#FF0000"></i>';
-          }else{          // obtener fecha y hora actual 
-          var fecha = fechaActual.getDate() + '/' + (fechaActual.getMonth() + 1) + '/' + fechaActual.getFullYear();
-          var hora = fechaActual.getHours() + ':' + fechaActual.getMinutes() + ':' + fechaActual.getSeconds();
-          
-          // obtener fecha y hora de la ultima ejecucion
-          // row.ultima_ejecucion tiene formato  2024-02-28T08:00:00Z y quiero obtener 28/02/2024 08:00:00
-          var fechaUltimaEjecucion = row.ultima_ejecucion.split('T')[0].split('-').reverse().join('/');
-          var horaUltimaEjecucion = row.ultima_ejecucion.split('T')[1].split('Z')[0];
-          
-          // comprobar si la fecha y hora de la ultima ejecucion es inferior a la fecha y hora actual
-          if (fechaUltimaEjecucion == fecha && horaUltimaEjecucion < hora) {
-              icono =  '<i class="fa-solid fa-triangle-exclamation fa-lg" style="color:#FF0000"></i>';
+
+          const comparacion = compararFechas(fechaProxima, fechaActualFormateada);
+
+          if (comparacion === -1) {
+            icono = '<i class="fa-solid fa-triangle-exclamation fa-xl" style="color:#FF0000"></i>';
           }
 
-          }      
-
-          return icono;
+          return icono
 
       }
     },
@@ -122,9 +135,9 @@
           // ocultar columna Acciones si el usuario no es administrador
           return '';
         }
-        var botonParalizarProceso = '<a href="/private/docLaruex/paralizarProceso/' + row.nombre_proceso + '/" class="mx-2 pausa" title="Abrir" ><i class="fa-solid fa-pause fa-xl" ></i></a>';
+        var botonParalizarProceso = '<a href="/private/docLaruex/paralizarProceso/' + row.nombre_proceso + '/' + row.nombre_ejecutable + '/' +'" class="mx-2 pausa" title="Paralizar proceso" ><i class="fa-solid fa-pause fa-xl" ></i></a>';
         
-        var botonEliminarProceso = '<a href="/private/docLaruex/eliminarProceso/' + row.nombre_proceso + '/' + '" class="mx-1 eliminarProceso" title="Editar"><i class="fa-solid fa-eraser fa-xl"></i></a>';
+        var botonEliminarProceso = '<a href="/private/docLaruex/eliminarProceso/' + row.nombre_proceso + '/' + row.nombre_ejecutable + '/' +'" class="mx-1 eliminarProceso" title="Eliminar Proceso"><i class="fa-solid fa-eraser fa-xl"></i></a>';
         return (botonParalizarProceso + botonEliminarProceso);
 
       },
