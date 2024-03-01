@@ -21,8 +21,6 @@
   </nav>
 </div>
 
-
-
 <!-- ============= Tablas ============= -->
 
 <!-- Tabla con lista de fabricantes -->
@@ -36,20 +34,36 @@
 
 <script type="text/javascript">
 
+    function generarFechaActual() {
+      const fechaActual = new Date();
+
+      // Convertir la fecha a UTC
+      const fechaUTC = new Date(fechaActual.getUTCFullYear(), fechaActual.getUTCMonth(), fechaActual.getUTCDate(), fechaActual.getUTCHours(), fechaActual.getUTCMinutes(), fechaActual.getUTCSeconds());
+
+      return fechaUTC;
+    }
+
+    function convertiFecha(fecha) {
+      const fechaDate = new Date(fecha);
+      const fechaFormateada = new Date(fechaDate.getUTCFullYear(), fechaDate.getUTCMonth(), fechaDate.getUTCDate(), fechaDate.getUTCHours(), fechaDate.getUTCMinutes(), fechaDate.getUTCSeconds());
+      return fechaFormateada;
+    }
 
     function compararFechas(fecha1, fecha2) {
-      // Convertir las fechas a objetos Date
-      const fecha1Date = new Date(fecha1);
-      const fecha2Date = new Date(fecha2);
+        if (!(fecha1 instanceof Date && fecha2 instanceof Date)) {
+          throw new TypeError('Ambos elementos Deben ser Date objects');
+        }
 
+        const tiempoFecha1 = fecha1.getTime(); // Get milliseconds since epoch for date1
+        const tiempoFecha2 = fecha2.getTime(); // Get milliseconds since epoch for date2
 
-      // Si la fecha 1 tiene zona horaria UTC, convertir la fecha 2 a la misma zona horaria
-      if (fecha1.endsWith("Z")) {
-        fecha2Date.setUTCHours(fecha2Date.getHours() - fecha2Date.getTimezoneOffset() / 60);
-      }
-
-      // Comparar las dos fechas
-      return fecha1Date.getTime() - fecha2Date.getTime();
+        if (tiempoFecha1 > tiempoFecha2) {
+          return 1; // fecha1 is greater than fecha2
+        } else if (tiempoFecha1 < tiempoFecha2) {
+          return -1; // fecha2 is greater than fecha1
+        } else {
+          return 0; // fechas are equal
+        }
     }
 
   $('#tabla_operatividad_aplicaciones').bootstrapTable({
@@ -85,14 +99,11 @@
             second: '2-digit',
             hour12: false,
           };
-
-          const fechaFormateada = fecha.toLocaleString('es-ES', options);
-          
+          const fechaFormateada = fecha.toLocaleString('es-ES', options);    
           return fechaFormateada;
         } else {
           return "--";
         }
-
       },
 
     },{
@@ -100,23 +111,12 @@
       field: 'estado',
       align: "center",
       formatter: function (value, row) {
-          // obtener fecha actual y hora actual con zona horaria UTC
-          const fechaProxima = row.proxima_ejecucion; // Fecha en UTC
-          const fechaActual = new Date();
-          const fechaActualFormateada = fechaActual.toISOString().slice(0, 19);
-
-          //const fechaActualFormateada = fechaActual.toISOString().slice(0, 19);
-
-          console.log(row.proxima_ejecucion, typeof(row.proxima_ejecucion));
-
-          console.log("--",fechaActualFormateada, typeof(fechaActualFormateada));
-
+           const fechaGenerada = generarFechaActual();
+           const fechaProxima = convertiFecha(row.proxima_ejecucion); // Fecha en UTC
+           const resultado = compararFechas(fechaProxima, fechaGenerada);
 
           var icono = '<i class="fa-duotone fa-circle-check fa-xl"  style="--fa-primary-color: #39d553; --fa-secondary-color: #39d553;"></i>';
-
-          const comparacion = compararFechas(fechaProxima, fechaActualFormateada);
-
-          if (comparacion === -1) {
+          if (resultado == -1) {
             icono = '<i class="fa-solid fa-triangle-exclamation fa-xl" style="color:#FF0000"></i>';
           }
 
