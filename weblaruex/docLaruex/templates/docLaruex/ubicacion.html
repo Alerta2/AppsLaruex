@@ -14,35 +14,32 @@
 <!-- breadcrumb   -->
 <div class="card-body">
   <nav>
-      <h5 class="card-title">{{ ubicacion.id.nombre }}
-        {% if administrador %}
-        <!-- boton que permite asociar elementos al formato actual-->
-        <a href="" title="Asociar Archivo" class="mx-" data-toggle="modal" data-toggle="tooltip"
-          data-target="#modalAsociarArchivo" style="color: #0A9396; " download><i class="fa-solid fa-link enlace enviarNotificacion"></i></a>
-        
-          {% if registros %}
-          <a href="/private/docLaruex/verMantenimientosAsociados/{{ubicacion.id.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento" style="color:#511f31"><i class="fa-duotone fa-screwdriver-wrench enviarNotificacion"></i></a>
-          {% endif %}
-          <a  class="mx-1" title="editar ubicación" data-target="#modalEditarUbicacion" data-toggle="modal"
-          style="color: #bb3e03; align-items: md-center"><i class="fa-duotone fa-money-check-pen editarObjeto"></i></a>  
+    <h5 class="card-title">{{ ubicacion.id.nombre }}
+      {% if administrador %}
+      <!-- boton que permite asociar elementos al formato actual-->
+      <a href="" title="Asociar Archivo" class="mx-" data-toggle="modal" data-toggle="tooltip"
+        data-target="#modalAsociarArchivo" style="color: #0A9396; " download><i class="fa-solid fa-link enlace enviarNotificacion"></i></a>
+        {% if registros %}
+        <a href="/private/docLaruex/verMantenimientosAsociados/{{ubicacion.id.id}}/" class="mx-1" title="Ir a la tarea de Mantenimiento" style="color:#511f31"><i class="fa-duotone fa-screwdriver-wrench enviarNotificacion"></i></a>
         {% endif %}
-      </h5>
+        <a  class="mx-1" title="editar ubicación" data-target="#modalEditarUbicacion" data-toggle="modal"
+        style="color: #bb3e03; align-items: md-center"><i class="fa-duotone fa-money-check-pen editarObjeto"></i></a>  
+      {% endif %}
+    </h5>
     <ol class="breadcrumb" style="background-color:#fff !important">
-      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
-            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i class="bi bi-house-door"></i></a></li>
       <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/objetos">Listado de Objetos</a>
       </li>
       <li class="breadcrumb-item" style="font-size: large;"><a
           href="\private/docLaruex/tipoObjeto/Ubicacion/">Listado de Ubicaciones</a></li>
-      
       {% if ubicacion.id.padre %}
         <li class="breadcrumb-item" style="font-size: large;"><a
         href="\private/docLaruex/verObjeto/{{ ubicacion.id.padre.id }}/">{{ ubicacion.id.padre.nombre }}</a></li>
       {% endif %}
         <li class="breadcrumb-item active" style="font-size: large;">{{ ubicacion.id.nombre }}</li>    
-
     </ol>
   </nav>
+
   <div class="d-flex justify-content-end">
     <a class="mx-1" title="Enviar nota relacionada con {{ ubicacion.id.nombre }}" data-toggle="modal" data-target="#modalFormularioEnviarNota" style="color: #001219; align-items: md-center"><i class="fa-duotone fa-message-pen fa-2x enviarNotificacion"></i></a>
     <a class="mx-1" title="Notas relacionadas con {{ ubicacion.id.nombre }}" data-toggle="modal" data-target="#modalFormularioVerNotas" style="color: #001219; align-items: md-center"><i class="fa-duotone fa-messages fa-2x enviarNotificacion"></i></a>
@@ -85,8 +82,6 @@
       </div>
     </div>
   </section>
-
-
   <!-- ========== Modal para Ver las llaves almacenadas modalLlavesAlmacenadas ========== -->
 
   <!-- ========== Modal Ver Notas ================= -->
