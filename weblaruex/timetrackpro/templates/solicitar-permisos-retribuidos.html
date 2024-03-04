@@ -94,7 +94,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Solicitar días de asuntos propios</h5>
+          <h5 class="modal-title">Solicitar permisos</h5>
           <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -128,7 +128,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-xl-6 mt-2">
+            <div class="col-xl-12 mt-2">
               <label class="text-sm">Permisos</label>
               <input id="inputPermisos" list="permisosRetribuidos"  class="form-select">
               <input type="number" id="id_permiso" name="id_permiso"  class="form-control" hidden>
@@ -318,7 +318,7 @@
 
         // se muestra el modal para agregar el festivo
         var label = document.getElementById("tituloModalAgregarDesdeCalendario");
-        label.innerHTML = "Solicitar " + dia + " de " + mes + " del " + year + " como día de asuntos propios";
+        label.innerHTML = "Solicitar " + dia + " de " + mes + " del " + year + " como día de permisos";
 
         // se obtiene el año actual
         var yearActual = document.getElementById("year_actual");

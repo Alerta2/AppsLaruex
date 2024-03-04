@@ -21,9 +21,10 @@ from django.db.models.functions import ExtractWeek
 import io
 import pytz
 from django.utils import timezone
+from django.core.mail import send_mail
 
-
-
+from calendario_guardias.models import MonitorizaApps
+from rare.models import MensajesTelegram
 
 # ? Configuración de mensajes de 
 iconosAviso ={
@@ -180,7 +181,7 @@ def home(request):
     diasPropiosConsumidos = calcularAsuntosPropiosConsumidos(empleado.id_usuario, datetime.now().year)
     diasPropiosRecuperablesConsumidos = calcularAsuntosPropiosRecuperablesConsumidos(empleado.id_usuario, datetime.now().year)
     diasPropiosSolicitados = calcularAsuntosPropiosSolicitados(empleado.id_usuario, datetime.now().year)
-    diasPropiosRestantes= 6-diasPropiosConsumidos
+    diasPropiosRestantes= settings.DIAS_ASUNTOS_PROPIOS-diasPropiosConsumidos
     diasVacacionesConsumidos = calcularVacacionesConsumidas(empleado.id_usuario, datetime.now().year)
     diasVacacionesRestantes = 30-diasVacacionesConsumidos
     diasVacacionesSolicitados = calcularVacacionesSolicitadas(empleado.id_usuario, datetime.now().year)
@@ -988,13 +989,16 @@ def obtenerRegistroEmpleados(request):
     """
 
     administrador = esAdministrador(request.user.id)
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values()
+    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(activo=1).values()
+    exEmpleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(activo=0).exclude(id__in=[100,101]).values()
+
     # current_url = request.path[1:]
     
     infoVista = {
         "navBar":navBar,
         "administrador":administrador,
         "empleados":list(empleados),
+        "exEmpleados":list(exEmpleados),
         "rutaActual": "Informe de asistencia empleados",
     }
     return render(request,"informe-registro-usuario.html",infoVista)
@@ -1496,6 +1500,28 @@ def verRegistro(request, id):
     ruta_leido = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + registro.ruta
     IdEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
 
+
+    '''
+    <url> - url de la aplicacion
+    <mes> - mes del fichero de registro
+    <year> - año del fichero de registro
+    <seccion> - seccion del fichero de registro
+    '''
+
+    '''
+    ASUNTO 
+    Nuevo fichero de registro de jornada insertado.       
+
+    MENSAJE PARA EL DESTINATARIO
+
+    Se ha insertado un nuevo fichero de registro de jornada en la aplicación.
+    Los datos del fichero son los siguientes:
+    - Mes y año: <mes> de <year>
+    - Sección: <seccion>
+    Puede consultar más información en el siguiente enlace.
+    <url>
+    '''
+
     if request.method == 'POST' and administrador:
         if not os.path.isfile(ruta):
             return "El archivo no existe"
@@ -1525,6 +1551,18 @@ def verRegistro(request, id):
                     nuevoRegistro.save()
         # Mover el archivo a la nueva ruta después de procesarlo
         shutil.move(ruta, ruta_leido)
+        url = 'http://alerta2.es/private/timetrackpro/registros-insertados'
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=49)[0]
+        subject = mensajeTipoDestinatario.mensaje.replace('\n', '').replace('\r', '')
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<mes>", registro.mes).replace("<year>", str(registro.year)).replace("<url>", url).replace("<seccion>", registro.seccion)
+
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
+
+        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        enviarTelegram(subject, mensajeDestinatario)
+
 
     if RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido=registro.id, id_empleado=IdEmpleado.id).exists() or administrador or director:
         infoVista = {
@@ -1948,8 +1986,7 @@ def notificarErrorEnFichaje(request):
     :return: a redirect to the 'timetrackpro:ver-errores-notificados' view with the parameter
     'id=idEmpleadoMaquina'.
     """
-    
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values('id', 'nombre')
+    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(activo=1).values('id', 'nombre')
     administrador = esAdministrador(request.user.id)
     empleadoActual = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
     
@@ -1968,7 +2005,9 @@ def notificarErrorEnFichaje(request):
 
 
         idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=empleado.id)[0]
-        #empleadoError = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleado.id_usuario)[0]
+
+
+        solicitante = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleado.id_usuario.id)[0]
 
         motivo = request.POST.get("motivoError")
         estado = 1 # indico que aún esta pendiente de revisar
@@ -1976,8 +2015,66 @@ def notificarErrorEnFichaje(request):
         registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
         horaNotificacion = datetime.now()
 
+        '''
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <url> - url de la aplicacion
+        <fechaRegistro> - fecha de registro del problema
+        <fechaIncidencia> - fecha en la que se produjo el problema
+        <motivo> - motivo del problema
+        '''
+
+        '''
+        ASUNTO 
+        Error en el fichaje manual de <nombreSolicitante> <apellidosSolicitante>
+
+        MENSAJE PARA EL REMITENTE
+        Se ha notificado un error en el fichaje manual con fecha <fechaIncidencia>.
+        Puede consultar el estado en el siguiente enlace:
+        <url>        
+
+        MENSAJE PARA EL DESTINATARIO
+
+        <nombreSolicitante> <apellidosSolicitante> ha notificado un error al fichar manualmente.
+        Los detalles del error son los siguientes:
+
+        Empleado: <nombreSolicitante> <apellidosSolicitante>
+        Fecha de notificación: <fechaRegistro>
+        -------------------------   
+        Fecha del error: <fechaIncidencia>
+        Motivo: <motivo>
+        -------------------------
+
+        Puede consultar más información en el siguiente enlace.
+        <url>
+        '''
+
+        url = 'http://alerta2.es/private/timetrackpro/ver-errores-notificados/'
+        fechaNotificacion = horaNotificacion.strftime("%d-%m-%Y a las %H:%M:%S")
+        horaFecha = hora.split("T")[0]
+        fechaIncidencia = horaFecha + " " + hora.split("T")[1]
+
+        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=47)[0]
+        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace('\n', '').replace('\r', '')
+        
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", url).replace("<fechaIncidencia>", fechaIncidencia)
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=48)[0]
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", url).replace("<fechaRegistro>", fechaIncidencia).replace("<fechaIncidencia>", fechaNotificacion).replace("<motivo>", motivo)
+
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
+
+        # convertir a direcciones de correo
+        correoEmpleado = convertirAMail(solicitante.email)
+        mailSolicitante = [correoEmpleado,]
+
         nuevoErrorRegistrado = ErroresRegistroNotificados(id_empleado=idEmpleado.id_usuario, hora=hora, motivo=motivo, estado=estado, quien_notifica=registrador, hora_notificacion=horaNotificacion)
-        nuevoErrorRegistrado.save(using='timetrackpro')
+        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        enviarTelegram(subject, mensajeDestinatario)
+        
+        #nuevoErrorRegistrado.save(using='timetrackpro')
         return redirect('timetrackpro:ver-errores-notificados', id=idEmpleadoMaquina)   
      
     return render(request,"notificar-error-registro.html", infoVista)
@@ -2491,7 +2588,7 @@ def agregarUsuarioMaquina(request):
             numHuellas = request.POST.get('huellas_registradas')
 
             if not EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=request.POST.get("id_empleado_maquina")).exists():
-                nuevoUser = EmpleadosMaquinaTimetrackpro(id=id, nombre=nombre, turno=turno, horas_maxima_contrato=horas_maxima_contrato, en_practicas=en_practicas, maquina_laboratorio=maquina_laboratorio, maquina_alerta2=maquina_alerta2, maquina_departamento=maquina_departamento, codigo_fichar=pin, admin_dispositivo=esAdmin, huellas_registradas=numHuellas, fichar_remoto=ficharRemoto)
+                nuevoUser = EmpleadosMaquinaTimetrackpro(id=id, nombre=nombre, turno=turno, horas_maxima_contrato=horas_maxima_contrato, en_practicas=en_practicas, maquina_laboratorio=maquina_laboratorio, maquina_alerta2=maquina_alerta2, maquina_departamento=maquina_departamento, codigo_fichar=pin, admin_dispositivo=esAdmin, huellas_registradas=numHuellas, fichar_remoto=ficharRemoto, activo=1)
                 nuevoUser.save(using='timetrackpro')
             
 
@@ -3842,7 +3939,7 @@ def solicitarModificarAsuntosPropios(request):
         asuntoPropio = AsuntosPropios.objects.using("timetrackpro").filter(id=idAsuntosPropios)[0]
         estadoPendiente = EstadosSolicitudes.objects.using("timetrackpro").filter(id=17)[0]
         asuntoPropio.estado = estadoPendiente
-        asuntoPropio.save(using='timetrackpro')
+        #asuntoPropio.save(using='timetrackpro')
         fechaInicioActual = request.POST.get("fechaActualInicio")
         fechaFinActual = request.POST.get("fechaActualFin")
         diasConsumidosActual = request.POST.get("dias_actuales_consumidos")
@@ -3851,9 +3948,56 @@ def solicitarModificarAsuntosPropios(request):
         fechaNuevaFin = request.POST.get("fechaFinNueva")
         diasConsumidosNuevos = request.POST.get("dias_nuevos_consumidos")
         motivoCambio = request.POST.get("motivo_cambio")
+
+        '''
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <url> - url de la aplicacion
+        <fechaInicioActual> - fecha de inicio del periodo actual
+        <fechaFinActual> - fecha de fin del periodo actual
+        <diasConsumidosActual> - dias consumidos en el periodo actual
+        <fechaNuevaInicio> - fecha de inicio del nuevo periodo
+        <fechaNuevaFin> - fecha de fin del nuevo periodo
+        <diasConsumidosNuevos> - dias consumidos en el nuevo periodo
+        '''
+
+        '''
+        ASUNTO 
+        Solicitud de cambio día de asuntos propios <nombreSolicitante> <apellidosSolicitante>.
+        
+        MENSAJE PARA EL REMITENTE
+
+        Su solicitud de cambio de asuntos propios ha sido registrada con éxito.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>        
+
+        MENSAJE PARA EL DESTINATARIO
+
+        <nombreSolicitante> <apellidosSolicitante> ha solicitado un cambio de asuntos propios cambiado el perido del <fechaInicioActual> al <fechaFinActual> que abarcaba <diasConsumidosActual> día/s por el periodo del <fechaNuevaInicio> al <fechaNuevaFin> que abarca <diasConsumidosNuevos> día/s.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+        '''
+
+        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=35)[0]
+        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace('\n', '').replace('\r', '')
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", "http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/").replace("<fechaInicioActual>", fechaInicioActual).replace("<fechaFinActual>", fechaFinActual).replace("<diasConsumidosActual>", diasConsumidosActual).replace("<fechaNuevaInicio>", fechaNuevaInicio).replace("<fechaNuevaFin>", fechaNuevaFin).replace("<diasConsumidosNuevos>", diasConsumidosNuevos)
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=36)[0]
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", "http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/").replace("<fechaInicioActual>", fechaInicioActual).replace("<fechaFinActual>", fechaFinActual).replace("<diasConsumidosActual>", diasConsumidosActual).replace("<fechaNuevaInicio>", fechaNuevaInicio).replace("<fechaNuevaFin>", fechaNuevaFin).replace("<diasConsumidosNuevos>", diasConsumidosNuevos)
+        
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
+        # convertir a direcciones de correo
+        correoEmpleado = convertirAMail(solicitante.email)
+
+        mailSolicitante = [correoEmpleado,]
+
         solicitudModificacionAsuntosPropios = CambiosAsuntosPropios(id_periodo_cambio=asuntoPropio, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
         solicitudModificacionAsuntosPropios.save(using='timetrackpro')
-    return redirect('timetrackpro:solicitar-vacaciones')
+        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        enviarTelegram(subject, mensajeDestinatario)
+    return redirect('timetrackpro:solicitar-asuntos-propios')
 
 
 def documentacion(request):
@@ -4371,28 +4515,23 @@ def solicitarAsuntosPropios(request, year=None):
     empleados = EmpleadosTimetrackpro.objects.using("timetrackpro").values()
     sustitutos = Sustitutos.objects.using("timetrackpro").values()
     asuntosPropiosEmpleados = []
+    estadoSolicitado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
     diasConsumidos = 0
+    if year is None:
+        year = str(datetime.now().year)
+
     if administrador or director:
-        if year is None:
-            asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").values()
-        else:
-            asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values()
+        asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values()
 
     if not director:
-        if year is None:
-            asuntos = AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado).values()
-        else:
-            asuntos = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).values()
-        
+        asuntos = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado,estado=estadoSolicitado).values()
         for a in asuntos:
             diasConsumidos += a['dias_consumidos']
 
-    if year is None:
-        year = str(datetime.now().year)
     mes = str(datetime.now().month)
     if len(mes) == 1:
         mes = "0" + mes
-    initialDate = year + "-" + mes + "-01"
+    initialDate = str(year) + "-" + mes + "-01"
     if request.method == 'POST':
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
@@ -4401,23 +4540,94 @@ def solicitarAsuntosPropios(request, year=None):
         diasConsumidos = request.POST.get("dias_consumidos")
         
         recuperable = 0 
-        if request.POST.get("recuperable") == 1:
+        if request.POST.get("recuperable") == "1":
             recuperable = 1
 
         tareasASustituir = None
+        funciones = ""
         if request.POST.get("tareas_a_sustituir") != "":
             tareasASustituir = request.POST.get("tareas_a_sustituir")
+            funciones = tareasASustituir
 
         descripcion = None
         if request.POST.get("descripcion") != "":
             descripcion = request.POST.get("descripcion")
+        print('\033[91m'+'descripcion: ' + '\033[92m', descripcion)
 
         empleadoSustituto = request.POST.get("sustituto")
 
         if empleadoSustituto != "0" and empleadoSustituto != 0:        
-            sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0] 
+            sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0]
+            nombreSustituto = sustituto.nombre + " " + sustituto.apellidos 
+    
         else:
             sustituto = None
+            nombreSustituto = "Ninguno"    
+
+        '''
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <tipo> - tipo de solicitud asunto propios o asuntos propios recuperables
+        <url> - url de la aplicacion
+        <fechaInicio> - fecha de inicio del periodo actual
+        <fechaFin> - fecha de fin del periodo actual
+        <diasConsumidos> - dias consumidos en el periodo actual
+        <funciones> - funciones a realizar por el sustituto 
+        <sustituto> - nombre del sustituto
+        <recuperacion> - si el asunto propio es recuperable o no    
+        '''
+
+        '''
+        ASUNTO 
+        Solicitud de día de <tipo> <nombreSolicitante> <apellidosSolicitante>.
+        
+        MENSAJE PARA EL REMITENTE
+        Su solicitud de <tipo> ha sido registrada con éxito.
+        Periodo del <fechaInicio> al <fechaFin> que abarcaba <diasConsumidos> día/s.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+        
+
+        MENSAJE PARA EL DESTINATARIO
+        <nombreSolicitante> <apellidosSolicitante> ha solicitado <diasConsumidos> día/s de <tipo> desde <fechaInicio> al <fechaFin>.
+        <recuperacion>.
+        Las funciones a cubir son:
+        <funciones>
+        La persona que asume la sustitución es:
+        <sustituto>
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+               
+        '''
+        
+        url = 'http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/'
+        recuperacion = ""
+        tipoAsuntos = "asuntos propios"
+        # correo enviado al usuario
+
+        if recuperable == 1:
+            tipoAsuntos = "asuntos propios recuperables"
+            if descripcion != None:
+                recuperacion = "Las horas se recuperarán de la siguiente manera: " + descripcion
+
+
+        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=37)[0]
+        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<tipo>", tipoAsuntos).replace('\n', '').replace('\r', '')
+        
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasConsumidos>", diasConsumidos).replace("<tipo>", tipoAsuntos)
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=38)[0]
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasConsumidos>", diasConsumidos).replace("<funciones>", funciones).replace("<sustituto>", nombreSustituto).replace("<recuperacion>", recuperacion).replace("<tipo>", tipoAsuntos)
+
+        # adjuntar el enlace a la aplicacion web
+
+
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
+        # convertir a direcciones de correo
+        correoEmpleado = convertirAMail(empleado.email)
+
+        mailSolicitante = [correoEmpleado,]
 
         if AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin).exists():
             return redirect('timetrackpro:solicitar-asuntos-propios')
@@ -4427,6 +4637,9 @@ def solicitarAsuntosPropios(request, year=None):
             year = fechaInicio.split("-")[0]
             nuevoAsuntoPropio = AsuntosPropios(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, estado=estado, fecha_solicitud=fechaSolicitud, year=year, recuperable=recuperable, descripcion=descripcion, tareas_a_sustituir=tareasASustituir, sustituto=sustituto)
             nuevoAsuntoPropio.save(using='timetrackpro')
+            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+            enviarTelegram(subject, mensajeDestinatario)
 
             return redirect('timetrackpro:solicitar-asuntos-propios', year=year)
     infoVista = {
@@ -4484,7 +4697,6 @@ def solicitarPermisosRetribuidos(request, year=None):
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
         idPermiso = None
-        print("----------------")
         if "id_permiso" in request.POST:
             idPermiso = request.POST.get("id_permiso")
         print('\033[91m'+'idPermiso: ' + '\033[92m', idPermiso)
@@ -4500,8 +4712,67 @@ def solicitarPermisosRetribuidos(request, year=None):
         for p in permisosSolicitados:
             if p['fecha_inicio'] == fechaInicio:
                 return redirect('timetrackpro:ups', mensaje='Ya existe un permiso retribuido para el día ' + fechaInicio + '')
+            
+
+        '''
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <url> - url de la aplicacion
+        <fechaInicio> - fecha de inicio del periodo actual
+        <fechaFin> - fecha de fin del periodo actual
+        <diasSolicitados> - dias consumidos en el periodo actual
+        <motivo> - motivo de la solicitud
+        '''
+
+        '''
+        ASUNTO 
+        Nueva solicitud de permiso de ausencias <nombreSolicitante> <apellidosSolicitante>.
+
+        MENSAJE PARA EL REMITENTE
+
+        Su solicitud de permisos de ausencias sido registrada con éxito.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>        
+
+        MENSAJE PARA EL DESTINATARIO
+
+        <nombreSolicitante> <apellidosSolicitante> ha solicitado un nuevo permiso de ausencias.
+        El motivo de la solicitud es
+        <motivo>
+        La duración máxima de la solicitud es de <diasDisponibles>.
+        El perido solicitado abarca <diasSolicitados> día/s comenzando desde el  <fechaInicio> al <fechaFin>.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+        '''
+
+        url = 'http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/'
+        motivo = codigoPermiso.nombre
+        diasDisponibles = "indefinida"
+        if codigoPermiso.dias != None and codigoPermiso.dias != 999:
+            diasDisponibles = str(codigoPermiso.dias)  + " día/s " + codigoPermiso.habiles_o_naturales
+
+        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=43)[0]
+        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace('\n', '').replace('\r', '')
+        
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo)
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=44)[0]
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo).replace("<diasDisponibles>", diasDisponibles)
+        
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
+
+        # convertir a direcciones de correo
+        correoEmpleado = convertirAMail(empleado.email)
+
+        mailSolicitante = [correoEmpleado,]
+
         nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso)
-        nuevoPermiso.save(using='timetrackpro')
+        #nuevoPermiso.save(using='timetrackpro')
+        
+        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        enviarTelegram(subject, mensajeDestinatario)
         alerta["activa"] = True
         alerta["icono"] = iconosAviso["success"]
         alerta["tipo"] = "success"
@@ -4554,8 +4825,67 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
         for p in permisos:
             if p['fecha_inicio'] == fechaInicio:
                 return redirect('timetrackpro:ups', mensaje='Ya existe un permiso retribuido para el día ' + fechaInicio + '')
+            
+
+        '''
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <url> - url de la aplicacion
+        <fechaInicio> - fecha de inicio del periodo actual
+        <fechaFin> - fecha de fin del periodo actual
+        <diasSolicitados> - dias consumidos en el periodo actual
+        <motivo> - motivo de la solicitud
+        '''
+
+        '''
+        ASUNTO 
+        Nueva solicitud de permiso de ausencias <nombreSolicitante> <apellidosSolicitante>.
+
+        MENSAJE PARA EL REMITENTE
+
+        Su solicitud de permisos de ausencias sido registrada con éxito.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>        
+
+        MENSAJE PARA EL DESTINATARIO
+
+        <nombreSolicitante> <apellidosSolicitante> ha solicitado un nuevo permiso de ausencias.
+        El motivo de la solicitud es
+        <motivo>
+        La duración máxima de la solicitud es de <diasDisponibles>.
+        El perido solicitado abarca <diasSolicitados> día/s comenzando desde el  <fechaInicio> al <fechaFin>.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+        '''
+
+        url = 'http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/'
+        motivo = codigoPermiso.nombre
+        diasDisponibles = "indefinida"
+        if codigoPermiso.dias != None and codigoPermiso.dias != 999:
+            diasDisponibles = str(codigoPermiso.dias)  + " día/s " + codigoPermiso.habiles_o_naturales
+
+        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=43)[0]
+        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace('\n', '').replace('\r', '')
+        
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo)
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=44)[0]
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo).replace("<diasDisponibles>", diasDisponibles)
+        
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
+
+        # convertir a direcciones de correo
+        correoEmpleado = convertirAMail(empleado.email)
+
+        mailSolicitante = [correoEmpleado,]
+
+
         nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso)
-        nuevoPermiso.save(using='timetrackpro')
+        #nuevoPermiso.save(using='timetrackpro')
+        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        enviarTelegram(subject, mensajeDestinatario)
         alerta["activa"] = True
         alerta["icono"] = iconosAviso["success"]
         alerta["tipo"] = "success"
@@ -4877,6 +5207,17 @@ def modificarSolicitudPermisoRetribuido(request):
         return redirect('timetrackpro:sin-permiso')
     
 
+def convertirAMail(correo):
+    '''
+    La funcion "convertirAMail" permite convertir un correo electronico en un formato valido para enviar un correo electronico.
+    :param correo: El parametro "correo" es el correo electronico que se desean convertir
+    :return: un objeto "str" que contiene el correo electronico convertido
+    '''
+    mail = ""
+    if correo != "":
+        mail = "<" + correo + ">"
+    return mail
+
 @login_required
 def solicitarVacaciones(request):
     '''
@@ -4936,6 +5277,7 @@ def solicitarVacaciones(request):
     }
 
     if request.method == 'POST':
+
         # obtenemos los datos del empleado
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
 
@@ -4950,15 +5292,65 @@ def solicitarVacaciones(request):
         fechaSolicitud = datetime.now()
     
         year = fechaInicio.split("-")[0]
+
+        '''
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <url> - url de la aplicacion
+        <fechaInicio> - fecha de inicio del periodo actual
+        <fechaFin> - fecha de fin del periodo actual
+        '''
+
+        '''
+        ASUNTO 
+        Solicitud de vacaciones <nombreSolicitante> <apellidosSolicitante>.
+
+        MENSAJE PARA EL REMITENTE
+        Su solicitud de vacaciones ha sido registrada con éxito.
+        El periodo seleccionado comienza el <fechaInicio> y finaliza el <fechaFin>.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+        
+
+        MENSAJE PARA EL DESTINATARIO
+        <nombreSolicitante> <apellidosSolicitante> ha registrado una solicitud de vacaciones para el periodo del <fechaInicio> al <fechaFin>.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+               
+        '''
+        url = 'http://alerta2.es/private/timetrackpro/solicitar-vacaciones/'
+        # correo enviado al usuario
+
+        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=39)[0]
+        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace('\n', '').replace('\r', '')
+
+
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=40)[0]
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
+
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
+        # convertir a direcciones de correo
+        correoEmpleado = convertirAMail(empleado.email)
+
+        mailSolicitante = [correoEmpleado,]
         # compruebo si ya existe un registro de vacaciones para ese periodo 
         if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio=fechaInicio).exists():
             return redirect('timetrackpro:ups', mensaje="Parece que ya existe una solicitud de vacaciones para esas fechas.")
         else:
             nuevoRegistroVacaciones = VacacionesTimetrackpro(empleado=empleado, tipo_vacaciones=tipoVacaciones, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, fecha_solicitud=fechaSolicitud, year=year, estado=estado)
             nuevoRegistroVacaciones.save(using='timetrackpro')
+
+            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+            enviarTelegram(subject, mensajeDestinatario)
+            
             return redirect('timetrackpro:solicitar-vacaciones')   
     
     return render(request,"solicitarVacaciones.html", infoVista)
+
 
 
 @login_required
@@ -4982,14 +5374,67 @@ def solicitarModificarVacaciones(request):
         vacaciones.estado = estadoPendiente
         vacaciones.save(using='timetrackpro')
         fechaInicioActual = request.POST.get("fechaActualInicio")
+        print('\033[91m'+'fechaInicioActual: ' + '\033[92m', fechaInicioActual)
         fechaFinActual = request.POST.get("fechaActualFin")
-        diasConsumidosActual = request.POST.get("dias_actuales_consumidos")
+        print('\033[91m'+'fechaFinActual: ' + '\033[92m', fechaFinActual)
+        diasConsumidosActual = vacaciones.dias_consumidos
         fechaSolicitud = datetime.now()
         fechaNuevaInicio = request.POST.get("fechaInicioNueva")
         fechaNuevaFin = request.POST.get("fechaFinNueva")
         diasConsumidosNuevos = request.POST.get("dias_nuevos_consumidos")
         motivoCambio = request.POST.get("motivo_cambio")
+
+
+        '''
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <url> - url de la aplicacion
+        <fechaInicioActual> - fecha de inicio del periodo actual
+        <fechaFinActual> - fecha de fin del periodo actual
+        <fechaNuevaInicio> - fecha de inicio del periodo nuevo
+        <fechaNuevaFin> - fecha de fin del periodo nuevo
+        '''
+
+        '''
+        ASUNTO 
+        Solicitud de cambio periodo de vacaciones <nombreSolicitante> <apellidosSolicitante>.
+
+        MENSAJE PARA EL REMITENTE
+        Su solicitud de cambio del periodo de vacaciones ha sido registrada con éxito.
+        El periodo actual comienza el <fechaInicioActual> y finaliza el <fechaFinActual>.
+        El nuevo periodo comienza el <fechaNuevaInicio> y finaliza el <fechaNuevaFin>.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+
+        MENSAJE PARA EL DESTINATARIO
+        <nombreSolicitante> <apellidosSolicitante> ha registrado una solicitud de cambio de vacaciones modificando el periodo actual del <fechaInicioActual> al <fechaFinActual> por el perido desde el <fechaNuevaInicio> al <fechaNuevaFin>.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+        '''
+
+
+        url = 'http://alerta2.es/private/timetrackpro/solicitar-vacaciones/'
+
+        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=41)[0]
+        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace('\n', '').replace('\r', '')
+
+
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", url).replace("<fechaInicioActual>", fechaInicioActual).replace("<fechaFinActual>", fechaFinActual).replace("<fechaNuevaInicio>", fechaNuevaInicio).replace("<fechaNuevaFin>", fechaNuevaFin)
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=42)[0]
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", url).replace("<fechaInicioActual>", fechaInicioActual).replace("<fechaFinActual>", fechaFinActual).replace("<fechaNuevaInicio>", fechaNuevaInicio).replace("<fechaNuevaFin>", fechaNuevaFin)
+
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
+        # convertir a direcciones de correo
+        correoEmpleado = convertirAMail(solicitante.email)
+
+        mailSolicitante = [correoEmpleado,]
+
         solicitudModificacionVacaciones = CambiosVacacionesTimetrackpro(id_periodo_cambio=vacaciones, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
+        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        enviarTelegram(subject, mensajeDestinatario)
         solicitudModificacionVacaciones.save(using='timetrackpro')
     return redirect('timetrackpro:solicitar-vacaciones')
 
@@ -5257,14 +5702,66 @@ def notificarDatosErroneos(request):
     }
     if request.method == 'POST':
         usuario = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
+        refEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=usuario)[0]
+        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=refEmpleado.id_usuario.id)[0]
         estado = estadosErrores["Pendiente"]
         fechaRegistro = datetime.now()
         motivo = request.POST.get("motivoError")
         tipo = "2"
+
+        '''
+        tipo = 2 -> Corrección de datos erróneos
+        tipo = 1 -> Fallos en la aplicación
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <url> - url de la aplicacion
+        <fechaRegistro> - fecha de registro del problema
+        <motivo> - motivo del problema
+        '''
+
+        '''
+        ASUNTO 
+        Nueva solicitud de <tipo> en timetrackpro.
+
+        MENSAJE PARA EL REMITENTE
+
+        Su incidencia ha quedado registrada. Puede consultar el estado en el siguiente enlace:
+        <url>        
+
+        MENSAJE PARA EL DESTINATARIO
+
+        <nombreSolicitante> <apellidosSolicitante> ha registrado una incidencia de <tipo> con fecha <fechaRegistro>.
+        El motivo de la solicitud es:
+        <motivo>
+        Puede consultar más información en el siguiente enlace.
+        <url>
+        '''
+
+        url = 'http://alerta2.es/private/timetrackpro/listado-incidencias'
+        stringFecha = fechaRegistro.strftime("%d-%m-%Y a las %H:%M:%S")
+
+        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=45)[0]
+        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<tipo>", "Corrección de datos erróneos").replace('\n', '').replace('\r', '')
+        
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url)
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=46)[0]
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaRegistro>", stringFecha).replace("<motivo>", motivo).replace("<tipo>", "Corrección de datos erróneos")
+
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO]
+
+        # convertir a direcciones de correo
+        correoEmpleado = convertirAMail(empleado.email)
+
+        mailSolicitante = [correoEmpleado,]
         error = ProblemasDetectadosTimeTrackPro(usuario=usuario, estado=estado, fecha_registro=fechaRegistro, problema_detectado=motivo, tipo=tipo)
+
+        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
         error.save(using='timetrackpro')
 
-        return redirect('timetrackpro:ver-errores-notificados', id=error.id)   
+        return redirect('timetrackpro:ver-incidencia', id=error.id)   
      
     return render(request,"notificar-incidencia.html", infoVista)
 
@@ -5292,14 +5789,65 @@ def notificarErroresApp(request):
     }
     if request.method == 'POST':
         usuario = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
+        refEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=usuario)[0]
+        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=refEmpleado.id_usuario.id)[0]
         estado = estadosErrores["Pendiente"]
         fechaRegistro = datetime.now()
         motivo = request.POST.get("motivoError")
         tipo = "1"
+
+        '''
+        tipo = 2 -> Corrección de datos erróneos
+        tipo = 1 -> Fallos en la aplicación
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <url> - url de la aplicacion
+        <fechaRegistro> - fecha de registro del problema
+        <motivo> - motivo del problema
+        '''
+
+        '''
+        ASUNTO 
+        Nueva solicitud de <tipo> en timetrackpro.
+
+        MENSAJE PARA EL REMITENTE
+
+        Su incidencia ha quedado registrada. Puede consultar el estado en el siguiente enlace:
+        <url>        
+
+        MENSAJE PARA EL DESTINATARIO
+
+        <nombreSolicitante> <apellidosSolicitante> ha registrado una incidencia de <tipo> con fecha <fechaRegistro>.
+        El motivo de la solicitud es:
+        <motivo>
+        Puede consultar más información en el siguiente enlace.
+        <url>
+        '''
+
+        url = 'http://alerta2.es/private/timetrackpro/listado-incidencias'
+        stringFecha = fechaRegistro.strftime("%d-%m-%Y a las %H:%M:%S")
+
+        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=45)[0]
+        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<tipo>","Fallos en la aplicación" ).replace("<apellidosSolicitante>", empleado.apellidos).replace('\n', '').replace('\r', '')
+        
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url)
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=46)[0]
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaRegistro>", stringFecha).replace("<motivo>", motivo).replace("<tipo>", "Fallos en la aplicación")
+
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO]
+
+        # convertir a direcciones de correo
+        correoEmpleado = convertirAMail(empleado.email)
+
+        mailSolicitante = [correoEmpleado,]
+
         error = ProblemasDetectadosTimeTrackPro(usuario=usuario, estado=estado, fecha_registro=fechaRegistro, problema_detectado=motivo, tipo=tipo)
         error.save(using='timetrackpro')
-
-        return redirect('timetrackpro:ver-errores-notificados', id=error.id)    
+        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        return redirect('timetrackpro:ver-incidencia', id=error.id)    
      
     return render(request,"notificar-incidencia.html", infoVista)
 
@@ -5311,6 +5859,7 @@ def problemasNotificados(request):
     :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "problemas-notificados.html" con los datos necesarios para la vista
     '''
+
     infoVista = {
         "navBar":navBar,
         "administrador":esAdministrador(request.user.id),
@@ -5472,3 +6021,9 @@ def subirDocumento(f, destino):
     with open(destino, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+
+def enviarTelegram(asunto, mensaje):
+    '''
+    La funcion "enviarTelegram" permite enviar un mensaje a traves de Telegram.
+    '''
+    MensajesTelegram(id_area=4,id_estacion=None,fecha_hora_utc=datetime.now(pytz.timezone("Europe/Madrid")),mensaje=asunto,descripcion=mensaje,icono='19',estado=0,id_telegram=settings.ID_CHAT_TIMETRACK,silenciar=0, confirmar=0).save(using='spd')
