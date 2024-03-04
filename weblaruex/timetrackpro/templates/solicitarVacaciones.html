@@ -208,7 +208,7 @@
             </div>
           </div>
           
-          <div class="row d-flex justify-content-center mb-2">
+          <div class="row d-flex justify-content-center mb-2" hidden>
             <div class="col-xl-4"  id="divFechaInicioActual" hidden>
               <label class="col-form-label text-muted">Fecha inicio actual</label>
 
@@ -311,6 +311,7 @@
   </div>
 
 <script>
+  mostrarInfo();  
   function mostrarTextArea (){
     if($('#estado').val() == 10){
       
@@ -623,8 +624,6 @@ document.addEventListener('DOMContentLoaded', function() {
         botonGuardarSolicitar.removeAttribute("disabled");
         botonGuardarModificar.removeAttribute("disabled");
       }
-
-
     }
     // obtener la diferencia en dias entre las dos fechas
     var fecha1 = new Date(fecha_inicio);
@@ -636,6 +635,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function mostrarInfo(){ 
+    console.log("entro");
     // obtengo el id de las vacaciones que desea modificar
     var idSelect = document.getElementById("vacaciones_modificar").value;
 

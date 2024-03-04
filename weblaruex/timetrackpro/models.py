@@ -169,6 +169,7 @@ class EmpleadosMaquinaTimetrackpro(models.Model):
     huellas_registradas = models.IntegerField(db_column='huellas_registradas')
     admin_dispositivo = models.IntegerField(db_column='admin_dispositivo')
     fichar_remoto = models.IntegerField(db_column='fichar_remoto')
+    activo = models.IntegerField(db_column='activo')
 
     class Meta:
         managed = False
@@ -395,7 +396,6 @@ class ErroresRegistroNotificados(models.Model):
     hora_notificacion = models.DateTimeField()
     hora_modificacion_o_rechazo = models.DateTimeField(blank=True, null=True)
 
-
     class Meta:
         managed = False
         db_table = 'errores_registro_notificados'
@@ -602,4 +602,21 @@ class ProblemasDetectadosTimeTrackPro(models.Model):
     class Meta:
         managed = False
         db_table = 'problemas_detectados'
+
+class MonitorizaMensajesTipo(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    mensaje = models.CharField(db_column='MENSAJE', max_length=200)  # Field name made lowercase.
+    descripcion = models.CharField(db_column='DESCRIPCION', max_length=500, blank=True, null=True)  # Field name made lowercase.
+    icono = models.CharField(db_column='ICONO', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    confirmar = models.IntegerField(db_column='CONFIRMAR')  # Field name made lowercase.
+    silenciar = models.IntegerField(db_column='SILENCIAR')  # Field name made lowercase.
+    estado = models.IntegerField(db_column='ESTADO')  # Field name made lowercase.
+    id_area = models.IntegerField(db_column='ID_AREA')  # Field name made lowercase.
+    usuarios_sms = models.CharField(db_column='USUARIOS_SMS', max_length=500, blank=True, null=True)  # Field name made lowercase.
+    tipo_mensaje_enviado = models.CharField(db_column='TIPO_MENSAJE_ENVIADO', max_length=100, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'monitoriza_mensajes_tipo'
+
 
