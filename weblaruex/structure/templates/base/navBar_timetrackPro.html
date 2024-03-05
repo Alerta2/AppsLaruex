@@ -29,7 +29,7 @@
             </li>
             {% if not user.is_authenticated %}
             <li class="nav-item d-flex align-items-center">
-              <a href="/accounts/login/?next={{request.path}}" class="nav-link text-body font-weight-bold px-0">
+              <a href="/accounts/logout/?next={{request.path}}" class="nav-link text-body font-weight-bold px-0">
                 <span class="d-sm-inline d-none">Sign In</span>
               </a>
             </li>
