@@ -18,13 +18,9 @@ from django.urls import reverse
 import calendar
 from django.db.models import Sum
 from django.db.models.functions import ExtractWeek
-import io
-import pytz
-from django.utils import timezone
-from django.core.mail import send_mail
 
-from calendario_guardias.models import MonitorizaApps
-from rare.models import MensajesTelegram
+
+
 
 # ? Configuración de mensajes de 
 iconosAviso ={
@@ -74,92 +70,9 @@ excluidos = ["Prueba", "Pruebas", "prueba", "pruebas", "PRUEBA", "PRUEBAS", "Usu
 # Defino la barra de navegación
 navBar = NavBar.objects.using("timetrackpro").values()
 
-def calcularVacacionesSolicitadas(idUsuario, year):
-    '''
-    La función se encarga de calcular los días de vacaciones solicitados por un usuario en un año concreto.
-    :param idUsuario: Identificador del usuario del que se quieren calcular los días de vacaciones solicitados.
-    :param year: Año en el que se quieren calcular los días de vacaciones solicitados.
-    :return: Número de días de vacaciones solicitados por el usuario en el año concreto.
-    '''
-    vacacionesSolicitadas = 0
-    estadoSolicitado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
-    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoSolicitado).values('dias_consumidos')
-    if vacaciones.exists():
-        for v in vacaciones:
-            vacacionesSolicitadas = vacacionesSolicitadas + v['dias_consumidos']
-    return vacacionesSolicitadas
 
-
-def calcularVacacionesConsumidas(idUsuario, year):
-    '''
-    La función se encarga de calcular los días de vacaciones consumidos por un usuario en un año concreto.
-    :param idUsuario: Identificador del usuario del que se quieren calcular los días de vacaciones solicitados.
-    :param year: Año en el que se quieren calcular los días de vacaciones solicitados.
-    :return: Número de días de vacaciones consumidos por el usuario en el año concreto.
-    '''
-    vacacionesConsumidas = 0
-    estadoAceptado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=11)[0]
-    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoAceptado).values('dias_consumidos')
-    if vacaciones.exists():
-        for v in vacaciones:
-            vacacionesConsumidas = vacacionesConsumidas + v['dias_consumidos']
-    return vacacionesConsumidas
-
-def calcularAsuntosPropiosSolicitados(idUsuario, year):
-    '''
-    Función que se encarga de calcular los días de asuntos propios solicitados por un usuario en un año concreto.
-    :param idUsuario: Identificador del usuario del que se quieren calcular los días de asuntos propios solicitados.
-    :param year: Año en el que se quieren calcular los días de asuntos propios solicitados.
-    :return: Número de días de asuntos propios solicitados por el usuario en el año concreto.
-    '''
-    asuntosSolicitados = 0
-    estadoSolicitado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
-    AsuntosPropiosSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoSolicitado).values('dias_consumidos')
-    
-    if AsuntosPropiosSolicitados.exists():
-        for a in AsuntosPropiosSolicitados:
-            asuntosSolicitados = asuntosSolicitados + a['dias_consumidos']
-    return asuntosSolicitados
-
-def calcularAsuntosPropiosConsumidos(idUsuario, year):
-    # calcular dias de de asuntos propios consumidos
-    '''
-    Función que se encarga de calcular los días de asuntos propios consumidos por un usuario en un año concreto.
-    :param idUsuario: Identificador del usuario del que se quieren calcular los días de asuntos propios consumidos.
-    :param year: Año en el que se quieren calcular los días de asuntos propios consumidos.
-    :return: Número de días de asuntos propios consumidos por el usuario en el año concreto.
-    '''
-    
-    asuntosConsumidos = 0
-    estadoAceptado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=11)[0]
-    AsuntosPropiosAceptados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoAceptado, recuperable=0 ).values('dias_consumidos')
-    
-    if AsuntosPropiosAceptados.exists():
-        for asunto in AsuntosPropiosAceptados:
-            asuntosConsumidos = asuntosConsumidos + asunto['dias_consumidos']
-    
-    return asuntosConsumidos
-
-def calcularAsuntosPropiosRecuperablesConsumidos(idUsuario, year):
-    # calcular dias de de asuntos propios consumidos
-    '''
-    Función que se encarga de calcular los días de asuntos propios consumidos por un usuario en un año concreto.
-    :param idUsuario: Identificador del usuario del que se quieren calcular los días de asuntos propios consumidos.
-    :param year: Año en el que se quieren calcular los días de asuntos propios consumidos.
-    :return: Número de días de asuntos propios consumidos por el usuario en el año concreto.
-    '''
-    
-    asuntosRecuperablesConsumidos = 0
-    estadoAceptado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=11)[0]
-    AsuntosPropiosAceptados = AsuntosPropios.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoAceptado, recuperable=1 ).values('dias_consumidos')
-    
-    if AsuntosPropiosAceptados.exists():
-        for asunto in AsuntosPropiosAceptados:
-            asuntosRecuperablesConsumidos = asuntosRecuperablesConsumidos + asunto['dias_consumidos']
-    
-    return asuntosRecuperablesConsumidos
-
-
+# The above code is defining a function called "home" that takes a parameter called "request".
+# However, the code is incomplete and there are three hash symbols ("
 def home(request):
     """
     The function `home` renders a specific HTML template based on the user's role and provides
@@ -174,17 +87,12 @@ def home(request):
     """
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
-    # calcular cuantos dias de asuntos propios ha consumido durante el año en curso
-    # calcular cuantos dias de vacaciones ha consumido durante el año en curso
-    user = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
-    empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=user)[0]
-    diasPropiosConsumidos = calcularAsuntosPropiosConsumidos(empleado.id_usuario, datetime.now().year)
-    diasPropiosRecuperablesConsumidos = calcularAsuntosPropiosRecuperablesConsumidos(empleado.id_usuario, datetime.now().year)
-    diasPropiosSolicitados = calcularAsuntosPropiosSolicitados(empleado.id_usuario, datetime.now().year)
-    diasPropiosRestantes= settings.DIAS_ASUNTOS_PROPIOS-diasPropiosConsumidos
-    diasVacacionesConsumidos = calcularVacacionesConsumidas(empleado.id_usuario, datetime.now().year)
+    diasPropiosConsumidos = 3
+    diasPropiosRestantes= 6-diasPropiosConsumidos
+    diasPropiosSolicitados = 0
+    diasVacacionesConsumidos = 15
     diasVacacionesRestantes = 30-diasVacacionesConsumidos
-    diasVacacionesSolicitados = calcularVacacionesSolicitadas(empleado.id_usuario, datetime.now().year)
+    diasVacacionesSolicitados = 8
     infoVista = {
         "navBar":navBar,
         "administrador":administrador,
@@ -194,8 +102,6 @@ def home(request):
         "diasVacacionesRestantes":diasVacacionesRestantes,
         "diasPropiosSolicitados":diasPropiosSolicitados,
         "diasVacacionesSolicitados":diasVacacionesSolicitados,
-        "diasPropiosRecuperablesConsumidos":diasPropiosRecuperablesConsumidos,
-        "alerta":alerta
     }
     return render(request,"home.html",infoVista)
     # guardo los datos en un diccionario
@@ -254,28 +160,11 @@ def ups(request, mensaje=None):
         "TimeTrackProTittle":"TimeTrackPro - Ups permiso",
         "mensaje":msg,
         "rutaActual": "Ups"
+
+
     }
 
     return render(request,"ups.html",infoVista)
-
-def correcto(request, mensaje=None):
-    """
-    Vista que se encarga de mostrar la página de "Correcto" cuando un usuario intenta insertar solicitudes con fechas que ya existen en la base de datos.
-    :param request: HttpRequest que representa la solicitud HTTP que se está procesando.
-    :return: HttpResponse que representa la respuesta HTTP resultante.
-    """
-    msg = "Acción realizada correctamente."
-    if mensaje is not None:
-        msg = mensaje
-    # guardo los datos en un diccionario
-    infoVista = {
-        "navBar":navBar,
-        "administrador":esAdministrador(request.user.id),
-        "TimeTrackProTittle":"TimeTrackPro - Correcto",
-        "mensaje":msg,
-        "rutaActual": "Ok"
-    }
-    return render(request,"correcto.html",infoVista)
 
 def habilitaciones(request):     
     """
@@ -764,52 +653,18 @@ def registrosInsertados(request):
     archivos = []
     if administrador or director:
         archivos = RegistrosJornadaInsertados.objects.using("timetrackpro").order_by('year', 'mes').all()
-        infoVista = {
-            "navBar":navBar,
-            "administrador":administrador,
-            "archivos":list(archivos), 
-            "rutaActual": "Registros insertados",
-            "yearActual":datetime.now().year
-        }
-        return render(request,"registros-insertados.html",infoVista)
-    else:
-        return redirect('timetrackpro:sin-permiso')
-
-@login_required
-def registrosRemotosInsertados(request):
-    """
-    The function "registrosInsertados" retrieves and displays inserted records for administrators and
-    directors.    
-    :param request: The request object represents the HTTP request that the server receives from the
-    client. It contains information such as the user making the request, the HTTP method used (GET,
-    POST, etc.), and any data sent with the request
-    :return: a rendered HTML template with the data needed for the view. The data includes the
-    navigation bar, a boolean value indicating if the user is an administrator, a list of inserted
-    records, and the current route.
-    """
-    # guardo los datos en un diccionario
-    administrador = esAdministrador(request.user.id)
-    director = esDirector(request.user.id)
-    yearActual = datetime.now().year
-    # obtengo los datos necesarios para la vista
-    archivos = []
-    if administrador or director:
-        archivos = RegistrosJornadaInsertados.objects.using("timetrackpro").order_by('year', 'mes').all()
-        infoVista = {
-            "navBar":navBar,
-            "administrador":administrador,
-            "archivos":list(archivos), 
-            "yearActual":yearActual,
-            "rutaActual": "Registros insertados desde la aplicación"
-        }
-        return render(request,"registros-remotos-insertados.html",infoVista)
-    else:
-        return redirect('timetrackpro:sin-permiso')
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+        "archivos":list(archivos), 
+        "rutaActual": "Registros insertados"
+    }
+    return render(request,"registros-insertados.html",infoVista)
 
 
 
 @login_required
-def datosRegistrosInsertados(request, seccion=None, year=None, mes=None):
+def datosRegistrosInsertados(request):
     """
     The function "datosRegistrosInsertados" retrieves inserted records from a database and returns them
     as a JSON response.
@@ -821,120 +676,12 @@ def datosRegistrosInsertados(request, seccion=None, year=None, mes=None):
     inserted journal entries and includes the following fields: 'id', 'seccion', 'mes', 'year',
     'fecha_lectura', 'insertador__first_name', 'insertador__last_name', and 'ruta'.
     """
-
-    secciones = {
-        1: "Todos",
-        2: "Alerta2",
-        3: "Departamento",
-        4: "Laboratorios",
-    }
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     registros = []
     if administrador or director:
-        if seccion == 1 or seccion == None or seccion == "1" or seccion == "Todos":
-            if mes == None:
-                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
-            else:
-                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(year=year, mes=nombreMeses[int(mes)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
-        else:
-            if mes == None:
-                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(seccion=secciones[int(seccion)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
-            else:
-                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(seccion=secciones[int(seccion)], year=year, mes=nombreMeses[int(mes)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
+        registros = RegistrosJornadaInsertados.objects.using("timetrackpro").values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
     return JsonResponse(list(registros), safe=False)
-
-
-@login_required
-def datosRegistrosRemotosInsertados(request, remoto=None, year=None, mes=None):
-    """
-    La función "datosRegistrosRemotosInsertados" recupera los registros insertados desde la aplicación
-    y los devuelve como una respuesta JSON.
-    :param request: El objeto "request" representa la solicitud HTTP que el usuario hizo para acceder a
-    la vista. Contiene información como la sesión del usuario, el método HTTP utilizado (GET, POST, etc.)
-    y cualquier dato enviado con la solicitud.
-    :param remoto: El parámetro "remoto" es una cadena que indica si los registros insertados son
-    remotos o no. Si el valor es "remoto", se devuelven los registros insertados desde la aplicación.
-    Si el valor es "local", se devuelven los registros insertados localmente.
-    :return: una respuesta JSON que contiene una lista de diccionarios. Cada diccionario representa un
-    registro de entradas de diario insertadas y contiene los siguientes campos: 'id', 'seccion', 'mes',
-    'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', y 'ruta'.
-    """ 
-    if remoto == "2" or remoto == 2:
-        remoto = None
-
-    if year == None:
-        year = datetime.now().year
-
-    if mes == None:
-        #obtengo el ultimo mes
-        if datetime.now().month == 1:
-            mes = 12
-            year = datetime.now().year - 1
-        else:
-            mes = datetime.now().month - 1
-
-    administrador = esAdministrador(request.user.id)
-    director = esDirector(request.user.id)
-    registros = []
-    if administrador or director:
-        if remoto == None:
-            registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido__isnull=True,hora__year=year, hora__month=mes).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
-        else:
-            registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido__isnull=True, remoto=remoto, hora__year=year, hora__month=mes).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
-    return JsonResponse(list(registros), safe=False)
-
-
-@login_required
-def diasTotalesEmpleados(request, year=None):
-    """
-    La función "diasTotalesEmpleados" comprueba si el usuario es un administrador o un director, y si es
-    así, recupera los datos necesarios para la vista y renderiza la plantilla "relaciones-empleados.html"
-    con los datos. Si el usuario no es un administrador o un director, redirige a la página "sin-permiso".
-    :param request: El objeto "request" representa la solicitud HTTP que el usuario hizo para acceder a
-    la vista. Contiene información como la sesión del usuario, el método HTTP utilizado (GET, POST, etc.)
-    y cualquier dato enviado con la solicitud.
-    :return: una plantilla HTML renderizada con los datos necesarios para la vista. Los datos incluyen la
-    barra de navegación, un valor booleano que indica si el usuario es un administrador, una lista de
-    registros insertados y la ruta actual.
-    """
-
-    administrador = esAdministrador(request.user.id)
-    director = esDirector(request.user.id)
-    if administrador or director:
-        if year == None:
-            year = datetime.now().year
-        infoVista = {
-            "navBar":navBar,
-            "administrador":administrador,
-            "rutaActual": "Dias totales solicitados por los empleados",
-            "year":year
-        }
-        return render(request,"dias-totales-empleados.html",infoVista)
-    else:
-        return redirect('timetrackpro:sin-permiso')
-
-
-@login_required
-def datosDiasTotalesEmpleados(request, year=None):
-    administrador = esAdministrador(request.user.id)
-    director = esDirector(request.user.id)
-    diasTotalesEmpleados = []
-    if year == None:
-        year = datetime.now().year
-    
-    if administrador or director:
-        
-        empleados = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(fecha_baja_app__isnull = True).values('id', 'nombre', 'apellidos', 'fecha_baja_app')
-        for e in empleados:
-            vacaciones = calcularVacacionesConsumidas(e['id'], year)
-            asuntosPropios = calcularAsuntosPropiosConsumidos(e['id'],year)
-            asuntosPropiosRecuperables = calcularAsuntosPropiosRecuperablesConsumidos(e['id'],year)
-            ausencias = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=e['id'], year=year).count()
-            diasTotalesEmpleados.append({"empleado": e, "vacaciones": vacaciones, "asuntosPropios":asuntosPropios, "asuntosPropiosRecuperables":asuntosPropiosRecuperables, "ausencias":ausencias, "activo":e['fecha_baja_app']})
-
-
-    return JsonResponse(list(diasTotalesEmpleados), safe=False)
 
 
 
@@ -950,6 +697,7 @@ def relacionesEmpleados(request):
     :return: una plantilla HTML renderizada con los datos necesarios para la vista. Los datos incluyen la
     barra de navegación, un valor booleano que indica si el usuario es un administrador, una lista de
     registros insertados y la ruta actual.
+
     """
 
     administrador = esAdministrador(request.user.id)
@@ -989,16 +737,13 @@ def obtenerRegistroEmpleados(request):
     """
 
     administrador = esAdministrador(request.user.id)
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(activo=1).values()
-    exEmpleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(activo=0).exclude(id__in=[100,101]).values()
-
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
     
     infoVista = {
         "navBar":navBar,
         "administrador":administrador,
         "empleados":list(empleados),
-        "exEmpleados":list(exEmpleados),
         "rutaActual": "Informe de asistencia empleados",
     }
     return render(request,"informe-registro-usuario.html",infoVista)
@@ -1016,8 +761,9 @@ def obtenerRegistroSemanalEmpleados(request):
     """
 
     administrador = esAdministrador(request.user.id)
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values()
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
+    
     infoVista = {
         "navBar":navBar,
         "administrador":administrador,
@@ -1025,33 +771,6 @@ def obtenerRegistroSemanalEmpleados(request):
         "rutaActual": "Informe de asistencia empleados",
     }
     return render(request,"informe-registro-semanal-usuario.html",infoVista)
-
-@login_required
-def fichar(request):
-    empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    
-    if request.method == 'POST':
-        # obtener hora actual, hora utc    
-        zona_horaria_espana = pytz.timezone('Europe/Madrid')
-        hora = datetime.now(zona_horaria_espana).strftime("%Y-%m-%d %H:%M:%S")
-        registro = RegistrosTimetrackpro(id_empleado=empleado.id_empleado, nombre_empleado=empleado.id_empleado.nombre, hora=hora, remoto=1)
-        registro.save(using='timetrackpro')
-        alerta["activa"] = True
-        alerta["tipo"] = "success"
-        alerta["mensaje"] = "Fichaje realizado correctamente."
-        alerta["icono"] = iconosAviso["success"]
-
-        return redirect('timetrackpro:correcto', mensaje='Has fichado correctamente.')
-
-    infoVista = {
-        "navBar":navBar,
-        "rutaActual": "Fichar",
-        "alerta": alerta,
-    }
-    return render(request,"fichar.html",infoVista)
-
-    
-
 
 @login_required
 def datosRegistroEmpleados(request):
@@ -1092,7 +811,7 @@ def datosRegistroEmpleados(request):
         if request.GET.get("listEmpleados") != None:
             usuarios = request.GET.get("listEmpleados").split("_")
         else: 
-            usuarios = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values_list('id', flat=True)
+            usuarios = EmpleadosMaquina.objects.using("timetrackpro").values_list('id', flat=True)
     else:
         usuario = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         usuarios.append(usuario.id_empleado.id)
@@ -1143,7 +862,7 @@ def datosRegistroSemanalEmpleados(request):
         if request.GET.get("listEmpleados") != None:
             usuarios = request.GET.get("listEmpleados").split("_")
         else: 
-            usuarios = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values_list('id', flat=True)
+            usuarios = EmpleadosMaquina.objects.using("timetrackpro").values_list('id', flat=True)
     else:
         usuario = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         usuarios.append(usuario.id_empleado.id)            
@@ -1167,7 +886,7 @@ def comprobarJornadaEmpleado(idUsuario,fechaInicio, fechaFin=None):
         fechaFin = fechaInicio
     jornadaLaboral = 37.5
     # compruebo si el usuario tiene una jornada definida
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idUsuario)[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=idUsuario)[0]
     # comprubo si existe una jornada para el empleado donde la fecha de inicio sea mayor o igual que la fechaInicio y la fecha de fin sea null
     if RelJornadaEmpleados.objects.using("timetrackpro").order_by('-id').filter(id_empleado=empleado, fecha_inicio__lte=fechaInicio, fecha_fin__isnull=True).exists():
         jornada = RelJornadaEmpleados.objects.using("timetrackpro").order_by('id').filter(id_empleado=empleado, fecha_inicio__lte=fechaInicio, fecha_fin__isnull=True)[0]
@@ -1196,7 +915,7 @@ def comprobarPermisosEmpleado(idUsuario, fechaInicio, fechaFin=None):
     """
     if fechaFin is None:
         fechaFin = fechaInicio    
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idUsuario)[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=idUsuario)[0]
     estadosAceptadosPermisos = [18,20,21]
     diasPermisos = 0;
     diasAsuntosPropios = 0;
@@ -1237,57 +956,25 @@ def comprobarFestivos(fechaInicio, fechaFin=None):
         if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio=fechaInicio).exists():
             festivos = 1
     else:
-        if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin).exists():  
+        if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio).exists():        
             # cuento los dias de festivos restando la fecha fin a la fecha inicio
-            # obtengo todos los festivos que hay entre la fecha de inicio y la fecha de fin
-
             festivo = FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio)[0]
-
-            if  festivo.fecha_fin <= fechaFin:
-                
+            if festivo.fecha_fin <= fechaFin:
                 festivos = (festivo.fecha_fin - festivo.fecha_inicio).days + 1
             else:
                 festivos = (fechaFin - festivo.fecha_inicio).days + 1
 
     if festivos < 0:
         festivos = 0
-
     return festivos
-
-def comprobarFestivosSemanas(fechaInicio, fechaFin=None):
-    # si la fechaFin no existe le asigno la fechaInicio
-    if fechaFin is None:
-        fechaFin = fechaInicio
-    festivos = 0
-    # compruebo si hay algún festivo entre las dos fechas 
-    if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin).exists():
-        festivo = FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin)[0]
-        # obtener diferencia dias entre las fechas
-        # si la fecha de inicio es distinta de la fecha fin
-        fInicio = date(festivo.fecha_inicio.year, festivo.fecha_inicio.month, festivo.fecha_inicio.day)
-        fFin = date(festivo.fecha_fin.year, festivo.fecha_fin.month, festivo.fecha_fin.day)
-        # comparo las fechas de inicio y fin
-        
-        if fFin != fInicio:
-            # obtengo la diferencia de dias entre la fecha de inicio y la fecha de fin
-            # me quedo unicamente con los dias de la fecha de inicio y la fecha de fin y los resto
-            dias = (fFin - fInicio).days + 1
-        else:
-            dias = 1
-        festivos = festivos + dias  
-    return festivos
-
 
 def pruebas(request):
-    empleados = []
-    idEmpleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=1)[0]
-    empleados.append(idEmpleado.id)
-    fechaInicio = date(2023, 10, 1)
-    fechaFin =  date(2023, 10, 31)
-    calcularHorasSemanales(empleados, fechaInicio, fechaFin)
-        # Devuelve una respuesta HTTP adecuada, por ejemplo:
-    #festivos = comprobarFestivos(fechaInicio, fechaFin)
-    return HttpResponse("festivos: " + str(festivos))
+    idEmpleado = Empleados.objects.using("timetrackpro").filter(id=9)[0]
+    fechaInicio = date(2023, 5, 15)
+    fechaFin =  date(2023, 5, 21)
+    # Devuelve una respuesta HTTP adecuada, por ejemplo:
+    festivos = comprobarFestivos(fechaInicio, fechaFin)
+    return HttpResponse(festivos)
     #return jornada
 
 def calcularHoras(usuarios, fechaInicio, fechaFin):
@@ -1310,18 +997,17 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
     # sumo un dia a la fecha fin
     fechaFin = fechaFin + timedelta(days=1)
 
-    registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).order_by("hora").all()
-    # for registro in registros:
-    #     print(registro.id_empleado.id, registro.hora)
+    registros = Registros.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
     # agrupo los registros por semana 
     
     for e in usuarios:
-        dias = registros.filter(id_empleado__id=e).order_by("id_empleado", 'hora').values_list('hora__date').distinct()
+        dias = registros.filter(id_empleado__id=e).values('hora__date').distinct()
         empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e)[0]
-        dias = list(set(dias))
+
         for d in dias:
+            print("calculo para empleado", empleado.id_usuario.nombre, empleado.id_usuario.apellidos, "dia: ", d["hora__date"])
             # obtener la jornada del empleado
-            jornada = comprobarJornadaEmpleado(empleado.id_usuario.id, d[0])
+            jornada = comprobarJornadaEmpleado(empleado.id_usuario.id, d["hora__date"])
             if isinstance(jornada, float):
                 jornadaLaboral = jornada
             elif isinstance(jornada, dict) and 'get' in jornada:
@@ -1329,13 +1015,11 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
             else:
                 jornadaLaboral=jornada
 
-            dia_siguiente = d[0]+timedelta(days=1)
-            # hacer que registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d["hora__date"],dia_siguiente)).all() esté ordenado por hora
-
-            registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d[0],dia_siguiente)).all()
+            dia_siguiente = d["hora__date"]+timedelta(days=1)
+            registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d["hora__date"],dia_siguiente)).all()
             # aquí podríamos comprobar cuando el usuario no tienen ningun registro ese día si tiene alguna justificacion para ajustar
-            permisos, asuntosPropios, vacaciones, diasPermisos, diasAsuntosPropios, diasVacaciones = comprobarPermisosEmpleado(empleado.id_usuario.id, d[0])
-            festivo = comprobarFestivos(d[0])
+            permisos, asuntosPropios, vacaciones, diasPermisos, diasAsuntosPropios, diasVacaciones = comprobarPermisosEmpleado(empleado.id_usuario.id, d["hora__date"])
+            festivo = comprobarFestivos(d["hora__date"])
             if len(registrosDiaEmpleado)%2 == 0:
                 horas = 0
                 tramo = 0
@@ -1348,10 +1032,10 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
                         horas = horas + (r.hora - auxHoras).total_seconds()/3600
                         tramo = 0
                 # comprobar justificaciones para ajustar las horas del dia
-                informe.append({"empleado": e, "dia": d[0], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivo": festivo})
+                informe.append({"empleado": e, "dia": d["hora__date"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": len(registrosDiaEmpleado), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivo": festivo})
             else:
                 fichajesHechos = registrosDiaEmpleado.values_list('hora__time', flat=True)
-                informe.append({"empleado": e, "dia": d[0], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivo": festivo})
+                informe.append({"empleado": e, "dia": d["hora__date"], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivo": festivo})
     return informe
 
 def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
@@ -1373,18 +1057,17 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
     informe = []
     # sumo un dia a la fecha fin
     fechaFin = fechaFin + timedelta(days=1)
-    registros = RegistrosTimetrackpro.objects.using("timetrackpro").order_by("hora").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
+    registros = Registros.objects.using("timetrackpro").filter(id_empleado__id__in=usuarios, hora__range=(fechaInicio, fechaFin)).all()
+    
     for e in usuarios:
-        semanas = registros.filter(id_empleado__id=e).annotate(semana=ExtractWeek('hora')).values_list('semana').distinct()
+        semanas = registros.filter(id_empleado__id=e).annotate(semana=ExtractWeek('hora')).values('semana').distinct()
         empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=e)[0]
-        semanas = list(set(semanas))
         #obtengo las horas por dias y las agrupo por semana.
         for s in semanas:
-            dias = registros.filter(id_empleado__id=e, hora__week=s[0]).values_list('hora__date').distinct()
-            dias = list(set(dias))
-            year = dias[0][0].year
+            dias = registros.filter(id_empleado__id=e, hora__week=s["semana"]).values('hora__date').distinct()
+            year = dias[0]["hora__date"].year
             # obtengo todos los dias de esa semana 
-            inicioSemana, finSemana = obtenerFechaSemana(year, s[0])    
+            inicioSemana, finSemana = obtenerFechaSemana(year, s["semana"])            
             horas = 0
             diasErrores = []
             diasFichados = 0
@@ -1396,13 +1079,12 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
             else:
                 jornadaLaboral=jornada
             permisos, asuntosPropios, vacaciones, diasPermisos, diasAsuntosPropios, diasVacaciones = comprobarPermisosEmpleado(empleado.id_usuario.id, inicioSemana, finSemana)
-            #festivos = comprobarFestivos(inicioSemana, finSemana)
-            festivos = comprobarFestivosSemanas(inicioSemana, finSemana)
+            festivos = comprobarFestivos(inicioSemana, finSemana)
         
             for d in dias:
                 # comprubeo si el dia tiene un numero par de registros
-                dia_siguiente = d[0]+timedelta(days=1)
-                registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d[0],dia_siguiente)).all()
+                dia_siguiente = d["hora__date"]+timedelta(days=1)
+                registrosDiaEmpleado = registros.filter(id_empleado__id=e, hora__range=(d["hora__date"],dia_siguiente)).all()
 
                 if len(registrosDiaEmpleado)%2 == 0:
                     tramo = 0
@@ -1416,12 +1098,12 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
                             tramo = 0
                     diasFichados = diasFichados + 1
                 else:
-                    diasErrores.append(d[0])
+                    diasErrores.append(d["hora__date"])
             # si hay dias con errores, los añado al informe
             if len(diasErrores) > 0:                
-                informe.append({"empleado": e, "semana": s[0], "horas": horas, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": diasFichados, "diasErrores": diasErrores, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
+                informe.append({"empleado": e, "semana": s["semana"], "horas": horas, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": diasFichados, "diasErrores": diasErrores, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
             else:
-                informe.append({"empleado": e, "semana": s[0], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": diasFichados, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
+                informe.append({"empleado": e, "semana": s["semana"], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": diasFichados, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
     return informe
 
 
@@ -1494,43 +1176,18 @@ def verRegistro(request, id):
     director = esDirector(request.user.id)
     registro = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=id)[0]
     maquina = MaquinaControlAsistencia.objects.using("timetrackpro").filter(nombre__icontains=registro.seccion)[0]
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values()
 
     ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_NUEVO + registro.ruta
     ruta_leido = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + registro.ruta
     IdEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
 
-
-    '''
-    <url> - url de la aplicacion
-    <mes> - mes del fichero de registro
-    <year> - año del fichero de registro
-    <seccion> - seccion del fichero de registro
-    '''
-
-    '''
-    ASUNTO 
-    Nuevo fichero de registro de jornada insertado.       
-
-    MENSAJE PARA EL DESTINATARIO
-
-    Se ha insertado un nuevo fichero de registro de jornada en la aplicación.
-    Los datos del fichero son los siguientes:
-    - Mes y año: <mes> de <year>
-    - Sección: <seccion>
-    Puede consultar más información en el siguiente enlace.
-    <url>
-    '''
-
     if request.method == 'POST' and administrador:
+        print("-- Entro en el post --")
         if not os.path.isfile(ruta):
             return "El archivo no existe"
-        with io.open(ruta, "r", encoding="utf-8") as archivo:
-            primeraLinea = True
+        with open(ruta, "r") as archivo:
+            archivo.readline()
             for linea in archivo:
-                if primeraLinea:
-                    primeraLinea = False
-                    continue
                 linea = linea.strip()
                 # Comprobar si la línea está vacía
                 if not linea:
@@ -1540,37 +1197,22 @@ def verRegistro(request, id):
                 # Obtener los valores de los campos (reemplaza con los nombres correctos)
                 id_empleado = campos[0].lstrip('0')
                 nombre = campos[1]
-                # reemplazo los espacios por guiones bajos y lo pongo en mayusculas
-                nombre = nombre.replace(" ", "_").upper()
-                empleado = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(nombre=nombre)[0]
+                empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(nombre=nombre)[0]
                 hora = convertirFormatoDateTime(campos[3])
                 # Comprobar si en la base de datos existen registros con el mismo id_archivo_leido
-                if not RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido=id, id_empleado=empleado.id, hora=hora).exists():
+                if not Registros.objects.using("timetrackpro").filter(id_archivo_leido=id, id_empleado=empleado.id, hora=hora).exists():
                     # Si no existe, crea un nuevo registro en la base de datos
-                    nuevoRegistro = RegistrosTimetrackpro(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
+                    nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
                     nuevoRegistro.save()
         # Mover el archivo a la nueva ruta después de procesarlo
         shutil.move(ruta, ruta_leido)
-        url = 'http://alerta2.es/private/timetrackpro/registros-insertados'
 
-        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=49)[0]
-        subject = mensajeTipoDestinatario.mensaje.replace('\n', '').replace('\r', '')
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<mes>", registro.mes).replace("<year>", str(registro.year)).replace("<url>", url).replace("<seccion>", registro.seccion)
-
-        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
-        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
-
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
-        enviarTelegram(subject, mensajeDestinatario)
-
-
-    if RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido=registro.id, id_empleado=IdEmpleado.id).exists() or administrador or director:
+    if Registros.objects.using("timetrackpro").filter(id_archivo_leido=registro.id, id_empleado=IdEmpleado.id).exists() or administrador or director:
         infoVista = {
             "navBar":navBar,
             "administrador":administrador,
             "registro":registro,
             "rutaActual":"Registros insertados" + " / " + str(registro.seccion) + " / " + str(registro.mes) + " / " + str(registro.year),
-            "empleados":empleados,
         }
         return render(request,"verRegistro.html",infoVista)
     else:
@@ -1615,6 +1257,7 @@ def actualizarRegistro(request, id):
         ruta_leido = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + registro.ruta
 
         if request.method == 'POST':
+            print("-- Entro en el post --")
             if not os.path.isfile(ruta):
                 return "El archivo no existe"
             with open(ruta, "r") as archivo:
@@ -1628,26 +1271,26 @@ def actualizarRegistro(request, id):
                     campos = linea.split('\t')
                     # Obtener los valores de los campos (reemplaza con los nombres correctos)
                     id_empleado = campos[0].lstrip('0')
-                    empleado = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=id_empleado)[0]
+                    empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=id_empleado)[0]
                     nombre = campos[1]
                     hora = convertirFormatoDateTime(campos[3])
                     # Comprobar si en la base de datos existen registros con el mismo id_archivo_leido
-                    if RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido=id).exists():
-                        registrosYaInsertados = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido=id).values()
+                    if Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).exists():
+                        registrosYaInsertados = Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).values()
                         for r in registrosYaInsertados:
                             if r["id_empleado"] == empleado.id and r["hora"] == hora:
                                 continue
                             else:
                                 # Si no existe, crea un nuevo registro en la base de datos
-                                nuevoRegistro = RegistrosTimetrackpro(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
+                                nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
                                 nuevoRegistro.save()
                     else:
                         # Si no existe, crea un nuevo registro en la base de datos
-                        nuevoRegistro = RegistrosTimetrackpro(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
+                        nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=0, id_archivo_leido=registro)
                         nuevoRegistro.save()
             # Mover el archivo a la nueva ruta después de procesarlo
             shutil.move(ruta, ruta_leido)
-        registrosInsertados = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido=registro.id).values()
+        registrosInsertados = Registros.objects.using("timetrackpro").filter(id_archivo_leido=registro.id).values()
 
         # guardo los datos en un diccionario
         infoVista = {
@@ -1659,7 +1302,7 @@ def actualizarRegistro(request, id):
         return render(request,"verRegistro.html",infoVista)
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para actualizar el registro seleccionado.")
-
+    
 @login_required
 def datosRegistro(request, id):
     """
@@ -1680,9 +1323,9 @@ def datosRegistro(request, id):
     registros = []
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id).values('id_empleado__id')
     if administrador or director:
-        registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido=id).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
+        registros = Registros.objects.using("timetrackpro").filter(id_archivo_leido=id).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
     else:
-        registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido=id, id_empleado__id__in=empleado).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
+        registros = Registros.objects.using("timetrackpro").filter(id_archivo_leido=id, id_empleado__id__in=empleado).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
     return JsonResponse(list(registros), safe=False)
 
 @login_required
@@ -1705,8 +1348,8 @@ def verLineaRegistro(request, id):
     director = esDirector(request.user.id)
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id).values('id_empleado__id')
 
-    if RegistrosTimetrackpro.objects.using("timetrackpro").filter(id=id, id_empleado__id__in=empleado).exists() or administrador or director:     
-        registro = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+    if Registros.objects.using("timetrackpro").filter(id=id, id_empleado__id__in=empleado).exists() or administrador or director:     
+        registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
    
         rutaActual = "Registro " + registro.nombre_empleado +" / " + registro.hora.strftime("%d de %m de %Y") + " / " + registro.hora.strftime("%H:%M:%S") 
         rutaPrevia = "Registros insertados"
@@ -1741,17 +1384,18 @@ def agregarLineaRegistro(request):
     if administrador and request.method == 'POST':
             registro = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=request.POST.get("registro"))[0]
             maquina = MaquinaControlAsistencia.objects.using("timetrackpro").filter(nombre__icontains=registro.seccion)[0]
-            empleado = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=request.POST.get("empleado"))[0]
+            empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=request.POST.get("empleado"))[0]
             nombre = empleado.nombre
             hora = request.POST.get("hora_registro")
             remoto = 0
             modificado = 1
             id_archivo_leido = registro
-            nuevoRegistro = RegistrosTimetrackpro(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=remoto, modificado=modificado, id_archivo_leido=id_archivo_leido)
+            nuevoRegistro = Registros(id_empleado=empleado, nombre_empleado=nombre, hora=hora, maquina=maquina, remoto=remoto, modificado=modificado, id_archivo_leido=id_archivo_leido)
             nuevoRegistro.save(using='timetrackpro')
             return redirect('timetrackpro:ver-registro', id=registro.id)
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para agregar un registro.")
+
 
 
 @login_required
@@ -1770,7 +1414,7 @@ def editarLineaRegistro(request, id):
     """
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
-        registro = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+        registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
 
         registro.hora = request.POST.get("hora")
         registro.modificado = 1
@@ -1783,38 +1427,6 @@ def editarLineaRegistro(request, id):
         return redirect('timetrackpro:ver-linea-registro', id=id)
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para editar el registro seleccionado.")
-
-@login_required
-def eliminarArchivoRegistro(request, id):
-    """
-    la función `eliminarArchivoRegistro` elimina un archivo de la base de datos y guarda el registro
-    eliminado en otra tabla.
-    :param request: El objeto `request` es un objeto que representa la solicitud HTTP realizada por el
-    cliente. Contiene información como el usuario que realiza la solicitud, el método utilizado (GET o
-    POST) y cualquier dato enviado con la solicitud
-    :param id: El parámetro `id` es el identificador del registro que necesita ser eliminado de la base
-    de datos
-    :return: una redirección a la vista 'timetrackpro:registros-insertados' si el usuario tiene
-    permisos de administrador, de lo contrario, una redirección a la vista 'timetrackpro:ups' con el
-    parámetro 'mensaje' establecido en "No tienes permiso para eliminar el registro seleccionado."
-    """
-
-    administrador = esAdministrador(request.user.id)
-    if administrador:
-        archivoModificado = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=id)[0]
-        registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido=archivoModificado)
-        # eliminar el fichero de la carpeta de registros insertados
-        ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + archivoModificado.ruta
-        if os.path.isfile(ruta):
-            os.remove(ruta)
-        for r in registros:
-            r.delete(using='timetrackpro')
-        archivoModificado.delete(using='timetrackpro')
-        
-        return redirect('timetrackpro:registros-insertados')
-    else:
-        return redirect('timetrackpro:ups', mensaje="No tienes permiso para eliminar el registro seleccionado.")
-
 
 @login_required
 def eliminarLineaRegistro(request, id):
@@ -1831,39 +1443,29 @@ def eliminarLineaRegistro(request, id):
     the id of the 'archivoModificado' object, or a redirect to the 'timetrackpro:ups' view with the
     'mensaje' parameter set to "No tienes permiso para eliminar el registro seleccionado."
     """
+    registro = Registros.objects.using("timetrackpro").filter(id=id)[0]
+    archivoModificado = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=registro.id_archivo_leido.id)[0]
     administrador = esAdministrador(request.user.id)
     if request.method == 'POST' and administrador:
-        registro = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
         idRegistroEliminado = registro.id
         idEmpleado = registro.id_empleado
         nombreEmpleado = registro.nombre_empleado
         hora = registro.hora
         maquina = registro.maquina
         remoto = registro.remoto
-            
-        if registro.id_archivo_leido != None:
-            idArchivoLeido = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=registro.id_archivo_leido.id)[0]
-        else:
-            idArchivoLeido = None
+        idArchivoLeido = archivoModificado
         fechaEliminacion = datetime.now()
         motivo = request.POST.get("motivoEliminacion")
         registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=int(request.POST.get("registradorEliminacion")))[0]
 
-        
-
-        # agrego el registro eliminado a la tabla de registros eliminados
         nuevoRegistroEliminado = RegistrosEliminados(id_registro_eliminado=idRegistroEliminado, id_empleado=idEmpleado, nombre_empleado=nombreEmpleado, hora=hora, maquina=maquina, remoto=remoto, id_archivo_leido=idArchivoLeido, fecha_eliminacion=fechaEliminacion, motivo=motivo, eliminado_por=registrador)
+
         nuevoRegistroEliminado.save(using='timetrackpro')
-        # elimino el registro de la tabla de registros
         registro.delete(using='timetrackpro')
 
-        
 
-        if idArchivoLeido == None:
-            return redirect('timetrackpro:registros-remotos-insertados')
         # guardo los datos en un diccionario
-        else:
-            return redirect('timetrackpro:ver-registro', id=idArchivoLeido.id)
+        return redirect('timetrackpro:ver-registro', id=archivoModificado.id)
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para eliminar el registro seleccionado.")
 
@@ -1923,10 +1525,9 @@ def verErroresNotificados(request, id=None):
     "id" parameter is not provided, the function will retrieve all errors
     :return: a rendered HTML template with the context data "infoVista".
     """
-    administrador = esAdministrador(request.user.id)
     infoVista = {
         "navBar":navBar,
-        "administrador":administrador,
+        "administrador":esAdministrador(request.user.id),
         "rutaActual": "Errores al fichar notificados",
     }
     return render(request,"errores-registrados.html",infoVista)
@@ -1965,10 +1566,10 @@ def datosErroresNotificadosPendientes(request):
     director = esDirector(request.user.id)
     errores = []
     if administrador or director:
-        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(estado=estadosErrores['Pendiente']).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado', 'id_empleado__id', 'id_empleado__nombre') 
+        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(estado=estadosErrores['Pendiente']).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre') 
     else:
         idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=idEmpleado, estado=estadosErrores['Pendiente']).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado', 'id_empleado__id', 'id_empleado__nombre')
+        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=idEmpleado, estado=estadosErrores['Pendiente']).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre')
 
     # obtengo los festivos registrados en la base de datos
 
@@ -1986,7 +1587,8 @@ def notificarErrorEnFichaje(request):
     :return: a redirect to the 'timetrackpro:ver-errores-notificados' view with the parameter
     'id=idEmpleadoMaquina'.
     """
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(activo=1).values('id', 'nombre')
+    
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
     administrador = esAdministrador(request.user.id)
     empleadoActual = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
     
@@ -1999,82 +1601,22 @@ def notificarErrorEnFichaje(request):
         "rutaActual": "Notificar error en fichaje",
     }
     if request.method == 'POST':
-        idEmpleadoMaquina = request.POST.get("empleado_maquina")
+        idEmpleadoMaquina = request.POST.get("idEmpleadoMaquina")
 
-        empleado = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleadoMaquina)[0]
+        empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=idEmpleadoMaquina)[0]
 
-
-        idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=empleado.id)[0]
-
-
-        solicitante = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleado.id_usuario.id)[0]
-
+        idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=empleado)[0]
         motivo = request.POST.get("motivoError")
         estado = 1 # indico que aún esta pendiente de revisar
         hora = request.POST.get("hora")
-        registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
+        if idEmpleado in request.POST:
+            registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.POST.get("idEmpleado"))[0]
+        else:
+            registrador = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
         horaNotificacion = datetime.now()
 
-        '''
-        <nombreSolicitante> - nombre del usuario que solicita el cambio
-        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
-        <url> - url de la aplicacion
-        <fechaRegistro> - fecha de registro del problema
-        <fechaIncidencia> - fecha en la que se produjo el problema
-        <motivo> - motivo del problema
-        '''
-
-        '''
-        ASUNTO 
-        Error en el fichaje manual de <nombreSolicitante> <apellidosSolicitante>
-
-        MENSAJE PARA EL REMITENTE
-        Se ha notificado un error en el fichaje manual con fecha <fechaIncidencia>.
-        Puede consultar el estado en el siguiente enlace:
-        <url>        
-
-        MENSAJE PARA EL DESTINATARIO
-
-        <nombreSolicitante> <apellidosSolicitante> ha notificado un error al fichar manualmente.
-        Los detalles del error son los siguientes:
-
-        Empleado: <nombreSolicitante> <apellidosSolicitante>
-        Fecha de notificación: <fechaRegistro>
-        -------------------------   
-        Fecha del error: <fechaIncidencia>
-        Motivo: <motivo>
-        -------------------------
-
-        Puede consultar más información en el siguiente enlace.
-        <url>
-        '''
-
-        url = 'http://alerta2.es/private/timetrackpro/ver-errores-notificados/'
-        fechaNotificacion = horaNotificacion.strftime("%d-%m-%Y a las %H:%M:%S")
-        horaFecha = hora.split("T")[0]
-        fechaIncidencia = horaFecha + " " + hora.split("T")[1]
-
-        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=47)[0]
-        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace('\n', '').replace('\r', '')
-        
-        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", url).replace("<fechaIncidencia>", fechaIncidencia)
-
-        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=48)[0]
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", url).replace("<fechaRegistro>", fechaIncidencia).replace("<fechaIncidencia>", fechaNotificacion).replace("<motivo>", motivo)
-
-        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
-        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
-
-        # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(solicitante.email)
-        mailSolicitante = [correoEmpleado,]
-
-        nuevoErrorRegistrado = ErroresRegistroNotificados(id_empleado=idEmpleado.id_usuario, hora=hora, motivo=motivo, estado=estado, quien_notifica=registrador, hora_notificacion=horaNotificacion)
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
-        enviarTelegram(subject, mensajeDestinatario)
-        
-        #nuevoErrorRegistrado.save(using='timetrackpro')
+        nuevoErrorRegistrado = ErroresRegistroNotificados(id_empleado=idEmpleado, hora=hora, motivo=motivo, estado=estado, quien_notifica=registrador, hora_notificacion=horaNotificacion)
+        nuevoErrorRegistrado.save(using='timetrackpro')
         return redirect('timetrackpro:ver-errores-notificados', id=idEmpleadoMaquina)   
      
     return render(request,"notificar-error-registro.html", infoVista)
@@ -2098,8 +1640,7 @@ def verErrorRegistroNotificado(request, id):
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id).values('id','id_empleado','id_empleado__id','id_empleado__id','id_empleado__nombre','id_empleado__apellidos', 'hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica')[0]
-    empleados = EmpleadosTimetrackpro.objects.using("timetrackpro").values('id', 'nombre', 'apellidos')
+    error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id).values('id','id_empleado','id_empleado__id','id_empleado__id', 'hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica')[0]
     # compruebo si el empleado que ha notificado el error es el mismo que el que lo ha registrado
     if administrador or director or error['id_empleado__id'] == empleado.id_empleado.id:
         # guardo los datos en un diccionario
@@ -2108,7 +1649,6 @@ def verErrorRegistroNotificado(request, id):
             "administrador":administrador,
             "error":error,
             "empleado":empleado,
-            "empleados":empleados,
             "rutaActual": "Error notificado " + str(error['hora'].strftime("%d-%m-%Y")),
             "rutaPrevia": "Errores notificados",
             "urlRutaPrevia": reverse('timetrackpro:ver-errores-notificados')
@@ -2132,7 +1672,7 @@ def modificarEstadoErrorRegistroNotificado(request, id):
     parameter.
     """
     error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id)[0]
-    empleadoMaquina = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=error.id_empleado.id_empleado.id)[0]
+    empleadoMaquina = EmpleadosMaquina.objects.using("timetrackpro").filter(id=error.id_empleado.id_empleado.id)[0]
     administrador = esAdministrador(request.user.id)
     if administrador:
         if request.method == 'POST':
@@ -2148,7 +1688,7 @@ def modificarEstadoErrorRegistroNotificado(request, id):
             if int(estado) == estadosErrores['Aceptado']:
                 # inserto el registro en la tabla de registros
                 motivoModificacion = "Error en el fichaje manual"
-                nuevoRegistro = RegistrosTimetrackpro(id_empleado=empleadoMaquina, nombre_empleado=empleadoMaquina.nombre, hora=error.hora, maquina=None, remoto=0, modificado=1, id_archivo_leido=None, motivo_modificacion=motivoModificacion)
+                nuevoRegistro = Registros(id_empleado=empleadoMaquina, nombre_empleado=empleadoMaquina.nombre, hora=error.hora, maquina=None, remoto=0, modificado=1, id_archivo_leido=None, motivo_modificacion=motivoModificacion)
                 nuevoRegistro.save(using='timetrackpro')
     # guardo los datos en un diccionario
     return redirect('timetrackpro:ver-error-registro-notificado', id=id)
@@ -2173,10 +1713,8 @@ def editarErrorRegistroNotificado(request, id):
         if request.method == 'POST' and administrador:
             error.hora = request.POST.get("hora")
             if request.POST.get("empleadoModificado") != "":
-
-                empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=request.POST.get("empleadoModificado"))[0]
-                error.id_empleado = empleado
-                error.motivo = request.POST.get("nuevoMotivoError")
+                empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=request.POST.get("empleadoModificado"))[0]
+                error.id_empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=empleado)[0]
             error.save(using='timetrackpro')
 
         # guardo los datos en un diccionario
@@ -2195,7 +1733,7 @@ def eliminarErrorRegistroNotificado(request, id):
     :param id: The "id" parameter is the unique identifier of the error to be deleted from the
     "ErroresRegistroNotificados" table in the "timetrackpro" database
     :return: a redirect response. If the user is an administrator, it redirects to the
-    'timetrackpro:ver-errores-notificados' URL. If the user is not an administrator, it redirects to the
+    'timetrackpro:ver-errores-registrados' URL. If the user is not an administrator, it redirects to the
     'timetrackpro:ups' URL with a message indicating that the user does not have permission to delete
     the selected error.
     """
@@ -2204,7 +1742,7 @@ def eliminarErrorRegistroNotificado(request, id):
         error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id)[0]
         error.delete(using='timetrackpro')
         # guardo los datos en un diccionario
-        return redirect('timetrackpro:ver-errores-notificados')
+        return redirect('timetrackpro:ver-errores-registrados')
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para eliminar el error seleccionado.")
 
@@ -2230,10 +1768,10 @@ def datosErroresNotificados(request, id=None):
     if administrador or director:
 
         if id == None:
-            errores = ErroresRegistroNotificados.objects.using("timetrackpro").values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id', 'id_empleado__nombre')
+            errores = ErroresRegistroNotificados.objects.using("timetrackpro").values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre')
 
         else:
-            errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=id).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado', 'id_empleado__id', 'id_empleado__nombre') 
+            errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=id).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre') 
     else:
         idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=idEmpleado).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre')
@@ -2252,7 +1790,7 @@ def insertarRegistroManual(request):
     :return: The code is returning a rendered HTML template with the context data "infoVista".
     """
     administrador = esAdministrador(request.user.id)
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values('id', 'nombre')
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
 
     # guardo los datos en un diccionario
     infoVista = {
@@ -2454,8 +1992,8 @@ def agregarUsuario(request):
                 infoAdicionalEmpleado = request.POST.get("infoAdicional_empleado")
 
             nuevoUsuario = None
-            if not EmpleadosTimetrackpro.objects.using("timetrackpro").filter(dni__icontains=dniEmpleado).exists():
-                nuevoUsuario = EmpleadosTimetrackpro(nombre=nombreEmpleado, apellidos=apellidosEmpleado, puesto=puestoEmpleado, direccion=direccionEmpleado, telefono=telefonoEmpleado, telefono2=telefono2Empleado, email=emailEmpleado, email2=email2Empleado, dni=dniEmpleado, fecha_nacimiento=fechaNacimientoEmpleado, info_adicional=infoAdicionalEmpleado, extension=extensionEmpleado, fecha_alta_app=fechaAltaApp)
+            if not Empleados.objects.using("timetrackpro").filter(dni__icontains=dniEmpleado).exists():
+                nuevoUsuario = Empleados(nombre=nombreEmpleado, apellidos=apellidosEmpleado, puesto=puestoEmpleado, direccion=direccionEmpleado, telefono=telefonoEmpleado, telefono2=telefono2Empleado, email=emailEmpleado, email2=email2Empleado, dni=dniEmpleado, fecha_nacimiento=fechaNacimientoEmpleado, info_adicional=infoAdicionalEmpleado, extension=extensionEmpleado, fecha_alta_app=fechaAltaApp)
                 nuevoUsuario.save(using='timetrackpro')
 
                 if request.FILES['fotoEmpleadoSeleccionado']:
@@ -2466,7 +2004,7 @@ def agregarUsuario(request):
                     nuevoUsuario.img = nombreArchivo
                     nuevoUsuario.save(using='timetrackpro')
             else:
-                nuevoUsuario = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(dni__icontains=dniEmpleado)[0]
+                nuevoUsuario = Empleados.objects.using("timetrackpro").filter(dni__icontains=dniEmpleado)[0]
             return redirect('timetrackpro:ver-empleado', id=nuevoUsuario.id)
         
         else:
@@ -2489,7 +2027,7 @@ def usuariosMaquina(request):
         # obtengo los datos necesarios para la vista
     administrador = esAdministrador(request.user.id)
 
-    usuariosMaquina = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values('id', 'nombre', 'turno', 'horas_maxima_contrato', 'en_practicas', 'maquina_laboratorio', 'maquina_alerta2', 'maquina_departamento')
+    usuariosMaquina = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre', 'turno', 'horas_maxima_contrato', 'en_practicas', 'maquina_laboratorio', 'maquina_alerta2', 'maquina_departamento')
 
     # guardo los datos en un diccionario
     infoVista = {
@@ -2517,7 +2055,7 @@ def datosUsuariosMaquina(request):
     director =  esDirector(request.user.id)
     usersMaquina=[]
     if administrador or director:
-        usersMaquina = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values('id', 'nombre', 'turno', 'horas_maxima_contrato', 'en_practicas', 'maquina_laboratorio', 'maquina_alerta2', 'maquina_departamento')
+        usersMaquina = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre', 'turno', 'horas_maxima_contrato', 'en_practicas', 'maquina_laboratorio', 'maquina_alerta2', 'maquina_departamento')
 
     return JsonResponse(list(usersMaquina), safe=False)
 
@@ -2572,23 +2110,21 @@ def agregarUsuarioMaquina(request):
             else:
                 maquina_laboratorio = 0
             
-            pin = 0 
             if request.POST.get('permite_pin') == "on":
                 pin = 1
 
         
-            esAdmin=0
             if request.POST.get('es_administrador') == "on":
                 esAdmin = 1
 
-            ficharRemoto = 0 
+                
             if request.POST.get('fichar_remoto') == "on":
                 ficharRemoto = 1
             
             numHuellas = request.POST.get('huellas_registradas')
 
-            if not EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=request.POST.get("id_empleado_maquina")).exists():
-                nuevoUser = EmpleadosMaquinaTimetrackpro(id=id, nombre=nombre, turno=turno, horas_maxima_contrato=horas_maxima_contrato, en_practicas=en_practicas, maquina_laboratorio=maquina_laboratorio, maquina_alerta2=maquina_alerta2, maquina_departamento=maquina_departamento, codigo_fichar=pin, admin_dispositivo=esAdmin, huellas_registradas=numHuellas, fichar_remoto=ficharRemoto, activo=1)
+            if not EmpleadosMaquina.objects.using("timetrackpro").filter(id=request.POST.get("id_empleado_maquina")).exists():
+                nuevoUser = EmpleadosMaquina(id=id, nombre=nombre, turno=turno, horas_maxima_contrato=horas_maxima_contrato, en_practicas=en_practicas, maquina_laboratorio=maquina_laboratorio, maquina_alerta2=maquina_alerta2, maquina_departamento=maquina_departamento, permite_pin=pin, es_administrador=esAdmin, huellas_registradas=numHuellas, fichar_remoto=ficharRemoto)
                 nuevoUser.save(using='timetrackpro')
             
 
@@ -2615,7 +2151,7 @@ def verUsuarioMaquina(request, id):
 
     # obtengo los datos necesarios para la vista
     
-    usuarioMaquina = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+    usuarioMaquina = EmpleadosMaquina.objects.using("timetrackpro").filter(id=id)[0]
     relUser = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=usuarioMaquina)[0]
     
     userLogin = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
@@ -2725,7 +2261,7 @@ def verEmpleado(request, id):
     '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
-    usuario = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+    usuario = Empleados.objects.using("timetrackpro").filter(id=id)[0]
     idUser = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
     if administrador or director or idUser.id_usuario.id == usuario.id:
             # obtengo los datos necesarios para la vista
@@ -2747,7 +2283,7 @@ def verEmpleado(request, id):
         if TarjetasAcceso.objects.using("timetrackpro").filter(dni=usuario.dni).exists():
             tarjeta = TarjetasAcceso.objects.using("timetrackpro").filter(dni=usuario.dni)[0]
 
-        empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values('id', 'nombre')
+        empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
         # guardo los datos en un diccionario
         infoVista = {
             "navBar":navBar,
@@ -2786,10 +2322,10 @@ def asociarUsuario(request):
     :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "asociar-empleados.html" con los datos necesarios para la vista    
     '''
-    usuariosApp = EmpleadosTimetrackpro.objects.using("timetrackpro").values()
+    usuariosApp = Empleados.objects.using("timetrackpro").values()
     administrador = esAdministrador(request.user.id)
     # datos de los empleados registrados en las máquinas de control de asistencia
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values()
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
     # datos de los empleados registrados en django
     usuariosDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
 
@@ -2809,11 +2345,11 @@ def asociarUsuario(request):
         if request.method == 'POST':
             # obtenemos el identificador del usuario con la información que hay en la aplicación sobre el usuario, este contiene toda la info relevante del usuario
             idUser = request.POST.get("userApp")
-            usuario = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idUser)[0]
+            usuario = Empleados.objects.using("timetrackpro").filter(id=idUser)[0]
 
             # obtenemos el identificador del empleado, este contiene la información de la máquina de control de asistencia
             idEmpleado = request.POST.get("empleado_maquina")
-            empleado = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleado)[0]
+            empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=idEmpleado)[0]
 
             # obtenemos el identificador del usuario de django
             idUserDjango = request.POST.get("usuariosDjango")
@@ -2870,9 +2406,9 @@ def editarAsociarUsuario(request, id):
     if administrador:
         
         relacionActual = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=id).values('id', 'id_usuario', 'id_usuario__id', 'id_usuario__nombre', 'id_usuario__apellidos','id_empleado', 'id_empleado__id','id_empleado__nombre','id_auth_user', 'id_auth_user__id','id_auth_user__first_name','id_auth_user__last_name', 'id_tarjeta_acceso', 'id_tarjeta_acceso__id', 'id_tarjeta_acceso__nombre', 'id_tarjeta_acceso__apellidos', 'id_tarjeta_acceso__id_tarjeta')[0]
-        usuariosApp = EmpleadosTimetrackpro.objects.using("timetrackpro").values()
+        usuariosApp = Empleados.objects.using("timetrackpro").values()
         # datos de los empleados registrados en las máquinas de control de asistencia
-        empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values()
+        empleados = EmpleadosMaquina.objects.using("timetrackpro").values()
         # datos de los empleados registrados en django
         usuariosDjango = AuthUserTimeTrackPro.objects.using("timetrackpro").exclude(first_name__in=excluidos).exclude(last_name__in=excluidos).exclude(username__in=excluidos).order_by('first_name').values('id', 'first_name', 'last_name', 'is_active')
 
@@ -2894,11 +2430,11 @@ def editarAsociarUsuario(request, id):
 
             # obtenemos el identificador del usuario con la información que hay en la aplicación sobre el usuario, este contiene toda la info relevante del usuario
             idUser = request.POST.get("userApp")
-            usuario = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idUser)[0]
+            usuario = Empleados.objects.using("timetrackpro").filter(id=idUser)[0]
 
             # obtenemos el identificador del empleado, este contiene la información de la máquina de control de asistencia
             idEmpleado = request.POST.get("empleado_maquina")
-            empleado = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleado)[0]
+            empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=idEmpleado)[0]
 
             # obtenemos el identificador del usuario de django
             idUserDjango = request.POST.get("usuariosDjango")
@@ -2940,7 +2476,7 @@ def editarEmpleado(request, id):
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "editar-empleado.html" con los datos necesarios para la vista
     '''
     
-    usuario = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+    usuario = Empleados.objects.using("timetrackpro").filter(id=id)[0]
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=usuario)[0]
     administrador = esAdministrador(request.user.id)
     # guardo los datos en un diccionario
@@ -3190,13 +2726,13 @@ def agregarJornada(request, year=None):
 
             if id_empleado == "0":
                 # obtengo todos los empleados
-                empleados = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(fecha_baja_app__isnull=True).values()
+                empleados = Empleados.objects.using("timetrackpro").filter(fecha_baja_app__isnull=True).values()
                 for e in empleados:
-                    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=e['id'])[0]
+                    empleado = Empleados.objects.using("timetrackpro").filter(id=e['id'])[0]
                     nuevaJornada = RelJornadaEmpleados(id_empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, horas_semanales=horas)
                     nuevaJornada.save(using='timetrackpro')
             else:
-                empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=id_empleado)[0]
+                empleado = Empleados.objects.using("timetrackpro").filter(id=id_empleado)[0]
                 nuevaJornada = RelJornadaEmpleados(id_empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, horas_semanales=horas)
                 nuevaJornada.save(using='timetrackpro')
             
@@ -3282,14 +2818,14 @@ def datosFestivosVacacionesEmpleado(request):
     year = datetime.now().year
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
     estadoAceptado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=11)[0]
-    usuario = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=empleado.id_usuario.id)[0]
+    usuario = Empleados.objects.using("timetrackpro").filter(id=empleado.id_usuario.id)[0]
     # obtengo los festivos registrados en la base de datos
     festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=year).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
     
     if administrador or director:
         vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado','empleado__nombre','empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
     else:
-        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario, year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado','empleado__nombre','empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
+        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(estado=estadoAceptado, empleado=usuario, year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado','empleado__nombre','empleado__apellidos', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
 
     # creo una lista vacía para guardar los datos de los festivos
     salidaFestivos = []
@@ -3331,6 +2867,7 @@ def vacacionesSolicitadas(request):
     mes = str(datetime.now().month)
     year = str(datetime.now().year)
     
+    print (year, type(year))
     if len(mes) == 1:
         mes = "0" + str(mes)
 
@@ -3358,7 +2895,8 @@ def datosVacacionesSolicitadas(request, year=None):
      # obtengo los datos necesarios para la vista
     salida = []
     user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+    print('\033[91m'+'usuario: ' + '\033[92m', empleado)
 
     if administrador or director:
         vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(estado__in=[9,10,11],year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos')
@@ -3378,7 +2916,7 @@ def datosCambioVacacionesSolicitadas(request, year=None):
         year = datetime.now().year
      # obtengo los datos necesarios para la vista
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    usuario = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=empleado.id_usuario.id)[0]
+    usuario = Empleados.objects.using("timetrackpro").filter(id=empleado.id_usuario.id)[0]
     cambiosVacaciones = []
     if administrador or director:
         cambiosVacaciones = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(fecha_inicio_actual__year=year).values('id', 'solicitante', 'solicitante__nombre', 'solicitante__apellidos', 'id_periodo_cambio', 'id_periodo_cambio__tipo_vacaciones', 'id_periodo_cambio__tipo_vacaciones__nombre', 'id_periodo_cambio__tipo_vacaciones__color', 'id_periodo_cambio__tipo_vacaciones__color_calendario', 'fecha_inicio_actual', 'fecha_fin_actual', 'dias_actuales_consumidos', 'fecha_inicio_nueva', 'fecha_fin_nueva', 'dias_nuevos_consumidos', 'motivo_solicitud', 'estado', 'motivo_rechazo', 'fecha_solicitud')
@@ -3401,7 +2939,6 @@ def datosCalendarioVacacionesSolicitadas(request):
     festivos = FestivosTimetrackPro.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
 
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(estado__in=[9,11,12]).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado','empleado__nombre', 'empleado__apellidos','fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
-    print('\033[91m'+'vacaciones: ' + '\033[92m', vacaciones)
     # creo una lista vacía para guardar los datos de los festivos
     salidaFestivos = []
 
@@ -3416,17 +2953,14 @@ def datosCalendarioVacacionesSolicitadas(request):
             'color':festivo['tipo_festividad__color_calendario']
         })
     salidaVacaciones = [] 
-
     for vacacion in vacaciones:
         salidaVacaciones.append({
             'id':vacacion['id'],
             'title':vacacion['empleado__nombre'] + " " +vacacion['empleado__apellidos'],
             'start':vacacion['fecha_inicio'],
-            'end':vacacion['fecha_fin'] + timedelta(days=1),
+            'end':vacacion['fecha_fin'],
             'color':vacacion['tipo_vacaciones__color_calendario']
         })
-    
-    print('\033[91m'+'salidaVacaciones: ' + '\033[92m', salidaVacaciones)
 
     salida = salidaFestivos + salidaVacaciones
     # devuelvo la lista en formato json
@@ -3630,7 +3164,7 @@ def verVacacionesSeleccionadas(request, id):
 
     '''
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'empleado__id','fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos', 'estado__id','estado__nombre','estado')[0]
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=vacaciones["empleado__id"])[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=vacaciones["empleado__id"])[0]
 
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -3662,7 +3196,7 @@ def verVacacionesSeleccionadas(request, id):
     '''
     
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'empleado__id','fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos', 'estado__id','estado__nombre','estado')[0]
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=vacaciones["empleado__id"])[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=vacaciones["empleado__id"])[0]
 
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -3693,7 +3227,7 @@ def verCambioVacacionesSeleccionadas(request, id):
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verCambioVacacionesSeleccionadas.html" con los datos necesarios para la vista
     '''
     vacaciones = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id).values('id','solicitante', 'solicitante__id', 'solicitante__nombre', 'solicitante__apellidos', 'id_periodo_cambio', 'fecha_inicio_actual' , 'fecha_fin_actual', 'dias_actuales_consumidos', 'fecha_inicio_nueva', 'fecha_fin_nueva', 'dias_nuevos_consumidos','motivo_solicitud', 'estado', 'estado__id','motivo_rechazo', 'fecha_solicitud','id_periodo_cambio__tipo_vacaciones__nombre' )[0]
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=vacaciones["solicitante__id"])[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=vacaciones["solicitante__id"])[0]
 
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -3932,14 +3466,14 @@ def solicitarModificarAsuntosPropios(request):
         # obtenemos los datos del empleado
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         idEmpleado = user.id_empleado.id
-        solicitante = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleado)[0]
+        solicitante = Empleados.objects.using("timetrackpro").filter(id=idEmpleado)[0]
         estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=1)[0]
         # obtenemos los datos del formulario
         idAsuntosPropios = request.POST.get("asunto_modificar")
         asuntoPropio = AsuntosPropios.objects.using("timetrackpro").filter(id=idAsuntosPropios)[0]
         estadoPendiente = EstadosSolicitudes.objects.using("timetrackpro").filter(id=17)[0]
         asuntoPropio.estado = estadoPendiente
-        #asuntoPropio.save(using='timetrackpro')
+        asuntoPropio.save(using='timetrackpro')
         fechaInicioActual = request.POST.get("fechaActualInicio")
         fechaFinActual = request.POST.get("fechaActualFin")
         diasConsumidosActual = request.POST.get("dias_actuales_consumidos")
@@ -3948,56 +3482,9 @@ def solicitarModificarAsuntosPropios(request):
         fechaNuevaFin = request.POST.get("fechaFinNueva")
         diasConsumidosNuevos = request.POST.get("dias_nuevos_consumidos")
         motivoCambio = request.POST.get("motivo_cambio")
-
-        '''
-        <nombreSolicitante> - nombre del usuario que solicita el cambio
-        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
-        <url> - url de la aplicacion
-        <fechaInicioActual> - fecha de inicio del periodo actual
-        <fechaFinActual> - fecha de fin del periodo actual
-        <diasConsumidosActual> - dias consumidos en el periodo actual
-        <fechaNuevaInicio> - fecha de inicio del nuevo periodo
-        <fechaNuevaFin> - fecha de fin del nuevo periodo
-        <diasConsumidosNuevos> - dias consumidos en el nuevo periodo
-        '''
-
-        '''
-        ASUNTO 
-        Solicitud de cambio día de asuntos propios <nombreSolicitante> <apellidosSolicitante>.
-        
-        MENSAJE PARA EL REMITENTE
-
-        Su solicitud de cambio de asuntos propios ha sido registrada con éxito.
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>        
-
-        MENSAJE PARA EL DESTINATARIO
-
-        <nombreSolicitante> <apellidosSolicitante> ha solicitado un cambio de asuntos propios cambiado el perido del <fechaInicioActual> al <fechaFinActual> que abarcaba <diasConsumidosActual> día/s por el periodo del <fechaNuevaInicio> al <fechaNuevaFin> que abarca <diasConsumidosNuevos> día/s.
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>
-        '''
-
-        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=35)[0]
-        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace('\n', '').replace('\r', '')
-        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", "http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/").replace("<fechaInicioActual>", fechaInicioActual).replace("<fechaFinActual>", fechaFinActual).replace("<diasConsumidosActual>", diasConsumidosActual).replace("<fechaNuevaInicio>", fechaNuevaInicio).replace("<fechaNuevaFin>", fechaNuevaFin).replace("<diasConsumidosNuevos>", diasConsumidosNuevos)
-
-        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=36)[0]
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", "http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/").replace("<fechaInicioActual>", fechaInicioActual).replace("<fechaFinActual>", fechaFinActual).replace("<diasConsumidosActual>", diasConsumidosActual).replace("<fechaNuevaInicio>", fechaNuevaInicio).replace("<fechaNuevaFin>", fechaNuevaFin).replace("<diasConsumidosNuevos>", diasConsumidosNuevos)
-        
-        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
-        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
-        # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(solicitante.email)
-
-        mailSolicitante = [correoEmpleado,]
-
         solicitudModificacionAsuntosPropios = CambiosAsuntosPropios(id_periodo_cambio=asuntoPropio, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
         solicitudModificacionAsuntosPropios.save(using='timetrackpro')
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
-        enviarTelegram(subject, mensajeDestinatario)
-    return redirect('timetrackpro:solicitar-asuntos-propios')
+    return redirect('timetrackpro:solicitar-vacaciones')
 
 
 def documentacion(request):
@@ -4511,123 +3998,56 @@ def solicitarAsuntosPropios(request, year=None):
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
-    empleados = EmpleadosTimetrackpro.objects.using("timetrackpro").values()
+    empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+    empleados = Empleados.objects.using("timetrackpro").values()
     sustitutos = Sustitutos.objects.using("timetrackpro").values()
     asuntosPropiosEmpleados = []
-    estadoSolicitado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
     diasConsumidos = 0
-    if year is None:
-        year = str(datetime.now().year)
-
     if administrador or director:
-        asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values()
+        if year is None:
+            asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").values()
+        else:
+            asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values()
 
     if not director:
-        asuntos = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado,estado=estadoSolicitado).values()
+        if year is None:
+            asuntos = AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado).values()
+        else:
+            asuntos = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).values()
+        
         for a in asuntos:
             diasConsumidos += a['dias_consumidos']
 
+    if year is None:
+        year = str(datetime.now().year)
     mes = str(datetime.now().month)
     if len(mes) == 1:
         mes = "0" + mes
-    initialDate = str(year) + "-" + mes + "-01"
+    initialDate = year + "-" + mes + "-01"
     if request.method == 'POST':
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
         fechaInicio = request.POST.get("fecha_inicio")
         fechaFin = request.POST.get("fecha_fin")
         diasConsumidos = request.POST.get("dias_consumidos")
         
         recuperable = 0 
-        if request.POST.get("recuperable") == "1":
+        if request.POST.get("recuperable") == 1:
             recuperable = 1
 
         tareasASustituir = None
-        funciones = ""
         if request.POST.get("tareas_a_sustituir") != "":
             tareasASustituir = request.POST.get("tareas_a_sustituir")
-            funciones = tareasASustituir
 
         descripcion = None
         if request.POST.get("descripcion") != "":
             descripcion = request.POST.get("descripcion")
-        print('\033[91m'+'descripcion: ' + '\033[92m', descripcion)
 
         empleadoSustituto = request.POST.get("sustituto")
-
-        if empleadoSustituto != "0" and empleadoSustituto != 0:        
-            sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0]
-            nombreSustituto = sustituto.nombre + " " + sustituto.apellidos 
-    
+        if empleadoSustituto != 0:        
+            sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0] 
         else:
             sustituto = None
-            nombreSustituto = "Ninguno"    
-
-        '''
-        <nombreSolicitante> - nombre del usuario que solicita el cambio
-        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
-        <tipo> - tipo de solicitud asunto propios o asuntos propios recuperables
-        <url> - url de la aplicacion
-        <fechaInicio> - fecha de inicio del periodo actual
-        <fechaFin> - fecha de fin del periodo actual
-        <diasConsumidos> - dias consumidos en el periodo actual
-        <funciones> - funciones a realizar por el sustituto 
-        <sustituto> - nombre del sustituto
-        <recuperacion> - si el asunto propio es recuperable o no    
-        '''
-
-        '''
-        ASUNTO 
-        Solicitud de día de <tipo> <nombreSolicitante> <apellidosSolicitante>.
-        
-        MENSAJE PARA EL REMITENTE
-        Su solicitud de <tipo> ha sido registrada con éxito.
-        Periodo del <fechaInicio> al <fechaFin> que abarcaba <diasConsumidos> día/s.
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>
-        
-
-        MENSAJE PARA EL DESTINATARIO
-        <nombreSolicitante> <apellidosSolicitante> ha solicitado <diasConsumidos> día/s de <tipo> desde <fechaInicio> al <fechaFin>.
-        <recuperacion>.
-        Las funciones a cubir son:
-        <funciones>
-        La persona que asume la sustitución es:
-        <sustituto>
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>
-               
-        '''
-        
-        url = 'http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/'
-        recuperacion = ""
-        tipoAsuntos = "asuntos propios"
-        # correo enviado al usuario
-
-        if recuperable == 1:
-            tipoAsuntos = "asuntos propios recuperables"
-            if descripcion != None:
-                recuperacion = "Las horas se recuperarán de la siguiente manera: " + descripcion
-
-
-        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=37)[0]
-        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<tipo>", tipoAsuntos).replace('\n', '').replace('\r', '')
-        
-        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasConsumidos>", diasConsumidos).replace("<tipo>", tipoAsuntos)
-
-        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=38)[0]
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasConsumidos>", diasConsumidos).replace("<funciones>", funciones).replace("<sustituto>", nombreSustituto).replace("<recuperacion>", recuperacion).replace("<tipo>", tipoAsuntos)
-
-        # adjuntar el enlace a la aplicacion web
-
-
-        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
-        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
-        # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
-
-        mailSolicitante = [correoEmpleado,]
 
         if AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin).exists():
             return redirect('timetrackpro:solicitar-asuntos-propios')
@@ -4637,9 +4057,6 @@ def solicitarAsuntosPropios(request, year=None):
             year = fechaInicio.split("-")[0]
             nuevoAsuntoPropio = AsuntosPropios(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, estado=estado, fecha_solicitud=fechaSolicitud, year=year, recuperable=recuperable, descripcion=descripcion, tareas_a_sustituir=tareasASustituir, sustituto=sustituto)
             nuevoAsuntoPropio.save(using='timetrackpro')
-            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
-            enviarTelegram(subject, mensajeDestinatario)
 
             return redirect('timetrackpro:solicitar-asuntos-propios', year=year)
     infoVista = {
@@ -4670,8 +4087,8 @@ def solicitarPermisosRetribuidos(request, year=None):
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
-    empleados = EmpleadosTimetrackpro.objects.using("timetrackpro").values()
+    empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+    empleados = Empleados.objects.using("timetrackpro").values()
     sustitutos = Sustitutos.objects.using("timetrackpro").values()
     asuntosPropiosEmpleados = []
     permisosSolicitadosEmpleados = []
@@ -4695,11 +4112,8 @@ def solicitarPermisosRetribuidos(request, year=None):
     
     if request.method == 'POST':
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
-        idPermiso = None
-        if "id_permiso" in request.POST:
-            idPermiso = request.POST.get("id_permiso")
-        print('\033[91m'+'idPermiso: ' + '\033[92m', idPermiso)
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
+        idPermiso = request.POST.get("id_permiso")
         codigoPermiso = PermisosRetribuidos.objects.using("timetrackpro").filter(id=idPermiso)[0]
         fechaInicio = request.POST.get("fecha_inicio")
         fechaFin = request.POST.get("fecha_fin")
@@ -4712,67 +4126,8 @@ def solicitarPermisosRetribuidos(request, year=None):
         for p in permisosSolicitados:
             if p['fecha_inicio'] == fechaInicio:
                 return redirect('timetrackpro:ups', mensaje='Ya existe un permiso retribuido para el día ' + fechaInicio + '')
-            
-
-        '''
-        <nombreSolicitante> - nombre del usuario que solicita el cambio
-        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
-        <url> - url de la aplicacion
-        <fechaInicio> - fecha de inicio del periodo actual
-        <fechaFin> - fecha de fin del periodo actual
-        <diasSolicitados> - dias consumidos en el periodo actual
-        <motivo> - motivo de la solicitud
-        '''
-
-        '''
-        ASUNTO 
-        Nueva solicitud de permiso de ausencias <nombreSolicitante> <apellidosSolicitante>.
-
-        MENSAJE PARA EL REMITENTE
-
-        Su solicitud de permisos de ausencias sido registrada con éxito.
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>        
-
-        MENSAJE PARA EL DESTINATARIO
-
-        <nombreSolicitante> <apellidosSolicitante> ha solicitado un nuevo permiso de ausencias.
-        El motivo de la solicitud es
-        <motivo>
-        La duración máxima de la solicitud es de <diasDisponibles>.
-        El perido solicitado abarca <diasSolicitados> día/s comenzando desde el  <fechaInicio> al <fechaFin>.
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>
-        '''
-
-        url = 'http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/'
-        motivo = codigoPermiso.nombre
-        diasDisponibles = "indefinida"
-        if codigoPermiso.dias != None and codigoPermiso.dias != 999:
-            diasDisponibles = str(codigoPermiso.dias)  + " día/s " + codigoPermiso.habiles_o_naturales
-
-        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=43)[0]
-        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace('\n', '').replace('\r', '')
-        
-        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo)
-
-        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=44)[0]
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo).replace("<diasDisponibles>", diasDisponibles)
-        
-        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
-        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
-
-        # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
-
-        mailSolicitante = [correoEmpleado,]
-
         nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso)
-        #nuevoPermiso.save(using='timetrackpro')
-        
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
-        enviarTelegram(subject, mensajeDestinatario)
+        nuevoPermiso.save(using='timetrackpro')
         alerta["activa"] = True
         alerta["icono"] = iconosAviso["success"]
         alerta["tipo"] = "success"
@@ -4810,8 +4165,8 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
     if request.method == 'POST':
         permisos = PermisosYAusenciasSolicitados.objects.using("timetrackpro").values()
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
-        idPermiso = request.POST.get("id_permiso")
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
+        idPermiso = request.POST.get("id_permiso_calendario")
         codigoPermiso = PermisosRetribuidos.objects.using("timetrackpro").filter(id=idPermiso)[0]
         fechaInicio = request.POST.get("fecha_inicio_calendario")
         fechaFin = request.POST.get("fecha_fin_calendario")
@@ -4825,67 +4180,8 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
         for p in permisos:
             if p['fecha_inicio'] == fechaInicio:
                 return redirect('timetrackpro:ups', mensaje='Ya existe un permiso retribuido para el día ' + fechaInicio + '')
-            
-
-        '''
-        <nombreSolicitante> - nombre del usuario que solicita el cambio
-        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
-        <url> - url de la aplicacion
-        <fechaInicio> - fecha de inicio del periodo actual
-        <fechaFin> - fecha de fin del periodo actual
-        <diasSolicitados> - dias consumidos en el periodo actual
-        <motivo> - motivo de la solicitud
-        '''
-
-        '''
-        ASUNTO 
-        Nueva solicitud de permiso de ausencias <nombreSolicitante> <apellidosSolicitante>.
-
-        MENSAJE PARA EL REMITENTE
-
-        Su solicitud de permisos de ausencias sido registrada con éxito.
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>        
-
-        MENSAJE PARA EL DESTINATARIO
-
-        <nombreSolicitante> <apellidosSolicitante> ha solicitado un nuevo permiso de ausencias.
-        El motivo de la solicitud es
-        <motivo>
-        La duración máxima de la solicitud es de <diasDisponibles>.
-        El perido solicitado abarca <diasSolicitados> día/s comenzando desde el  <fechaInicio> al <fechaFin>.
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>
-        '''
-
-        url = 'http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/'
-        motivo = codigoPermiso.nombre
-        diasDisponibles = "indefinida"
-        if codigoPermiso.dias != None and codigoPermiso.dias != 999:
-            diasDisponibles = str(codigoPermiso.dias)  + " día/s " + codigoPermiso.habiles_o_naturales
-
-        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=43)[0]
-        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace('\n', '').replace('\r', '')
-        
-        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo)
-
-        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=44)[0]
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo).replace("<diasDisponibles>", diasDisponibles)
-        
-        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
-        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
-
-        # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
-
-        mailSolicitante = [correoEmpleado,]
-
-
         nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso)
-        #nuevoPermiso.save(using='timetrackpro')
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
-        enviarTelegram(subject, mensajeDestinatario)
+        nuevoPermiso.save(using='timetrackpro')
         alerta["activa"] = True
         alerta["icono"] = iconosAviso["success"]
         alerta["tipo"] = "success"
@@ -4904,7 +4200,7 @@ def datosAsuntosPropiosEmpleados(request, year=None):
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     idUser = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idUser.id_usuario.id)[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=idUser.id_usuario.id)[0]
     diasSolicitados = []
     if year is None:
         year = datetime.now().year
@@ -4926,7 +4222,7 @@ def datosAsuntosPropiosSolicitados(request, year=None):
     :return: un objeto "JsonResponse" que contiene los datos de los asuntos propios solicitados por un empleado en concreto en formato json
     '''
     user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
     diasSolicitados = []
     if year is None:
         year = datetime.now().year
@@ -4961,7 +4257,7 @@ def datosPermisosRetribuidosSolicitados(request, year=None):
     :return: un objeto "JsonResponse" que contiene los datos de los permisos retribuidos de vacaciones solicitados por un empleado en concreto en formato json
     '''
     user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
     permisosSolicitados = []
     if year is None:
         year = datetime.now().year
@@ -4985,14 +4281,12 @@ def verSolicitudPermisosRetribuidos(request, id=None):
 
     if id is not None:
         solicitud = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(id=id)[0]    
-        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=solicitud.empleado.id)[0]
+        empleado = Empleados.objects.using("timetrackpro").filter(id=solicitud.empleado.id)[0]
         diasConsumidos = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=empleado, year=solicitud.year).aggregate(Sum('dias_solicitados'))['dias_solicitados__sum']
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values('id', 'nombre')
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
     sustitutos = Sustitutos.objects.using("timetrackpro").values('id', 'nombre', 'apellidos')
     permisos = PermisosRetribuidos.objects.using("timetrackpro").values('id', 'cod_uex', 'nombre', 'tipo__id', 'tipo__nombre', 'dias', 'habiles_o_naturales', 'solicitud_dias_naturales_antelacion', 'pas', 'pdi')
-    solicitante = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-
-    if solicitud.empleado.id == solicitante.id_usuario.id or director or administrador:
+    if solicitud.empleado.id == request.user.id or director or administrador:
         # guardo los datos en un diccionario
         infoVista = {
             "navBar":navBar,
@@ -5121,31 +4415,6 @@ def descargarSolicitudPermisosRetribuidos(request, id):
     else:
         return JsonResponse({'status': 'error', 'message': 'El archivo no esta disponible, compruebe que la ruta y el archivo tengan la misma extensión'})
 
-
-@login_required
-def descargarFicheroMaquina(request, id):
-    '''
-    La funcion "descargarSolicitudPermisosRetribuidos" permite descargar el justificante de un permiso retribuido en concreto.
-    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
-    :param id: El parametro "id" es el identificador del permiso retribuido del que se desean descargar el justificante
-    :return: un objeto "FileResponse" que contiene el justificante del permiso retribuido en concreto
-    '''
-
-    fichero = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(id=id)[0]
-        
-    administrador = esAdministrador(request.user.id)
-    direccion = esDirector(request.user.id)
-
-    ruta = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + fichero.ruta
-
-    # compruebo si la ruta devuelve algo 
-    if os.path.exists(ruta) and (administrador or direccion):
-        return FileResponse(open(ruta, 'rb'))
-    else:
-        return JsonResponse({'status': 'error', 'message': 'El archivo no esta disponible, compruebe que la ruta y el archivo tengan la misma extensión'})
-
-
-
 @login_required
 def actualizarJustificanteSolicitudPermisosRetribuidos(request, id):
     '''
@@ -5207,17 +4476,6 @@ def modificarSolicitudPermisoRetribuido(request):
         return redirect('timetrackpro:sin-permiso')
     
 
-def convertirAMail(correo):
-    '''
-    La funcion "convertirAMail" permite convertir un correo electronico en un formato valido para enviar un correo electronico.
-    :param correo: El parametro "correo" es el correo electronico que se desean convertir
-    :return: un objeto "str" que contiene el correo electronico convertido
-    '''
-    mail = ""
-    if correo != "":
-        mail = "<" + correo + ">"
-    return mail
-
 @login_required
 def solicitarVacaciones(request):
     '''
@@ -5231,7 +4489,8 @@ def solicitarVacaciones(request):
     # obtengo los datos necesarios para la vista
     
     usuario = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=usuario.id_usuario.id)[0]
+    empleado = Empleados.objects.using("timetrackpro").filter(id=usuario.id_usuario.id)[0]
+    print('\033[91m'+'usuario: ' + '\033[92m', usuario)
     tipoFestivos = TipoFestivos.objects.using("timetrackpro").values()
     # current_url = request.path[1:]
     mes = str(datetime.now().month)
@@ -5246,6 +4505,7 @@ def solicitarVacaciones(request):
     if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, year=int(datetime.now().year)).exists():
         vacacionesEncontradas = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, year=int(datetime.now().year)).values('id','tipo_vacaciones__nombre', 'year', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado__nombre', 'estado__id','fecha_solicitud', 'tipo_vacaciones__color')
         for v in vacacionesEncontradas:
+            print(v)
             vacaciones.append(v)
 
     if CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(solicitante=empleado,estado__in=EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1, id__in=(9, 10))).exists():
@@ -5277,11 +4537,10 @@ def solicitarVacaciones(request):
     }
 
     if request.method == 'POST':
-
         # obtenemos los datos del empleado
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
 
-        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
 
         estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
         # obtenemos los datos del formulario
@@ -5292,65 +4551,15 @@ def solicitarVacaciones(request):
         fechaSolicitud = datetime.now()
     
         year = fechaInicio.split("-")[0]
-
-        '''
-        <nombreSolicitante> - nombre del usuario que solicita el cambio
-        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
-        <url> - url de la aplicacion
-        <fechaInicio> - fecha de inicio del periodo actual
-        <fechaFin> - fecha de fin del periodo actual
-        '''
-
-        '''
-        ASUNTO 
-        Solicitud de vacaciones <nombreSolicitante> <apellidosSolicitante>.
-
-        MENSAJE PARA EL REMITENTE
-        Su solicitud de vacaciones ha sido registrada con éxito.
-        El periodo seleccionado comienza el <fechaInicio> y finaliza el <fechaFin>.
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>
-        
-
-        MENSAJE PARA EL DESTINATARIO
-        <nombreSolicitante> <apellidosSolicitante> ha registrado una solicitud de vacaciones para el periodo del <fechaInicio> al <fechaFin>.
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>
-               
-        '''
-        url = 'http://alerta2.es/private/timetrackpro/solicitar-vacaciones/'
-        # correo enviado al usuario
-
-        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=39)[0]
-        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace('\n', '').replace('\r', '')
-
-
-        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
-
-        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=40)[0]
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
-
-        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
-        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
-        # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
-
-        mailSolicitante = [correoEmpleado,]
         # compruebo si ya existe un registro de vacaciones para ese periodo 
         if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio=fechaInicio).exists():
             return redirect('timetrackpro:ups', mensaje="Parece que ya existe una solicitud de vacaciones para esas fechas.")
         else:
             nuevoRegistroVacaciones = VacacionesTimetrackpro(empleado=empleado, tipo_vacaciones=tipoVacaciones, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, fecha_solicitud=fechaSolicitud, year=year, estado=estado)
             nuevoRegistroVacaciones.save(using='timetrackpro')
-
-            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
-            enviarTelegram(subject, mensajeDestinatario)
-            
             return redirect('timetrackpro:solicitar-vacaciones')   
     
     return render(request,"solicitarVacaciones.html", infoVista)
-
 
 
 @login_required
@@ -5365,7 +4574,7 @@ def solicitarModificarVacaciones(request):
         # obtenemos los datos del empleado
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
         idEmpleado = user.id_empleado.id
-        solicitante = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleado)[0]
+        solicitante = Empleados.objects.using("timetrackpro").filter(id=idEmpleado)[0]
         estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
         # obtenemos los datos del formulario
         idVacaciones = request.POST.get("vacaciones_modificar")
@@ -5374,67 +4583,14 @@ def solicitarModificarVacaciones(request):
         vacaciones.estado = estadoPendiente
         vacaciones.save(using='timetrackpro')
         fechaInicioActual = request.POST.get("fechaActualInicio")
-        print('\033[91m'+'fechaInicioActual: ' + '\033[92m', fechaInicioActual)
         fechaFinActual = request.POST.get("fechaActualFin")
-        print('\033[91m'+'fechaFinActual: ' + '\033[92m', fechaFinActual)
-        diasConsumidosActual = vacaciones.dias_consumidos
+        diasConsumidosActual = request.POST.get("dias_actuales_consumidos")
         fechaSolicitud = datetime.now()
         fechaNuevaInicio = request.POST.get("fechaInicioNueva")
         fechaNuevaFin = request.POST.get("fechaFinNueva")
         diasConsumidosNuevos = request.POST.get("dias_nuevos_consumidos")
         motivoCambio = request.POST.get("motivo_cambio")
-
-
-        '''
-        <nombreSolicitante> - nombre del usuario que solicita el cambio
-        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
-        <url> - url de la aplicacion
-        <fechaInicioActual> - fecha de inicio del periodo actual
-        <fechaFinActual> - fecha de fin del periodo actual
-        <fechaNuevaInicio> - fecha de inicio del periodo nuevo
-        <fechaNuevaFin> - fecha de fin del periodo nuevo
-        '''
-
-        '''
-        ASUNTO 
-        Solicitud de cambio periodo de vacaciones <nombreSolicitante> <apellidosSolicitante>.
-
-        MENSAJE PARA EL REMITENTE
-        Su solicitud de cambio del periodo de vacaciones ha sido registrada con éxito.
-        El periodo actual comienza el <fechaInicioActual> y finaliza el <fechaFinActual>.
-        El nuevo periodo comienza el <fechaNuevaInicio> y finaliza el <fechaNuevaFin>.
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>
-
-        MENSAJE PARA EL DESTINATARIO
-        <nombreSolicitante> <apellidosSolicitante> ha registrado una solicitud de cambio de vacaciones modificando el periodo actual del <fechaInicioActual> al <fechaFinActual> por el perido desde el <fechaNuevaInicio> al <fechaNuevaFin>.
-        Puede consultar el estado de la solicitud en el siguiente enlace.
-        <url>
-        '''
-
-
-        url = 'http://alerta2.es/private/timetrackpro/solicitar-vacaciones/'
-
-        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=41)[0]
-        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace('\n', '').replace('\r', '')
-
-
-        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", url).replace("<fechaInicioActual>", fechaInicioActual).replace("<fechaFinActual>", fechaFinActual).replace("<fechaNuevaInicio>", fechaNuevaInicio).replace("<fechaNuevaFin>", fechaNuevaFin)
-
-        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=42)[0]
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", solicitante.nombre).replace("<apellidosSolicitante>", solicitante.apellidos).replace("<url>", url).replace("<fechaInicioActual>", fechaInicioActual).replace("<fechaFinActual>", fechaFinActual).replace("<fechaNuevaInicio>", fechaNuevaInicio).replace("<fechaNuevaFin>", fechaNuevaFin)
-
-        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
-        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
-        # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(solicitante.email)
-
-        mailSolicitante = [correoEmpleado,]
-
         solicitudModificacionVacaciones = CambiosVacacionesTimetrackpro(id_periodo_cambio=vacaciones, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
-        enviarTelegram(subject, mensajeDestinatario)
         solicitudModificacionVacaciones.save(using='timetrackpro')
     return redirect('timetrackpro:solicitar-vacaciones')
 
@@ -5466,9 +4622,9 @@ def verSolicitudAsuntosPropios(request, id=None):
     administrador = esAdministrador(request.user.id)
     if id is not None:
         solicitud = AsuntosPropios.objects.using("timetrackpro").filter(id=id)[0]    
-        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=solicitud.empleado.id)[0]
+        empleado = Empleados.objects.using("timetrackpro").filter(id=solicitud.empleado.id)[0]
         diasConsumidos = AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, year=solicitud.year).aggregate(Sum('dias_consumidos'))['dias_consumidos__sum']
-        empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values('id', 'nombre')
+        empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
         sustitutos = Sustitutos.objects.using("timetrackpro").values('id', 'nombre', 'apellidos')
         # guardo los datos en un diccionario
         infoVista = {
@@ -5523,7 +4679,7 @@ def datosCalendarioAsuntosPropios(request, year=None):
     salidaPermisos = []
     if not admin and not director:
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
         asuntosPropios = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
         permisosSocilicitados = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(year=year,empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_solicitados','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'codigo_permiso__nombre', 'codigo_permiso__cod_uex', 'justificante')
         # recorro los festivos y los guardo en la lista
@@ -5584,6 +4740,7 @@ def datosCalendarioAsuntosPropios(request, year=None):
     return JsonResponse(salida, safe=False)
 
 
+
 @login_required
 def agregarAsuntosPropiosCalendario(request):
     '''
@@ -5594,7 +4751,7 @@ def agregarAsuntosPropiosCalendario(request):
 
     if request.method == 'POST':
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
+        empleado = Empleados.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
         fechaInicio = request.POST.get("fecha_inicio_seleccionada")
         fechaFin = request.POST.get("fecha_fin_seleccionada")
         diasConsumidos = request.POST.get("dias_seleccionados_consumidos")
@@ -5612,7 +4769,7 @@ def agregarAsuntosPropiosCalendario(request):
             descripcion = request.POST.get("descripcion_calendario")
 
         empleadoSustituto = request.POST.get("sustituto_calendario")
-        if empleadoSustituto != "0" and empleadoSustituto != 0:       
+        if empleadoSustituto != 0:        
             sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0] 
         else:
             sustituto = None
@@ -5645,7 +4802,7 @@ def notificarIncidencias(request):
     }
     if request.method == 'POST':
         idEmpleadoMaquina = request.POST.get("idEmpleadoMaquina")
-        empleado = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleadoMaquina)[0]
+        empleado = EmpleadosMaquina.objects.using("timetrackpro").filter(id=idEmpleadoMaquina)[0]
         idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=empleado)[0]
         motivo = request.POST.get("motivoError")
         estado = 1 # indico que aún esta pendiente de revisar
@@ -5688,7 +4845,7 @@ def notificarDatosErroneos(request):
     :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "notificar-incidencias.html" con los datos necesarios para la vista
     '''  
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values('id', 'nombre')
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
     administrador = esAdministrador(request.user.id)
     # guardo los datos en un diccionario
     infoVista = {
@@ -5702,66 +4859,14 @@ def notificarDatosErroneos(request):
     }
     if request.method == 'POST':
         usuario = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
-        refEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=usuario)[0]
-        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=refEmpleado.id_usuario.id)[0]
         estado = estadosErrores["Pendiente"]
         fechaRegistro = datetime.now()
         motivo = request.POST.get("motivoError")
         tipo = "2"
-
-        '''
-        tipo = 2 -> Corrección de datos erróneos
-        tipo = 1 -> Fallos en la aplicación
-        <nombreSolicitante> - nombre del usuario que solicita el cambio
-        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
-        <url> - url de la aplicacion
-        <fechaRegistro> - fecha de registro del problema
-        <motivo> - motivo del problema
-        '''
-
-        '''
-        ASUNTO 
-        Nueva solicitud de <tipo> en timetrackpro.
-
-        MENSAJE PARA EL REMITENTE
-
-        Su incidencia ha quedado registrada. Puede consultar el estado en el siguiente enlace:
-        <url>        
-
-        MENSAJE PARA EL DESTINATARIO
-
-        <nombreSolicitante> <apellidosSolicitante> ha registrado una incidencia de <tipo> con fecha <fechaRegistro>.
-        El motivo de la solicitud es:
-        <motivo>
-        Puede consultar más información en el siguiente enlace.
-        <url>
-        '''
-
-        url = 'http://alerta2.es/private/timetrackpro/listado-incidencias'
-        stringFecha = fechaRegistro.strftime("%d-%m-%Y a las %H:%M:%S")
-
-        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=45)[0]
-        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<tipo>", "Corrección de datos erróneos").replace('\n', '').replace('\r', '')
-        
-        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url)
-
-        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=46)[0]
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaRegistro>", stringFecha).replace("<motivo>", motivo).replace("<tipo>", "Corrección de datos erróneos")
-
-        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
-        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO]
-
-        # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
-
-        mailSolicitante = [correoEmpleado,]
         error = ProblemasDetectadosTimeTrackPro(usuario=usuario, estado=estado, fecha_registro=fechaRegistro, problema_detectado=motivo, tipo=tipo)
-
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
         error.save(using='timetrackpro')
 
-        return redirect('timetrackpro:ver-incidencia', id=error.id)   
+        return redirect('timetrackpro:ver-errores-notificados', id=error.id)   
      
     return render(request,"notificar-incidencia.html", infoVista)
 
@@ -5774,7 +4879,7 @@ def notificarErroresApp(request):
     :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "notificar-incidencias.html" con los datos necesarios para la vista
     '''    
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values('id', 'nombre')
+    empleados = EmpleadosMaquina.objects.using("timetrackpro").values('id', 'nombre')
     administrador = esAdministrador(request.user.id)
     # guardo los datos en un diccionario
     infoVista = {
@@ -5789,65 +4894,14 @@ def notificarErroresApp(request):
     }
     if request.method == 'POST':
         usuario = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
-        refEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=usuario)[0]
-        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=refEmpleado.id_usuario.id)[0]
         estado = estadosErrores["Pendiente"]
         fechaRegistro = datetime.now()
         motivo = request.POST.get("motivoError")
         tipo = "1"
-
-        '''
-        tipo = 2 -> Corrección de datos erróneos
-        tipo = 1 -> Fallos en la aplicación
-        <nombreSolicitante> - nombre del usuario que solicita el cambio
-        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
-        <url> - url de la aplicacion
-        <fechaRegistro> - fecha de registro del problema
-        <motivo> - motivo del problema
-        '''
-
-        '''
-        ASUNTO 
-        Nueva solicitud de <tipo> en timetrackpro.
-
-        MENSAJE PARA EL REMITENTE
-
-        Su incidencia ha quedado registrada. Puede consultar el estado en el siguiente enlace:
-        <url>        
-
-        MENSAJE PARA EL DESTINATARIO
-
-        <nombreSolicitante> <apellidosSolicitante> ha registrado una incidencia de <tipo> con fecha <fechaRegistro>.
-        El motivo de la solicitud es:
-        <motivo>
-        Puede consultar más información en el siguiente enlace.
-        <url>
-        '''
-
-        url = 'http://alerta2.es/private/timetrackpro/listado-incidencias'
-        stringFecha = fechaRegistro.strftime("%d-%m-%Y a las %H:%M:%S")
-
-        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=45)[0]
-        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<tipo>","Fallos en la aplicación" ).replace("<apellidosSolicitante>", empleado.apellidos).replace('\n', '').replace('\r', '')
-        
-        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url)
-
-        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=46)[0]
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaRegistro>", stringFecha).replace("<motivo>", motivo).replace("<tipo>", "Fallos en la aplicación")
-
-        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
-        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO]
-
-        # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
-
-        mailSolicitante = [correoEmpleado,]
-
         error = ProblemasDetectadosTimeTrackPro(usuario=usuario, estado=estado, fecha_registro=fechaRegistro, problema_detectado=motivo, tipo=tipo)
         error.save(using='timetrackpro')
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
-        return redirect('timetrackpro:ver-incidencia', id=error.id)    
+
+        return redirect('timetrackpro:ver-errores-notificados', id=error.id)    
      
     return render(request,"notificar-incidencia.html", infoVista)
 
@@ -5859,7 +4913,6 @@ def problemasNotificados(request):
     :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "problemas-notificados.html" con los datos necesarios para la vista
     '''
-
     infoVista = {
         "navBar":navBar,
         "administrador":esAdministrador(request.user.id),
@@ -5961,7 +5014,7 @@ def jornadas(request):
     director = esDirector(request.user.id)
 
     if administrador or director:
-        empleados = EmpleadosTimetrackpro.objects.using("timetrackpro").values()
+        empleados = Empleados.objects.using("timetrackpro").values()
         jornadas = RelJornadaEmpleados.objects.using("timetrackpro").values()
 
         # current_url = request.path[1:]
@@ -5997,7 +5050,7 @@ def datosJornadas(request):
 
             empleado_id = j.get('id_empleado_id')
             if empleado_id is not None:
-                empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=empleado_id).first()
+                empleado = Empleados.objects.using("timetrackpro").filter(id=empleado_id).first()
                 if empleado:
                     j['empleado'] = empleado.nombre + " " + empleado.apellidos
                 else:
@@ -6021,9 +5074,3 @@ def subirDocumento(f, destino):
     with open(destino, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
-
-def enviarTelegram(asunto, mensaje):
-    '''
-    La funcion "enviarTelegram" permite enviar un mensaje a traves de Telegram.
-    '''
-    MensajesTelegram(id_area=4,id_estacion=None,fecha_hora_utc=datetime.now(pytz.timezone("Europe/Madrid")),mensaje=asunto,descripcion=mensaje,icono='19',estado=0,id_telegram=settings.ID_CHAT_TIMETRACK,silenciar=0, confirmar=0).save(using='spd')
