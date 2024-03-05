@@ -287,8 +287,8 @@ $("#tabla_archivos_insertados").bootstrapTable({
           var botonDescargar = '<a href="/private/timetrackpro/descargar-fichero-maquina/' + row.id + '/" class="mx-1 text-sm" title="descargar fichero" download><i class="fa-solid fa-download fa-lg entrar"></i></a>';
           
           var botonEliminar = '<a href="/private/timetrackpro/eliminar-registro/' + row.id + '/" class="mx-1" title="Eliminar fichero" data-toggle="modal" data-target="#modalEliminar" onclick="$('+"'#formularioModalEliminarAsociacion').attr('action', '/private/timetrackpro/eliminar-registro/"+ row.id + "/');"+'" ><i class="fa-solid fa-trash" ></i></a>';
-          
-          if (administrador){
+
+          if (administrador == "True"){
             return botonVer + botonDescargar + botonEliminar;
           }else{
             return botonVer + botonDescargar;

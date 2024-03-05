@@ -11,7 +11,7 @@ from datetime import date, datetime, timedelta
 from django.core.exceptions import ObjectDoesNotExist
 import unicodedata
 from django.db.models import Q, F, Max, Min, Count, Sum, Avg
-from timetrackpro.funciones.funcionesAuxiliares import *
+from timetrackpro.funciones.funcionesAuxiliaresTimetrackpro import *
 from django.db.models.functions import TruncDate
 from django.http import FileResponse, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
@@ -159,46 +159,51 @@ def calcularAsuntosPropiosRecuperablesConsumidos(idUsuario, year):
     
     return asuntosRecuperablesConsumidos
 
-
+@login_required
 def home(request):
-    """
-    The function `home` renders a specific HTML template based on the user's role and provides
-    information about remaining and requested vacation days.
-    
-    :param request: The `request` parameter is an object that represents the HTTP request made by the
-    client. It contains information such as the user making the request, the method used (GET, POST,
-    etc.), and any data sent with the request
-    :return: a rendered HTML template based on the user's role. If the user is an administrator, it
-    returns the "home-admin.html" template. If the user is a director, it returns the "home.html"
-    template. Otherwise, it also returns the "home.html" template.
-    """
-    administrador = esAdministrador(request.user.id)
-    director = esDirector(request.user.id)
-    # calcular cuantos dias de asuntos propios ha consumido durante el año en curso
-    # calcular cuantos dias de vacaciones ha consumido durante el año en curso
-    user = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
-    empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=user)[0]
-    diasPropiosConsumidos = calcularAsuntosPropiosConsumidos(empleado.id_usuario, datetime.now().year)
-    diasPropiosRecuperablesConsumidos = calcularAsuntosPropiosRecuperablesConsumidos(empleado.id_usuario, datetime.now().year)
-    diasPropiosSolicitados = calcularAsuntosPropiosSolicitados(empleado.id_usuario, datetime.now().year)
-    diasPropiosRestantes= settings.DIAS_ASUNTOS_PROPIOS-diasPropiosConsumidos
-    diasVacacionesConsumidos = calcularVacacionesConsumidas(empleado.id_usuario, datetime.now().year)
-    diasVacacionesRestantes = 30-diasVacacionesConsumidos
-    diasVacacionesSolicitados = calcularVacacionesSolicitadas(empleado.id_usuario, datetime.now().year)
-    infoVista = {
-        "navBar":navBar,
-        "administrador":administrador,
-        "director":director,
-        "rutaActual": "Home",
-        "diasPropiosRestantes":diasPropiosRestantes,
-        "diasVacacionesRestantes":diasVacacionesRestantes,
-        "diasPropiosSolicitados":diasPropiosSolicitados,
-        "diasVacacionesSolicitados":diasVacacionesSolicitados,
-        "diasPropiosRecuperablesConsumidos":diasPropiosRecuperablesConsumidos,
-        "alerta":alerta
-    }
-    return render(request,"home.html",infoVista)
-    # guardo los datos en un diccionario
+
+    # si el usario esta logueado y autenticado
+    if request.user.is_authenticated:
+        """
+        The function `home` renders a specific HTML template based on the user's role and provides
+        information about remaining and requested vacation days.
+        
+        :param request: The `request` parameter is an object that represents the HTTP request made by the
+        client. It contains information such as the user making the request, the method used (GET, POST,
+        etc.), and any data sent with the request
+        :return: a rendered HTML template based on the user's role. If the user is an administrator, it
+        returns the "home-admin.html" template. If the user is a director, it returns the "home.html"
+        template. Otherwise, it also returns the "home.html" template.
+        """
+        administrador = esAdministrador(request.user.id)
+        director = esDirector(request.user.id)
+        # calcular cuantos dias de asuntos propios ha consumido durante el año en curso
+        # calcular cuantos dias de vacaciones ha consumido durante el año en curso
+        user = AuthUserTimeTrackPro.objects.using("timetrackpro").filter(id=request.user.id)[0]
+        empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=user)[0]
+        diasPropiosConsumidos = calcularAsuntosPropiosConsumidos(empleado.id_usuario, datetime.now().year)
+        diasPropiosRecuperablesConsumidos = calcularAsuntosPropiosRecuperablesConsumidos(empleado.id_usuario, datetime.now().year)
+        diasPropiosSolicitados = calcularAsuntosPropiosSolicitados(empleado.id_usuario, datetime.now().year)
+        diasPropiosRestantes= settings.DIAS_ASUNTOS_PROPIOS-diasPropiosConsumidos
+        diasVacacionesConsumidos = calcularVacacionesConsumidas(empleado.id_usuario, datetime.now().year)
+        diasVacacionesRestantes = 30-diasVacacionesConsumidos
+        diasVacacionesSolicitados = calcularVacacionesSolicitadas(empleado.id_usuario, datetime.now().year)
+        infoVista = {
+            "navBar":navBar,
+            "administrador":administrador,
+            "director":director,
+            "rutaActual": "Home",
+            "diasPropiosRestantes":diasPropiosRestantes,
+            "diasVacacionesRestantes":diasVacacionesRestantes,
+            "diasPropiosSolicitados":diasPropiosSolicitados,
+            "diasVacacionesSolicitados":diasVacacionesSolicitados,
+            "diasPropiosRecuperablesConsumidos":diasPropiosRecuperablesConsumidos,
+            "alerta":alerta
+        }
+        return render(request,"home.html",infoVista)
+        # guardo los datos en un diccionario
+    else:
+        return redirect('timetrackpro:sin-permiso')
 
 
 def noEncontrado(request):
@@ -286,7 +291,7 @@ def habilitaciones(request):
     client. It contains information such as the user making the request, the requested URL, and any data
     sent with the request
     :return: The code is returning a response based on the user's permissions. If the user is an
-    administrator, it will render the "habilitaciones.html" template with the provided context data. If
+    administrator, it will render the "HabilitacionesTimeTrackPro.html" template with the provided context data. If
     the user is not an administrator, it will redirect to the "sin-permiso" URL.
     """
     alerta = request.session.pop('alerta', None)
@@ -305,7 +310,7 @@ def habilitaciones(request):
         "rutaActual": "Habilitaciones"
     }
     if administrador:
-        return render(request,"habilitaciones.html",infoVista)
+        return render(request,"HabilitacionesTimeTrackPro.html",infoVista)
     
     else:
         return redirect('timetrackpro:sin-permiso')
@@ -396,7 +401,7 @@ def modificarHabilitacion(request):
     if administrador:
         if request.method == 'POST':
             idHabilitacion = request.POST.get("idHabilitacion")
-            habilitacion = Habilitaciones.objects.using("timetrackpro").filter(id=idHabilitacion)[0]
+            habilitacion = HabilitacionesTimeTrackPro.objects.using("timetrackpro").filter(id=idHabilitacion)[0]
             nombreHabilitacion = request.POST.get("nombreHabilitacion")
             habilitacion.nombre = nombreHabilitacion
             habilitacion.save(using='timetrackpro')
@@ -420,7 +425,7 @@ def eliminarHabilitacion(request):
     if administrador:
         if request.method == 'POST':
             idHabilitacion = request.POST.get("idHabilitacion")
-            habilitacion = Habilitaciones.objects.using("timetrackpro").filter(id=idHabilitacion)[0]
+            habilitacion = HabilitacionesTimeTrackPro.objects.using("timetrackpro").filter(id=idHabilitacion)[0]
             habilitacion.delete(using='timetrackpro')
         return redirect('timetrackpro:habilitaciones')
     else:
@@ -1016,12 +1021,14 @@ def obtenerRegistroSemanalEmpleados(request):
     """
 
     administrador = esAdministrador(request.user.id)
-    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").values()
+    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(activo=1).values()
+    exEmpleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(activo=0).exclude(id__in=[100,101]).values()
     # current_url = request.path[1:]
     infoVista = {
         "navBar":navBar,
         "administrador":administrador,
         "empleados":list(empleados),
+        "exEmpleados":list(exEmpleados),
         "rutaActual": "Informe de asistencia empleados",
     }
     return render(request,"informe-registro-semanal-usuario.html",infoVista)
@@ -2066,7 +2073,10 @@ def notificarErrorEnFichaje(request):
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
 
         # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(solicitante.email)
+        if solicitante.email != "" and solicitante.email != None:
+            correoEmpleado = convertirAMail(solicitante.email)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
         mailSolicitante = [correoEmpleado,]
 
         nuevoErrorRegistrado = ErroresRegistroNotificados(id_empleado=idEmpleado.id_usuario, hora=hora, motivo=motivo, estado=estado, quien_notifica=registrador, hora_notificacion=horaNotificacion)
@@ -3401,7 +3411,6 @@ def datosCalendarioVacacionesSolicitadas(request):
     festivos = FestivosTimetrackPro.objects.using("timetrackpro").values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
 
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(estado__in=[9,11,12]).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado','empleado__nombre', 'empleado__apellidos','fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud')
-    print('\033[91m'+'vacaciones: ' + '\033[92m', vacaciones)
     # creo una lista vacía para guardar los datos de los festivos
     salidaFestivos = []
 
@@ -3426,7 +3435,6 @@ def datosCalendarioVacacionesSolicitadas(request):
             'color':vacacion['tipo_vacaciones__color_calendario']
         })
     
-    print('\033[91m'+'salidaVacaciones: ' + '\033[92m', salidaVacaciones)
 
     salida = salidaFestivos + salidaVacaciones
     # devuelvo la lista en formato json
@@ -3988,7 +3996,10 @@ def solicitarModificarAsuntosPropios(request):
         email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
         # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(solicitante.email)
+        if solicitante.email != "" and solicitante.email != None:
+            correoEmpleado = convertirAMail(solicitante.email)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
 
         mailSolicitante = [correoEmpleado,]
 
@@ -4552,7 +4563,6 @@ def solicitarAsuntosPropios(request, year=None):
         descripcion = None
         if request.POST.get("descripcion") != "":
             descripcion = request.POST.get("descripcion")
-        print('\033[91m'+'descripcion: ' + '\033[92m', descripcion)
 
         empleadoSustituto = request.POST.get("sustituto")
 
@@ -4625,7 +4635,10 @@ def solicitarAsuntosPropios(request, year=None):
         email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
         # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
+        if empleado.email != "" and empleado.email != None:
+            correoEmpleado = convertirAMail(empleado.email)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
 
         mailSolicitante = [correoEmpleado,]
 
@@ -4699,7 +4712,6 @@ def solicitarPermisosRetribuidos(request, year=None):
         idPermiso = None
         if "id_permiso" in request.POST:
             idPermiso = request.POST.get("id_permiso")
-        print('\033[91m'+'idPermiso: ' + '\033[92m', idPermiso)
         codigoPermiso = PermisosRetribuidos.objects.using("timetrackpro").filter(id=idPermiso)[0]
         fechaInicio = request.POST.get("fecha_inicio")
         fechaFin = request.POST.get("fecha_fin")
@@ -4763,7 +4775,10 @@ def solicitarPermisosRetribuidos(request, year=None):
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
 
         # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
+        if empleado.email != "" and empleado.email != None:
+            correoEmpleado = convertirAMail(empleado.email)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
 
         mailSolicitante = [correoEmpleado,]
 
@@ -4876,7 +4891,10 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
 
         # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
+        if empleado.email != "" and empleado.email != None:
+            correoEmpleado = convertirAMail(empleado.email)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
 
         mailSolicitante = [correoEmpleado,]
 
@@ -5333,7 +5351,10 @@ def solicitarVacaciones(request):
         email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
         # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
+        if empleado.email != "" and empleado.email != None:
+            correoEmpleado = convertirAMail(empleado.email)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
 
         mailSolicitante = [correoEmpleado,]
         # compruebo si ya existe un registro de vacaciones para ese periodo 
@@ -5374,9 +5395,7 @@ def solicitarModificarVacaciones(request):
         vacaciones.estado = estadoPendiente
         vacaciones.save(using='timetrackpro')
         fechaInicioActual = request.POST.get("fechaActualInicio")
-        print('\033[91m'+'fechaInicioActual: ' + '\033[92m', fechaInicioActual)
         fechaFinActual = request.POST.get("fechaActualFin")
-        print('\033[91m'+'fechaFinActual: ' + '\033[92m', fechaFinActual)
         diasConsumidosActual = vacaciones.dias_consumidos
         fechaSolicitud = datetime.now()
         fechaNuevaInicio = request.POST.get("fechaInicioNueva")
@@ -5427,7 +5446,11 @@ def solicitarModificarVacaciones(request):
         email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
         # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(solicitante.email)
+
+        if solicitante.email != "" and solicitante.email != None:
+            correoEmpleado = convertirAMail(solicitante.email)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
 
         mailSolicitante = [correoEmpleado,]
 
@@ -5752,7 +5775,10 @@ def notificarDatosErroneos(request):
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO]
 
         # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
+        if empleado.email != "" and empleado.email != None:
+            correoEmpleado = convertirAMail(empleado.email)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
 
         mailSolicitante = [correoEmpleado,]
         error = ProblemasDetectadosTimeTrackPro(usuario=usuario, estado=estado, fecha_registro=fechaRegistro, problema_detectado=motivo, tipo=tipo)
@@ -5839,7 +5865,10 @@ def notificarErroresApp(request):
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO]
 
         # convertir a direcciones de correo
-        correoEmpleado = convertirAMail(empleado.email)
+        if empleado.email != "" and empleado.email != None:
+            correoEmpleado = convertirAMail(empleado.email)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
 
         mailSolicitante = [correoEmpleado,]
 
