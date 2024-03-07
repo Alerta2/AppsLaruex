@@ -421,7 +421,7 @@ def habilitaciones(request):
         "rutaActual": "Habilitaciones"
     }
     if administrador:
-        return render(request,"HabilitacionesTimeTrackPro.html",infoVista)
+        return render(request,"habilitaciones.html",infoVista)
     
     else:
         return redirect('timetrackpro:sin-permiso')
@@ -3663,13 +3663,7 @@ def agregarFestivo(request):
         fecha = request.POST.get("fecha_inicio")
         year = request.POST.get("year")
 
-        fechaFin = None
-        if "fecha_fin" in request.POST and request.POST.get("fecha_fin") != "":
-            fechaFin = request.POST.get("fecha_fin")  
-        else:
-            fechaFin = fecha
-        
-        nuevoFestivo = FestivosTimetrackPro(nombre=nombre, tipo_festividad=tipo, fecha_inicio=fecha, fecha_fin=fechaFin, year=year)
+        nuevoFestivo = FestivosTimetrackPro(nombre=nombre, tipo_festividad=tipo, fecha_inicio=fecha, fecha_fin=fecha,year=year)
         nuevoFestivo.save(using='timetrackpro')
         return redirect('timetrackpro:festivos-year', year=year)    
     # current_url = request.path[1:]
@@ -3720,10 +3714,9 @@ def editarFestivo(request, id):
         tipo = TipoFestivos.objects.using("timetrackpro").filter(id=idTipo)[0]
         festivo.tipo_festividad = tipo
         festivo.fecha_inicio = request.POST.get("fecha_inicio_editar")
+        festivo.fecha_fin = request.POST.get("fecha_inicio_editar")
         if "year_editar" in request.POST and request.POST.get("year_editar") != "":
             festivo.year = request.POST.get("year_editar")
-        if "fecha_fin_editar" in request.POST and request.POST.get("fecha_fin_editar") != "":
-            festivo.fecha_fin = request.POST.get("fecha_fin_editar")  
         festivo.save(using='timetrackpro')
         return redirect('timetrackpro:festivos-year', year=festivo.year)    
 
@@ -4845,6 +4838,7 @@ def solicitarPermisosRetribuidos(request, year=None):
     asuntosPropiosEmpleados = []
     asuntos=[]
     permisosSolicitadosEmpleados = []
+    permisosSolicitados = []
     permisos = PermisosRetribuidos.objects.using("timetrackpro").values('id', 'cod_uex', 'nombre', 'tipo__id', 'tipo__nombre', 'dias', 'habiles_o_naturales', 'solicitud_dias_naturales_antelacion', 'pas', 'pdi')
     diasConsumidos = 0
     if year is None:
@@ -4862,6 +4856,8 @@ def solicitarPermisosRetribuidos(request, year=None):
     if len(mes) == 1:
         mes = "0" + mes
     initialDate = year + "-" + mes + "-01"
+    irDocumentacionUex = settings.IR_DOCUMENTACION_UEX
+
     
     if request.method == 'POST':
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
@@ -4949,6 +4945,8 @@ def solicitarPermisosRetribuidos(request, year=None):
         alerta["icono"] = iconosAviso["success"]
         alerta["tipo"] = "success"
         alerta["mensaje"] = "Permiso agregado correctamente."
+
+
         return redirect('timetrackpro:solicitar-permisos-retribuidos', year=year)
 
     infoVista = {
@@ -4968,6 +4966,7 @@ def solicitarPermisosRetribuidos(request, year=None):
         "rutaActual": "Permisos solicitados "  + str(year),
         "rutaPrevia": "Solicitudes",
         "urlRutaPrevia": reverse('timetrackpro:solicitudes'),
+        "irDocumentacionUex" : irDocumentacionUex
     }
     return render(request,"solicitar-permisos-retribuidos.html",infoVista)
 
@@ -5430,7 +5429,7 @@ def solicitarVacaciones(request):
 
     festivos = []
     if FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__month=mes).exists():
-        festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__month=mes).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
+        festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__month=mes).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'year')
     
     initialDate = year + "-" + mes + "-" + diaInicial
     navidad = False
@@ -5709,7 +5708,7 @@ def datosCalendarioAsuntosPropios(request, year=None):
     if year == None:
         year = datetime.now().year
 
-    festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=year).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year', 'tipo_festividad__color_calendario')
+    festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(year=year).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'year', 'tipo_festividad__color_calendario')
     # recorro los festivos y los guardo en la lista
     for festivo in festivos:
         # inserto los datos en la lista siguiendo la estructura que requiere el calendario
