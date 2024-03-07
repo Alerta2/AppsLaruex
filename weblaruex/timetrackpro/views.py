@@ -3802,7 +3802,7 @@ def verCambioVacacionesSeleccionadas(request, id):
     :param id: El parametro "id" es el identificador de los cambios de vacaciones que se desean ver
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verCambioVacacionesSeleccionadas.html" con los datos necesarios para la vista
     '''
-    vacaciones = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id).values('id','solicitante', 'solicitante__id', 'solicitante__nombre', 'solicitante__apellidos', 'id_periodo_cambio', 'fecha_inicio_actual' , 'fecha_fin_actual', 'dias_actuales_consumidos', 'fecha_inicio_nueva', 'fecha_fin_nueva', 'dias_nuevos_consumidos','motivo_solicitud', 'estado', 'estado__id','motivo_rechazo', 'fecha_solicitud','id_periodo_cambio__tipo_vacaciones__nombre' , 'dias_habiles_actuales_consumidos', 'dias_habiles_nuevos_consumidos')[0]
+    vacaciones = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id).values('id','solicitante', 'solicitante__id', 'solicitante__nombre', 'solicitante__apellidos', 'id_periodo_cambio', 'fecha_inicio_actual' , 'fecha_fin_actual', 'dias_actuales_consumidos', 'fecha_inicio_nueva', 'fecha_fin_nueva', 'dias_nuevos_consumidos','motivo_solicitud', 'estado', 'estado__id','motivo_rechazo', 'fecha_solicitud','id_periodo_cambio__tipo_vacaciones__nombre' , 'dias_habiles_actuales_consumidos', 'dias_habiles_nuevos_consumidos', 'id_periodo_cambio__motivo_rechazo')[0]
     empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=vacaciones["solicitante__id"])[0]
 
     administrador = esAdministrador(request.user.id)
