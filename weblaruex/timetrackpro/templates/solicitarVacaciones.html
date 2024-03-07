@@ -335,6 +335,36 @@ $("#vacaciones_solicitadas").bootstrapTable({
     cache: false, 
     columns: [
       {
+        title: "",
+        halign:"center",
+        sortable: true,
+        align: "center",
+        formatter: function(value, row) {
+          //var tipoVacaciones = row.id_periodo_cambio__tipo_vacaciones;
+          var tipoVacaciones = row.tipo_vacaciones;
+          console.log(tipoVacaciones, typeof(tipoVacaciones));
+          icono = '';
+          switch (tipoVacaciones){
+            case 1:
+              icono  = '<div><h6 class="mb-0 text-sm text-dark"><i class="fa-solid fa-tree-decorated fa-lg"></i><h6 class="mb-0 text-sm"></div>';
+              break;
+            case 2:
+              icono  = '<div><h6 class="mb-0 text-sm text-secondary"><i class="fa-solid fa-book-bible fa-lg"></i><h6 class="mb-0 text-sm"></div>';
+              break;
+            case 3:
+              icono  = '<div><h6 class="mb-0 text-sm text-warning"><i class="fa-solid fa-sun fa-lg"></i><h6 class="mb-0 text-sm"></div>';
+              break;
+            case 4:
+              icono  = '<div><h6 class="mb-0 text-sm text-primary"><i class="fa-kit fa-solid-calendar-days-user fa-lg"></i></i><h6 class="mb-0 text-sm"></div>';
+              break;
+            default:
+              icono  = '<div><h6 class="mb-0 text-sm text-primary"><i class="fa-solid fa-tree-decorated fa-lg"></i><h6 class="mb-0 text-sm"></div>';
+              break;
+          }
+          return icono;
+        }
+      },  
+      {
         title: "Empleado",
         halign:"left",
         sortable: true,
