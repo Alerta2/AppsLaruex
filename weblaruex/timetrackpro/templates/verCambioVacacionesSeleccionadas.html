@@ -72,6 +72,10 @@
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_actuales_consumidos}} días</li>
             
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_habiles_actuales_consumidos}} días hábiles</li>
+            {% if vacaciones.id_periodo_cambio__motivo_rechazo %}
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg text-center font-italic">
+               {{vacaciones.id_periodo_cambio__motivo_rechazo}} </li>
+            {% endif %}
           </ul>
           <hr class="separacion">
           <ul class="list-group font-weight-bold">
@@ -81,7 +85,15 @@
             
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_nuevos_consumidos}} días</li>
             
-            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_habiles_nuevos_consumidos}} días hábiles</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_habiles_nuevos_consumidos}} días hábiles</li>            
+            {% if vacaciones.motivo_solicitud and not vacaciones.motivo_rechazo %}
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg text-center font-italic">
+               {{vacaciones.motivo_solicitud}} </li>
+            {% endif %}
+            {% if vacaciones.motivo_rechazo %}
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg text-center font-italic">
+               {{vacaciones.motivo_rechazo}} </li>
+            {% endif %}
           </ul>
         </div>
       </div>
