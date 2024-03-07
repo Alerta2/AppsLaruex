@@ -85,8 +85,8 @@ def calcularVacacionesSolicitadas(idUsuario, year):
     vacacionesHabilesSolicitadas = 0
     estadoSolicitado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
 
-    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoSolicitado).values('dias_consumidos', 'dias_habiles_consumidos').exists():
-        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoSolicitado).values('dias_consumidos', 'dias_habiles_consumidos')
+    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoSolicitado, tipo_vacaciones__in=[3,4]).values('dias_consumidos', 'dias_habiles_consumidos').exists():
+        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoSolicitado, tipo_vacaciones__in=[3,4]).values('dias_consumidos', 'dias_habiles_consumidos')
         for v in vacaciones:
             vacacionesSolicitadas = vacacionesSolicitadas + v['dias_consumidos']
             vacacionesHabilesSolicitadas = vacacionesHabilesSolicitadas + v['dias_habiles_consumidos']
@@ -141,6 +141,39 @@ def calcularDiasHabiles(fechaInicio, fechaFin):
                 diasHabiles = diasHabiles + 1
     return diasHabiles
 
+
+def gastadasVacacionesSemanaSanta(idUsuario, year):
+    '''
+        0 - Disponibles
+        1 - Solicitadas
+        2 - No disponibles
+    '''
+    estadoAceptado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=11)[0]
+    estadoSolicitado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+    disfrutadas = 0
+    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoAceptado, tipo_vacaciones=2).exists():
+        disfrutadas = 2
+    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoSolicitado, tipo_vacaciones=2).exists():
+        disfrutadas = 1
+    return disfrutadas
+
+
+def gastadasVacacionesNavidad(idUsuario, year):
+    '''
+        0 - Disponibles
+        1 - Solicitadas
+        2 - No disponibles
+    '''
+    estadoAceptado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=11)[0]
+    estadoSolicitado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
+    disfrutadas = 0
+    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoAceptado, tipo_vacaciones=1).exists():
+        disfrutadas = 2
+    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoSolicitado, tipo_vacaciones=1).exists():
+        disfrutadas = 1
+    return disfrutadas
+
+
 def calcularVacacionesConsumidas(idUsuario, year):
     '''
     La función se encarga de calcular los días hábiles de vacaciones consumidos por un usuario en un año concreto.
@@ -151,9 +184,9 @@ def calcularVacacionesConsumidas(idUsuario, year):
     vacacionesConsumidas = 0
     estadoAceptado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=11)[0]
 
-    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoAceptado).exists():
+    if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoAceptado, tipo_vacaciones__in=[3,4]).exists():
         # obtiene las vacaciones aceptadas del usuario y calcula todos los dias consumidos llamando a la funcion calcularDiasHabiles
-        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoAceptado).values('fecha_inicio', 'fecha_fin', 'dias_consumidos', 'dias_habiles_consumidos')
+        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=idUsuario, year=year, estado = estadoAceptado, tipo_vacaciones__in=[3,4]).values('fecha_inicio', 'fecha_fin', 'dias_consumidos', 'dias_habiles_consumidos')
         for v in vacaciones:
             vacacionesConsumidas = vacacionesConsumidas + v['dias_habiles_consumidos']
     return vacacionesConsumidas
@@ -260,6 +293,8 @@ def home(request):
         diasVacacionesNaturalesRestantes = 30-diasVacacionesNaturalesConsumidos
         diasVacacionesRestantes = 22-diasVacacionesConsumidos
         diasVacacionesSolicitados, diasHabilesVacacionesSolicitados  = calcularVacacionesSolicitadas(empleado.id_usuario, datetime.now().year)
+        navidad = gastadasVacacionesNavidad(empleado.id_usuario, datetime.now().year)
+        semanaSanta = gastadasVacacionesSemanaSanta(empleado.id_usuario, datetime.now().year)
         infoVista = {
             "navBar":navBar,
             "administrador":administrador,
@@ -272,7 +307,9 @@ def home(request):
             "diasVacacionesSolicitados":diasVacacionesSolicitados,
             "diasHabilesVacacionesSolicitados":diasHabilesVacacionesSolicitados,
             "diasPropiosRecuperablesConsumidos":diasPropiosRecuperablesConsumidos,
-            "alerta":alerta
+            "alerta":alerta,
+            "navidad":navidad,
+            "semanaSanta":semanaSanta
         }
         return render(request,"home.html",infoVista)
         # guardo los datos en un diccionario
@@ -1010,7 +1047,10 @@ def datosDiasTotalesEmpleados(request, year=None):
             asuntosPropios = calcularAsuntosPropiosConsumidos(e['id'],year)
             asuntosPropiosRecuperables = calcularAsuntosPropiosRecuperablesConsumidos(e['id'],year)
             ausencias = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=e['id'], year=year).count()
-            diasTotalesEmpleados.append({"empleado": e, "vacaciones": vacaciones, "asuntosPropios":asuntosPropios, "asuntosPropiosRecuperables":asuntosPropiosRecuperables, "ausencias":ausencias, "activo":e['fecha_baja_app']})
+            disfrutadasVacacionesSemanaSanta = gastadasVacacionesSemanaSanta(e['id'], year)
+            disfrutadasVacacionesNavidad = gastadasVacacionesNavidad(e['id'], year)
+            print('\033[91m'+'disfrutadasVacacionesNavidad: ' + '\033[92m', disfrutadasVacacionesNavidad)
+            diasTotalesEmpleados.append({"empleado": e, "vacaciones": vacaciones, "asuntosPropios":asuntosPropios, "asuntosPropiosRecuperables":asuntosPropiosRecuperables, "ausencias":ausencias, "activo":e['fecha_baja_app'], "semanaSanta":disfrutadasVacacionesSemanaSanta, "navidad":disfrutadasVacacionesNavidad})
 
 
     return JsonResponse(list(diasTotalesEmpleados), safe=False)
@@ -5362,7 +5402,6 @@ def solicitarVacaciones(request):
     '''
     administrador = esAdministrador(request.user.id)
     estados = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1).values()
-    periodosVacaciones = TipoVacaciones.objects.using("timetrackpro").values()
     # obtengo los datos necesarios para la vista
     
     usuario = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
@@ -5394,6 +5433,22 @@ def solicitarVacaciones(request):
         festivos = FestivosTimetrackPro.objects.using("timetrackpro").filter(fecha_inicio__month=mes).values('id', 'nombre', 'tipo_festividad__id', 'tipo_festividad__nombre', 'tipo_festividad__color', 'fecha_inicio', 'fecha_fin', 'year')
     
     initialDate = year + "-" + mes + "-" + diaInicial
+    navidad = False
+    vacacionesExcluidos = []
+    periodosVacaciones = []
+    if gastadasVacacionesNavidad(empleado, year) != 0:
+        navidad = True
+        vacacionesExcluidos.append(1)
+
+
+    semanaSanta = False
+    if gastadasVacacionesSemanaSanta(empleado, year) != 0:
+        semanaSanta = True
+        vacacionesExcluidos.append(2)
+
+    periodosVacaciones = TipoVacaciones.objects.using("timetrackpro").exclude(id__in=vacacionesExcluidos).values()
+
+
     
     infoVista = {
         "navBar":navBar,
@@ -5404,11 +5459,13 @@ def solicitarVacaciones(request):
         "usuario":usuario,
         "estados":list(estados),
         "periodosVacaciones":list(periodosVacaciones),
-        "vacaciones":vacaciones, 
+        "vacaciones":vacaciones,
         "cambios":cambios, 
         "rutaActual":"Solicitud de Vacaciones" + " " + str(datetime.now().year),
         "rutaPrevia":"Solicitudes",
         "urlRutaPrevia":reverse('timetrackpro:solicitudes'),
+        "navidad":navidad,
+        "semanaSanta":semanaSanta,
     }
 
     if request.method == 'POST':

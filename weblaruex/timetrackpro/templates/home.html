@@ -91,6 +91,43 @@
       </div>
     </div>
   </div>
+  <div class="col-xl-4 col-sm-6 mb-xl-0">
+    <div class="card">
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-8">
+            <div class="numbers">
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Otras vacaciones restantes</p>
+              <h5 class="font-weight-bolder mb-0">
+                {% if navidad == 0 %}
+                  <span class="text-dark text-sm font-weight-bolder ms-3">Navidad <i class="fa-solid fa-check ms-2 text-success fa-lg"></i></span>
+                {% elif navidad == 2 %}
+                  <span class="text-dark text-sm font-weight-bolder ms-3">Navidad <i class="fa-solid fa-x ms-2 text-danger fa-lg"></i></span>
+                {% else %}
+                  <span class="text-dark text-sm font-weight-bolder ms-3">Navidad <i class="fa-solid fa-hourglass-half ms-2 text-warning fa-lg"></i></span>
+                {% endif %}
+
+                
+                {% if semanaSanta == 0 %}
+                  <span class="text-dark text-sm font-weight-bolder ms-3">Semana Santa <i class="fa-solid fa-check ms-2 text-success fa-lg"></i></span>
+                {% elif semanaSanta == 2 %}
+                  <span class="text-dark text-sm font-weight-bolder ms-3">Semana Santa <i class="fa-solid fa-x ms-2 text-danger fa-lg"></i></span>
+                {% else %}
+                  <span class="text-dark text-sm font-weight-bolder ms-3">Semana Santa <i class="fa-solid fa-hourglass-half ms-2 text-warning fa-lg"></i></span>
+                {% endif %}
+
+              </h5>
+            </div>
+          </div>
+          <div class="col-4 text-end">
+            <div class="icon icon-shape bg-gradient-dark shadow text-center border-radius-md">
+              <i class="fa-solid fa-calendar-days fa-xl mt-2" aria-hidden="true" style="color: #fff"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <div class="row mt-4 mx-0">
   <div class="col-lg-4 col-sm-6 mb-xl-0">

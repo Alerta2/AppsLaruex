@@ -50,6 +50,8 @@ $("#relacion-empleados").bootstrapTable({
       halign:"center",
       sortable: true,
       align: "center",
+      width:"100",
+
       formatter: function(value, row) {
         var vacacionesTotales = 22
         var vacaciones = row.vacaciones;
@@ -71,6 +73,7 @@ $("#relacion-empleados").bootstrapTable({
       halign:"center",
       sortable: true,
       align: "center",
+      width:"100",
       formatter: function(value, row) {
         var asuntosPropiosTotales = 7;
         var asuntosPropios = row.asuntosPropios;
@@ -87,11 +90,68 @@ $("#relacion-empleados").bootstrapTable({
       }
     },
     {
+      title: "Semana Santa",
+      field: "hora",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      width:"100",
+      formatter: function(value, row) {
+        var disfrutadas = row.semanaSanta;
+        switch(disfrutadas){
+          case 0:
+            estado = '<span class="badge badge-sm bg-bg-gradient-secondary">No Disfrutadas</span>'
+            break;
+          case 1:
+            estado = '<span class="badge badge-sm bg-gradient-warning">Solicitadas</span>'
+            break;
+          case 2:
+            estado = '<span class="badge badge-sm bg-gradient-danger">Disfrutadas</span>'
+            break;
+          default:
+            estado = '<span class="badge badge-sm bg-gradient-success">No Disfrutada</span>'
+        }
+
+        var divNombre = '<div><h6 class="text-sm mb-0">'+estado +'</h6></div>';
+
+        return divNombre ;
+      }
+    },
+    {
+      title: "Navidad",
+      field: "hora",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      width:"100",
+      formatter: function(value, row) {
+        var disfrutadas = row.semanaSanta;
+        switch(disfrutadas){
+          case 0:
+            estado = '<span class="badge badge-sm bg-bg-gradient-secondary">No Disfrutadas</span>'
+            break;
+          case 1:
+            estado = '<span class="badge badge-sm bg-gradient-warning">Solicitadas</span>'
+            break;
+          case 2:
+            estado = '<span class="badge badge-sm bg-gradient-danger">Disfrutadas</span>'
+            break;
+          default:
+            estado = '<span class="badge badge-sm bg-gradient-success">No Disfrutada</span>'
+        }
+
+        var divNombre = '<div><h6 class="text-sm mb-0">'+estado +'</h6></div>';
+
+        return divNombre ;
+      }
+    },
+    {
       title: "Ausencias Solicitadas",
       field: "hora",
       halign:"center",
       sortable: true,
       align: "center",
+      width:"100",
       formatter: function(value, row) {
         var ausencias = row.ausencias;
         var divNombre = '<div><h6 class="text-sm mb-0">'+ausencias +'</h6></div>';
@@ -109,6 +169,7 @@ $("#relacion-empleados").bootstrapTable({
       halign:"center",
       sortable: true,
       align: "center",
+      width:"100",
       formatter: function(value, row) {
         var asuntosPropios = row.asuntosPropiosRecuperables;
         var divNombre = '<div><h6 class="text-sm mb-0"> -- </h6></div>';
