@@ -52,7 +52,7 @@
             {% endif %}
 
             {% if vacaciones.estado__id == 10 %}
-            <span class="badge badge-sm bg-gradient-danger">Aceptado</span>
+            <span class="badge badge-sm bg-gradient-danger">Rechazado</span>
             {% endif %}
 
             {% if vacaciones.estado__id == 11 %}
@@ -70,6 +70,8 @@
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i>{{vacaciones.fecha_inicio_actual|date:"d M"}} <strong>al</strong> {{vacaciones.fecha_fin_actual}}</li>
             
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_actuales_consumidos}} días</li>
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_habiles_actuales_consumidos}} días hábiles</li>
           </ul>
           <hr class="separacion">
           <ul class="list-group font-weight-bold">
@@ -78,6 +80,8 @@
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i>{{vacaciones.fecha_inicio_nueva|date:"d M"}} <strong>al</strong> {{vacaciones.fecha_fin_nueva}}</li>
             
             <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_nuevos_consumidos}} días</li>
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{vacaciones.dias_habiles_nuevos_consumidos}} días hábiles</li>
           </ul>
         </div>
       </div>
@@ -150,9 +154,9 @@
           <div class="row">
             <div class="col-xl-8 mx-auto my-2" >
               <label class="text-sm">Nuevo estado</label>
-              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
+              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea(this.value)">
                 
-                <option value="9" {% if vacaciones.estado__id == 9 %} selected {% endif %}>Pendiente</option>
+                <option value="9" {% if vacaciones.estado__id == 9 %} selected {% endif %} >Pendiente</option>
                 <option value="10" {% if vacaciones.estado__id == 10 %} selected {% endif %}>Rechazado</option>
                 <option value="11" {% if vacaciones.estado__id == 11 %} selected {% endif %}>Aceptado</option>
                 <option value="12" {% if vacaciones.estado__id == 12 %} selected {% endif %}>Cambio Solicitado</option>
@@ -225,20 +229,17 @@
 
 
 <script>
-
-  function mostrarTextArea (){
-    if($('#estado').val() == 2){
-      
+  function mostrarTextArea(estado){
+    console.log("estado",estado);
+    if (estado == 10){
       $('#botonModificar').attr('disabled', true);
       $('#rowMotivo').show();
       $('#motivo').keyup(function(){
       if($(this).val().length > 10)
         $('#botonModificar').attr('disabled', false);
-    })
+    });
     }else{
-      
       $('#botonModificar').attr('disabled', false);
-      
       $('#rowMotivo').hide();
     }
   }

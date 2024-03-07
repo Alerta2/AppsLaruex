@@ -13,11 +13,7 @@
           <p class="mb-0">Información sobre los dias solicitados por los empleados</p>
         </div>
         <div class="card-body">
-          
-
-
           <table  id="relacion-empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
-
         </div>
       </div>
 
@@ -55,7 +51,7 @@ $("#relacion-empleados").bootstrapTable({
       sortable: true,
       align: "center",
       formatter: function(value, row) {
-        var vacacionesTotales = 30
+        var vacacionesTotales = 22
         var vacaciones = row.vacaciones;
         var textNombre = "";
         if (vacaciones >= vacacionesTotales){
