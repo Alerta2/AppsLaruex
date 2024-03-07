@@ -72,7 +72,7 @@
         </div>
         
         <div class="card-body pt-0 p-3" >
-          {% if not vacaciones %}
+          {% if not vacaciones and not administrador %}
           <p class="text-sm"><strong class="text-info">Aún no ha seleccionado vacaciones</strong></p>
           {% else %}
           <div class="table-responsive ms-3 me-3">
@@ -126,7 +126,7 @@
 
         <div class="modal-body">
         <form id="formularioSolicitarVacaciones" action="{% url 'timetrackpro:solicitar-vacaciones' %}" method="POST"
-          enctype="multipart/form-data">
+          enctype="multipart/form-data" onsubmit="openLoader()">
           {% csrf_token %}
 
           <div class="row">
@@ -157,6 +157,7 @@
                 <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
                   aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
                 <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos"  min="1" hidden >
+                <input type="number" class="form-control" name="dias_habiles_consumidos" id="dias_habiles_consumidos"  min="1" hidden >
               </div>  
             </div>
           </div>
@@ -187,7 +188,7 @@
         <form id="formularioModificarVacaciones" action="{% url 'timetrackpro:solicitar-modificar-vacaciones' %}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
-          <div class="row  d-flex justify-content-center">
+          <div class="row  d-flex justify-content-center mx-auto">
             <div class="col-xl-10">
               <label class="col-form-label">Seleccione las vacaciones</label>
               {{ vacaciones|json_script:"listaVacaciones" }}
@@ -209,22 +210,20 @@
           </div>
           
           <div class="row d-flex justify-content-center mb-2" hidden>
-            <div class="col-xl-4"  id="divFechaInicioActual" hidden>
+            <div class="col-xl-5"  id="divFechaInicioActual" hidden>
               <label class="col-form-label text-muted">Fecha inicio actual</label>
 
               <input type="date" class="form-control" name="fechaActualInicio" id="fechaActualInicio"  style="background-color: #dbdbdf;">
             </div>
-            <div class="col-xl-4"  id="divFechaFinActual" hidden>
+            <div class="col-xl-5"  id="divFechaFinActual" hidden>
               <label class="col-form-label text-muted">Fecha fin actual</label>
               <input type="date" class="form-control" name="fechaActualFin" id="fechaActualFin" style="background-color: #dbdbdf;" >
             </div>
-            
-            <div class="col-xl-2"  id="divDiasActualesConsumidos" hidden>
-              <label class="col-form-label text-muted">Dias</label>
 
-              <input type="number" class="form-control" name="dias_actuales_consumidos" id="dias_actuales_consumidos"  min="1"  style="background-color: #dbdbdf;">
+          </div>
+          <div class="col-xl-2"  id="divDiasActualesConsumidos" hidden>
 
-            </div>
+            <input type="number" class="form-control" name="dias_actuales_consumidos" id="dias_actuales_consumidos"  min="1"  style="background-color: #dbdbdf;">
 
           </div>
 
@@ -406,10 +405,10 @@ $("#vacaciones_solicitadas").bootstrapTable({
         }
       },
       {
-        title: "Días",
+        title: "Días Habiles",
         align: "center",
         formatter: function(value, row) {
-          var dias = row.dias_consumidos;      
+          var dias = row.dias_habiles_consumidos;      
           var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
           return div;
         }
@@ -470,7 +469,7 @@ $("#cambio_vacaciones_solicitadas").bootstrapTable({
         }
       },    
       {
-        title: "Fecha inicio",
+        title: "Nueva Fecha inicio",
         field: "fecha_inicio",
         align: "center",
         formatter: function(value, row) {
@@ -489,7 +488,7 @@ $("#cambio_vacaciones_solicitadas").bootstrapTable({
             "12": "Dic",
           };
           // obtengo la fecha de lectura
-          var fechaLectura = row.fecha_inicio_actual;
+          var fechaLectura = row.fecha_inicio_nueva;
           // obtengo la fecha
           var fecha = fechaLectura.split("T")[0];
           mesFecha = fecha.split("-")[1];
@@ -499,7 +498,7 @@ $("#cambio_vacaciones_solicitadas").bootstrapTable({
           return div;
         }
       },      {
-        title: "Fecha fin",
+        title: "Nueva Fecha fin",
         field: "fecha_fin",
         align: "center",
         formatter: function(value, row) {
@@ -518,7 +517,7 @@ $("#cambio_vacaciones_solicitadas").bootstrapTable({
             "12": "Dic",
           };
           // obtengo la fecha de lectura
-          var fechaLectura = row.fecha_fin_actual;
+          var fechaLectura = row.fecha_fin_nueva;
           // obtengo la fecha
           var fecha = fechaLectura.split("T")[0];
           mesFecha = fecha.split("-")[1];
@@ -528,10 +527,10 @@ $("#cambio_vacaciones_solicitadas").bootstrapTable({
         }
       },
       {
-        title: "Días",
+        title: "Días Hábiles",
         align: "center",
         formatter: function(value, row) {
-          var dias = row.dias_nuevos_consumidos;      
+          var dias = row.dias_habiles_nuevos_consumidos;      
           var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
           return div;
         }
@@ -542,11 +541,11 @@ $("#cambio_vacaciones_solicitadas").bootstrapTable({
         formatter: function(value, row) {
           var estado = row.estado;
           var div= '<span class="badge badge-sm bg-gradient-dark text-wrap">Cambio solicitado</span>';
-          if (estado == 19)
+          if (estado == 10)
             var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
           if (estado == 20)
             var div = '<span class="badge badge-sm bg-gradient-info">Aceptada</span>';
-          if (estado == 21)
+          if (estado == 12)
             var div = '<span class="badge badge-sm bg-gradient-success">Justificada</span>';
           return div;
         }
@@ -606,6 +605,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function calcularDias(inicio, fin, dias_consumidos){
     fecha_inicio = document.getElementById(inicio).value;
     fecha_fin = document.getElementById(fin).value;
+    
     dias_consumidos = document.getElementById(dias_consumidos);
     botonGuardarSolicitar = document.getElementById("guardarSolicitarVacaciones");
     botonGuardarModificar = document.getElementById("guardarModificarVacaciones");
@@ -661,7 +661,7 @@ document.addEventListener('DOMContentLoaded', function() {
         fechaFinActual.value = mylist[i].fecha_fin;
         fechaFinActual.setAttribute("readonly", true);
         diasConsumidosActuales.value = mylist[i].dias_consumidos;
-        diasConsumidosActuales.setAttribute("readonly", true);
+        diasConsumidosActuales.setAttribute("readonly", true);        diasConsumidosActuales.setAttribute("hidden", true);
         
         console.log(mylist[i]);
       }

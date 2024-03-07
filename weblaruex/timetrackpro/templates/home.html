@@ -30,6 +30,7 @@
     </div>
   </div>
   {% endif %}
+  
 
   <div class="col-xl-4 col-sm-6 mb-xl-0 mb-4">
     <div class="card">
@@ -67,13 +68,13 @@
         <div class="row">
           <div class="col-8">
             <div class="numbers">
-              <p class="text-sm mb-0 text-capitalize font-weight-bold">Días naturales de vacaciones restantes</p>
+              <p class="text-sm mb-0 text-capitalize font-weight-bold">Días de vacaciones restantes</p>
               <h5 class="font-weight-bolder mb-0">
 
                 {% if diasVacacionesRestantes != 0 %}
                 {{diasVacacionesRestantes}}
-                  {% if diasVacacionesSolicitados != 0 %}
-                  <span class="text-danger text-sm font-weight-bolder">-{{diasVacacionesSolicitados}}</span>
+                  {% if diasHabilesVacacionesSolicitados != 0 %}
+                  <span class="text-danger text-sm font-weight-bolder">-{{diasHabilesVacacionesSolicitados}}</span>
                   {% endif %}
                 {% else %}
                 <span class="text-danger text-gradient font-weight-bolder">Sin días</span>
