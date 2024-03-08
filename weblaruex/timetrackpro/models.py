@@ -223,7 +223,7 @@ class FestivosTimetrackPro(models.Model):
     nombre = models.CharField(db_column='Nombre', max_length=100)  # Field name made lowercase.
     tipo_festividad = models.ForeignKey('TipoFestivos', models.DO_NOTHING, db_column='Tipo_festividad')  # Field name made lowercase.
     fecha_inicio = models.DateField()
-    fecha_fin = models.DateField()
+    fecha_fin = models.DateField(null=True, blank=True)
     year = models.IntegerField()
     class Meta:
         managed = False

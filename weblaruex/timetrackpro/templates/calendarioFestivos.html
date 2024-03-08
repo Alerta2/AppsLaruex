@@ -111,18 +111,7 @@
             </button>
           </div>
           <div class="modal-body">
-            <div class="row d-flex justify-content-center" id="rowMultiple">
-              <div class="col-xl-6" id="colMultiple">
-                <label>¿La festividad abarca varios días?</label>
-                <select class="form-control" aria-label="Nombre en el dispositivo" id="varios_dias"
-                  aria-describedby="text-addon" >
-                  <option selected hidden>Indique si o no</option>
-                  <option value="0">No</option>
-                  <option value="1">Si</option>
-                </select>
-              </div>
-            </div>
-            <div class="row" id="divFormularioFestivos" hidden>
+            <div class="row" id="divFormularioFestivos">
               <input class="form-control" type="text" id="year" name="year" hidden>
               <div class="col-xl-6">
                 <label>Inicio</label>
@@ -131,15 +120,8 @@
                     aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" onchange="obtenerFecha()">
                 </div>
               </div>
-              <div class="col-xl-6" id="inputFechaFin">
-                <label>Fin</label>
-                <div class="">
-                  <input type="date" class="form-control" aria-label="Fecha final de la festividad"
-                    aria-describedby="text-addon" name="fecha_fin" id="fecha_fin">
-                </div>
-              </div>
             </div>
-            <div class="row" id="divFormularioFestivos2" hidden>
+            <div class="row" id="divFormularioFestivos2" >
               <div class="col-xl-6">
                 <label>Festividad</label>
                 <input type="text" class="form-control" placeholder="Nombre de la festividad"
@@ -238,36 +220,12 @@ document.addEventListener('DOMContentLoaded', function() {
     calendar.updateSize(); // actualizo el tamaño del calendario
   });
 
-  document.getElementById("varios_dias").addEventListener(
-  "change",
-  () => {
-    var festivoMultiple = document.getElementById("varios_dias").value;
-    var divFestivo = document.getElementById("divFormularioFestivos");
-    var divFestivo2 = document.getElementById("divFormularioFestivos2");
-    let colMultiple = document.getElementById("colMultiple");
-    let rowMultiple = document.getElementById("rowMultiple");
-    var inputFechaFin = document.getElementById("inputFechaFin");
-
-    // se muestra el div con el formulario de festivos
-    divFestivo.removeAttribute("hidden");
-    divFestivo2.removeAttribute("hidden");
-
-    if (festivoMultiple == "0") {
-      // se oculta el input de fecha fin
-      inputFechaFin.style.display = "none";   
-    }
-    colMultiple.style.display = "none"; 
-    rowMultiple.style.display = "none"; 
-  },
-  false,
-);
 
   function obtenerFecha() {
     var fecha = document.getElementById("fecha_inicio").value;
-    var fecha_fin = document.getElementById("fecha_fin");
     var inputYear = document.getElementById("year");
     var year = fecha.substring(0, 4);
-    fecha_fin.value = fecha;
+    fecha.value = fecha;
     inputYear.value = year;
   }
 
