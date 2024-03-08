@@ -16,13 +16,20 @@
               <div class="text text-sm">Editar</div>
             </button>
             </div>
+      {% endif %}
+
+      
+      {% if administrador or director%}
             <div class="col">
              <button class="botonLink" data-toggle="modal" data-target="#modalCambiarEstado">             
               <div class="sign-Btn-link"><i class="fa-solid fa-sign-hanging fa-lg" style="color: #ffffff;"></i></div>
               <div class="text text-sm">Cambiar estado</div>
             </button>
             </div>
+      
+        {% endif %}
             
+        {% if administrador %}
             <div class="col">
               <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarAsuntosPropios">             
                <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
