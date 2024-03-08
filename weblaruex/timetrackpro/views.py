@@ -2253,6 +2253,7 @@ def modificarEstadoErrorRegistroNotificado(request, id):
     error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id)[0]
     empleadosLaruex  = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=error.id_empleado)[0]
     empleadoMaquina = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=empleadosLaruex.id_empleado.id)[0]
+
     administrador = esAdministrador(request.user.id)
     if administrador:
         if request.method == 'POST':
