@@ -10,30 +10,23 @@
 {% endblock %}
 
 {% block content %}
-<div class="pagetitle">
-  <nav>
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
-      </ol>
-  </nav>
-</div>
+
 <!-- Info programa -->
 <section class="section dashboard">
     <!-- Info programa cards -->
     <div class="col-12">
       <div class="row">
         <!-- Card -->
-        <div class="col-xxl-3 col-lg-4 col-md-6 col-sm-12">
+        <div class="col-sm-12">
           <div class="card info-card sales-card">
             <div class="card-body">
-              <h5 class="card-title">Versión <span>| 1.5</span></h5>
+              <h5 class="card-title">Versión <span>| 1.0</span></h5>
               <div class="d-flex align-items-center">
                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                     <img src="{% static 'img/logos/logo_laruex.png' %}" alt="Logo" title="Logo Laruex - Ir a Inicio" width="60px"/>
                 </div>
                 <div class="ps-3">
                   <h6>Gestión de Muestras</h6>
-                  <span class="text-success small pt-1 fw-bold">..</span> <span class="text-muted small pt-2 ps-1">..</span>
                 </div>
               </div>
             </div>
@@ -205,6 +198,28 @@
 </section>
 
 <script>
+
+  function almacenarCodigos(){
+    var codigos = [{"codigo":"1005212000000", "texto":"muestra aguas labaqua"},{"codigo":"1000563000000", "texto":"muestra2"}, {"codigo":"2005212000954", "texto":"alicuota1"}, {"codigo":"2005212000955", "texto":"alicuota2"}];
+    datos = {
+      "codigos": JSON.stringify(codigos),
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    }
+
+    $.ajax({  
+      type: "POST",
+      dataType: "json",
+      data: datos,
+      url:"/private/gestionmuestras/almacenarCodigosBarras/",
+      success: function(data)
+      {
+          console.log("creado");
+      }
+    });
+
+  }
+  
+  
 
 </script>
 <!-- End Botones -->

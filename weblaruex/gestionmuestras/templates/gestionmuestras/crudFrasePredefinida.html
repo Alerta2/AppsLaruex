@@ -1,0 +1,192 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+
+<!-- modal confirm delete cod muestra -->
+<div class="modal fade" id="modalConfirmDeleteFrase" tabindex="-1" aria-labelledby="modalConfirmDeleteFraseLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmDeleteFraseLabel">Eliminar Frase</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea eliminar el Frase?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="confirmarBorrado()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal confirm delete cod muestra -->
+
+<!-- modal to add or edit a cod muestra -->
+<div class="modal fade" id="modalAddEditFrase" tabindex="-1" aria-labelledby="modalAddEditFraseLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAddEditFraseLabel">Nuevo Frase</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="formModal" class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal to add or edit a cod muestra -->
+
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <table class="table"
+            id="table"
+            data-toggle="table"
+            data-pagination="true"
+            data-page-size="25"
+            data-height="800"
+            data-search="true"
+            data-show-columns="true"
+            data-show-refresh="true"
+            data-show-columns-toggle-all="true"
+            data-show-fullscreen="true"
+            data-buttons="buttons"
+            data-buttons-class="light"
+            data-show-export="true"
+            data-url="/private/gestionmuestras/gestionFrasePredefinidaDatos/">
+        </table>
+    </div>
+    <!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+<script>
+    // tabla para mostrar los FrasePredefinida
+    // parámetros: identificador, texto, destino
+    // identificador no se muestran en la tabla por defecto
+    $('#table').bootstrapTable({
+        columns: [
+            {
+                field: 'identificador',
+                visible: false
+            },
+            {
+                field: 'texto',
+                title: 'Texto',
+                sortable: true
+            },
+            {
+                field: 'destino',
+                title: 'Destino',
+                sortable: true
+            }
+            ,{
+                title: 'Acciones',
+                formatter: function (value, row) {
+                  // si usuario es administrador
+                  let botones = '<div class="btn-group">';
+                  botones += '<a class="btn" onclick="editarFrase('+"'"+row.identificador+"'"+')"><i class="fa-solid fa-pen-to-square"></i></a>';
+                  
+                  {% if user.is_superuser %}
+                    botones += '<a class="btn" onclick="borrarFrase('+"'"+row.identificador+"'"+')"><i class="fa-solid fa-trash"></i></a>';
+                  {% endif %}
+                  botones += '</div>';
+                  return botones;
+                }
+            }],
+        locale: "es-ES",
+        search: true,
+        sortName: 'doc',
+        sortOrder: 'asc',
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+    })
+
+    function dateFormat(value, row, index) {
+        return moment(value).format('DD/MM/YYYY HH:mm');
+    }
+
+    function buttons () {
+        return {
+          btnAdd: {
+            text: 'Nuevo Frase',
+            icon: 'bi-plus',
+            event: function () {
+                $.ajax({
+                url: '/private/gestionmuestras/gestionFrasePredefinidaNuevo/',
+                type: 'GET',
+                success: function(response){
+                    $('#formModal').html(response);
+                    $('#modalAddEditFrase').modal('show');
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+            },
+            attributes: {
+              title: 'Nuevo Frase',
+            }
+          }
+        }
+    }
+    let codigoAuxiliar = "";
+    function borrarFrase(identificador){
+        codigoAuxiliar = identificador;
+        $('#modalConfirmDeleteFrase').modal('show');
+    }
+    function confirmarBorrado(){
+        $('#modalConfirmDeleteFrase').modal('hide');
+        $.ajax({
+            url: '/private/gestionmuestras/gestionFrasePredefinidaBorrar/',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}', 'identificador': codigoAuxiliar
+            },
+            success: function(response){
+                $('#table').bootstrapTable('refresh');
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    }
+    function editarFrase(identificador){
+        $.ajax({
+            url: '/private/gestionmuestras/gestionFrasePredefinidaEditar/',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}', 
+                'consulta': 1,
+                'identificador': identificador
+            },
+            success: function(response){
+                $('#formModal').html(response);
+                $('#modalAddEditFrase').modal('show');
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    }
+</script>
+{% endblock %}

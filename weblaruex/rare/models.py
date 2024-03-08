@@ -1207,6 +1207,7 @@ class MensajesTelegram(models.Model):
     class Meta: 
         managed = False 
         db_table = 'mensajes_telegram'
+        
 class MensajesTelegramHistorico(models.Model):
     id_mensaje = models.IntegerField(db_column='ID_MENSAJE', primary_key=True)  # Field name made lowercase.
     id_area = models.IntegerField(db_column='ID_AREA', blank=True, null=True)  # Field name made lowercase.

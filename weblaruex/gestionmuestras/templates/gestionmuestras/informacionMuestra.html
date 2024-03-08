@@ -11,11 +11,6 @@
 {% block content %}
 
 
-
-<!-- import scripts gestion de muestras -->
-<script src="{% static 'js/scriptsGestion/gestionMuestras.js' %}"></script>
-
-
 <div class="pagetitle">
   <nav>
       <ol class="breadcrumb">
@@ -79,6 +74,11 @@
                   <span class="text-success small pt-1 fw-bold">Muestra</span> <span class="text-muted small pt-2 ps-1">{{ muestra.identificador }}</span>
                 </div>
               </div>
+              <div class="d-flex align-items-center mt-5">
+                <a href="{% url 'gestionmuestras:gestmuesInsertarAlicuotas' muestra.identificador %}" class="card-icon rounded-circle d-flex align-items-center justify-content-center mr-1" data-toggle="tooltip" data-placement="bottom" title="Insertar alicuotas"><i class="fa-duotone fa-vials"></i></a>
+                <a href="" data-toggle="modal" data-target="#selectorEtiquetasModal" onclick="rellenarModalEtiquetas({{muestra.identificador}})" class="card-icon rounded-circle d-flex align-items-center justify-content-center mr-1" data-toggle="tooltip" data-placement="bottom" title="Crear códigos de barras"><i class="fa-solid fa-barcode-read"></i></a>
+                <a href="{% url 'gestionmuestras:gestmuesModificarMuestra' muestra.identificador %}" class="card-icon rounded-circle d-flex align-items-center justify-content-center mr-1" data-toggle="tooltip" data-placement="bottom" title="Modificar Muestra"><i class="fa-duotone fa-pen-to-square"></i></a>
+              </div>
               {% if informe %}
                 <h5 class="card-title">INFORME <span>| {{ informe.identificador }}_{{ informe.anio }}</span></h5>
               {% endif %}
@@ -95,27 +95,27 @@
                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                   <i class="fa-regular fa-calendar-arrow-down"></i>
                 </div>
-                <div class="">
+                <div class="pl-2">
                   <h6>{{ muestra.fecha_hora_recogida|date:"d/m/y H:m" }}</h6>
-                  <span class="text-success small pt-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida inicial</span>
+                  <span class="text-success small pl-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida inicial</span>
                 </div>
               </div>
-              <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center my-3">
                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                   <i class="fa-regular fa-calendar-arrow-up"></i>
                 </div>
-                <div class="">
+                <div class="pl-2">
                   <h6>{{ muestra.fecha_hora_recogida|date:"d/m/y H:m" }}</h6>
-                  <span class="text-success small pt-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida final</span>
+                  <span class="text-success small pl-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida final</span>
                 </div>
               </div>
               <div class="d-flex align-items-center">
                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                   <i class="fa-regular fa-calendar-check"></i>
                 </div>
-                <div class="">
+                <div class="pl-2">
                   <h6>{{ muestra.fecha_hora_recogida|date:"d/m/y H:m" }}</h6>
-                  <span class="text-success small pt-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida referencia</span>
+                  <span class="text-success small pl-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida referencia</span>
                 </div>
               </div>
             </div>
@@ -267,8 +267,11 @@
                 formatter: function (value, row) {
                   // si usuario es administrador
                   let botones = '<div class="btn-group">';
+                  {% if perms.auth.insercion_muestras %}
+                    botones += '<a class="btn" onclick="duplicarAlicuota(' + row.identificador + ', '+ row.id_analiticas__identificador + ', '+ row.analista_tecnico__identificador + ', '+"'#tableAlicuotas'"+')" data-toggle="tooltip" data-placement="bottom" title="Duplicar alicuota"><i class="fa-solid fa-copy"></i></a>';
+                  {% endif %}
                   {% if user.is_superuser %}
-                    botones += '<a class="btn" onclick="borrarAlicuota(' + row.identificador + ', '+"'#tableAlicuotas'"+')"><i class="fa-solid fa-trash"></i></a>';
+                    botones += '<a class="btn" onclick="borrarAlicuota(' + row.identificador + ', '+"'#tableAlicuotas'"+')" data-toggle="tooltip" data-placement="bottom" title="Borrar alicuota"><i class="fa-solid fa-trash"></i></a>';
                   {% endif %}
                   botones += '</div>';
                   return botones;
@@ -290,7 +293,7 @@
         return {
           btnAdd: {
             text: 'Add new row',
-            icon: 'fa-plus',
+            icon: 'bi-plus',
             event: function () {
               alert('Do some stuff to e.g. add a new row')
             },

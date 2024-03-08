@@ -1,0 +1,149 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <table class="table"
+            id="table"
+            data-toggle="table"
+            data-pagination="true"
+            data-page-size="25"
+            data-height="800"
+            data-search="true"
+            data-show-columns="true"
+            data-show-refresh="true"
+            data-show-columns-toggle-all="true"
+            data-show-fullscreen="true"
+            data-buttons="buttons"
+            data-buttons-class="light"
+            data-show-export="true"
+            data-detail-view="true"
+            data-detail-formatter="detailFormatter"
+            data-url="/private/gestionmuestras/consultarMuestrasRecogerDatos/">
+            <thead>
+            </thead>
+        </table>
+    </div>
+    <!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+<script>
+    // parametros de la tabla 'n_recogida__numero', 'n_recogida__csn__nombre', 'n_recogida__procedencia__nombre', 'n_recogida__memoria__descripcion', 'csn__nombre', 'recoge', 'n_recogida__suministra', 'suministra', 'observaciones', 'n_recogida__observaciones', 'recogido', 'fecha_recogida_inicial', 'fecha_recogida_final', 'fecha_recepcion', 'conservacion', 'nfiltro', 'ibomba', 'mes'
+    $('#table').bootstrapTable({
+        columns: [
+            
+            { 
+                sortable: true,
+                align: 'center',
+                formatter: function (value, row) {
+                    if (row.recogido == 0) {
+                        return '<i class="fa-solid fa-hourglass-start fa-xl" style="color:#FFA914"></i>';
+                    }
+                    else {
+                        return '<i class="fa-solid fa-box-check fa-xl" style="color:#039e00"></i>';
+                    }
+
+                }
+            },
+            {
+                field: 'n_recogida__numero', title: 'Nº Recogida', sortable: true
+            },
+            {field: 'n_recogida__csn__nombre', title: 'CSN', sortable: true},
+            {
+                field: 'n_recogida__procedencia__nombre', 
+                title: 'Procedencia', 
+                sortable: true,
+                formatter: function (value, row) {
+                    var procedencia = '<p>Procedencia: '+row.n_recogida__procedencia__nombre+'</p>'
+                    var suministra = '<p>Suministra: '+row.n_recogida__suministra+' / '+row.suministra+'</p>'
+                    return '<div class="row">'+procedencia+suministra+'</div>';
+                }
+            },
+            {field: 'n_recogida__memoria__memoria', title: 'Memoria', sortable: true},
+            {field: 'csn__nombre', title: 'CSN', sortable: true},
+            {field: 'recoge', title: 'Recoge', sortable: true},
+            {
+                title: 'Fecha Recogida Inicial', 
+                sortable: true, 
+                align: 'center',
+                formatter: function (value, row) {
+                    // if value is null, return '-'
+                    
+                    console.log(row.fecha_recogida_inicial);
+                    if (row.fecha_recogida_inicial == null) 
+                        return '-';
+                    else
+                        return moment(value).format('DD/MM/YYYY HH:mm');
+                }
+
+            },
+            {
+                title: 'Fecha Recogida Final', 
+                sortable: true, 
+                align: 'center',
+                formatter: function (value, row) {
+                    // if value is null, return '-'
+                    if (row.fecha_recogida_final == null) 
+                        return '-';
+                    else
+                        return moment(value).format('DD/MM/YYYY HH:mm');
+                }
+            },
+            {field: 'fecha_recepcion', title: 'Fecha Recepción', sortable: true, formatter: 'dateFormat'},
+            {field: 'mes', title: 'Mes', sortable: true},
+        ],
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+    })
+
+    function dateFormat(value, row, index) {
+        return moment(value).format('DD/MM/YYYY HH:mm');
+    }
+
+    function buttons () {
+        return {
+          btnAdd: {
+            text: 'Add new row',
+            icon: 'bi-plus',
+            event: function () {
+              alert('Do some stuff to e.g. add a new row')
+            },
+            attributes: {
+              title: 'Add a new row to the table'
+            }
+          }
+        }
+    }
+    function detailFormatter(index, row) {
+        var html = []
+        html.push('<p><b>Observacion general:</b> ' + value + '</p>')
+        html.push('<p><b>Observacion particular:</b> ' + value + '</p>')
+        if (row.conservacion != 'nan')
+            html.push('<p><b>Conservación:</b> ' + value + '</p>')
+        if (row.nfiltro != 0)
+            html.push('<p><b>Nº Filtro:</b> ' + value + '</p>')
+        if (row.ibomba != 0)
+            html.push('<p><b>Bomba:</b> ' + value + '</p>')
+        return html.join('')
+    }
+</script>>
+{% endblock %}

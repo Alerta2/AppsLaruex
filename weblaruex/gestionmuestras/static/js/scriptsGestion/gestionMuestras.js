@@ -47,3 +47,110 @@ function borrarAlicuota(id, tabla){
         }
     });
 }
+
+// funcion que duplica una alicuota, el tratamiento y refresca la tabla en caso de ser necesario
+function duplicarAlicuota(id, determinacion, usuario, tabla){
+    $.ajax({
+        url: '/private/gestionmuestras/duplicarAlicuota/',
+        type: 'POST',
+        data: {
+            'id': id,
+            'determinacion': determinacion,
+            'usuario': usuario,
+        },
+        success: function(response){
+            crearAviso(id, "Alicuota duplicada correctamente")
+            $(tabla).bootstrapTable('refresh');
+        },
+        error: function(error){
+            console.log(error);
+        }
+    });
+    
+}
+
+
+function consultarEtiquetas(){
+
+    $.ajax({  
+        type: "GET",
+        dataType: "html",
+        url:"/private/gestionmuestras/consultarEtiquetas/",
+        success: function(data)
+            {
+                // cambio el valor del div de id etiquetas_almacenadas por data
+                $("#etiquetas_almacenadas").html(data);
+                $("#etiquetas_almacenadas").css("height", "400px");
+
+            }
+        });
+
+    }
+
+
+function rellenarModalEtiquetas(id){
+    $("#etiquetasSeleccionar").html("<p>Buscando etiquetas posibles...</p>");
+
+    $.ajax({  
+        type: "GET",
+        dataType: "html",
+        url:"/private/gestionmuestras/etiquetasSeleccionar/"+id+"/",
+        success: function(data)
+        {
+            $("#etiquetasSeleccionar").html(data);
+        }
+    });
+}
+
+            
+// if etiquetas is empty hide div hoja_etiquetas
+
+function eliminarCodigo(codigo){
+    $.ajax({  
+        type: "GET",
+        dataType: "json",
+        url:"/private/gestionmuestras/eliminarCodigosExistentes/"+codigo+"/",
+        success: function(data)
+        {
+        consultarEtiquetas();
+        }
+    });
+
+}
+
+
+
+function quitarEtiqueta(codigo){
+    for (let index = 0; index < auxiliarJson.length; index++) {
+        if (auxiliarJson[index].codigo == codigo) {
+            auxiliarJson.splice(index, 1);
+            break;
+        }
+    }
+    // elimino el elemento etiqueta_+codigo
+    document.getElementById("etiqueta_"+codigo).remove();
+}
+
+function disminuirEtiqueta(codigo){
+    for (let index = 0; index < auxiliarJson.length; index++) {
+        if (auxiliarJson[index].codigo == codigo) {
+            auxiliarJson[index].cantidad = auxiliarJson[index].cantidad - 1;
+            if (auxiliarJson[index].cantidad == 0) {
+              quitarEtiqueta(codigo);
+            }
+            break;
+        }
+    }
+}
+
+function aumentarEtiqueta(codigo){
+    for (let index = 0; index < auxiliarJson.length; index++) {
+        if (auxiliarJson[index].codigo == codigo) {
+            auxiliarJson[index].cantidad = auxiliarJson[index].cantidad + 1;
+            break;
+        }
+    }
+}
+
+
+

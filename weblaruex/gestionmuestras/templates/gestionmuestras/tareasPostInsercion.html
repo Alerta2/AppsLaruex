@@ -34,16 +34,44 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Tareas post-insercción</h5>
-            <div class="card-header my-4">Asignación de tratamientos</div>
-            <div class="row">
-                {% for t in tratamientos %}
-                    <div class="col-3">
-                        {{ t }}
-                    </div>
-                {% endfor %}
-            </div>
-            <div class="card-header my-4">Controles requeridos</div>
-            <div class="card-header my-4">Impresión de etiquetas</div>
+            <form class="g-3" action="{% url 'gestionmuestras:gestmuesFinalizarInsercion' %}" method="POST"> 
+                {% csrf_token %}
+                <div class="card-header my-4">Asignación de tratamientos</div>
+                <div class="row">
+                    {% for t in tratamientos %}
+                        <div class="col-lg-3 col-md-4 col-sm-6 my-2">
+                            <div class="form-check form-switch">
+                                <label class="form-label">Determinacion: <b>{{ t.determinacion.nombre }}</b> con tratamiento <b>{{ t.tratamiento.descripcion }}</b> a realizar por: </label>
+                                <select name="{{t.key}}" id="{{ t.key }}" class="form-select" required>
+                                    {% for tecnico in t.tecnico %}
+                                        <option value="{{ tecnico }}">{{ tecnico }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="card-header my-4">Controles requeridos</div>
+                <div class="row">
+                    {% for c in controles_requeridos %}
+                        <div class="col-lg-3 col-md-4 col-sm-6 my-2">
+                            <div class="form-check form-switch">
+                                <label class="form-label">Determinacion: <b>{{ c.determinacion.nombre }}</b> con tratamiento <b>{{ c.tratamiento.descripcion }}</b> requiere <b>{{c.control}}</b> a realizar por: </label>
+                                <select name="{{c.key}}_{{c.control}}" id="{{ c.key }}_{{c.control}}" class="form-select" required>
+                                    {% for tecnico in c.tecnico %}
+                                        <option value="{{ tecnico }}">{{ tecnico }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center">
+                    <div class="card-header my-4"></div>
+                    <button type="submit" class="btn btn-primary">Insertar</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </div>
+            </form><!-- End Multi Columns Form -->
         </div>
     </div>
 </section>

@@ -1,0 +1,97 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+    button, input[type="submit"], input[type="reset"] {
+        background: none;
+        color: inherit;
+        border: none;
+        padding: 0;
+        font: inherit;
+        cursor: pointer;
+        outline: inherit;
+    }
+    .param-adicional div:hover{
+        background-color: #D7E9FC;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Etiquetas pendientes de imprimir</h5>
+            <div class="row mb-3">
+                
+                  {% for etiqueta in etiquetas %}
+                  <div class="col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                  <div id="etiqueta_{{etiqueta.codigo}}" class="card rounded-2 h-100 my-auto">
+                    <div class="card-body my-auto">
+                      <div class="row d-flex justify-content-between align-items-center">
+                        <div class="col-md-7 col-lg-7 col-xl-7">
+                          <p class="lead fw-normal mt-3 mb-1">Tipo de muestra / alicuota</p>
+                          <p><span class="text-muted">Código: </span>{{etiqueta.codigo}} </p>
+                          <p><span class="text-muted">Texto: </span>{{etiqueta.texto}}</p>
+                          {%if etiqueta.codigo_reducido %}<p><span class="text-muted">Codigo Reducido: </span>{{etiqueta.codigo_reducido}}</p>{% endif %}
+                        </div>
+                        <div class="col-md-4 col-lg-4 col-xl-4 d-flex">
+                          <button class="btn btn-link px-2"
+                            onclick="this.parentNode.querySelector('input[type=number]').stepDown(); disminuirEtiqueta({{etiqueta.codigo}}); renovarEtiquetasSesion();">
+                            <i class="fas fa-minus"></i>
+                          </button>
+    
+                          <input id="form1" min="0" name="quantity" value="{{etiqueta.cantidad}}" type="number"
+                            class="form-control form-control-sm" />
+                          <button class="btn btn-link px-2"
+                            onclick="this.parentNode.querySelector('input[type=number]').stepUp(); aumentarEtiqueta({{etiqueta.codigo}}); renovarEtiquetasSesion();">
+                            <i class="fas fa-plus"></i>
+                          </button>
+                        </div>
+                        <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+                          <a href="#!" onclick="quitarEtiqueta({{etiqueta.codigo}}); renovarEtiquetasSesion();" class="text-danger"><i class="fas fa-trash fa-lg"></i></a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- el boton cerrar pone en el div de id "etiquetasSeleccionar" el texto "Seleccione las etiquetas a imprimir"-->
+            <a href="/private/gestionmuestras/crearCodigosBarras/" class="btn border-primary text-primary">Imprimir</a>
+            <!-- El botón agregar ejecuta la funcion cargarEtiquetasSesion() y pulsa el boton cerrar del modal -->
+            <a href="/private/gestionmuestras/vaciarCodigosBarras/" class="btn border-danger text-danger">Eliminar etiquetas</a>
+        </div>
+    </div>
+</section>
+<!-- End Info programa -->
+
+<script>
+   auxiliarJson = {{ etiquetas|safe }};
+   function renovarEtiquetasSesion(){
+      $.ajax({  
+          type: "POST",
+          dataType: "json",
+          // data contiene el token de django csrfmiddlewaretoken y el array de codigos en el key codigos
+          data: {csrfmiddlewaretoken: '{{ csrf_token }}', codigos: JSON.stringify(auxiliarJson)},
+          url:"/private/gestionmuestras/renovarCodigosBarras/",
+          success: function(data)
+          {
+          }
+      });
+    }
+</script>
+{% endblock %}

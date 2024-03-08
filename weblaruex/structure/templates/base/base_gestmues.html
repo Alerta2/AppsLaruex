@@ -20,6 +20,12 @@
         <link rel="apple-touch-icon" sizes="144x144" href="{% static 'img/apple-touch-icon-144x144.png' %}" sizes="144x144"/>
         <link rel="apple-touch-icon" sizes="152x152" href="{% static 'img/apple-touch-icon-152x152.png' %}" sizes="152x152"/>
         <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon-180x180.png' %}" sizes="180x180"/>
+
+
+        
+        <!-- import scripts gestion de muestras -->
+        <script src="{% static 'js/scriptsGestion/gestionMuestras.js' %}"></script>
+
         <!-- favicon -->
         <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" />
 
@@ -77,8 +83,11 @@
         <script src="{% static 'js/jquery.nicescroll.js' %}"></script>
 
         <!-- bootstrap table -->
-        <link href="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.css" rel="stylesheet">
-        <script src="https://unpkg.com/bootstrap-table@1.18.2/dist/bootstrap-table.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.3/dist/bootstrap-table.min.css" rel="stylesheet">
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.3/dist/bootstrap-table.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.22.3/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+
         <script src="https://momentjs.com/downloads/moment.min.js"></script>
 
         <script src="https://cdn.jsdelivr.net/npm/tableexport.jquery.plugin@1.10.21/tableExport.min.js"></script>
@@ -112,11 +121,46 @@
                 z-index: 2000;
                 width: 100%;
             }
+            #hoja_etiquetas{
+                z-index: 1000;
+                position: fixed;
+                top: 0px;
+                right: 0px;
+            }
             {% block css %}
             {% endblock %}
         </style>
     </head>
     <body>
+        <!-- modal selector de etiquetas -->
+        <!-- Modal -->
+        <div class="modal fade" id="selectorEtiquetasModal" tabindex="-1" role="dialog" aria-labelledby="selectorEtiquetasModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="selectorEtiquetasModalLabel">Seleccione las etiquetas para imprimir:</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div id="etiquetasSeleccionar" class="modal-body">
+                        Seleccione las etiquetas a imprimir
+                    </div>
+                    <div class="modal-footer">
+                    <!-- el boton cerrar pone en el div de id "etiquetasSeleccionar" el texto "Seleccione las etiquetas a imprimir"-->
+                    <button id="cerrarModelEtiquetas" type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#etiquetasSeleccionar').html('Seleccione las etiquetas a imprimir');">Cerrar</button>
+                    <!-- El botón agregar ejecuta la funcion cargarEtiquetasSesion() y pulsa el boton cerrar del modal -->
+                    <button type="button" class="btn btn-primary" onclick="cargarEtiquetasSesion(); $('#cerrarModelEtiquetas').click()">Agregar</button>
+                    </div>
+                </div>  
+            </div>
+        </div>
+        <!-- fin modal selector de etiquetas -->
+
+        <!-- modal modificacion de las tablas -->
+        <div class="modal fade" id="gestionTablasModal" tabindex="-1" aria-labelledby="gestionTablasModalLabel" aria-hidden="true"></div>
+        <!-- fin modal modificacion de las tablas -->
+
         <section id="alertas_push"></section>
         {% block modal %}
         {% endblock %}
@@ -138,8 +182,10 @@
 
         <script src="{% static 'js/cookiealert.js' %}"></script>
         <script type="text/javascript">
+            $("#hoja_etiquetas").hide();
+
             $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
+                $('[data-toggle="tooltip"]').tooltip()
             });
             
             function crearAviso(id, comentario){
@@ -158,6 +204,82 @@
                 }, 1000);
             }
             
+            function cargarBotonesGestion(){
+                $.ajax({  
+                    type: "GET",
+                    dataType: "html",
+                    url:"/private/gestionmuestras/botonesGestion/",
+                    success: function(data)
+                    {
+                        $("#gestionTablasModal").html(data);
+                    }
+                });
+            }
+            cargarBotonesGestion();
+
+            function consultarEtiquetas(){
+
+                $.ajax({  
+                    type: "GET",
+                    dataType: "html",
+                    url:"/private/gestionmuestras/consultarEtiquetas/",
+                    success: function(data)
+                        {
+                            // cambio el valor del div de id etiquetas_almacenadas por data
+                            $("#etiquetas_almacenadas").html(data);
+                            $("#etiquetas_almacenadas").css("height", "400px");
+                            $("#hoja_etiquetas").show();
+                        }
+                    });
+
+                }
+
+            
+            function rellenarModalEtiquetas(id){
+                $("#etiquetasSeleccionar").html("<p>Buscando etiquetas posibles...</p>");
+
+                $.ajax({  
+                    type: "GET",
+                    dataType: "html",
+                    url:"/private/gestionmuestras/etiquetasSeleccionar/"+id+"/",
+                    success: function(data)
+                    {
+                        $("#etiquetasSeleccionar").html(data);
+                    }
+                });
+            }
+
+                        
+            // if etiquetas is empty hide div hoja_etiquetas
+            
+            function eliminarCodigo(codigo){
+                $.ajax({  
+                    type: "GET",
+                    dataType: "json",
+                    url:"/private/gestionmuestras/eliminarCodigosExistentes/"+codigo+"/",
+                    success: function(data)
+                    {
+                        consultarEtiquetas();
+                    }
+                });
+
+            }
+
+            function cargarEtiquetasSesion(){
+                $.ajax({  
+                    type: "POST",
+                    dataType: "json",
+                    // data contiene el token de django csrfmiddlewaretoken y el array de codigos en el key codigos
+                    data: {csrfmiddlewaretoken: '{{ csrf_token }}', codigos: JSON.stringify(auxiliarJson)},
+                    url:"/private/gestionmuestras/almacenarCodigosBarras/",
+                    success: function(data)
+                    {
+                        auxiliarJson = [];
+                        consultarEtiquetas();
+                    }
+                });
+            }
+
             {% block js %}
             {% endblock %}
         </script>

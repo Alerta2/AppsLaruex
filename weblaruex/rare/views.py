@@ -2844,8 +2844,8 @@ def generacionInforme(request):
 def enviarMensajeMonitoriza(request):
     usuariosInformados = consultarTelefonosInformados()
     if (request.POST.get("checkboxCanalTelegram") =="on"):
-        MensajesTelegram(id_area=1,id_estacion=None,fecha_hora_utc=datetime.now(pytz.timezone("Europe/Madrid")),mensaje="Información adicional",descripcion=request.POST.get('TextAreaMensajeEnvio'),icono='38',estado=0,id_telegram=-1001749964853,silenciar=0, confirmar=0).save(using='spd')
-    
+        MensajesTelegram(id_area=1,id_estacion=None,fecha_hora_utc=datetime.now(pytz.timezone("Europe/Madrid")),mensaje="Información adicional",descripcion=request.POST.get('TextAreaMensajeEnvio'),icono='38',estado=0,id_telegram=settings.ID_CHAT_RAREX,silenciar=0, confirmar=0).save(using='spd')
+   
     if (request.POST.get("checkboxCanalSMS") =="on"):
         for telefono in usuariosInformados:
             MensajesSms(fecha_hora_utc=datetime.now(pytz.timezone("Europe/Madrid")),mensaje="Información adicional",descripcion=request.POST.get('TextAreaMensajeEnvio'),icono='38',estado=0,telefono=telefono,confirmar=0).save(using='spd')

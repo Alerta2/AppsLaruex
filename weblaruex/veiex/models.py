@@ -139,7 +139,7 @@ class UmbralesVle(models.Model):
 
 
 class ValoresVeiex(models.Model):
-    id_estacion = models.OneToOneField(Estaciones, models.DO_NOTHING, db_column='ID_ESTACION', primary_key=True)  # Field name made lowercase.
+    id_estacion = models.ForeignKey(Estaciones, models.DO_NOTHING, db_column='ID_ESTACION', primary_key=True)  # Field name made lowercase.
     id_canal = models.ForeignKey(Canales, models.DO_NOTHING, db_column='ID_CANAL')  # Field name made lowercase.
     fecha_hora_utc = models.DateTimeField(db_column='FECHA_HORA_UTC')  # Field name made lowercase.
     fecha_hora_local = models.DateTimeField(db_column='FECHA_HORA_LOCAL')  # Field name made lowercase.

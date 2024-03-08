@@ -30,6 +30,17 @@ class AnalisisMedido(models.Model):
         managed = False
         db_table = 'analisis_medido'
 
+class BotonesEdicion(models.Model):
+    id = models.IntegerField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    nombre = models.CharField(db_column='NOMBRE', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    url = models.CharField(db_column='URL', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    icono = models.CharField(db_column='ICONO', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    grupo = models.IntegerField(db_column='GRUPO', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'botones_edicion'
+
 class Clientes(models.Model):
     identificador = models.AutoField(db_column='IDENTIFICADOR', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='NOMBRE', max_length=255)  # Field name made lowercase.
@@ -71,6 +82,27 @@ class EstadoMuestras(models.Model):
         db_table = 'estado_muestras'
 
 
+class EventosMuestras(models.Model):
+    identificador = models.IntegerField(db_column='IDENTIFICADOR', primary_key=True)  # Field name made lowercase.
+    muestra = models.IntegerField(db_column='MUESTRA', blank=True, null=True)  # Field name made lowercase.
+    evento = models.CharField(db_column='EVENTO', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    fecha_evento = models.DateTimeField(db_column='FECHA_EVENTO', blank=True, null=True)  # Field name made lowercase.
+    comentario = models.CharField(db_column='COMENTARIO', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    usuario = models.IntegerField(db_column='USUARIO', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'eventos_muestras'
+
+class FrasesPredefinidas(models.Model):
+    identificador = models.IntegerField(db_column='IDENTIFICADOR', primary_key=True)  # Field name made lowercase.
+    texto = models.CharField(db_column='TEXTO', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    destino = models.CharField(db_column='DESTINO', max_length=30, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'frases_predefinidas'
+
 class FrecuenciaRecogida(models.Model):
     identificador = models.AutoField(db_column='IDENTIFICADOR', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='NOMBRE', max_length=30)  # Field name made lowercase.
@@ -109,7 +141,7 @@ class ParametrosMuestra(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'parametros_muestra'
+        db_table = 'parametros_muestra_nuevo'
         
 class Procedencias(models.Model):
     codigo = models.IntegerField(db_column='CODIGO', primary_key=True)  # Field name made lowercase.
@@ -118,6 +150,18 @@ class Procedencias(models.Model):
     class Meta:
         managed = False
         db_table = 'procedencias'
+
+class RelacionInformesGenerados(models.Model):
+    id_muestra = models.CharField(db_column='ID_MUESTRA', primary_key=True, max_length=30)  # Field name made lowercase.
+    informe = models.CharField(db_column='INFORME', max_length=30)  # Field name made lowercase.
+    cliente = models.CharField(db_column='CLIENTE', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    referencia = models.CharField(db_column='REFERENCIA', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    fecha_emision = models.DateField(db_column='FECHA_EMISION', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'relacion_informes_generados'
+        unique_together = (('id_muestra', 'informe'),)
 
 
 class Suministradores(models.Model):
@@ -157,7 +201,6 @@ class Usuarios(models.Model):
         db_table = 'usuarios'
         unique_together = (('identificador', 'dni'),)
 
-
 class Determinaciones(models.Model):
     identificador = models.AutoField(db_column='IDENTIFICADOR', primary_key=True)  # Field name made lowercase.
     nombre = models.CharField(db_column='NOMBRE', max_length=50)  # Field name made lowercase.
@@ -179,7 +222,7 @@ class Tratamiento(models.Model):
         db_table = 'tratamiento'
 
 class MuestraActualCodigo(models.Model):
-    id_tratamiento = models.ForeignKey('Tratamiento', models.DO_NOTHING, db_column='ID_TRATAMIENTO', primary_key=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     codigo = models.CharField(db_column='CODIGO', max_length=10)  # Field name made lowercase.
     posicion = models.IntegerField(db_column='POSICION')  # Field name made lowercase.
     duplicada = models.IntegerField(db_column='DUPLICADA')  # Field name made lowercase.
@@ -209,7 +252,7 @@ class CodMuestras(models.Model):
 
 class RecogidaGeneral(models.Model):
     identificador = models.AutoField(primary_key=True)  # Field name made lowercase.
-    codigo_csn = models.ForeignKey('CodMuestras', models.DO_NOTHING, db_column='CODIGO_CSN')  # Field name made lowercase.
+    codigo_csn = models.ForeignKey(CodMuestras, models.DO_NOTHING, db_column='CODIGO_CSN')  # Field name made lowercase.
     codigo_procedencia = models.ForeignKey(Procedencias, models.DO_NOTHING, db_column='CODIGO_PROCEDENCIA')  # Field name made lowercase.
     codigo_memoria = models.ForeignKey(Memorias, models.DO_NOTHING, db_column='CODIGO_MEMORIA')  # Field name made lowercase.
     observaciones = models.CharField(db_column='OBSERVACIONES', max_length=150, blank=True, null=True)  # Field name made lowercase.
@@ -237,11 +280,11 @@ class MuestrasProgramadas(models.Model):
 
 class HistoricoRecogida(models.Model):
     identificador = models.AutoField(db_column='IDENTIFICADOR', primary_key=True)  # Field name made lowercase.
-    codigo_recogida = models.ForeignKey('RecogidaGeneral', models.DO_NOTHING, db_column='CODIGO_RECOGIDA')  # Field name made lowercase.
+    codigo_recogida = models.ForeignKey(RecogidaGeneral, models.DO_NOTHING, db_column='CODIGO_RECOGIDA')  # Field name made lowercase.
     codigo_barras = models.CharField(db_column='CODIGO_BARRAS', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    recepcionado_por = models.ForeignKey('Usuarios', models.DO_NOTHING, db_column='RECEPCIONADO_POR', blank=True, null=True)  # Field name made lowercase.
-    cliente = models.ForeignKey('Clientes', models.DO_NOTHING, db_column='CLIENTE')  # Field name made lowercase.
-    suministrador = models.ForeignKey('Suministradores', models.DO_NOTHING, db_column='SUMINISTRADOR')  # Field name made lowercase.
+    recepcionado_por = models.ForeignKey(Usuarios, models.DO_NOTHING, db_column='RECEPCIONADO_POR', blank=True, null=True)  # Field name made lowercase.
+    cliente = models.ForeignKey(Clientes, models.DO_NOTHING, db_column='CLIENTE')  # Field name made lowercase.
+    suministrador = models.ForeignKey(Suministradores, models.DO_NOTHING, db_column='SUMINISTRADOR')  # Field name made lowercase.
     fecha_hora_recogida = models.DateTimeField(db_column='FECHA_HORA_RECOGIDA')  # Field name made lowercase.
     fecha_hora_recogida_2 = models.DateTimeField(db_column='FECHA_HORA_RECOGIDA_2')  # Field name made lowercase.
     fecha_hora_recogida_ref = models.DateTimeField(db_column='FECHA_HORA_RECOGIDA_REF')  # Field name made lowercase.
@@ -278,7 +321,7 @@ class RelacionHistoricoMuestraAnaliticas(models.Model):
     codigo_barras = models.CharField(db_column='CODIGO_BARRAS', max_length=50, blank=True, null=True)  # Field name made lowercase.
     id_analiticas = models.ForeignKey(Determinaciones, models.DO_NOTHING, db_column='ID_ANALITICAS')  # Field name made lowercase.
     fecha_hora_entrega = models.DateTimeField(db_column='FECHA_HORA_ENTREGA', blank=True, null=True)  # Field name made lowercase.
-    analista_tecnico = models.ForeignKey('Usuarios', models.DO_NOTHING, db_column='ANALISTA_TECNICO')  # Field name made lowercase.
+    analista_tecnico = models.ForeignKey(Usuarios, models.DO_NOTHING, db_column='ANALISTA_TECNICO')  # Field name made lowercase.
     descripcion = models.CharField(db_column='DESCRIPCION', max_length=100, blank=True, null=True)  # Field name made lowercase.
     alicuota = models.CharField(db_column='ALICUOTA', max_length=30)  # Field name made lowercase.
     cantidad_muestra_analizada = models.FloatField(db_column='CANTIDAD_MUESTRA_ANALIZADA', blank=True, null=True)  # Field name made lowercase.
@@ -295,17 +338,27 @@ class RelacionHistoricoMuestraAnaliticas(models.Model):
 
 class RelacionAnaliticasTratamiento(models.Model):
     identificador = models.AutoField(db_column='IDENTIFICADOR', primary_key=True)  # Field name made lowercase.
-    id_muestra_analitica = models.ForeignKey('RelacionHistoricoMuestraAnaliticas', models.DO_NOTHING, db_column='ID_MUESTRA_ANALITICA')  # Field name made lowercase.
-    tratamiento = models.ForeignKey('Tratamiento', models.DO_NOTHING, db_column='TRATAMIENTO', blank=True, null=True)  # Field name made lowercase.
+    id_muestra_analitica = models.ForeignKey(RelacionHistoricoMuestraAnaliticas, models.DO_NOTHING, db_column='ID_MUESTRA_ANALITICA')  # Field name made lowercase.
+    tratamiento = models.ForeignKey(Tratamiento, models.DO_NOTHING, db_column='TRATAMIENTO', blank=True, null=True)  # Field name made lowercase.
     cod_reducido = models.CharField(db_column='COD_REDUCIDO', max_length=30)  # Field name made lowercase.
     fecha_inicio = models.DateTimeField(db_column='FECHA_INICIO')  # Field name made lowercase.
     fecha_fin = models.DateTimeField(db_column='FECHA_FIN', blank=True, null=True)  # Field name made lowercase.
-    analista = models.ForeignKey('Usuarios', models.DO_NOTHING, db_column='ANALISTA')  # Field name made lowercase.
+    analista = models.ForeignKey(Usuarios, models.DO_NOTHING, db_column='ANALISTA')  # Field name made lowercase.
     paso_actual = models.IntegerField(db_column='PASO_ACTUAL')  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'relacion_analiticas_tratamiento'
+
+class RelacionControlesTratamientos(models.Model):
+    identificador = models.AutoField(db_column='IDENTIFICADOR', primary_key=True)  # Field name made lowercase.
+    tipo_control = models.CharField(db_column='TIPO_CONTROL', max_length=10)  # Field name made lowercase.
+    codigo = models.CharField(db_column='CODIGO', max_length=10)  # Field name made lowercase.
+    id_muestra_historico = models.IntegerField(db_column='ID_MUESTRA_HISTORICO')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'relacion_controles_tratamientos'
 
 class RelacionDeterminacionesTratamientos(models.Model):
     id_determinacion = models.OneToOneField(Determinaciones, models.DO_NOTHING, db_column='ID_DETERMINACION', primary_key=True)  # Field name made lowercase.
@@ -341,9 +394,16 @@ class RelacionParametrosAnalitica(models.Model):
         managed = False
         db_table = 'relacion_parametros_analitica'
 
+class RelacionProcedenciasGestionVraex(models.Model):
+    id_gestion_muestras = models.IntegerField(db_column='ID_GESTION_MUESTRAS', primary_key=True)  # Field name made lowercase.
+    id_vraex = models.IntegerField(db_column='ID_VRAEX', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'relacion_procedencias_gestion_vraex'
 
 class RelacionProcedimientosResponsables(models.Model):
-    procedimiento = models.OneToOneField('Tratamiento', models.DO_NOTHING, db_column='PROCEDIMIENTO', primary_key=True)  # Field name made lowercase.
+    procedimiento = models.OneToOneField(Tratamiento, models.DO_NOTHING, db_column='PROCEDIMIENTO', primary_key=True)  # Field name made lowercase.
     responsable = models.CharField(db_column='RESPONSABLE', max_length=30)  # Field name made lowercase.
     sustituto_1 = models.CharField(db_column='SUSTITUTO_1', max_length=30)  # Field name made lowercase.
     sustituto_2 = models.CharField(db_column='SUSTITUTO_2', max_length=30, blank=True, null=True)  # Field name made lowercase.
@@ -352,7 +412,7 @@ class RelacionProcedimientosResponsables(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'relacion_procedimientos_responsables'
+        db_table = 'relacion_procedimientos_responsables_nueva'
 
 
 class RelacionTipoDeterminacionParametros(models.Model):
@@ -369,14 +429,14 @@ class RelacionTipoDeterminacionParametros(models.Model):
 
 
 class RelacionInformesMuestra(models.Model):
-    identificador = models.IntegerField(db_column='IDENTIFICADOR', primary_key=True)  # Field name made lowercase.
-    codigo_muestra_asociada = models.CharField(db_column='CODIGO_MUESTRA_ASOCIADA', max_length=50)  # Field name made lowercase.
+    identificador = models.IntegerField(db_column='IDENTIFICADOR')  # Field name made lowercase.
+    codigo_muestra_asociada = models.CharField(db_column='CODIGO_MUESTRA_ASOCIADA', max_length=50, primary_key=True)  # Field name made lowercase.
     anio = models.IntegerField(db_column='ANIO')  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'relacion_informes_muestra'
-        unique_together = (('identificador', 'anio'),)
+        unique_together = (('codigo_muestra_asociada', 'anio'),)
 
 
 # PARA MEDIDAS
@@ -431,3 +491,93 @@ class RelacionTratamientoAlfabetaResultado(models.Model):
     class Meta:
         managed = False
         db_table = 'relacion_tratamiento_alfabeta_resultado'
+
+class RelacionTratamientosMuestraCodigo(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    id_muestra_codigo = models.ForeignKey(MuestraActualCodigo, models.DO_NOTHING, db_column='ID_MUESTRA_CODIGO')  # Field name made lowercase.
+    id_tratamiento = models.ForeignKey(Tratamiento, models.DO_NOTHING, db_column='ID_TRATAMIENTO')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'relacion_tratamientos_muestra_codigo'
+
+class GestmuesRecogida(models.Model):
+    id = models.IntegerField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    numero = models.IntegerField(db_column='NUMERO', blank=True, null=True)  # Field name made lowercase.
+    csn = models.ForeignKey(CodMuestras, db_column='CSN', max_length=30, on_delete=models.PROTECT)  # Field name made lowercase.
+    procedencia = models.ForeignKey(Procedencias, db_column='PROCEDENCIA', on_delete=models.PROTECT)  # Field name made lowercase.
+    memoria = models.ForeignKey(Memorias, db_column='MEMORIA', max_length=10, on_delete=models.PROTECT)  # Field name made lowercase.
+    suministra = models.CharField(db_column='SUMINISTRA', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    observaciones = models.CharField(db_column='OBSERVACIONES', max_length=255, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'gestmues_recogida'
+
+class GestmuesColeccion(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    n_recogida = models.ForeignKey(GestmuesRecogida, models.DO_NOTHING, db_column='N_RECOGIDA', blank=True, null=True)  # Field name made lowercase.
+    csn = models.ForeignKey(CodMuestras, db_column='CSN', blank=True, null=True, on_delete=models.PROTECT)  # Field name made lowercase.
+    recoge = models.CharField(db_column='RECOGE', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    suministra = models.CharField(db_column='SUMINISTRA', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    observaciones = models.CharField(db_column='OBSERVACIONES', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    recogido = models.IntegerField(db_column='RECOGIDO', blank=True, null=True)  # Field name made lowercase.
+    fecha_recogida_inicial = models.DateTimeField(db_column='FECHA_RECOGIDA_INICIAL', blank=True, null=True)  # Field name made lowercase.
+    fecha_recogida_final = models.DateTimeField(db_column='FECHA_RECOGIDA_FINAL', blank=True, null=True)  # Field name made lowercase.
+    fecha_recepcion = models.DateTimeField(db_column='FECHA RECEPCION', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    conservacion = models.CharField(db_column='CONSERVACION', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    nfiltro = models.IntegerField(db_column='NFILTRO', blank=True, null=True)  # Field name made lowercase.
+    ibomba = models.CharField(db_column='IBOMBA', max_length=30, blank=True, null=True)  # Field name made lowercase.
+    mes = models.CharField(db_column='MES', max_length=30, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'gestmues_coleccion'
+
+class GestmuesRelacionRecogidaDeterminacion(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    id_muestra_recogida = models.ForeignKey(GestmuesColeccion, models.DO_NOTHING, db_column='ID_MUESTRA_RECOGIDA', blank=True, null=True)  # Field name made lowercase.
+    id_determinacion = models.ForeignKey(Determinaciones, models.DO_NOTHING, db_column='ID_DETERMINACION', blank=True, null=True)  # Field name made lowercase.
+    mes = models.CharField(db_column='MES', max_length=30, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'gestmues_relacion_recogida_determinacion'
+
+class MensajesTelegram(models.Model):
+    id_mensaje = models.AutoField(db_column='ID_MENSAJE', primary_key=True)  # Field name made lowercase.
+    id_area = models.IntegerField(db_column='ID_AREA', blank=True, null=True)  # Field name made lowercase.
+    id_estacion = models.IntegerField(db_column='ID_ESTACION', blank=True, null=True)  # Field name made lowercase.
+    id_canal = models.IntegerField(db_column='ID_CANAL', blank=True, null=True)  # Field name made lowercase.
+    fecha_hora_utc = models.DateTimeField(db_column='FECHA_HORA_UTC')  # Field name made lowercase.
+    mensaje = models.CharField(db_column='MENSAJE', max_length=200)  # Field name made lowercase.
+    descripcion = models.CharField(db_column='DESCRIPCION', max_length=9000, blank=True, null=True)  # Field name made lowercase.
+    icono = models.CharField(db_column='ICONO', max_length=100, blank=True, null=True)  # Field name made lowercase.
+    estado = models.IntegerField(db_column='ESTADO')  # Field name made lowercase.
+    id_telegram = models.CharField(db_column='ID_TELEGRAM', max_length=100)  # Field name made lowercase.
+    silenciar = models.IntegerField(db_column='SILENCIAR', blank=True, null=True)  # Field name made lowercase.
+    confirmar = models.IntegerField(db_column='CONFIRMAR', blank=True, null=True)  # Field name made lowercase.
+    tipo_mensaje_enviado = models.IntegerField(db_column='TIPO_MENSAJE_ENVIADO', blank=True, null=True)  # Field name made lowercase.
+    enviado = models.IntegerField(db_column='ENVIADO', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'mensajes_telegram'
+
+
+class MonitorizaMensajesTipo(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    mensaje = models.CharField(db_column='MENSAJE', max_length=200)  # Field name made lowercase.
+    descripcion = models.CharField(db_column='DESCRIPCION', max_length=500, blank=True, null=True)  # Field name made lowercase.
+    icono = models.CharField(db_column='ICONO', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    confirmar = models.IntegerField(db_column='CONFIRMAR')  # Field name made lowercase.
+    silenciar = models.IntegerField(db_column='SILENCIAR')  # Field name made lowercase.
+    estado = models.IntegerField(db_column='ESTADO')  # Field name made lowercase.
+    id_area = models.IntegerField(db_column='ID_AREA')  # Field name made lowercase.
+    usuarios_sms = models.CharField(db_column='USUARIOS_SMS', max_length=500, blank=True, null=True)  # Field name made lowercase.
+    tipo_mensaje_enviado = models.CharField(db_column='TIPO_MENSAJE_ENVIADO', max_length=100, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'monitoriza_mensajes_tipo'
+
