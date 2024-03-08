@@ -148,7 +148,7 @@
                 <option value="9" {% if vacaciones.estado__id == 9 %} selected {% endif %}>Pendiente</option>
                 <option value="10" {% if vacaciones.estado__id == 10 %} selected {% endif %}>Rechazado</option>
                 <option value="11" {% if vacaciones.estado__id == 11 %} selected {% endif %}>Aceptado</option>
-                <option value="12" {% if vacaciones.estado__id == 12 %} selected {% endif %}>Cambio Solicitado</option>
+                <option value="12" {% if vacaciones.estado__id == 12 %} selected {% endif %} hidden>Cambio Solicitado</option>
               </select>
             </div>
             
@@ -214,9 +214,9 @@
 
 
 <script>
-
+mostrarTextArea();
   function mostrarTextArea (){
-    if($('#estado').val() == 2){
+    if($('#estado').val() == 10){
       
       $('#botonModificar').attr('disabled', true);
       $('#rowMotivo').show();

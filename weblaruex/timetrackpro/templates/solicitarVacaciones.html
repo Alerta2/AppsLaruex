@@ -72,7 +72,7 @@
         </div>
         
         <div class="card-body pt-0 p-3" >
-          {% if not vacaciones and not administrador %}
+          {% if vacaciones == None %}
           <p class="text-sm"><strong class="text-info">Aún no ha seleccionado vacaciones</strong></p>
           {% else %}
           <div class="table-responsive ms-3 me-3">
@@ -463,17 +463,16 @@ $("#vacaciones_solicitadas").bootstrapTable({
         formatter: function (value, row) {
           administrador = '{{administrador}}';
           director = '{{director}}';
+          console.log(administrador, director)
 
           var botonVer = '<a href="/private/timetrackpro/ver-vacaciones-seleccionadas/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
 
 
           var botonCambiarEstado = '<a href="" title="Cambiar estado solicitud de vacaciones" data-toggle="modal" data-target="#modalCambiarEstado" onclick="$('+"'#formularioCambiarEstado').attr('action', '/private/timetrackpro/cambiar-estado-vacaciones/"+ row.id +"/');"+'" class="mx-1"><i class="fa-solid fa-flag"></i></a>';
-          if (administrador == "True" || director == "True" )
+          if ((administrador == "True" ||  director == "True" ) && row.estado != 12)
             return botonVer + botonCambiarEstado;
           else
             return botonVer;
-
-
         },
       },
     ],
@@ -691,7 +690,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fechaFinActual.value = mylist[i].fecha_fin;
         fechaFinActual.setAttribute("readonly", true);
         diasConsumidosActuales.value = mylist[i].dias_consumidos;
-        diasConsumidosActuales.setAttribute("readonly", true);        diasConsumidosActuales.setAttribute("hidden", true);
+        diasConsumidosActuales.setAttribute("readonly", true);        
+        diasConsumidosActuales.setAttribute("hidden", true);
         
         console.log(mylist[i]);
       }
