@@ -3443,7 +3443,7 @@ def eliminarFormato(request, objetoEliminar):
         RegistroTareaProgramada.objects.using('docLaruex').filter(id_formato=formato).delete()
     
 
-    if Eventos.objects.using('docLaruex').filter(procedimiento_asociado=formato).exists():
+    if Eventos.objects.using('docLaruex').filter(formato_asociado=formato).exists():
         evento = Eventos.objects.using('docLaruex').filter(formato_asociado=formato)[0]
         evento.formato_asociado = None
         evento.save(using="docLaruex")
