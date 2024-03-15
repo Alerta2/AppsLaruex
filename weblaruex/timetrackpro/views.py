@@ -3884,6 +3884,21 @@ def cambiarEstadoVacaciones(request, id):
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verVacacionesSeleccionadas.html" con los datos necesarios para la vista
     '''
 
+    '''
+    <url> - url de la aplicacion
+    <fechaInicio> - fecha de inicio del periodo actual
+    <fechaFin> - fecha de fin del periodo actual
+    <estado> - estado de la solicitud
+
+    ASUNTO 
+    Solicitud de vacaciones <estado>.
+
+    MENSAJE PARA EL DESTINATARIO
+    Su solicitud de vacaciones para el periodo comprendido entre el <fechaInicio> y el <fechaFin> ha sido <estado>.
+    Puede consultar el estado de su solicitud en el siguiente enlace:
+    <url>
+    '''
+
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -3895,6 +3910,23 @@ def cambiarEstadoVacaciones(request, id):
             motivo = request.POST.get("motivo")
             vacaciones.motivo_estado_solicitud = motivo
         vacaciones.save(using='timetrackpro')
+        mailEmpleado = vacaciones.empleado.email
+        estadoSolicitud = vacaciones.estado.nombre
+        if mailEmpleado != "" and mailEmpleado != None:
+            correoEmpleado = convertirAMail(mailEmpleado)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+        mailSolicitante = [correoEmpleado,]
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=53)[0]
+        url = 'http://alerta2.es/private/timetrackpro/ver-vacaciones-seleccionadas/' + str(vacaciones.id) + '/'
+        fechaInicio = str(vacaciones.fecha_inicio)
+        fechaFin = str(vacaciones.fecha_fin)
+        subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estadoSolicitud).replace('\n', '').replace('\r', '')
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<estado>", estadoSolicitud).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
+
+        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+
         return redirect('timetrackpro:solicitar-vacaciones')
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para cambiar el estado de las vacaciones seleccionadas.")
@@ -3945,6 +3977,21 @@ def cambiarEstadoCambioVacaciones(request, id):
     :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
     :param id: El parametro "id" es el identificador del cambio de vacaciones que se desean modificar
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verCambioVacacionesSeleccionadas.html" con los datos necesarios para la vista
+
+    <nombreSolicitante> - nombre del usuario que solicita el cambio
+    <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+    <url> - url de la aplicacion
+    <fechaInicio> - fecha de inicio del periodo actual
+    <fechaFin> - fecha de fin del periodo actual
+    <estado> - estado de la solicitud
+
+    ASUNTO 
+    Solicitud de cambio de vacaciones <estado>.
+
+    MENSAJE PARA EL DESTINATARIO
+    Su solicitud de cambio de vacaciones para el periodo comprendido entre el <fechaInicio> y el <fechaFin> ha sido <estado>.
+    Puede consultar el estado de la solicitud en el siguiente enlace.
+    <url>
     '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -3972,6 +4019,22 @@ def cambiarEstadoCambioVacaciones(request, id):
         vacaciones.save(using='timetrackpro')
 
         cambioVacaciones.save(using='timetrackpro')
+        mailEmpleado = cambioVacaciones.solicitante.email
+        estadoSolicitud = cambioVacaciones.estado.nombre
+        if mailEmpleado != "" and mailEmpleado != None:
+            correoEmpleado = convertirAMail(mailEmpleado)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+        mailSolicitante = [correoEmpleado,]
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=55)[0]
+        url = 'http://alerta2.es/private/timetrackpro/ver-cambio-vacaciones-seleccionadas/' + str(cambioVacaciones.id) + '/'
+        fechaInicio = str(cambioVacaciones.fecha_inicio_nueva)
+        fechaFin = str(cambioVacaciones.fecha_fin_nueva)
+        subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estadoSolicitud).replace('\n', '').replace('\r', '')
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<estado>", estadoSolicitud).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
+
+        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
         return redirect('timetrackpro:ver-cambio-vacaciones-seleccionadas', id=id)
     else:
         return redirect('timetrackpro:sin-permiso')
@@ -4031,6 +4094,21 @@ def cambiarEstadoAsuntosPropios(request, id=None):
     :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verAsuntosPropiosSeleccionados.html" con los datos necesarios para la vista
     '''
+    
+    '''
+    <url> - url de la aplicacion
+    <fechaInicio> - fecha de inicio del periodo actual
+    <fechaFin> - fecha de fin del periodo actual
+    <estado> - estado de la solicitud
+
+    ASUNTO 
+    Solicitud de <tipoAsunto> <estado>.
+
+    MENSAJE PARA EL DESTINATARIO
+    Su solicitud de <tipoAsunto> para el periodo <fechaInicio> al <fechaFin> ha sido <estado>.
+    Puede consultar el estado de la solicitud en el siguiente enlace.
+    <url>
+    '''
 
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -4045,6 +4123,26 @@ def cambiarEstadoAsuntosPropios(request, id=None):
             motivo = request.POST.get("motivo")
             asunto.motivo_estado_solicitud = motivo
         asunto.save(using='timetrackpro')
+        mailEmpleado = asunto.empleado.email
+        tipo = "asuntos propios"
+        if asunto.recuperable == 1:
+            tipo = "asuntos propios recuperables"
+        estadoSolicitud = asunto.estado.nombre
+        if mailEmpleado != "" and mailEmpleado != None:
+            correoEmpleado = convertirAMail(mailEmpleado)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+
+        mailSolicitante = [correoEmpleado,]
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=54)[0]
+        url = 'http://alerta2.es/private/timetrackpro/ver-solicitud-asuntos-propios/' + str(asunto.id) + '/'
+        fechaInicio = str(asunto.fecha_inicio)
+        fechaFin = str(asunto.fecha_fin)
+        subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estadoSolicitud).replace("<tipoAsunto>", tipo).replace('\n', '').replace('\r', '')
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<tipoAsunto>", tipo).replace("<estado>", estadoSolicitud)
+        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+
         return redirect('timetrackpro:solicitar-asuntos-propios')
     else:
         return redirect('timetrackpro:ups', mensaje="No se ha podido cambiar el estado del asunto propio")
@@ -4927,7 +5025,7 @@ def solicitarPermisosRetribuidos(request, year=None):
         mailSolicitante = [correoEmpleado,]
 
         nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso)
-        #nuevoPermiso.save(using='timetrackpro')
+        nuevoPermiso.save(using='timetrackpro')
         
         send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
         send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
@@ -5202,6 +5300,42 @@ def cambiarEstadoSolicitudPermisoRetribuido(request, id=None):
             motivo = request.POST.get("motivo")
         permiso.motivo_estado_solicitud = motivo
         permiso.save(using='timetrackpro')
+        nombreEmpleado = permiso.empleado.nombre
+        apellidosEmpleado = permiso.empleado.apellidos
+        emailEmpleado = permiso.empleado.email
+        estado = permiso.estado.nombre
+        if emailEmpleado != "" and emailEmpleado != None:
+            correoEmpleado = convertirAMail(emailEmpleado)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+
+        mailSolicitante = [correoEmpleado,]
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=52)[0]
+        url = 'http://alerta2.es/private/timetrackpro/ver-solicitud-permisos-retribuidos/' + str(permiso.id) + '/'
+        fechaInicio = str(permiso.fecha_inicio)
+        fechaFin = str(permiso.fecha_fin)
+        '''
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <url> - url de la aplicacion
+        <fechaInicio> - fecha de inicio del periodo actual
+        <fechaFin> - fecha de fin del periodo actual
+        <estado> - estado de la solicitud
+
+        ASUNTO 
+        Solicitud de persimos <estado>.
+
+        MENSAJE PARA EL DESTINATARIO
+        Su solicitud de permisos de ausencias para el periodo <fechaInicio> al <fechaFin> ha sido <estado>.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+        '''
+        subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estado).replace('\n', '').replace('\r', '')
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", nombreEmpleado).replace("<estado>", estado).replace("<apellidosSolicitante>", apellidosEmpleado).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
+
+        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+
         return redirect('timetrackpro:ver-solicitud-permisos-retribuidos', id=id)
     else:
         return redirect('timetrackpro:ups', mensaje="No se ha podido cambiar el estado del permiso retribuido")
