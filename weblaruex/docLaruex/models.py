@@ -532,7 +532,7 @@ class HistoricoFormatosEditable(models.Model):
         db_table = 'historico_formatos_editable'
 
 class ReservasVehiculos(models.Model):
-    id = models.IntegerField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     id_equipo = models.ForeignKey(Equipo, models.DO_NOTHING, db_column='ID_Equipo')  # Field name made lowercase.
     fecha_inicio = models.DateField(db_column='Fecha_inicio')  # Field name made lowercase.
     fecha_fin = models.DateField(db_column='Fecha_fin')  # Field name made lowercase.
@@ -540,8 +540,6 @@ class ReservasVehiculos(models.Model):
     class Meta:
         managed = False
         db_table = 'reservas_vehiculos'
-
-
 
 class ReservasProcedimiento(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.

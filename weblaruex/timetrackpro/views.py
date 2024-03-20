@@ -25,6 +25,9 @@ from django.core.mail import send_mail
 
 from calendario_guardias.models import MonitorizaApps
 from rare.models import MensajesTelegram
+from docLaruex.models import ReservasVehiculos, Equipo
+from django.views.decorators.csrf import csrf_exempt
+
 
 # ? Configuración de mensajes de 
 iconosAviso ={
@@ -2253,7 +2256,6 @@ def modificarEstadoErrorRegistroNotificado(request, id):
     error = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id=id)[0]
     empleadosLaruex  = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_usuario=error.id_empleado)[0]
     empleadoMaquina = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(id=empleadosLaruex.id_empleado.id)[0]
-
     administrador = esAdministrador(request.user.id)
     if administrador:
         if request.method == 'POST':
@@ -3524,7 +3526,7 @@ def datosCambioVacacionesSolicitadas(request, year=None):
     if administrador or director:
         cambiosVacaciones = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(fecha_inicio_actual__year=year, estado__in=[9,10,12]).values('id', 'solicitante', 'solicitante__nombre', 'solicitante__apellidos', 'id_periodo_cambio', 'id_periodo_cambio__tipo_vacaciones', 'id_periodo_cambio__tipo_vacaciones__nombre', 'id_periodo_cambio__tipo_vacaciones__color', 'id_periodo_cambio__tipo_vacaciones__color_calendario', 'fecha_inicio_actual', 'fecha_fin_actual', 'dias_actuales_consumidos', 'fecha_inicio_nueva', 'fecha_fin_nueva', 'dias_nuevos_consumidos', 'motivo_solicitud', 'estado', 'motivo_rechazo', 'fecha_solicitud', 'dias_habiles_actuales_consumidos', 'dias_habiles_nuevos_consumidos')
     else:
-        cambiosVacaciones = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=usuario, fecha_inicio_actual__year=year, estado__in=[9,10,12]).values('id', 'solicitante', 'solicitante__nombre', 'solicitante__apellidos', 'id_periodo_cambio', 'id_periodo_cambio__tipo_vacaciones', 'id_periodo_cambio__tipo_vacaciones__nombre', 'id_periodo_cambio__tipo_vacaciones__color', 'id_periodo_cambio__tipo_vacaciones__color_calendario', 'fecha_inicio_actual', 'fecha_fin_actual', 'dias_actuales_consumidos', 'fecha_inicio_nueva', 'fecha_fin_nueva', 'dias_nuevos_consumidos', 'motivo_solicitud', 'estado', 'motivo_rechazo', 'fecha_solicitud', 'dias_habiles_actuales_consumidos', 'dias_habiles_nuevos_consumidos')
+        cambiosVacaciones = CambiosVacacionesTimetrackpro.objects.using("timetrackpro").filter(solicitante=usuario, fecha_inicio_actual__year=year, estado__in=[9,10,12]).values('id', 'solicitante', 'solicitante__nombre', 'solicitante__apellidos', 'id_periodo_cambio', 'id_periodo_cambio__tipo_vacaciones', 'id_periodo_cambio__tipo_vacaciones__nombre', 'id_periodo_cambio__tipo_vacaciones__color', 'id_periodo_cambio__tipo_vacaciones__color_calendario', 'fecha_inicio_actual', 'fecha_fin_actual', 'dias_actuales_consumidos', 'fecha_inicio_nueva', 'fecha_fin_nueva', 'dias_nuevos_consumidos', 'motivo_solicitud', 'estado', 'motivo_rechazo', 'fecha_solicitud', 'dias_habiles_actuales_consumidos', 'dias_habiles_nuevos_consumidos')
     # creo una lista vacía para guardar los datos de los festivos
     # devuelvo la lista en formato json
     return JsonResponse(list(cambiosVacaciones),safe=False)
@@ -3885,6 +3887,21 @@ def cambiarEstadoVacaciones(request, id):
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verVacacionesSeleccionadas.html" con los datos necesarios para la vista
     '''
 
+    '''
+    <url> - url de la aplicacion
+    <fechaInicio> - fecha de inicio del periodo actual
+    <fechaFin> - fecha de fin del periodo actual
+    <estado> - estado de la solicitud
+
+    ASUNTO 
+    Solicitud de vacaciones <estado>.
+
+    MENSAJE PARA EL DESTINATARIO
+    Su solicitud de vacaciones para el periodo comprendido entre el <fechaInicio> y el <fechaFin> ha sido <estado>.
+    Puede consultar el estado de su solicitud en el siguiente enlace:
+    <url>
+    '''
+
     vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -3896,6 +3913,23 @@ def cambiarEstadoVacaciones(request, id):
             motivo = request.POST.get("motivo")
             vacaciones.motivo_estado_solicitud = motivo
         vacaciones.save(using='timetrackpro')
+        mailEmpleado = vacaciones.empleado.email
+        estadoSolicitud = vacaciones.estado.nombre
+        if mailEmpleado != "" and mailEmpleado != None:
+            correoEmpleado = convertirAMail(mailEmpleado)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+        mailSolicitante = [correoEmpleado,]
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=53)[0]
+        url = 'http://alerta2.es/private/timetrackpro/ver-vacaciones-seleccionadas/' + str(vacaciones.id) + '/'
+        fechaInicio = str(vacaciones.fecha_inicio)
+        fechaFin = str(vacaciones.fecha_fin)
+        subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estadoSolicitud).replace('\n', '').replace('\r', '')
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<estado>", estadoSolicitud).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
+
+        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+
         return redirect('timetrackpro:solicitar-vacaciones')
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para cambiar el estado de las vacaciones seleccionadas.")
@@ -3946,6 +3980,21 @@ def cambiarEstadoCambioVacaciones(request, id):
     :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
     :param id: El parametro "id" es el identificador del cambio de vacaciones que se desean modificar
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verCambioVacacionesSeleccionadas.html" con los datos necesarios para la vista
+
+    <nombreSolicitante> - nombre del usuario que solicita el cambio
+    <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+    <url> - url de la aplicacion
+    <fechaInicio> - fecha de inicio del periodo actual
+    <fechaFin> - fecha de fin del periodo actual
+    <estado> - estado de la solicitud
+
+    ASUNTO 
+    Solicitud de cambio de vacaciones <estado>.
+
+    MENSAJE PARA EL DESTINATARIO
+    Su solicitud de cambio de vacaciones para el periodo comprendido entre el <fechaInicio> y el <fechaFin> ha sido <estado>.
+    Puede consultar el estado de la solicitud en el siguiente enlace.
+    <url>
     '''
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -3973,6 +4022,22 @@ def cambiarEstadoCambioVacaciones(request, id):
         vacaciones.save(using='timetrackpro')
 
         cambioVacaciones.save(using='timetrackpro')
+        mailEmpleado = cambioVacaciones.solicitante.email
+        estadoSolicitud = cambioVacaciones.estado.nombre
+        if mailEmpleado != "" and mailEmpleado != None:
+            correoEmpleado = convertirAMail(mailEmpleado)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+        mailSolicitante = [correoEmpleado,]
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=55)[0]
+        url = 'http://alerta2.es/private/timetrackpro/ver-cambio-vacaciones-seleccionadas/' + str(cambioVacaciones.id) + '/'
+        fechaInicio = str(cambioVacaciones.fecha_inicio_nueva)
+        fechaFin = str(cambioVacaciones.fecha_fin_nueva)
+        subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estadoSolicitud).replace('\n', '').replace('\r', '')
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<estado>", estadoSolicitud).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
+
+        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
         return redirect('timetrackpro:ver-cambio-vacaciones-seleccionadas', id=id)
     else:
         return redirect('timetrackpro:sin-permiso')
@@ -4032,6 +4097,21 @@ def cambiarEstadoAsuntosPropios(request, id=None):
     :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
     :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verAsuntosPropiosSeleccionados.html" con los datos necesarios para la vista
     '''
+    
+    '''
+    <url> - url de la aplicacion
+    <fechaInicio> - fecha de inicio del periodo actual
+    <fechaFin> - fecha de fin del periodo actual
+    <estado> - estado de la solicitud
+
+    ASUNTO 
+    Solicitud de <tipoAsunto> <estado>.
+
+    MENSAJE PARA EL DESTINATARIO
+    Su solicitud de <tipoAsunto> para el periodo <fechaInicio> al <fechaFin> ha sido <estado>.
+    Puede consultar el estado de la solicitud en el siguiente enlace.
+    <url>
+    '''
 
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
@@ -4046,6 +4126,26 @@ def cambiarEstadoAsuntosPropios(request, id=None):
             motivo = request.POST.get("motivo")
             asunto.motivo_estado_solicitud = motivo
         asunto.save(using='timetrackpro')
+        mailEmpleado = asunto.empleado.email
+        tipo = "asuntos propios"
+        if asunto.recuperable == 1:
+            tipo = "asuntos propios recuperables"
+        estadoSolicitud = asunto.estado.nombre
+        if mailEmpleado != "" and mailEmpleado != None:
+            correoEmpleado = convertirAMail(mailEmpleado)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+
+        mailSolicitante = [correoEmpleado,]
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=54)[0]
+        url = 'http://alerta2.es/private/timetrackpro/ver-solicitud-asuntos-propios/' + str(asunto.id) + '/'
+        fechaInicio = str(asunto.fecha_inicio)
+        fechaFin = str(asunto.fecha_fin)
+        subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estadoSolicitud).replace("<tipoAsunto>", tipo).replace('\n', '').replace('\r', '')
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<tipoAsunto>", tipo).replace("<estado>", estadoSolicitud)
+        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+
         return redirect('timetrackpro:solicitar-asuntos-propios')
     else:
         return redirect('timetrackpro:ups', mensaje="No se ha podido cambiar el estado del asunto propio")
@@ -4928,7 +5028,7 @@ def solicitarPermisosRetribuidos(request, year=None):
         mailSolicitante = [correoEmpleado,]
 
         nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso)
-        #nuevoPermiso.save(using='timetrackpro')
+        nuevoPermiso.save(using='timetrackpro')
         
         send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
         send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
@@ -5048,7 +5148,7 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
 
 
         nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso)
-        #nuevoPermiso.save(using='timetrackpro')
+        nuevoPermiso.save(using='timetrackpro')
         send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
         send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
         enviarTelegram(subject, mensajeDestinatario)
@@ -5203,6 +5303,42 @@ def cambiarEstadoSolicitudPermisoRetribuido(request, id=None):
             motivo = request.POST.get("motivo")
         permiso.motivo_estado_solicitud = motivo
         permiso.save(using='timetrackpro')
+        nombreEmpleado = permiso.empleado.nombre
+        apellidosEmpleado = permiso.empleado.apellidos
+        emailEmpleado = permiso.empleado.email
+        estado = permiso.estado.nombre
+        if emailEmpleado != "" and emailEmpleado != None:
+            correoEmpleado = convertirAMail(emailEmpleado)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+
+        mailSolicitante = [correoEmpleado,]
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=52)[0]
+        url = 'http://alerta2.es/private/timetrackpro/ver-solicitud-permisos-retribuidos/' + str(permiso.id) + '/'
+        fechaInicio = str(permiso.fecha_inicio)
+        fechaFin = str(permiso.fecha_fin)
+        '''
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <url> - url de la aplicacion
+        <fechaInicio> - fecha de inicio del periodo actual
+        <fechaFin> - fecha de fin del periodo actual
+        <estado> - estado de la solicitud
+
+        ASUNTO 
+        Solicitud de persimos <estado>.
+
+        MENSAJE PARA EL DESTINATARIO
+        Su solicitud de permisos de ausencias para el periodo <fechaInicio> al <fechaFin> ha sido <estado>.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+        '''
+        subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estado).replace('\n', '').replace('\r', '')
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", nombreEmpleado).replace("<estado>", estado).replace("<apellidosSolicitante>", apellidosEmpleado).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
+
+        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+
         return redirect('timetrackpro:ver-solicitud-permisos-retribuidos', id=id)
     else:
         return redirect('timetrackpro:ups', mensaje="No se ha podido cambiar el estado del permiso retribuido")
@@ -5549,9 +5685,9 @@ def solicitarModificarVacaciones(request):
     '''
     # guardo los datos en un diccionario
     if request.method == 'POST':
-        # obtenemos los datos del empleado
+        #obtengo el id del usuario autenticado 
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        idEmpleado = user.id_empleado.id
+        idEmpleado = user.id_usuario.id
         solicitante = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleado)[0]
         estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
         # obtenemos los datos del formulario
@@ -5624,10 +5760,11 @@ def solicitarModificarVacaciones(request):
         mailSolicitante = [correoEmpleado,]
 
         solicitudModificacionVacaciones = CambiosVacacionesTimetrackpro(id_periodo_cambio=vacaciones, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, dias_habiles_actuales_consumidos=diasHabilesConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado, dias_habiles_nuevos_consumidos=diasHabilesConsumidosNuevos)
+        solicitudModificacionVacaciones.save(using='timetrackpro')
+
         send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
         send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
         enviarTelegram(subject, mensajeDestinatario)
-        solicitudModificacionVacaciones.save(using='timetrackpro')
     return redirect('timetrackpro:solicitar-vacaciones')
 
 @login_required
@@ -6223,8 +6360,437 @@ def subirDocumento(f, destino):
         for chunk in f.chunks():
             destination.write(chunk)
 
-def enviarTelegram(asunto, mensaje):
+def enviarTelegram(asunto, mensaje, icono=None):
     '''
     La funcion "enviarTelegram" permite enviar un mensaje a traves de Telegram.
     '''
-    MensajesTelegram(id_area=4,id_estacion=None,fecha_hora_utc=datetime.now(pytz.timezone("Europe/Madrid")),mensaje=asunto,descripcion=mensaje,icono='19',estado=0,id_telegram=settings.ID_CHAT_TIMETRACK,silenciar=0, confirmar=0).save(using='spd')
+    if icono is None:
+        icono = '19'
+    MensajesTelegram(id_area=4,id_estacion=None,fecha_hora_utc=datetime.now(pytz.timezone("Europe/Madrid")),mensaje=asunto,descripcion=mensaje,icono=icono,estado=0,id_telegram=settings.ID_CHAT_TIMETRACK,silenciar=0, confirmar=0).save(using='spd')
+
+@login_required
+def datosViajes(request, year=None):
+    """
+    The function "datosUsuariosMaquina" retrieves data of users from a machine and returns it as a JSON
+    response.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the HTTP method used (GET,
+    POST, etc.), and any data sent with the request
+    :return: a JSON response containing a list of user data for the "EmpleadosMaquina" model. The user
+    data includes fields such as "id", "nombre", "turno", "horas_maxima_contrato", "en_practicas",
+    "maquina_laboratorio", "maquina_alerta2", and "maquina_departamento".
+    """
+
+    if year == None:
+        year = datetime.now().year  
+    viajes=[]
+    viajes = ViajesTimeTrackPro.objects.using("timetrackpro").filter(fecha_inicio__year=year).values('id', 'solicitante__nombre', 'solicitante__id', 'solicitante', 'solicitante__apellidos', 'lugar', 'fecha_solicitud', 'fecha_inicio', 'fecha_fin', 'motivo_viaje', 'estado','estado__id','estado__nombre', 'motivo_rechazo', 'vehiculo')
+    return JsonResponse(list(viajes), safe=False)
+
+@login_required
+def datosViajesCalendario(request, year=None):
+    '''
+    La funcion "datosFestivosCalendario" obtiene los festivos registrados en la base de datos y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los festivos
+    :return: un objeto "JsonResponse" que contiene los datos de los festivos en formato json    
+    '''
+    # obtengo los festivos registrados en la base de datos
+    festivos = []
+    if year == None:
+        viajes = ViajesTimeTrackPro.objects.using("timetrackpro").exclude(estado__id=24).values('id', 'solicitante__nombre', 'solicitante__id', 'solicitante', 'solicitante__apellidos', 'lugar', 'fecha_solicitud', 'fecha_inicio', 'fecha_fin', 'motivo_viaje', 'estado__nombre', 'motivo_rechazo', 'vehiculo')
+    else:
+        viajes = ViajesTimeTrackPro.objects.using("timetrackpro").filter(fecha_inicio__year=year).exclude(estado__id=24).values('id', 'solicitante__nombre', 'solicitante__id', 'solicitante', 'solicitante__apellidos', 'lugar', 'fecha_solicitud', 'fecha_inicio', 'fecha_fin', 'motivo_viaje', 'estado__nombre', 'motivo_rechazo', 'vehiculo')
+    # creo una lista vacía para guardar los datos de los festivos
+    salida = []
+
+    # recorro los festivos y los guardo en la lista
+    for viaje in viajes:
+        # inserto los datos en la lista siguiendo la estructura que requiere el calendario
+        salida.append({
+            'id':viaje['id'],
+            'title':viaje['lugar'],
+            'start':viaje['fecha_inicio'],
+            'end':viaje['fecha_fin'] + timedelta(days=1),
+            'color': '#63465a',
+            'textColor': '#FFFFFF'
+        })
+    # devuelvo la lista en formato json
+    return JsonResponse(salida, safe=False)
+    
+@csrf_exempt
+def obtenerVehiculosDisponibles(request):
+    vehiculosList = []
+    fechaInicio = request.POST.get("fecha_inicio")
+    fechaFin = request.POST.get("fecha_fin")
+    vehiculos = Equipo.objects.using("docLaruex").filter(tipo_equipo=21).values('id', 'cod_laruex', 'cod_uex', 'num_serie', 'descripcion', 'fecha_alta', 'fecha_baja', 'precio', 'modelo', 'motivo_baja', 'proyecto', 'cod_spida', 'propietario', 'proveedor', 'ubicacion_actual', 'grupo', 'alta_uex', 'id__nombre')
+    for vehiculo in vehiculos:
+        # obten la tabla donde se encuentran localizadas todas las reservas del vehiculo
+        reservas = ReservasVehiculos.objects.using("docLaruex").filter(id_equipo=vehiculo['id']) 
+        reservado = False
+        if reservas.filter(fecha_inicio__lte=fechaInicio, fecha_fin__gte=fechaInicio).exists() or reservas.filter(fecha_inicio__gte=fechaInicio, fecha_fin__gte=fechaFin, fecha_inicio__lte=fechaFin).exists() or reservas.filter(fecha_inicio__lte=fechaInicio, fecha_fin__gte=fechaInicio, fecha_fin__lte=fechaFin).exists() or reservas.filter(fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin).exists():
+            reservado = True
+        if not reservado:
+            vehiculosList.append(vehiculo)
+    return render(request,"relleno-combo-vehiculos.html",{"vehiculos":vehiculosList})
+    
+
+
+@login_required
+def viajes(request, year=None):
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)    
+    vehiculos = Equipo.objects.using("docLaruex").filter(tipo_equipo=21).values('id', 'cod_laruex', 'cod_uex', 'num_serie', 'descripcion', 'fecha_alta', 'fecha_baja', 'precio', 'modelo', 'motivo_baja', 'proyecto', 'cod_spida', 'propietario', 'proveedor', 'ubicacion_actual', 'grupo', 'alta_uex', 'id__nombre')
+    if year is None:
+        year = str(datetime.now().year)
+
+    mes = str(datetime.now().month)
+    if len(mes) == 1:
+        mes = "0" + mes
+    initialDate = str(year) + "-" + mes + "-01"
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+        "director":director,
+        "initialDate":initialDate,
+        "currentYear":year,
+        "rutaActual": "Viajes "  + str(year),
+        "rutaPrevia": "Solicitudes",
+        "vehiculos": vehiculos,
+        "urlRutaPrevia": reverse('timetrackpro:solicitudes'),
+    }
+    return render(request,"solicitar-viajes.html",infoVista)
+
+def enviarMensajeViaje(request, empleado, viaje):
+    '''
+    <nombreSolicitante> - nombre del usuario que solicita el cambio
+    <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+    <url> - url de la aplicacion
+    <fechaInicio> - fecha de inicio del periodo actual
+    <fechaFin> - fecha de fin del periodo actual
+    <motivo> - motivo de la solicitud
+    <lugar> - lugar del viaje
+
+    ASUNTO 
+    <nombreSolicitante> <apellidosSolicitante> ha solicitado un viaje.
+
+    MENSAJE PARA EL REMITENTE
+    Su solicitud de viaje ha sido registrada con éxito.
+    Fecha: <fechaInicio> al <fechaFin>
+    Lugar: <lugar>
+    Motivo: <motivo>
+    Puede consultar el estado de la solicitud en el siguiente enlace.
+    <url>
+
+
+    MENSAJE PARA EL DESTINATARIO
+    <nombreSolicitante> <apellidosSolicitante> ha solicita un viaje a <lugar> por el motivo de <motivo> desde el <fechaInicio> al <fechaFin>.
+    Puede consultar el estado de la solicitud en el siguiente enlace.
+    <url>
+        
+    '''
+    url = 'http://alerta2.es/private/timetrackpro/solicitud-viaje/' + str(viaje.id) + '/'
+    # convertir a direcciones de correo
+    if empleado.email != "" and empleado.email != None:
+        correoEmpleado = convertirAMail(empleado.email)
+    else:
+        correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+    
+    email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+    destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
+    mailSolicitante = [correoEmpleado,]
+
+    mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=56)[0]
+    subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace('\n', '').replace('\r', '')
+    
+    mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", viaje.fecha_inicio).replace("<fechaFin>", viaje.fecha_fin).replace("<lugar>", viaje.lugar).replace("<motivo>", viaje.motivo_viaje)
+
+    mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=57)[0]
+    mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", viaje.fecha_inicio).replace("<fechaFin>", viaje.fecha_fin).replace("<lugar>", viaje.lugar).replace("<motivo>", viaje.motivo_viaje)
+    send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+    send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+    enviarTelegram(subject, mensajeDestinatario, '42')
+
+    return redirect('timetrackpro:viajes')
+
+
+
+@login_required
+def solicitarViaje(request):
+    '''
+    La funcion "solicitarAsuntosPropios" permite solicitar un asunto propio a la base de datos.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param year: El parametro "year" es el año del que se quieren obtener los asuntos propios
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "solicitar-asuntos-propios.html" con los datos necesarios para la vista
+    '''
+    if request.method == 'POST':
+        user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+        empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0] 
+        fechaInicio = request.POST.get("fecha_inicio")
+        fechaFin = request.POST.get("fecha_fin")
+        motivo = ""
+        if request.POST.get("motivo") != "" or request.POST.get("motivo") != None:
+            motivo = request.POST.get("motivo")
+        
+        lugar = ""
+        if request.POST.get("lugar") != "" or request.POST.get("lugar") != None:
+            lugar = request.POST.get("lugar") 
+
+        viajes = ViajesTimeTrackPro.objects.using("timetrackpro").filter(solicitante=empleado) 
+        if viajes.filter(fecha_inicio__lte=fechaInicio, fecha_fin__gte=fechaInicio).exists() or viajes.filter(fecha_inicio__gte=fechaInicio, fecha_fin__gte=fechaFin, fecha_inicio__lte=fechaFin).exists() or viajes.filter(fecha_inicio__lte=fechaInicio, fecha_fin__gte=fechaInicio, fecha_fin__lte=fechaFin).exists() or viajes.filter(fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin).exists():
+            return redirect('timetrackpro:ups', mensaje='Ya tienes un viaje solicitado en esas fechas.')
+        else:
+            # estado viaje pendiente
+            estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=22)[0]
+            fechaSolicitud = datetime.now()
+            vehiculoSeleccionado = request.POST.get("vehiculo")
+            print('\033[91m'+'vehiculoSeleccionado: ' + '\033[92m', vehiculoSeleccionado)
+            vehiculo = None
+            if vehiculoSeleccionado != "" and vehiculoSeleccionado != None: 
+                vehiculoEquipo = Equipo.objects.using("docLaruex").filter(id=vehiculoSeleccionado)[0]
+                vehiculo = vehiculoSeleccionado
+                nuevaReservaVehiculo = ReservasVehiculos(id_equipo=vehiculoEquipo, fecha_inicio=fechaInicio, fecha_fin=fechaFin)
+                nuevaReservaVehiculo.save(using='docLaruex')
+            nuevoViaje = ViajesTimeTrackPro(solicitante=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, estado=estado, fecha_solicitud=fechaSolicitud, motivo_viaje=motivo, lugar=lugar, vehiculo=vehiculo)
+            nuevoViaje.save(using='timetrackpro')
+            enviarMensajeViaje(request, empleado, nuevoViaje)
+        return redirect('timetrackpro:viajes')
+    else:
+        return redirect('timetrackpro:ups', mensaje="No tienes permiso para editar la tarjeta.")
+
+        
+
+@login_required
+def verViaje(request, id):
+    '''
+    La funcion "verJornada" obtiene los datos de una jornada laboral en concreto y los muestra en una plantilla para su visualizacion.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de la jornada laboral que se desea ver
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-jornada.html" con los datos necesarios para la vista
+    '''
+    administrador = esAdministrador(request.user.id)
+    viaje = ViajesTimeTrackPro.objects.using("timetrackpro").filter(id=id)[0]
+    empleados = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(fecha_baja_app__isnull=True).values('id', 'nombre', 'apellidos')
+    vehiculo = None
+    if viaje.vehiculo != None:
+        vehiculo = Equipo.objects.using("docLaruex").filter(id=viaje.vehiculo)[0]
+    
+    estados = EstadosSolicitudes.objects.using("timetrackpro").filter(viajes=1).values()
+    infoVista = {
+        "navBar":navBar,
+        "administrador":esAdministrador(request.user.id),
+        "rutaActual": viaje.lugar,
+        "rutaPrevia": "Viajes",
+        "urlRutaPrevia": reverse('timetrackpro:viajes'),
+        "vehiculo":vehiculo,
+        "viaje":viaje,
+        "empleados":list(empleados),
+        "estados":list(estados),
+        "administrador":administrador,
+    }
+    return render(request,"ver-viaje.html",infoVista)
+
+@login_required
+def modificarViaje(request, id=None):
+    '''
+    La funcion "modificarViaje" permite modificar un viaje en concreto de la base de datos.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente. Contiene informacion como el usuario que realiza la peticion, el metodo HTTP utilizado (GET, POST, etc.), y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del viaje que se desea modificar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-viaje.html" con los datos necesarios para la vista
+    '''
+    administrador = esAdministrador(request.user.id)
+    if request.method == 'POST' and administrador:
+        if request.POST.get("id_viaje") and not id:
+            id = request.POST.get("id_viaje")
+
+        viaje = ViajesTimeTrackPro.objects.using("timetrackpro").filter(id=id)[0]
+        retirarVehiculo = request.POST.get("retirar_vehiculo")
+        if int(retirarVehiculo) == 0:
+            nuevoVehiculo = Equipo.objects.using("docLaruex").filter(id=request.POST.get("vehiculo"))[0]
+            if viaje.vehiculo:
+                vehiculo = Equipo.objects.using("docLaruex").filter(id=viaje.vehiculo)[0]
+                reservas = ReservasVehiculos.objects.using("docLaruex").filter(id_equipo=vehiculo, fecha_inicio=viaje.fecha_inicio, fecha_fin=viaje.fecha_fin)
+                for reserva in reservas:
+                    reserva.id_equipo = nuevoVehiculo
+                    reserva.fecha_inicio = request.POST.get("fecha_inicio")
+                    reserva.fecha_fin= request.POST.get("fecha_fin")
+                    reserva.save(using='docLaruex')
+            else:
+                nuevaReservaVehiculo = ReservasVehiculos(id_equipo=nuevoVehiculo, fecha_inicio=request.POST.get("fecha_inicio"), fecha_fin=request.POST.get("fecha_fin"))
+                nuevaReservaVehiculo.save(using='docLaruex')
+            idNuevoVehiculo = nuevoVehiculo.id.id
+        else:
+            if viaje.vehiculo:
+                vehiculo = Equipo.objects.using("docLaruex").filter(id=viaje.vehiculo)[0]
+                reservas = ReservasVehiculos.objects.using("docLaruex").filter(id_equipo=vehiculo, fecha_inicio=viaje.fecha_inicio, fecha_fin=viaje.fecha_fin)
+                for reserva in reservas:
+                    reserva.delete(using='docLaruex')
+            idNuevoVehiculo = None
+
+                
+        viaje.fecha_inicio = request.POST.get("fecha_inicio")
+        viaje.fecha_fin = request.POST.get("fecha_fin")
+        solicitante = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=request.POST.get("solicitante"))[0]         
+        viaje.solicitante = solicitante
+        viaje.lugar = request.POST.get("lugar")
+        viaje.motivo_viaje= request.POST.get("motivo_viaje")
+        viaje.vehiculo = idNuevoVehiculo    
+        viaje.save(using='timetrackpro')
+
+
+        return redirect('timetrackpro:ver-viaje', id=id)
+    else:
+        return redirect('timetrackpro:ups', mensaje="No tienes permiso para modificar el asunto propio seleccionado.")
+    
+
+
+
+@login_required
+def eliminarViaje(request, id=None):
+    '''
+    La función "eliminarViaje" permite eliminar un viaje en concreto de la base de datos.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del viaje que se desea eliminar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "viajes.html" con los datos necesarios para la vista
+    '''
+
+    administrador = esAdministrador(request.user.id)
+    if administrador:
+        if request.method == 'POST':
+            if request.POST.get("idViaje") and not id:
+                id = request.POST.get("idViaje")
+            viaje = ViajesTimeTrackPro.objects.using("timetrackpro").filter(id=id)[0]
+            if viaje.vehiculo:
+                vehiculo = Equipo.objects.using("docLaruex").filter(id=viaje.vehiculo)[0]
+                reservas = ReservasVehiculos.objects.using("docLaruex").filter(id_equipo=vehiculo, fecha_inicio=viaje.fecha_inicio, fecha_fin=viaje.fecha_fin)
+                for reserva in reservas:
+                    reserva.delete(using='docLaruex')
+            viaje.delete(using='timetrackpro')
+        return redirect('timetrackpro:viajes')
+    else:
+        return redirect('timetrackpro:sin-permiso')
+    
+
+@login_required
+def cambiarEstadoViaje(request, id=None):
+
+    '''
+    La función cambiarEstadoViaje permite cambiar el estado de un viaje en concreto de la base de datos.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del viaje que se desea modificar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "ver-viaje.html" con los datos necesarios para la vista
+    '''
+
+    '''
+    <url> - url de la aplicacion
+    <fechaInicio> - fecha de inicio del periodo actual
+    <fechaFin> - fecha de fin del periodo actual
+    <estado> - estado de la solicitud
+
+    ASUNTO 
+    Cambios en solicitud de viaje
+
+    MENSAJE PARA EL DESTINATARIO
+    Su solicitud de viaje para el periodo comprendido entre el <fechaInicio> y el <fechaFin> ha sido <estado>.
+    Puede consultar el estado de su solicitud en el siguiente enlace:
+    <url>
+    '''
+
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    if administrador or director:
+        if request.method == 'POST':
+            if request.POST.get("idViaje") and not id:
+                id = request.POST.get("idViaje")
+            viaje = ViajesTimeTrackPro.objects.using("timetrackpro").filter(id=id)[0]
+            estadoSeleccionado = request.POST.get("estado")
+            estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=estadoSeleccionado)[0]
+            if int(estadoSeleccionado) == 24:
+                motivoRechazo = request.POST.get("motivo_rechazo")
+                viaje.motivo_rechazo = motivoRechazo
+                if viaje.vehiculo:
+                    vehiculo = Equipo.objects.using("docLaruex").filter(id=viaje.vehiculo)[0]
+                    reservas = ReservasVehiculos.objects.using("docLaruex").filter(id_equipo=vehiculo, fecha_inicio=viaje.fecha_inicio, fecha_fin=viaje.fecha_fin)
+                    for reserva in reservas:
+                        reserva.delete(using='docLaruex')
+            viaje.estado = estado   
+            viaje.save(using='timetrackpro')
+
+            mailEmpleado = viaje.solicitante.email
+            estadoSolicitud = viaje.estado.nombre
+            if mailEmpleado != "" and mailEmpleado != None:
+                correoEmpleado = convertirAMail(mailEmpleado)
+            else:
+                correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+            mailSolicitante = [correoEmpleado,]
+            email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+            mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=58)[0]
+            url = 'http://alerta2.es/private/timetrackpro/ver-viaje/' + str(viaje.id) + '/'
+            fechaInicio = str(viaje.fecha_inicio)
+            fechaFin = str(viaje.fecha_fin)
+            subject = mensajeTipoDestinatario.mensaje.replace('\n', '').replace('\r', '')
+            mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<estado>", estadoSolicitud).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
+            send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+
+        return redirect('timetrackpro:ver-viaje', id=viaje.id)
+    else:
+        return redirect('timetrackpro:sin-permiso')
+    
+
+    
+@login_required
+def cambiarEstadoVacacionesPruebas(request, id):
+    '''
+    La funcion "cambiarEstadoVacaciones" permite cambiar el estado de unas vacaciones en concreto.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el clienteel metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador de las vacaciones que se desean modificar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "verVacacionesSeleccionadas.html" con los datos necesarios para la vista
+    '''
+
+    '''
+    <url> - url de la aplicacion
+    <fechaInicio> - fecha de inicio del periodo actual
+    <fechaFin> - fecha de fin del periodo actual
+    <estado> - estado de la solicitud
+
+    ASUNTO 
+    Solicitud de vacaciones <estado>.
+
+    MENSAJE PARA EL DESTINATARIO
+    Su solicitud de vacaciones para el periodo comprendido entre el <fechaInicio> y el <fechaFin> ha sido <estado>.
+    Puede consultar el estado de su solicitud en el siguiente enlace:
+    <url>
+    '''
+
+    vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    if request.method == 'POST' and (administrador or director):
+        estado = request.POST.get("estado")
+        nuevoEstado = EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1,id=estado)[0]
+        vacaciones.estado = nuevoEstado
+        if vacaciones.estado.id == 10:
+            motivo = request.POST.get("motivo")
+            vacaciones.motivo_estado_solicitud = motivo
+        vacaciones.save(using='timetrackpro')
+        mailEmpleado = vacaciones.empleado.email
+        estadoSolicitud = vacaciones.estado.nombre
+        if mailEmpleado != "" and mailEmpleado != None:
+            correoEmpleado = convertirAMail(mailEmpleado)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+        mailSolicitante = [correoEmpleado,]
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=53)[0]
+        url = 'http://alerta2.es/private/timetrackpro/ver-vacaciones-seleccionadas/' + str(vacaciones.id) + '/'
+        fechaInicio = str(vacaciones.fecha_inicio)
+        fechaFin = str(vacaciones.fecha_fin)
+        subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estadoSolicitud).replace('\n', '').replace('\r', '')
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<estado>", estadoSolicitud).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
+
+        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+
+        return redirect('timetrackpro:solicitar-vacaciones')
+    else:
+        return redirect('timetrackpro:ups', mensaje="No tienes permiso para cambiar el estado de las vacaciones seleccionadas.")

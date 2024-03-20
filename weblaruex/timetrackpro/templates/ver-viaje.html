@@ -1,0 +1,371 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+  <div class="row d-flex justify-content-center">
+    
+    <h3 class="text-info text-gradient">Solicitude de viaje</h3>
+    <h4 class="text-secondary">Solicitado: {{viaje.fecha_solicitud}}</h4>
+    <div class="col-12 col-xl-8">
+      {% if administrador %}
+        <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+          <div class="row">
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalEditarViaje">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-pen fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Editar</div>
+            </button>
+            </div>
+      {% endif %}
+
+      
+      {% if administrador or director%}
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalCambiarEstadoViaje">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-sign-hanging fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Cambiar estado</div>
+            </button>
+            </div>
+      
+        {% endif %}
+            
+        {% if administrador %}
+            <div class="col">
+              <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarViaje">             
+               <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
+               <div class="text text-sm">Eliminar</div>
+             </button>
+             </div>
+          </div>
+        </div>
+        
+      {% endif %}
+        
+
+      <div class="row">
+        <div class="col">
+
+          <div class="card ">
+            <div class="card-header pb-0 p-3">
+            </div>
+            <div class="card-body pt-0 p-3">
+              <ul class="list-group font-weight-bold">
+                <!-- 1- Pendiente, 2 Rechazado, 3 - Aceptado -->
+                {% if viaje.estado.id == 22 %}
+                <li class="list-group-item border-0 ps-0 text-lg text-info d-flex justify-content-end"><span class="badge badge-sm bg-gradient-secondary">Pendiente</span></li>
+                {% elif viaje.estado.id == 24 %}
+                <li class="list-group-item border-0 ps-0 text-lg text-danger d-flex justify-content-end"><span class="badge badge-sm bg-gradient-danger">Rechazada</span></li>
+                {% elif viaje.estado.id == 23 %}
+                <li class="list-group-item border-0 ps-0 text-lg text-success d-flex justify-content-end"><span class="badge badge-sm bg-gradient-success">Aceptado</span>'</li>
+                {% else %}
+                <li class="list-group-item border-0 ps-0 text-lg text-warning d-flex justify-content-end"><span class="badge badge-sm bg-gradient-secondary">Pendiente</span></li>
+                {% endif %}
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{viaje.solicitante.nombre}} {{viaje.solicitante.apellidos}}</li>
+                {% if viaje.fecha_inicio != viaje.fecha_fin %}
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{viaje.fecha_inicio|date:"d M Y"}} - {{viaje.fecha_fin|date:"d M Y"}}</li>    
+                {% else %}
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{viaje.fecha_inicio|date:"d M Y"}}</li> 
+                {% endif %}
+                {% if vehiculo %}
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-truck text-dark me-2"></i> {{vehiculo.id.nombre }}</li>
+                {% endif %}
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-location-dot text-dark me-2"></i> {{viaje.lugar|capfirst }}</li>
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><strong>Motivo del viaje</strong><p>{{viaje.motivo_viaje}}</p></li>
+
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% if viaje.estado.id == 24 %}
+        <div class="col">
+          <div class="card ">
+            <div class="card-header pb-0 p-3">
+            </div>
+            <div class="card-body pt-0 p-3">
+              <ul class="list-group font-weight-bold">
+                
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><strong>Motivo del rechazo</strong><p>{{viaje.motivo_rechazo}}</p></li>          
+    
+              </ul>
+            </div>
+          </div>
+  
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalEditarViaje" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEditarViaje"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar solicitud de viaje</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioModificarSolicitudViaje" action="{% url 'timetrackpro:modificar-viaje' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="number" class="form-control" name="id_viaje" id="id_viaje" value="{{viaje.id|safe}}" min="1" required hidden>
+          <input type="number" class="form-control" name="retirar_vehiculo" id="retirar_vehiculo" value="0" min="0" max="1" required hidden>
+          <div class="row">
+            <div class="col-xl-6">
+              <label class="col-form-label">Fecha de inicio</label>
+                <input type="date" class="form-control" aria-label="Fecha inicial de las vacaciones" aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" value="{{viaje.fecha_inicio|safe}}" >
+            </div>
+            
+            <div class="col-xl-6"   >
+
+                <label class="col-form-label">Fecha de fin</label>
+
+                <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
+                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" value="{{viaje.fecha_fin|safe}}">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 col-md-12">
+              <label for="solicitante" class="col-form-label">Solicitante</label>
+                <input id="inputEmpleados" list="solicitantes" value="{{viaje.solicitante.nombre}} {{viaje.solicitante.apellidos}}" class="form-select">
+                
+              <input type="number" id="solicitante" name="solicitante"  class="form-control" value="{{viaje.solicitante.id}}" hidden >
+
+              <datalist id="solicitantes">
+                {% for e in empleados %}
+                <option data-id="{{e.id}}" selected>{{e.nombre}} {{e.apellidos}}</option>
+                {% endfor %}
+              </datalist>
+            </div>
+          </div>    
+               
+          <div class="row mt-2">
+            <div class="col">
+              <label class="col-form-label">Lugar de viaje</label>
+                <input type="text" id="lugar" name="lugar" value="{{viaje.lugar}}" class="form-control" />
+            </div>
+          </div> 
+          <div class="row">
+            <div class="col">
+              <label class="col-form-label">Motivo del viaje</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique las tareas que deben ser sustituidas." id="motivo_viaje" name="motivo_viaje" rows="3" aria-describedby="text-addon">{{viaje.motivo_viaje}}</textarea>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-2" id="selectorVehiculos" {% if not viaje.vehiculo %} hidden {% endif %}>
+            <div class="col" >
+              <label class="text-sm">Seleccione el vehículo que desea reservar</label>
+              <select class="form-control" name="vehiculo" id="vehiculo">
+                {% if viaje.vehiculo %} <option value="{{vehiculo.id.id}}">{{vehiculo.id.nombre}}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center" id="rowBotonesVehiculos" >
+            <div class="col mt-2 mx-auto ">
+              <button type="button" class="btn bg-gradient-dark m-2" onclick="obtenerVehiculosDisponibles()">obtener vehículos disponibles</button>
+              <button type="button" class="btn bg-gradient-secondary m-2" onclick="descartarVehiculo()">liberar vehiculo</button>
+
+            </div>
+          </div>
+        </div> 
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonEditar">Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalCambiarEstadoViaje" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalCambiarEstadoViaje"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Aceptar o rechazar el viaje</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarEstadoViaje" action="{% url 'timetrackpro:cambiar-estado-viaje' id=viaje.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Nuevo estado</label>
+              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
+                
+                <option value="22" {% if viaje.estado.id == 22 %} selected {% endif %}>Pendiente</option>
+                <option value="23" {% if viaje.estado.id == 23 %} selected {% endif %}>Aceptado</option>
+                <option value="24" {% if viaje.estado.id == 24 %} selected {% endif %}>Rechazado</option>
+              </select>
+            </div>
+            
+          </div>
+          <div class="row"  id="rowMotivo">
+            <div class="col-xl-8 mx-auto my-2">
+              <label class="text-sm" id="labelMotivo">Motivo</label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el error" aria-label="Indique el motivo por el que se rechaza" id="motivo_rechazo" name="motivo_rechazo" aria-describedby="text-addon">{{viaje.motivo_rechazo}}</textarea>
+
+            </div>
+            
+          </div>
+
+
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonModificar" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalEliminarViaje" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEliminarViaje"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar viaje de viaje</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarEstadoViaje" action="{% url 'timetrackpro:eliminar-viaje' id=viaje.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+
+            <div class="col-xl-8 mx-auto my-2" >
+              <h6>¿Está seguro/a de eliminar la solicitud de viaje?</h6>
+              <p><span><i class="fa-solid fa-user me-2 "></i>{{viaje.solicitante.nombre}} {{viaje.solicitante.apellidos}}</span></p>
+
+              {% if viaje.fecha_inicio != viaje.fecha_fin %}
+                <p><span><i class="fa-solid fa-calendar me-2 ">Del {{viaje.fecha_inicio|date:'d' }} de {{viaje.fecha_inicio|date:'M' }} a {{viaje.fecha_fin|date:'d' }} de {{viaje.fecha_fin|date:'M' }} de {{viaje.fecha_fin|date:'Y' }}</span></p>
+              {% else %}
+              <p><span><i class="fa-solid fa-calendar me-2 "></i>{{viaje.fecha_inicio|date:'d' }} de {{viaje.fecha_inicio|date:'M' }} de {{viaje.fecha_fin|date:'Y' }}</span></p>
+              {% endif %}
+              
+              <p><span><i class="fa-solid fa-location-dot me-2 "></i>{{viaje.lugar}}</span></p>
+              <p><span><i class="fa-solid fa-circle-info me-2 "></i>{{viaje.motivo_viaje}}</span></p>
+
+
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonEliminar">Eliminar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+function descartarVehiculo(){
+  $('#retirar_vehiculo').val(1);
+  $('#selectorVehiculos').attr('hidden', true);
+  $('#rowBotonesVehiculos').attr('hidden', true);
+
+}
+function obtenerVehiculosDisponibles(){
+    $.ajax({
+      url: "{% url 'timetrackpro:obtener-vehiculos-disponibles' %}",
+      type: 'POST',
+      dataType: 'html',
+      data: {
+        'fecha_inicio': $('#fecha_inicio').val(),
+        'fecha_fin': $('#fecha_fin').val(),
+      },
+      success: function(data) {
+
+          // comprobar si hay vehículos disponibles
+          if(data == ""){
+            alert("No hay vehículos disponibles para las fechas seleccionadas");
+            return;
+          }else{
+            // mostrar selector vehículos 
+            $('#vehiculo').html(data);
+
+            $('#selectorVehiculos').removeAttr('hidden');
+          }
+      },
+      error: function(xhr, status, error) {
+          // Manejar errores de la solicitud AJAX
+          console.error(error);
+      }
+  });
+  
+  }
+  mostrarTextArea();
+  function mostrarTextArea (){
+    if($('#estado').val() == 24){
+      $('#botonModificar').attr('disabled', true);
+      $('#rowMotivo').show();
+      $('#motivo_rechazo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+    }else{
+      
+      $('#botonModificar').attr('disabled', false);
+      
+      $('#rowMotivo').hide();
+    }
+  }
+
+
+
+
+    // compruebo si en textarea de motivoEliminación hay algo escrito
+  // si hay algo escrito, habilito el boton de guardar
+  // si no hay nada escrito, deshabilito el boton de guardar
+  $(document).ready(function(){
+    $('#motivoEliminacion').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonEliminar').attr('disabled', false);
+    })
+  });
+
+
+  document.getElementById('inputEmpleados').addEventListener('input', function() {
+        const inputText = this.value;
+        const datalist = document.getElementById('solicitantes');
+        const options = datalist.getElementsByTagName('option');
+        const solicitanteSeleccionado = document.getElementById('solicitante');
+        for (const option of options) {
+            if (option.textContent === inputText) {
+                const selectedOptionId = option.getAttribute('data-id');
+                solicitanteSeleccionado.value = selectedOptionId;
+                console.log('ID de la opción seleccionada:', selectedOptionId);
+                break;
+            }
+        }
+    });
+
+
+  
+
+</script>
+{% endblock %}

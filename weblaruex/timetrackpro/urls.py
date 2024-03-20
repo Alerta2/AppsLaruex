@@ -235,5 +235,23 @@ urlpatterns = [
     path('private/timetrackpro/datos-dias-totales-empleados/', datosDiasTotalesEmpleados , name='datos-dias-totales-empleados'),
     path('private/timetrackpro/datos-dias-totales-empleados/<slug:year>/', datosDiasTotalesEmpleados , name='datos-dias-totales-empleados'),
 
+    # solicitar viajes 
+    path('private/timetrackpro/viajes/', viajes , name='viajes'),
+    path('private/timetrackpro/obtener-vehiculos-disponibles/', obtenerVehiculosDisponibles , name='obtener-vehiculos-disponibles'),
+    path('private/timetrackpro/viajes/<slug:year>/', viajes , name='viajes'),
+    path('private/timetrackpro/solicitar-viaje/', solicitarViaje , name='solicitar-viaje'),
+    path('private/timetrackpro/solicitar-viaje-calendario/', solicitarViaje , name='solicitar-viaje-calendario'),
+    path('private/timetrackpro/datos-viajes-calendario/<slug:year>/', datosViajesCalendario , name='datos-viajes-calendario'),
+    path('private/timetrackpro/datos-viajes-calendario/', datosViajesCalendario , name='datos-viajes-calendario'),
+    path('private/timetrackpro/datos-viajes/<slug:year>/', datosViajes , name='datos-viajes'),
+    path('private/timetrackpro/datos-viajes/', datosViajes , name='datos-viajes'),    
+    path('private/timetrackpro/ver-viaje/<slug:id>/', verViaje , name='ver-viaje'),   
+    path('private/timetrackpro/eliminar-viaje/', eliminarViaje , name='eliminar-viaje'),
+    path('private/timetrackpro/eliminar-viaje/<slug:id>/', eliminarViaje , name='eliminar-viaje'),
+    path('private/timetrackpro/modificar-viaje/<slug:id>/', modificarViaje , name='modificar-viaje'),
+    path('private/timetrackpro/modificar-viaje/', modificarViaje , name='modificar-viaje'),    
+    path('private/timetrackpro/cambiar-estado-viaje/<slug:id>/', cambiarEstadoViaje , name='cambiar-estado-viaje'),
+    path('private/timetrackpro/cambiar-estado-viaje/', cambiarEstadoViaje , name='cambiar-estado-viaje'),
+
 
 ]
