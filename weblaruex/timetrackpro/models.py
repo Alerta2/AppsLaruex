@@ -408,53 +408,12 @@ class EstadosSolicitudes(models.Model):
     vacaciones = models.IntegerField()
     solicitudes = models.IntegerField()
     permisos_retribuidos = models.IntegerField()
+    viajes = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'estados_solicitudes'
 
-class RegitroSolicitudViajes(models.Model):
-    id = models.IntegerField(primary_key=True)
-    id_empleado = models.IntegerField(blank=True, null=True)
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
-    id_estado = models.IntegerField(blank=True, null=True)
-    motivo_solicitud_rechazo = models.CharField(max_length=255, blank=True, null=True)
-    archivo_solicitud = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'regitro_solicitud_viajes'
-
-
-class RegitroSolicitudesPermisos(models.Model):
-    id = models.IntegerField(primary_key=True)
-    id_empleado = models.IntegerField(blank=True, null=True)
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
-    id_permisos = models.IntegerField(blank=True, null=True)
-    id_estado = models.IntegerField(blank=True, null=True)
-    motivo_solicitud_rechazo = models.CharField(max_length=255, blank=True, null=True)
-    archivo_solicitud = models.CharField(max_length=255, blank=True, null=True)
-    funciones_a_cubrir = models.CharField(max_length=255, blank=True, null=True)
-    id_empleado_sustituto = models.IntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'regitro_solicitudes_permisos'
-
-
-class RegitroViajesAceptados(models.Model):
-    id = models.IntegerField(primary_key=True)
-    id_registro_solicitud = models.IntegerField(blank=True, null=True)
-    id_empleado = models.IntegerField(blank=True, null=True)
-    dieta = models.IntegerField(blank=True, null=True)
-    ruta_solicitud = models.CharField(max_length=255, blank=True, null=True)
-    ruta_dieta = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'regitro_viajes_aceptados'
 
 
 class RelEmpleadosUsuarios(models.Model):
@@ -591,6 +550,21 @@ class VacacionesTimetrackpro(models.Model):
         managed = False
         db_table = 'vacaciones'
 
+class ViajesTimeTrackPro(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
+    solicitante = models.ForeignKey('EmpleadosTimetrackpro', models.DO_NOTHING, db_column='Solicitante')  # Field name made lowercase.
+    fecha_solicitud = models.DateTimeField(db_column='Fecha_solicitud')  # Field name made lowercase.
+    lugar = models.CharField(db_column='Lugar', max_length=100)  # Field name made lowercase.
+    fecha_inicio = models.DateField(db_column='Fecha_inicio')  # Field name made lowercase.
+    fecha_fin = models.DateField(db_column='Fecha_fin')  # Field name made lowercase.
+    motivo_viaje = models.CharField(db_column='Motivo_viaje', max_length=300)  # Field name made lowercase.
+    estado = models.ForeignKey('EstadosSolicitudes', models.DO_NOTHING, db_column='Estado')  # Field name made lowercase.
+    motivo_rechazo = models.CharField(db_column='Motivo_rechazo', max_length=300, blank=True, null=True)  # Field name made lowercase.
+    vehiculo = models.IntegerField(db_column='Vehiculo', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'viajes'
 
 class ProblemasDetectadosTimeTrackPro(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.

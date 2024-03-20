@@ -155,7 +155,7 @@
               <label class="col-form-label">Fecha de fin</label>
               <div class="">
                 <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
-                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
+                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="comprobarFechaRellena('fecha_inicio','fecha_fin', 'dias_consumidos')">
                 <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos"  min="1" hidden >
                 <input type="number" class="form-control" name="dias_habiles_consumidos" id="dias_habiles_consumidos"  min="1" hidden >
               </div>  
@@ -236,7 +236,7 @@
             <div class="col-xl-5">
               <label class="col-form-label">Nueva fecha de fin</label>
 
-              <input type="date" class="form-control" name="fechaFinNueva" id="fechaFinNueva"  onchange="calcularDias('fechaInicioNueva','fechaFinNueva', 'dias_nuevos_consumidos')">
+              <input type="date" class="form-control" name="fechaFinNueva" id="fechaFinNueva"  onchange="comprobarFechaRellena('fechaInicioNueva','fechaFinNueva', 'dias_nuevos_consumidos')">
               <input type="number" class="form-control" name="dias_nuevos_consumidos" id="dias_nuevos_consumidos"  min="1" hidden>
 
             </div>
@@ -631,6 +631,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
   });
 
+  function comprobarFechaRellena(inicio, fin, dias_consumidos){
+    
+    fecha_inicio = document.getElementById(inicio).value;
+    fecha_fin = document.getElementById(fin).value;
+
+    parts_fecha_inicio = fecha_inicio.split("-");
+    parts_fecha_fin = fecha_fin.split("-");
+    yearFin = parts_fecha_fin[0];
+
+    // comprobamos la dimensión de las fechas
+    if (parts_fecha_fin.length == 3 && yearFin.startsWith('20')){
+      calcularDias(inicio, fin, dias_consumidos);
+    }
+
+  }
+
   function calcularDias(inicio, fin, dias_consumidos){
     fecha_inicio = document.getElementById(inicio).value;
     fecha_fin = document.getElementById(fin).value;
@@ -641,8 +657,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // solo hago la comprobación si las dos fechas están rellenas
     // comprobar que la fecha fin este rellena
-    
-    if (fecha_inicio != "" && fecha_fin != ""){
       
       if (fecha_inicio > fecha_fin){
         alert("La fecha de inicio no puede ser mayor a la fecha de fin");
@@ -652,16 +666,17 @@ document.addEventListener('DOMContentLoaded', function() {
       else{
         botonGuardarSolicitar.removeAttribute("disabled");
         botonGuardarModificar.removeAttribute("disabled");
+            // obtener la diferencia en dias entre las dos fechas
+        var fecha1 = new Date(fecha_inicio);
+        var fecha2 = new Date(fecha_fin);
+        var diff = fecha2.getTime() - fecha1.getTime();
+        var dias = diff / (1000 * 60 * 60 * 24);
+        dias = dias + 1;
+        dias_consumidos.value = dias;
       }
     }
-    // obtener la diferencia en dias entre las dos fechas
-    var fecha1 = new Date(fecha_inicio);
-    var fecha2 = new Date(fecha_fin);
-    var diff = fecha2.getTime() - fecha1.getTime();
-    var dias = diff / (1000 * 60 * 60 * 24);
-    dias = dias + 1;
-    dias_consumidos.value = dias;
-  }
+
+
 
   function mostrarInfo(){ 
     console.log("entro");
