@@ -176,30 +176,30 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
     // cambiamos la funcionalidad del boton submit del formulario
     
     $("#estado").val(1)
-    $("#formularioModal").submit(function (e) {
+$("#formularioModal").submit(function (e) {
 
-// cancelamos el funcionamiento por defecto del boton submit
-e.preventDefault();
-// capturamos la información del formulario 
-var data = new FormData(this);
-// ejecuta una url/action con la capacidad de gestionar la salida
-$.ajax({
-  url: "/private/docLaruex/agregarArchivo/",
-  type: "POST",
-  data: data,
-  cache: false,
-  contentType: false,
-  processData: false,
-  // gestiono el return del view
-  success: function () {
-    crearAviso('objetoGuardar', 'Curriculum guardado con éxito', 'alert-success', 2000)
-    $(".divFormularios").remove();
-    $("#reset").trigger("click");
-    $('#tabla_Curriculums').bootstrapTable('refresh');
-    $('#cerrar').trigger('click');
-    $("#modalFormulario").trigger('reset');
-    location.reload(true);
-  }
+  // cancelamos el funcionamiento por defecto del boton submit
+  e.preventDefault();
+  // capturamos la información del formulario 
+  var data = new FormData(this);
+  // ejecuta una url/action con la capacidad de gestionar la salida
+  $.ajax({
+    url: "/private/docLaruex/agregarArchivo/",
+    type: "POST",
+    data: data,
+    cache: false,
+    contentType: false,
+    processData: false,
+    // gestiono el return del view
+    success: function () {
+      crearAviso('objetoGuardar', 'Curriculum guardado con éxito', 'alert-success', 2000)
+      $(".divFormularios").remove();
+      $("#reset").trigger("click");
+      $('#tabla_Curriculums').bootstrapTable('refresh');
+      $('#cerrar').trigger('click');
+      $("#modalFormulario").trigger('reset');
+      location.reload(true);
+    }
 });
 });
     $('#tabla_Curriculums').bootstrapTable({

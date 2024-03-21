@@ -90,7 +90,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <form id="formularioProyecto"  action="/private/docLaruex/agregarArchivo/" method="POST"
+        <form id="formularioProyecto"  action="{% url 'docLaruex:docLaruexAgregarProyecto'%}" method="POST"
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row" >  
@@ -446,34 +446,6 @@ aria-hidden="true">
   function mostrarFinanciadores(value) {
     $('#financiadoresProyectoSelect option[value="' + value + '"]').attr("selected", "selected");
   }
-/*
-  // cambiamos la funcionalidad del boton submit del formulario
-  $("#formularioProyecto").submit(function (e) {
-    // cancelamos el funcionamiento por defecto del boton submit
-    e.preventDefault();
-    // capturamos la información del formulario 
-    var data = new FormData(this);
-    // ejecuta una url/action con la capacidad de gestionar la salida
-    $.ajax({
-      url: "/private/docLaruex/agregarArchivo/",
-      type: "POST",
-      data: data,
-      cache: false,
-      contentType: false,
-      processData: false,
-      // gestiono el return del view
-      success: function () {
-        crearAviso('objetoGuardar', 'Proyecto guardado con éxito', 'alert-success', 2000);
-        document.getElementById('formularioProyecto').remove();
-        $('#tabla_proyectos').bootstrapTable('refresh');
-        $('#modalFormularioProyecto').trigger('reset');
-        $('#cerrarProyecto').trigger('click');
-        location.reload(true);
-
-      }
-    });
-  });
-*/
     // mostramos el nombre del archivo en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
     function mostrarNombreArchivo(value) {
 

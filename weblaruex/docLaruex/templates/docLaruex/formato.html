@@ -768,7 +768,7 @@
 
             <!-- Footer del ModalAsociarFormato -->
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              <button id="formularioAsociarFormatoCerrar"  type="button" class="btn btn-secondary" data-dismiss="modal">
                 Cerrar
               </button>
               <button type="submit" value="submit" class="btn btn-primary">
@@ -2088,6 +2088,7 @@
 
 
   $("#formularioAsociarFormato").submit(function (e) {
+    e.preventDefault();
     console.log("envio el formato");
     // capturamos la información del formulario 
     var data = new FormData(this);
@@ -2103,6 +2104,8 @@
       success: function (data) {
         console.log("He agregado el formato");
         console.log(data);
+        $('formularioAsociarFormatoCerrar').trigger('click');
+        location.reload();
       }
     });
   });
