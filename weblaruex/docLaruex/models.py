@@ -541,8 +541,6 @@ class ReservasVehiculos(models.Model):
         managed = False
         db_table = 'reservas_vehiculos'
 
-
-
 class ReservasProcedimiento(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)  # Field name made lowercase.
     procedimiento_reservado = models.CharField(db_column='Procedimiento_reservado', max_length=100)  # Field name made lowercase.
