@@ -57,7 +57,7 @@ $("#tabla_errores_insertados").bootstrapTable({
         formatter: function(value, row) {
           var nombreEmpleado = row.id_empleado__nombre;
           var id = row.id_empleado__id;
-          var div = '<div><h6 class="mb-0 text-sm">'+nombreEmpleado+'</h6><p class="text-xs text-secondary mb-0">ID:'+ id +'</p></div>';
+          var div = '<div><h6 class="mb-0 text-sm">'+nombreEmpleado+'</h6><p class="text-xs text-secondary mb-0">ID: '+ id +'</p></div>';
           return div;
         }
       },

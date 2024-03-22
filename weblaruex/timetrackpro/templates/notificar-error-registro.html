@@ -17,26 +17,30 @@
               <div class="card-body">
                 <div class="row">
                   <div class="mb-3">
-                    <input type="number" class="form-control" id="idEmpleado" name="idEmpleado" value="{{request.user.id}}" aria-label="Año al que aplica" aria-describedby="text-addon" hidden>                  
+                    <input type="number" class="form-control" id="idEmpleado" name="idEmpleado" value="{{request.user.id}}" aria-label="Año al que aplica" aria-describedby="text-addon" hidden>                 
                   </div>
                 </div>
                 <div class="row">
                   <div class="col mb-3">
 
                     <label class="col-form-label text-white">Empleado</label>
-  
-                    <select class="form-control" aria-label="Nombre en el dispositivo" id="empleado_maquina"
+                    <input type="number" class="form-control" id="empleado_maquina" name="empleado_maquina" value="{{empleadoActual.id_empleado.id}}" aria-label="Año al que aplica" aria-describedby="text-addon"  hidden>
+                    {% if administrador %} 
+
+                    <select class="form-control" aria-label="Nombre en el dispositivo" id="select_empleado_maquina"
                     name="empleado_maquina" aria-describedby="text-addon" {% if not administrador %} disabled {% endif %}
                     >
-                    {% if administrador %} 
-                    {% for empleado in empleados %}
-                      <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
-                    {% endfor %}
-                    {% else %}
-                    <option value="{{ empleadoActual.id_empleado.id }}">{{ empleadoActual.id_empleado.nombre }}</option>
-
-                   {% endif %}
+                      {% for empleado in empleados %}
+                        <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
+                      {% endfor %}
+                  
                     </select>
+                    
+
+                    {% else %} 
+                    <input type="text" class="form-control" id="empleado_maquina_text" name="empleado_maquina_text" value="{{empleadoActual.id_empleado.nombre}}" aria-label="Año al que aplica" aria-describedby="text-addon" readonly>  
+                    {% endif %}
+
                     </div>
                   <div class="col mb-3">
 
@@ -73,6 +77,14 @@
     $('#motivoError').keyup(function(){
       if($(this).val().length > 10)
         $('#notificarError').attr('disabled', false);
+    })
+  });
+
+  //  comprobar automáticamente el valor del select_empleado_maquina 
+  // y meter ese valor en el input empleado_maquina
+  $(document).ready(function(){
+    $('#select_empleado_maquina').change(function(){
+      $('#empleado_maquina').val($(this).val());
     })
   });
 

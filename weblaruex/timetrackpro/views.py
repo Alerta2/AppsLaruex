@@ -2351,16 +2351,13 @@ def datosErroresNotificados(request, id=None):
     director = esDirector(request.user.id)
 
     if administrador or director:
-
         if id == None:
-            errores = ErroresRegistroNotificados.objects.using("timetrackpro").values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id', 'id_empleado__nombre')
-
+            errores = ErroresRegistroNotificados.objects.using("timetrackpro").values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id', 'id_empleado__nombre', 'hora_notificacion', 'hora_modificacion_o_rechazo')
         else:
-            errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=id).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado', 'id_empleado__id', 'id_empleado__nombre') 
+            errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=id).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado', 'id_empleado__id', 'id_empleado__nombre', 'hora_notificacion', 'hora_modificacion_o_rechazo') 
     else:
         idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=idEmpleado).values('id','hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'quien_notifica__first_name','quien_notifica__last_name', 'id_empleado' , 'id_empleado__id_empleado', 'id_empleado__id_empleado__id', 'id_empleado__id_empleado__nombre')
-    # devuelvo la lista en formato json
+        errores = ErroresRegistroNotificados.objects.using("timetrackpro").filter(id_empleado=idEmpleado.id_usuario).values('id', 'id_empleado', 'hora', 'motivo', 'estado', 'motivo_rechazo', 'quien_notifica', 'quien_notifica__id', 'id_empleado', 'id_empleado__id', 'id_empleado__nombre', 'quien_notifica__first_name', 'quien_notifica__last_name', 'hora_notificacion', 'hora_modificacion_o_rechazo')
     return JsonResponse(list(errores), safe=False)
 
 
