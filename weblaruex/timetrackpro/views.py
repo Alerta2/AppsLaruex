@@ -4962,7 +4962,11 @@ def solicitarPermisosRetribuidos(request, year=None):
         diasSolicitados = request.POST.get("dias_solicitados")
         estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=18)[0]
         fechaSolicitud = datetime.now()
-        
+
+        motivoSolicitud = None
+        if "motivo_solicitud" in request.POST:
+            motivoSolicitud = request.POST.get("motivo_solicitud")
+
         for p in permisosSolicitados:
             if p['fecha_inicio'] == fechaInicio:
                 return redirect('timetrackpro:ups', mensaje='Ya existe un permiso retribuido para el día ' + fechaInicio + '')
@@ -4993,6 +4997,7 @@ def solicitarPermisosRetribuidos(request, year=None):
         <nombreSolicitante> <apellidosSolicitante> ha solicitado un nuevo permiso de ausencias.
         El motivo de la solicitud es
         <motivo>
+        <motivoSolicitud>
         La duración máxima de la solicitud es de <diasDisponibles>.
         El perido solicitado abarca <diasSolicitados> día/s comenzando desde el  <fechaInicio> al <fechaFin>.
         Puede consultar el estado de la solicitud en el siguiente enlace.
@@ -5008,10 +5013,10 @@ def solicitarPermisosRetribuidos(request, year=None):
         mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=43)[0]
         subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace('\n', '').replace('\r', '')
         
-        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo)
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo).replace("<motivoSolicitud>", motivoSolicitud)
 
         mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=44)[0]
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo).replace("<diasDisponibles>", diasDisponibles)
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo).replace("<motivoSolicitud>", motivoSolicitud).replace("<diasDisponibles>", diasDisponibles)
         
         email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
@@ -5024,7 +5029,7 @@ def solicitarPermisosRetribuidos(request, year=None):
 
         mailSolicitante = [correoEmpleado,]
 
-        nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso)
+        nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso, motivo_solicitud=motivoSolicitud)
         nuevoPermiso.save(using='timetrackpro')
         
         send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
@@ -5085,7 +5090,10 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
         for p in permisos:
             if p['fecha_inicio'] == fechaInicio:
                 return redirect('timetrackpro:ups', mensaje='Ya existe un permiso retribuido para el día ' + fechaInicio + '')
-            
+
+        motivoSolicitud = None
+        if "motivo_solicitud" in request.POST:
+            motivoSolicitud = request.POST.get("motivo_solicitud")
 
         '''
         <nombreSolicitante> - nombre del usuario que solicita el cambio
@@ -5112,6 +5120,7 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
         <nombreSolicitante> <apellidosSolicitante> ha solicitado un nuevo permiso de ausencias.
         El motivo de la solicitud es
         <motivo>
+        <motivoSolicitud>
         La duración máxima de la solicitud es de <diasDisponibles>.
         El perido solicitado abarca <diasSolicitados> día/s comenzando desde el  <fechaInicio> al <fechaFin>.
         Puede consultar el estado de la solicitud en el siguiente enlace.
@@ -5127,10 +5136,10 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
         mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=43)[0]
         subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace('\n', '').replace('\r', '')
         
-        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo)
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo).replace("<motivoSolicitud>", motivoSolicitud)
 
         mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=44)[0]
-        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo).replace("<diasDisponibles>", diasDisponibles)
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasSolicitados>", diasSolicitados).replace("<motivo>", motivo).replace("<motivoSolicitud>", motivoSolicitud).replace("<diasDisponibles>", diasDisponibles)
         
         email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
@@ -5144,7 +5153,7 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
         mailSolicitante = [correoEmpleado,]
 
 
-        nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso)
+        nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso, motivo_solicitud=motivoSolicitud)
         nuevoPermiso.save(using='timetrackpro')
         send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
         send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
@@ -5496,8 +5505,10 @@ def modificarSolicitudPermisoRetribuido(request):
             permiso.fecha_fin = request.POST.get("fecha_fin")
             permiso.dias_solicitados = request.POST.get("dias_solicitados")
             permiso.codigo_permiso = codigoPermiso
-            if request.POST.get("motivoEditar") != "":
-                permiso.motivo = request.POST.get("motivoEditar")
+            if request.POST.get("motivoEditar") != "" and request.POST.get("motivoEditar") != None:
+                permiso.motivo_estado_solicitud = request.POST.get("motivoEditar")
+            if request.POST.get("motivoSolicitud") != "" and request.POST.get("motivoSolicitud") != None:
+                permiso.motivo_solicitud = request.POST.get("motivoSolicitud")
             permiso.save(using='timetrackpro')
 
             return redirect('timetrackpro:ver-solicitud-permisos-retribuidos', id=id)
