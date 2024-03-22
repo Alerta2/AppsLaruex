@@ -307,6 +307,7 @@ class PermisosYAusenciasSolicitados(models.Model):
     estado = models.ForeignKey('EstadosSolicitudes', models.DO_NOTHING, db_column='estado')
     year = models.IntegerField()
     motivo_estado_solicitud = models.CharField(db_column='Motivo_estado_solicitud', max_length=1000, blank=True, null=True)  # Field name made lowercase.
+    motivo_solicitud = models.CharField(db_column='Motivo_solicitud', max_length=1000, blank=True, null=True)  # Field name made lowercase.
 
 
     class Meta:

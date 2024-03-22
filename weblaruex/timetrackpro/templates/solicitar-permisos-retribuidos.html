@@ -135,6 +135,13 @@
               <datalist id="permisosRetribuidos">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
             </div>
           </div>
+          
+          <div class="row">
+            <div class="col-xl-12 col-md-12">
+                <label class="col-form-label text-sm">Motivo de la solicitud</label>
+                <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Indique el motivo de la solicitud" id="motivo_solicitud" name="motivo_solicitud" aria-describedby="text-addon" rows="3"></textarea>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           {% if user.is_authenticated  %}
@@ -183,10 +190,16 @@
               </div>
               <div class="row">
                 <div class="col-xl-12 col-md-12">
-                      <label class="text-sm">Permisos</label>
+                      <label class="col-form-label text-sm">Permisos</label>
                       <input id="inputPermisosCalendario" list="permisosRetribuidosCalendario"  class="form-select">
                       <input type="number" id="id_permiso_calendario" name="id_permiso"  class="form-control" hidden>
                       <datalist id="permisosRetribuidosCalendario" class="text-sm">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xl-12 col-md-12">
+                    <label class="col-form-label text-sm">Motivo de la solicitud</label>
+                    <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Indique el motivo de la solicitud" id="motivo_solicitud_calendario" name="motivo_solicitud" aria-describedby="text-addon" rows="3"></textarea>
                 </div>
               </div>
             </div>
