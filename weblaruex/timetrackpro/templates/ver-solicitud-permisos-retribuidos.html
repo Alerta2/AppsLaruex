@@ -84,6 +84,12 @@
 
                 <li class="list-group-item border-0 ps-0 pt-0 text-lg"><span class="h5 text-muted mb-0">{{solicitud.codigo_permiso.cod_uex}} - {{solicitud.codigo_permiso.nombre}}</span></li>
 
+                <li class="list-group-item border-0 ps-0 pt-1 text-lg"><span class="h5 font-weight-bolder mb-0">Motivo:</span></li>
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><span class="h5 text-muted mb-0">{{solicitud.motivo_solicitud}}</span></li>
+                <hr class="separacion">
+                {% if solicitud.motivo_estado_solicitud %}
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><span class="h5 text-muted mb-0">{{solicitud.motivo_estado_solicitud}}</span></li>
+                {% endif %}
                 {% if solicitud.justificante %}
                 <li class="list-group-item border-0 ps-0 pt-2 text-lg text-center"><a href="{% get_media_prefix %}/timetrackpro/justificantes/{{solicitud.justificante}}" title="Descargar justificante" download><button type="button" class="btn bg-gradient-primary d-flex align-items-center mx-auto text-md"><i class="fa-duotone fa-file-pdf me-2 fa-3x"></i>Descargar Justificante</button></a></li> 
                 {% endif %}
@@ -147,6 +153,14 @@
               <input id="inputPermisosModificar" list="permisosRetribuidosModificar"  value="{{solicitud.codigo_permiso.nombre|safe}}" class="form-select">
               <input type="number" id="id_permiso_modificar" name="id_permiso_modificar" value="{{solicitud.codigo_permiso.id|safe}}" class="form-control" hidden>
               <datalist id="permisosRetribuidosModificar">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label class="col-form-label">Motivo de la solicitud</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique los motivos del rechazo" id="motivoSolicitud" name="motivoSolicitud" aria-describedby="text-addon">{{solicitud.motivo_solicitud}}</textarea>
+              </div>
             </div>
           </div>
           {% if solicitud.motivo_estado_solicitud %} 
