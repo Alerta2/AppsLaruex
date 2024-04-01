@@ -4075,8 +4075,10 @@ def modificarAsuntosPropios(request):
         asunto.fecha_inicio = request.POST.get("fecha_inicio")
         asunto.fecha_fin = request.POST.get("fecha_fin")
         asunto.dias_consumidos = request.POST.get("dias_consumidos")
-        sustituto = Sustitutos.objects.using("timetrackpro").filter(id=request.POST.get("sustituto"))[0]         
-        asunto.sustituto = sustituto
+        idSustituto = request.POST.get("sustituto")
+        if idSustituto != "None" and idSustituto != 0 and idSustituto != '0':
+            sustituto = Sustitutos.objects.using("timetrackpro").filter(id=request.POST.get("sustituto"))[0]         
+            asunto.sustituto = sustituto
         asunto.tareas_a_sustituir= request.POST.get("tareas_a_sustituir")
         recuperable = request.POST.get("recuperable")
         asunto.recuperable = recuperable
@@ -4770,13 +4772,12 @@ def solicitarAsuntosPropios(request, year=None):
     asuntosPropiosEmpleados = []
     diasConsumidos = 0
     if year is None:
-        year = str(datetime.now().year)
-        yearActual = datetime.now().year
+        year = datetime.now().year
 
     if administrador or director:
-        asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").filter(year=yearActual).values()
+        asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values()
 
-    asuntos = AsuntosPropios.objects.using("timetrackpro").filter(year=yearActual,empleado=empleado, estado__id=9).values()
+    asuntos = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado, estado__id=9).values()
     for a in asuntos:
         diasConsumidos += a['dias_consumidos']
 
