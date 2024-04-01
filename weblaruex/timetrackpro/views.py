@@ -4793,7 +4793,7 @@ def solicitarAsuntosPropios(request, year=None):
         diasConsumidos = request.POST.get("dias_consumidos")
         
         recuperable = 0 
-        if request.POST.get("recuperable") == "1":
+        if request.POST.get("recuperable") == "1" or request.POST.get("recuperable") == 1:
             recuperable = 1
 
         tareasASustituir = None
@@ -4860,9 +4860,9 @@ def solicitarAsuntosPropios(request, year=None):
         if recuperable == 1:
             tipoAsuntos = "asuntos propios recuperables"
             if descripcion != None:
-                recuperacion = "Las horas se recuperarán de la siguiente manera: " + descripcion
-
-
+               recuperacion = "Las horas se recuperarán de la siguiente manera: " + descripcion
+        
+        
         mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=37)[0]
         subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<tipo>", tipoAsuntos).replace('\n', '').replace('\r', '')
         
@@ -4895,7 +4895,6 @@ def solicitarAsuntosPropios(request, year=None):
             send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
             send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
             enviarTelegram(subject, mensajeDestinatario)
-
             return redirect('timetrackpro:solicitar-asuntos-propios', year=year)
     infoVista = {
         "navBar":navBar,
@@ -5944,7 +5943,7 @@ def agregarAsuntosPropiosCalendario(request):
         diasConsumidos = request.POST.get("dias_seleccionados_consumidos")
         
         recuperable = 0 
-        if request.POST.get("recuperable_calendario") == 1:
+        if request.POST.get("recuperable_calendario") == 1 or request.POST.get("recuperable_calendario") == "1":
             recuperable = 1
 
         tareasASustituir = None
@@ -5956,10 +5955,80 @@ def agregarAsuntosPropiosCalendario(request):
             descripcion = request.POST.get("descripcion_calendario")
 
         empleadoSustituto = request.POST.get("sustituto_calendario")
+        nombreSustituto = ""
         if empleadoSustituto != "0" and empleadoSustituto != 0:       
             sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0] 
+            nombreSustituto = sustituto.nombre + " " + sustituto.apellidos
         else:
             sustituto = None
+
+        '''
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <tipo> - tipo de solicitud asunto propios o asuntos propios recuperables
+        <url> - url de la aplicacion
+        <fechaInicio> - fecha de inicio del periodo actual
+        <fechaFin> - fecha de fin del periodo actual
+        <diasConsumidos> - dias consumidos en el periodo actual
+        <funciones> - funciones a realizar por el sustituto 
+        <sustituto> - nombre del sustituto
+        <recuperacion> - si el asunto propio es recuperable o no    
+        '''
+
+        '''
+        ASUNTO 
+        Solicitud de día de <tipo> <nombreSolicitante> <apellidosSolicitante>.
+        
+        MENSAJE PARA EL REMITENTE
+        Su solicitud de <tipo> ha sido registrada con éxito.
+        Periodo del <fechaInicio> al <fechaFin> que abarcaba <diasConsumidos> día/s.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+        
+
+        MENSAJE PARA EL DESTINATARIO
+        <nombreSolicitante> <apellidosSolicitante> ha solicitado <diasConsumidos> día/s de <tipo> desde <fechaInicio> al <fechaFin>.
+        <recuperacion>.
+        Las funciones a cubir son:
+        <funciones>
+        La persona que asume la sustitución es:
+        <sustituto>
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+               
+        '''
+        
+        url = 'http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/'
+        recuperacion = ""
+        tipoAsuntos = "asuntos propios"
+        # correo enviado al usuario
+
+        if recuperable == 1:
+            tipoAsuntos = "asuntos propios recuperables"
+            if descripcion != None:
+               recuperacion = "Las horas se recuperarán de la siguiente manera: " + descripcion
+        
+        
+        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=37)[0]
+        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<tipo>", tipoAsuntos).replace('\n', '').replace('\r', '')
+        
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasConsumidos>", diasConsumidos).replace("<tipo>", tipoAsuntos)
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=38)[0]
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasConsumidos>", diasConsumidos).replace("<funciones>", tareasASustituir).replace("<sustituto>", nombreSustituto).replace("<recuperacion>", recuperacion).replace("<tipo>", tipoAsuntos)
+
+        # adjuntar el enlace a la aplicacion web
+
+
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
+        # convertir a direcciones de correo
+        if empleado.email != "" and empleado.email != None:
+            correoEmpleado = convertirAMail(empleado.email)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+
+        mailSolicitante = [correoEmpleado,]
 
         if AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin).exists():
             return redirect('timetrackpro:solicitar-asuntos-propios')
@@ -5969,6 +6038,9 @@ def agregarAsuntosPropiosCalendario(request):
             year = request.POST.get("year_actual")
             nuevoAsuntoPropio = AsuntosPropios(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, estado=estado, fecha_solicitud=fechaSolicitud, year=year, recuperable=recuperable, descripcion=descripcion, tareas_a_sustituir=tareasASustituir, sustituto=sustituto)
             nuevoAsuntoPropio.save(using='timetrackpro')
+            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+            enviarTelegram(subject, mensajeDestinatario)
             return redirect('timetrackpro:solicitar-asuntos-propios', year=year)
  
     return solicitarAsuntosPropios(request)
