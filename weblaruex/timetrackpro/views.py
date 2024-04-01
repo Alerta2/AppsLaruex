@@ -880,18 +880,16 @@ def registrosInsertados(request):
     director = esDirector(request.user.id)
     # obtengo los datos necesarios para la vista
     archivos = []
-    if administrador or director:
-        archivos = RegistrosJornadaInsertados.objects.using("timetrackpro").order_by('year', 'mes').all()
-        infoVista = {
-            "navBar":navBar,
-            "administrador":administrador,
-            "archivos":list(archivos), 
-            "rutaActual": "Registros insertados",
-            "yearActual":datetime.now().year
-        }
-        return render(request,"registros-insertados.html",infoVista)
-    else:
-        return redirect('timetrackpro:sin-permiso')
+    archivos = RegistrosJornadaInsertados.objects.using("timetrackpro").order_by('year', 'mes').all()
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+        "director":director,
+        "archivos":list(archivos), 
+        "rutaActual": "Registros insertados",
+        "yearActual":datetime.now().year
+    }
+    return render(request,"registros-insertados.html",infoVista)
 
 @login_required
 def registrosRemotosInsertados(request):
@@ -911,18 +909,15 @@ def registrosRemotosInsertados(request):
     yearActual = datetime.now().year
     # obtengo los datos necesarios para la vista
     archivos = []
-    if administrador or director:
-        archivos = RegistrosJornadaInsertados.objects.using("timetrackpro").order_by('year', 'mes').all()
-        infoVista = {
-            "navBar":navBar,
-            "administrador":administrador,
-            "archivos":list(archivos), 
-            "yearActual":yearActual,
-            "rutaActual": "Registros insertados desde la aplicación"
-        }
-        return render(request,"registros-remotos-insertados.html",infoVista)
-    else:
-        return redirect('timetrackpro:sin-permiso')
+    archivos = RegistrosJornadaInsertados.objects.using("timetrackpro").order_by('year', 'mes').all()
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+        "archivos":list(archivos), 
+        "yearActual":yearActual,
+        "rutaActual": "Registros insertados desde la aplicación"
+    }
+    return render(request,"registros-remotos-insertados.html",infoVista)
 
 
 
@@ -949,17 +944,16 @@ def datosRegistrosInsertados(request, seccion=None, year=None, mes=None):
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     registros = []
-    if administrador or director:
-        if seccion == 1 or seccion == None or seccion == "1" or seccion == "Todos":
-            if mes == None:
-                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
-            else:
-                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(year=year, mes=nombreMeses[int(mes)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
+    if seccion == 1 or seccion == None or seccion == "1" or seccion == "Todos":
+        if mes == None:
+            registros = RegistrosJornadaInsertados.objects.using("timetrackpro").values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
         else:
-            if mes == None:
-                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(seccion=secciones[int(seccion)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
-            else:
-                registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(seccion=secciones[int(seccion)], year=year, mes=nombreMeses[int(mes)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
+            registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(year=year, mes=nombreMeses[int(mes)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
+    else:
+        if mes == None:
+            registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(seccion=secciones[int(seccion)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
+        else:
+            registros = RegistrosJornadaInsertados.objects.using("timetrackpro").filter(seccion=secciones[int(seccion)], year=year, mes=nombreMeses[int(mes)]).values('id', 'seccion', 'mes', 'year', 'fecha_lectura', 'insertador__first_name', 'insertador__last_name', 'ruta')
     return JsonResponse(list(registros), safe=False)
 
 
@@ -995,11 +989,18 @@ def datosRegistrosRemotosInsertados(request, remoto=None, year=None, mes=None):
     administrador = esAdministrador(request.user.id)
     director = esDirector(request.user.id)
     registros = []
+    
+    empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id).values('id_empleado__id')
     if administrador or director:
         if remoto == None:
             registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido__isnull=True,hora__year=year, hora__month=mes).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
         else:
             registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido__isnull=True, remoto=remoto, hora__year=year, hora__month=mes).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
+    else:
+        if remoto == None:
+            registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_empleado__id__in=empleado, id_archivo_leido__isnull=True,hora__year=year, hora__month=mes).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
+        else:
+            registros = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_empleado__id__in=empleado, id_archivo_leido__isnull=True, remoto=remoto, hora__year=year, hora__month=mes).values('id','id_empleado__nombre', 'hora', 'maquina__id', 'maquina__nombre', 'id_archivo_leido__mes', 'id_archivo_leido__year', 'id_archivo_leido__seccion', 'id_archivo_leido__fecha_lectura', 'id_archivo_leido__insertador__first_name', 'id_archivo_leido__insertador__last_name', 'remoto')
     return JsonResponse(list(registros), safe=False)
 
 
@@ -1151,9 +1152,8 @@ def obtenerRegistroSemanalEmpleados(request):
 @login_required
 def fichar(request):
     empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-    puedeFichar = False
+    registrosRemotosHoy = RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_empleado=empleado.id_empleado, hora__date=datetime.now().date(), remoto=1)
     if empleado.id_empleado.fichar_remoto == 1:
-    
         if request.method == 'POST':
             # obtener hora actual, hora utc    
             zona_horaria_espana = pytz.timezone('Europe/Madrid')
@@ -1171,6 +1171,7 @@ def fichar(request):
             "navBar":navBar,
             "rutaActual": "Fichar",
             "alerta": alerta,
+            "registrosRemotosHoy": list(registrosRemotosHoy),
         }
         return render(request,"fichar.html",infoVista)
     else:
@@ -1624,7 +1625,6 @@ def verRegistro(request, id):
     ruta_leido = settings.MEDIA_DESARROLLO_TIMETRACKPRO + settings.RUTA_REGISTROS_INSERTADOS + registro.ruta
     IdEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
 
-
     '''
     <url> - url de la aplicacion
     <mes> - mes del fichero de registro
@@ -1688,12 +1688,15 @@ def verRegistro(request, id):
         enviarTelegram(subject, mensajeDestinatario)
 
 
+
     if RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido=registro.id, id_empleado=IdEmpleado.id).exists() or administrador or director:
         infoVista = {
             "navBar":navBar,
             "administrador":administrador,
             "registro":registro,
-            "rutaActual":"Registros insertados" + " / " + str(registro.seccion) + " / " + str(registro.mes) + " / " + str(registro.year),
+            "rutaPrevia":"Registros insertados",
+            "urlRutaPrevia":reverse('timetrackpro:registros-insertados'),
+            "rutaActual":str(registro.seccion) + " / " + str(registro.mes) + " / " + str(registro.year),
             "empleados":empleados,
         }
         return render(request,"verRegistro.html",infoVista)

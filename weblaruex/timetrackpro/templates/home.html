@@ -292,23 +292,21 @@
                 <p class="mb-0">Selecciona un opción</p>
             </div>
             <div class="card-body pb-3">
-              {% if administrador or director %}
               <div class="card">
                 <div class="text-center">
                   <button type="button" class="btn bg-gradient-dark btn-lg w-100 mb-0" onclick="redirigir(6)">Registros de las maquinas</button>
                 </div>
               </div>
 
-              
+
               <div class="card">
                 <div class="text-center">
-                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(14)">Registros desde app</button>
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100  mt-4 mb-0" onclick="redirigir(14)">Registros desde app</button>
                 </div>
               </div>
-              {% endif %}
               <div class="card">
                 <div class="text-center">
-                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 {% if administrador or director %} mt-4 {% endif %}mb-0" onclick="redirigir(7)">Informe asistencias por días</button>
+                  <button type="button" class="btn bg-gradient-dark btn-lg w-100 mt-4 mb-0" onclick="redirigir(7)">Informe asistencias por días</button>
                 </div>
               </div>
               <div class="card">

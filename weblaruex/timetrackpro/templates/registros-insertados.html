@@ -282,6 +282,7 @@ $("#tabla_archivos_insertados").bootstrapTable({
         align: "center",
         formatter: function (value, row) {
           var administrador = "{{administrador}}";
+          var director = "{{director}}";
           var botonVer = '<a href="/private/timetrackpro/ver-registro/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
           
           var botonDescargar = '<a href="/private/timetrackpro/descargar-fichero-maquina/' + row.id + '/" class="mx-1 text-sm" title="descargar fichero" download><i class="fa-solid fa-download fa-lg entrar"></i></a>';
@@ -290,8 +291,10 @@ $("#tabla_archivos_insertados").bootstrapTable({
 
           if (administrador == "True"){
             return botonVer + botonDescargar + botonEliminar;
-          }else{
+          }else if (director == "True"){
             return botonVer + botonDescargar;
+          }else{
+            return botonVer;
           }                  
         },
       },

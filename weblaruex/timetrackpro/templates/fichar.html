@@ -8,9 +8,18 @@
           <div class="card bg-gradient-dark mt-8 ">
             <div class="card-header pb-0 text-left bg-transparent">
               <h2 class="font-weight-bolder text-info text-gradient">Hola, {{request.user.first_name}}</h2>
-              <p class="mb-0 text-white">Pulsa el botón para fichar</p>
+              <p class="mb-0 text-secondary text-bold">Pulsa el botón para fichar</p>
+
             </div>
             <div class="card-body">
+              {% if registrosRemotosHoy %}
+              <p class="text-white font-weight-bold">Registros de hoy</p>
+
+              {% for r in registrosRemotosHoy %}
+              <p class="text-white ">{{r.hora}}</p>
+              {% endfor %}
+              {% endif %}
+
               <form role="form" action="{% url 'timetrackpro:fichar' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="text-center">
