@@ -368,7 +368,7 @@ class RegistrosTimetrackpro(models.Model):
         db_table = 'registros'
 
 
-class RegistrosEliminados(models.Model):
+class RegistrosEliminadosTimetrackpro(models.Model):
     id = models.AutoField(db_column='id', primary_key=True)
     id_registro_eliminado = models.IntegerField()
     id_empleado = models.ForeignKey(EmpleadosMaquinaTimetrackpro, models.DO_NOTHING, db_column='id_empleado', blank=True, null=True)
