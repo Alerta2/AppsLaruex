@@ -253,5 +253,13 @@ urlpatterns = [
     path('private/timetrackpro/cambiar-estado-viaje/<slug:id>/', cambiarEstadoViaje , name='cambiar-estado-viaje'),
     path('private/timetrackpro/cambiar-estado-viaje/', cambiarEstadoViaje , name='cambiar-estado-viaje'),
 
+    # registros eliminados
+    path('private/timetrackpro/registros-eliminados/', obtenerInformeRegistroEliminado , name='registros-eliminados'),
+    path('private/timetrackpro/datos-registros-eliminados/', datosRegistrosEliminados , name='datos-registros-eliminados'),
+    path('private/timetrackpro/datos-registros-eliminados/<str:fechaInicio>/<str:fechaFin>/', datosRegistrosEliminados , name='datos-registros-eliminados'),
+    path('private/timetrackpro/ver-registro-eliminado/<slug:id>/', verRegistroEliminado , name='ver-registro-eliminado'),
+    path('private/timetrackpro/borrar-registro-eliminado/<slug:id>/', borrarRegistroEliminado , name='borrar-registro-eliminado'),
+    path('private/timetrackpro/restaurar-registro-eliminado/<slug:id>/', restaurarRegistroEliminado , name='restaurar-registro-eliminado'),
+
 
 ]

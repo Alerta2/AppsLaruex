@@ -1,0 +1,167 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+  <div class="row d-flex justify-content-center">
+    
+    <h3 class="text-info text-gradient">Registro erroneo de  {{empleado.id_usuario.nombre}} {{empleado.id_usuario.apellidos}}</h3>
+    <h4 class="text-secondary">{{registroEliminado.hora|date:"d M Y"}}</h4>
+    <div class="col-12 col-xl-4">
+      {% if administrador %}
+        <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+          <div class="row">
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalRestaurarRegistro">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-recycle fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">restaurar registro</div>
+            </button>
+            </div>
+            
+            <div class="col">
+              <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarRegistro">             
+               <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
+               <div class="text text-sm">Eliminar</div>
+             </button>
+             </div>
+          </div>
+        </div>
+        
+      {% endif %}
+        
+
+      <div class="card ">
+        <div class="card-header pb-0 p-3">
+        </div>
+        <div class="card-body pt-0 p-3">
+          
+          <ul class="list-group font-weight-bold">
+            <!-- 1- Pendiente, 2 Rechazado, 3 - Aceptado -->
+            {% if registroEliminado.remoto == 1 %}
+            <li class="list-group-item border-0 ps-0 text-lg text-dark text-end"><i class="fa-duotone fa-mobile-signal-out"></i> Remoto</li>
+            {% else %}
+            <li class="list-group-item border-0 ps-0 text-lg text-dark text-end"><i class="fa-duotone fa-fingerprint"></i> Presencial</li>
+            {% endif %}
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{empleado.id_usuario.nombre}} {{empleado.id_usuario.apellidos}}</li>
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{registroEliminado.hora|date:"H:i:s"}}</li>
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{registroEliminado.hora|date:"d M Y"}}</li>
+            <hr class="horizontal dark my-3">
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg text-center "></i> {{registroEliminado.motivo}}</li>
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg text-center text-secondary"><i class="fa-solid fa-calendar-xmark me-2"></i> {{registroEliminado.fecha_eliminacion|date:"d M Y"}} a las {{registroEliminado.fecha_eliminacion|date:"H:i:s"}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalRestaurarRegistro" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalRestaurarRegistro"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar registro de {{registroEliminado.nombre_empleado}}</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:restaurar-registro-eliminado' id=registroEliminado.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+
+            <div class="col-xl-8 mx-auto my-2" >
+              <h6>¿Está seguro/a de restaurar el registro?</h6>
+              <span>{{empleado.id_usuario.nombre}} {{empleado.id_usuario.apellidos}} - {{registroEliminado.hora|date:'d' }} de {{registroEliminado.hora|date:'M' }} de {{registroEliminado.hora|date:'Y' }} a las {{registroEliminado.hora|date:'H:i'}}</span>
+              
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonRestaurar">Restaurar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalEliminarRegistro" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEliminarRegistro"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar registro de {{registroEliminado.nombre_empleado}}</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:borrar-registro-eliminado' id=registroEliminado.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+
+            <div class="col-xl-8 mx-auto my-2" >
+              <h6>¿Está seguro/a de eliminar el registro ?</h6>
+              <span>{{empleado.id_usuario.nombre}} {{empleado.id_usuario.apellidos}} - {{registroEliminado.hora|date:'d' }} de {{registroEliminado.hora|date:'M' }} de {{registroEliminado.hora|date:'Y' }} a las {{registroEliminado.hora|date:'H:i'}}</span>
+              
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonEliminar">Eliminar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+
+  function mostrarTextArea (){
+    if($('#estado').val() == 2){
+      
+      $('#botonModificar').attr('disabled', true);
+      $('#rowMotivo').show();
+      $('#motivo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+    }else{
+      
+      $('#botonModificar').attr('disabled', false);
+      
+      $('#rowMotivo').hide();
+    }
+  }
+
+
+
+
+    // compruebo si en textarea de motivoEliminación hay algo escrito
+  // si hay algo escrito, habilito el boton de guardar
+  // si no hay nada escrito, deshabilito el boton de guardar
+  $(document).ready(function(){
+    $('#motivoEliminacion').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonEliminar').attr('disabled', false);
+    })
+  });
+</script>
+{% endblock %}

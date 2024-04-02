@@ -1689,21 +1689,17 @@ def verRegistro(request, id):
 
 
 
-    if RegistrosTimetrackpro.objects.using("timetrackpro").filter(id_archivo_leido=registro.id, id_empleado=IdEmpleado.id).exists() or administrador or director:
-        infoVista = {
-            "navBar":navBar,
-            "administrador":administrador,
-            "registro":registro,
-            "rutaPrevia":"Registros insertados",
-            "urlRutaPrevia":reverse('timetrackpro:registros-insertados'),
-            "rutaActual":str(registro.seccion) + " / " + str(registro.mes) + " / " + str(registro.year),
-            "empleados":empleados,
-        }
-        return render(request,"verRegistro.html",infoVista)
-    else:
-        return redirect('timetrackpro:ups', mensaje="No tienes permiso para ver el registro seleccionado.")
-
-    # guardo los datos en un diccionario
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+        "registro":registro,
+        "rutaPrevia":"Registros insertados",
+        "urlRutaPrevia":reverse('timetrackpro:registros-insertados'),
+        "rutaActual":str(registro.seccion) + " / " + str(registro.mes) + " / " + str(registro.year),
+        "empleados":empleados,
+    }
+    return render(request,"verRegistro.html",infoVista)
+  
 
 @login_required
 def actualizarRegistro(request, id):
@@ -1979,7 +1975,7 @@ def eliminarLineaRegistro(request, id):
         
 
         # agrego el registro eliminado a la tabla de registros eliminados
-        nuevoRegistroEliminado = RegistrosEliminados(id_registro_eliminado=idRegistroEliminado, id_empleado=idEmpleado, nombre_empleado=nombreEmpleado, hora=hora, maquina=maquina, remoto=remoto, id_archivo_leido=idArchivoLeido, fecha_eliminacion=fechaEliminacion, motivo=motivo, eliminado_por=registrador)
+        nuevoRegistroEliminado = RegistrosEliminadosTimetrackpro(id_registro_eliminado=idRegistroEliminado, id_empleado=idEmpleado, nombre_empleado=nombreEmpleado, hora=hora, maquina=maquina, remoto=remoto, id_archivo_leido=idArchivoLeido, fecha_eliminacion=fechaEliminacion, motivo=motivo, eliminado_por=registrador)
         nuevoRegistroEliminado.save(using='timetrackpro')
         # elimino el registro de la tabla de registros
         registro.delete(using='timetrackpro')
@@ -4075,8 +4071,10 @@ def modificarAsuntosPropios(request):
         asunto.fecha_inicio = request.POST.get("fecha_inicio")
         asunto.fecha_fin = request.POST.get("fecha_fin")
         asunto.dias_consumidos = request.POST.get("dias_consumidos")
-        sustituto = Sustitutos.objects.using("timetrackpro").filter(id=request.POST.get("sustituto"))[0]         
-        asunto.sustituto = sustituto
+        idSustituto = request.POST.get("sustituto")
+        if idSustituto != "None" and idSustituto != 0 and idSustituto != '0':
+            sustituto = Sustitutos.objects.using("timetrackpro").filter(id=request.POST.get("sustituto"))[0]         
+            asunto.sustituto = sustituto
         asunto.tareas_a_sustituir= request.POST.get("tareas_a_sustituir")
         recuperable = request.POST.get("recuperable")
         asunto.recuperable = recuperable
@@ -4770,13 +4768,12 @@ def solicitarAsuntosPropios(request, year=None):
     asuntosPropiosEmpleados = []
     diasConsumidos = 0
     if year is None:
-        year = str(datetime.now().year)
-        yearActual = datetime.now().year
+        year = datetime.now().year
 
     if administrador or director:
-        asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").filter(year=yearActual).values()
+        asuntosPropiosEmpleados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values()
 
-    asuntos = AsuntosPropios.objects.using("timetrackpro").filter(year=yearActual,empleado=empleado, estado__id=9).values()
+    asuntos = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado, estado__id=9).values()
     for a in asuntos:
         diasConsumidos += a['dias_consumidos']
 
@@ -4792,7 +4789,7 @@ def solicitarAsuntosPropios(request, year=None):
         diasConsumidos = request.POST.get("dias_consumidos")
         
         recuperable = 0 
-        if request.POST.get("recuperable") == "1":
+        if request.POST.get("recuperable") == "1" or request.POST.get("recuperable") == 1:
             recuperable = 1
 
         tareasASustituir = None
@@ -4859,9 +4856,9 @@ def solicitarAsuntosPropios(request, year=None):
         if recuperable == 1:
             tipoAsuntos = "asuntos propios recuperables"
             if descripcion != None:
-                recuperacion = "Las horas se recuperarán de la siguiente manera: " + descripcion
-
-
+               recuperacion = "Las horas se recuperarán de la siguiente manera: " + descripcion
+        
+        
         mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=37)[0]
         subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<tipo>", tipoAsuntos).replace('\n', '').replace('\r', '')
         
@@ -4894,7 +4891,6 @@ def solicitarAsuntosPropios(request, year=None):
             send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
             send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
             enviarTelegram(subject, mensajeDestinatario)
-
             return redirect('timetrackpro:solicitar-asuntos-propios', year=year)
     infoVista = {
         "navBar":navBar,
@@ -5943,7 +5939,7 @@ def agregarAsuntosPropiosCalendario(request):
         diasConsumidos = request.POST.get("dias_seleccionados_consumidos")
         
         recuperable = 0 
-        if request.POST.get("recuperable_calendario") == 1:
+        if request.POST.get("recuperable_calendario") == 1 or request.POST.get("recuperable_calendario") == "1":
             recuperable = 1
 
         tareasASustituir = None
@@ -5955,10 +5951,80 @@ def agregarAsuntosPropiosCalendario(request):
             descripcion = request.POST.get("descripcion_calendario")
 
         empleadoSustituto = request.POST.get("sustituto_calendario")
+        nombreSustituto = ""
         if empleadoSustituto != "0" and empleadoSustituto != 0:       
             sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0] 
+            nombreSustituto = sustituto.nombre + " " + sustituto.apellidos
         else:
             sustituto = None
+
+        '''
+        <nombreSolicitante> - nombre del usuario que solicita el cambio
+        <apellidosSolicitante> - apellidos del usuario que solicita el cambio
+        <tipo> - tipo de solicitud asunto propios o asuntos propios recuperables
+        <url> - url de la aplicacion
+        <fechaInicio> - fecha de inicio del periodo actual
+        <fechaFin> - fecha de fin del periodo actual
+        <diasConsumidos> - dias consumidos en el periodo actual
+        <funciones> - funciones a realizar por el sustituto 
+        <sustituto> - nombre del sustituto
+        <recuperacion> - si el asunto propio es recuperable o no    
+        '''
+
+        '''
+        ASUNTO 
+        Solicitud de día de <tipo> <nombreSolicitante> <apellidosSolicitante>.
+        
+        MENSAJE PARA EL REMITENTE
+        Su solicitud de <tipo> ha sido registrada con éxito.
+        Periodo del <fechaInicio> al <fechaFin> que abarcaba <diasConsumidos> día/s.
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+        
+
+        MENSAJE PARA EL DESTINATARIO
+        <nombreSolicitante> <apellidosSolicitante> ha solicitado <diasConsumidos> día/s de <tipo> desde <fechaInicio> al <fechaFin>.
+        <recuperacion>.
+        Las funciones a cubir son:
+        <funciones>
+        La persona que asume la sustitución es:
+        <sustituto>
+        Puede consultar el estado de la solicitud en el siguiente enlace.
+        <url>
+               
+        '''
+        
+        url = 'http://alerta2.es/private/timetrackpro/solicitar-asuntos-propios/'
+        recuperacion = ""
+        tipoAsuntos = "asuntos propios"
+        # correo enviado al usuario
+
+        if recuperable == 1:
+            tipoAsuntos = "asuntos propios recuperables"
+            if descripcion != None:
+               recuperacion = "Las horas se recuperarán de la siguiente manera: " + descripcion
+        
+        
+        mensajeTipoRemitente = MonitorizaMensajesTipo.objects.using("spd").filter(id=37)[0]
+        subject = mensajeTipoRemitente.mensaje.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<tipo>", tipoAsuntos).replace('\n', '').replace('\r', '')
+        
+        mensajeSolicitante = mensajeTipoRemitente.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasConsumidos>", diasConsumidos).replace("<tipo>", tipoAsuntos)
+
+        mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=38)[0]
+        mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<diasConsumidos>", diasConsumidos).replace("<funciones>", tareasASustituir).replace("<sustituto>", nombreSustituto).replace("<recuperacion>", recuperacion).replace("<tipo>", tipoAsuntos)
+
+        # adjuntar el enlace a la aplicacion web
+
+
+        email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
+        destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
+        # convertir a direcciones de correo
+        if empleado.email != "" and empleado.email != None:
+            correoEmpleado = convertirAMail(empleado.email)
+        else:
+            correoEmpleado = convertirAMail(settings.EMAIL_DEFAULT_TIMETRACKPRO)
+
+        mailSolicitante = [correoEmpleado,]
 
         if AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin).exists():
             return redirect('timetrackpro:solicitar-asuntos-propios')
@@ -5968,6 +6034,9 @@ def agregarAsuntosPropiosCalendario(request):
             year = request.POST.get("year_actual")
             nuevoAsuntoPropio = AsuntosPropios(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, estado=estado, fecha_solicitud=fechaSolicitud, year=year, recuperable=recuperable, descripcion=descripcion, tareas_a_sustituir=tareasASustituir, sustituto=sustituto)
             nuevoAsuntoPropio.save(using='timetrackpro')
+            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+            enviarTelegram(subject, mensajeDestinatario)
             return redirect('timetrackpro:solicitar-asuntos-propios', year=year)
  
     return solicitarAsuntosPropios(request)
@@ -6805,3 +6874,145 @@ def cambiarEstadoVacacionesPruebas(request, id):
         return redirect('timetrackpro:solicitar-vacaciones')
     else:
         return redirect('timetrackpro:ups', mensaje="No tienes permiso para cambiar el estado de las vacaciones seleccionadas.")
+
+@login_required
+def obtenerInformeRegistroEliminado(request):
+    """
+    La función "obtenerInformeRegistroEliminado" recupera los datos de registro de los empleados en función
+    de los parámetros proporcionados.
+    :param request: El objeto "request" es un objeto que representa la solicitud HTTP realizada por el
+    cliente. Contiene información como el método de solicitud, las cabeceras y los parámetros de la
+    consulta. En este código, se utiliza para recuperar los parámetros de la consulta utilizando el
+    método "GET".
+    """
+
+    administrador = esAdministrador(request.user.id)
+    empleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(activo=1).values()
+    exEmpleados = EmpleadosMaquinaTimetrackpro.objects.using("timetrackpro").filter(activo=0).exclude(id__in=[100,101]).values()
+
+    # current_url = request.path[1:]
+    
+    infoVista = {
+        "navBar":navBar,
+        "administrador":administrador,
+        "empleados":list(empleados),
+        "exEmpleados":list(exEmpleados),
+        "rutaActual": "Registros eliminados",
+    }
+    return render(request,"informe-registros-eliminados.html",infoVista)
+
+@login_required
+def datosRegistrosEliminados(request, fechaInicio=None, fechaFin=None):
+    """
+    La función "datosRegistrosEliminados" obtiene los datos de los registros eliminados de la base de datos.
+    :param request: El objeto "request" es un objeto que representa la solicitud HTTP realizada por el
+    cliente. Contiene información como el método de solicitud, las cabeceras y los parámetros de la
+    consulta. En este código, se utiliza para recuperar los parámetros de la consulta utilizando el
+    método "GET".
+
+    
+    """
+    
+
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    informe = []
+    if administrador or director:
+        # obtengo el listado de registros_eliminados, muestro el nombre completo del empleado relacionando el id_empleado en la tabla rel_empleados_usuarios.
+        if fechaInicio and fechaFin:
+            # transformar la fecha a formato datetime
+            fechaInicio = datetime.strptime(fechaInicio, '%Y-%m-%d')
+            fechaFin = datetime.strptime(fechaFin, '%Y-%m-%d')
+            registros = RegistrosEliminadosTimetrackpro.objects.using("timetrackpro").filter(hora__range=[fechaInicio, fechaFin]).order_by('-id').values()
+        else:
+            registros = RegistrosEliminadosTimetrackpro.objects.using("timetrackpro").order_by('-id').values()
+        for registro in registros:
+            # obtengo el nombre del empleado relacionando la tabla rel_empleados_usuarios con  de la tabla empleados_timetrackpro
+            idEmpleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_empleado=registro['id_empleado_id'])[0]
+            empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleado.id_usuario.id)[0]
+            registro['empleado'] = empleado.nombre + " " + empleado.apellidos
+            informe.append(registro)
+    return JsonResponse(list(informe), safe=False)
+        
+
+@login_required
+def verRegistroEliminado(request, id):
+    """
+    The function `verErrorRegistroNotificado` checks if the user is an administrator, director, or the
+    employee who registered the error, and then renders a template with the error details if they have
+    permission, otherwise it redirects to an error page.
+    
+    :param request: The `request` parameter is an object that represents the HTTP request made by the
+    client. It contains information such as the user making the request, the requested URL, and any data
+    sent with the request
+    :param id: The "id" parameter is the ID of the error notification that you want to view
+    :return: either a rendered HTML template with the necessary data or a redirect to another page with
+    an error message.
+    """
+    administrador = esAdministrador(request.user.id)
+    director = esDirector(request.user.id)
+    empleado = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
+    registroEliminado = RegistrosEliminadosTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+    # compruebo si el empleado que ha notificado el registroEliminado es el mismo que el que lo ha registrado
+    if administrador or director:
+        # guardo los datos en un diccionario
+        infoVista = {
+            "navBar":navBar,
+            "administrador":administrador,
+            "registroEliminado":registroEliminado,
+            "empleado":empleado,
+            "rutaActual": "Registro eliminado " + str(registroEliminado.id),
+            "rutaPrevia": "Registros eliminados",
+            "urlRutaPrevia": reverse('timetrackpro:registros-eliminados')
+            #"rutaPreviaUrl": reverse('timetrackpro:ver-errores-notificados', kwargs={'id': error['id_empleado__id']}),
+        }
+        return render(request,"verRegistroEliminado.html",infoVista)
+    else:
+        return redirect('timetrackpro:ups', mensaje="No tienes permiso para ver el error seleccionado.")
+
+
+@login_required
+def borrarRegistroEliminado(request, id=None):
+    '''
+    La función "borrarRegistroEliminado" permite eliminar un registro eliminado en concreto de la base de datos.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del registro eliminado que se desea eliminar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "registros-eliminados.html" con los datos necesarios para la vista.
+    '''
+
+    administrador = esAdministrador(request.user.id)
+    if administrador:
+        if request.method == 'POST':
+            if request.POST.get("idRegistroEliminado") and not id:
+                id = request.POST.get("idRegistroEliminado")
+            registroEliminado = RegistrosEliminadosTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+            registroEliminado.delete(using='timetrackpro')
+        return redirect('timetrackpro:registros-eliminados')
+    else:
+        return redirect('timetrackpro:sin-permiso')
+    
+
+
+@login_required
+def restaurarRegistroEliminado(request, id=None):
+    '''
+    La función "borrarRegistroEliminado" permite eliminar un registro eliminado en concreto de la base de datos.
+    :param request: El parametro "request" es un objeto que representa la peticion HTTP realizada por el cliente, el metodo HTTP utilizado (GET, POST, etc.) y cualquier dato enviado con la peticion
+    :param id: El parametro "id" es el identificador del registro eliminado que se desea eliminar
+    :return: un objeto "HttpResponseRedirect" que redirige a la pagina "registros-eliminados.html" con los datos necesarios para la vista.
+    '''
+
+    administrador = esAdministrador(request.user.id)
+    if administrador:
+        if request.method == 'POST':
+            if request.POST.get("idRegistroEliminado") and not id:
+                id = request.POST.get("idRegistroEliminado")
+            registroEliminado = RegistrosEliminadosTimetrackpro.objects.using("timetrackpro").filter(id=id)[0]
+            idregistroEliminado = registroEliminado.id_registro_eliminado
+            registroRestaurado = RegistrosTimetrackpro(id=idregistroEliminado, id_empleado=registroEliminado.id_empleado, nombre_empleado=registroEliminado.nombre_empleado, maquina=registroEliminado.maquina, hora=registroEliminado.hora, remoto=registroEliminado.remoto, id_archivo_leido=registroEliminado.id_archivo_leido, modificado=1, motivo_modificacion=registroEliminado.motivo)
+            registroRestaurado.save(using='timetrackpro')
+            registroEliminado.delete(using='timetrackpro')
+            
+        return redirect('timetrackpro:ver-linea-registro', id=idregistroEliminado)
+    else:
+        return redirect('timetrackpro:sin-permiso')
