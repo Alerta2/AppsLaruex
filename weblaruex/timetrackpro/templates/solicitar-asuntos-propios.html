@@ -66,7 +66,7 @@
         </div>
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
-            <table id="asuntos_propios_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            <table id="asuntos_propios_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@
         </div>
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
-            <table  id="asuntos_propios_solicitados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            <table  id="asuntos_propios_solicitados" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
         </div>
       </div>
@@ -112,7 +112,7 @@
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
 
-            <table  id="ausencias_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
+            <table  id="ausencias_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
           </div>     
         </div>
       </div>
@@ -628,7 +628,19 @@ document.addEventListener('DOMContentLoaded', function() {
           var div = '<div><h6 class="mb-0 text-sm">'+nombre+'</h6></div>';
           return div;
         }
-      },    
+      },
+      {
+        title: "Nombre",
+        field: "empleado__nombre",
+        // esconder columna
+        visible: false,
+      }, 
+      {
+        title: "Apellidos",
+        field: "empleado__apellidos",
+        // esconder columna
+        visible: false,
+      },     
       {
         title: "Fecha inicio",
         field: "fecha_inicio",
@@ -767,7 +779,19 @@ document.addEventListener('DOMContentLoaded', function() {
           var div = '<div><h6 class="mb-0 text-sm">'+nombre+'</h6></div>';
           return div;
         }
-      },    
+      },  
+      {
+        title: "Nombre",
+        field: "empleado__nombre",
+        // esconder columna
+        visible: false,
+      }, 
+      {
+        title: "Apellidos",
+        field: "empleado__apellidos",
+        // esconder columna
+        visible: false,
+      },      
       {
         title: "Fecha inicio",
         field: "fecha_inicio",

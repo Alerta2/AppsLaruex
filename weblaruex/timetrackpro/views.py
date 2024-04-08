@@ -3499,9 +3499,9 @@ def datosVacacionesSolicitadas(request, year=None):
     empleado = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=user.id_usuario.id)[0]
 
     if administrador or director:
-        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(estado__in=[9,10,11], year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos', 'dias_habiles_consumidos')
+        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(estado__in=[9,10,11], year=year).order_by('-fecha_inicio').values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos', 'dias_habiles_consumidos')
     else:
-        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado.id, estado__in=[9,10,11],year=year).values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos', 'dias_habiles_consumidos')
+        vacaciones = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado.id, estado__in=[9,10,11],year=year).order_by('-fecha_inicio').values('id', 'tipo_vacaciones', 'tipo_vacaciones__nombre', 'tipo_vacaciones__color', 'tipo_vacaciones__color_calendario',  'year', 'empleado', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'estado', 'fecha_solicitud', 'empleado__nombre','empleado__apellidos', 'dias_habiles_consumidos')
     return JsonResponse(list(vacaciones),safe=False)
 
 def datosCambioVacacionesSolicitadas(request, year=None):
@@ -5181,9 +5181,9 @@ def datosAsuntosPropiosEmpleados(request, year=None):
         year = datetime.now().year
 
     if administrador or director:
-            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
+            diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year).order_by('-fecha_inicio').values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
     else:
-        diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year, empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
+        diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year, empleado=empleado).order_by('-fecha_inicio').values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
 
     return JsonResponse(list(diasSolicitados), safe=False)
 
@@ -5201,7 +5201,7 @@ def datosAsuntosPropiosSolicitados(request, year=None):
     diasSolicitados = []
     if year is None:
         year = datetime.now().year
-    diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
+    diasSolicitados = AsuntosPropios.objects.using("timetrackpro").filter(year=year,empleado=empleado).order_by('-fecha_inicio').values('id','empleado__nombre','empleado__apellidos','empleado','year','dias_consumidos','fecha_solicitud','estado__nombre','estado__id','estado','fecha_inicio','fecha_fin', 'recuperable', 'descripcion', 'tareas_a_sustituir', 'sustituto__nombre', 'sustituto__apellidos', 'sustituto')
     
     return JsonResponse(list(diasSolicitados), safe=False)
 
@@ -5219,7 +5219,7 @@ def datosPermisosRetribuidosEmpleados(request, year=None):
     if year is None:
         year = datetime.now().year
     if administrador or director:
-        permisosEmpleados = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(year=year).values('id', 'empleado__nombre', 'empleado__apellidos', 'empleado', 'year', 'dias_solicitados', 'fecha_solicitud', 'estado__nombre', 'estado__id', 'estado', 'fecha_inicio', 'fecha_fin', 'justificante', 'codigo_permiso__nombre', 'codigo_permiso__id', 'codigo_permiso')
+        permisosEmpleados = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(year=year).order_by('-fecha_inicio').values('id', 'empleado__nombre', 'empleado__apellidos', 'empleado', 'year', 'dias_solicitados', 'fecha_solicitud', 'estado__nombre', 'estado__id', 'estado', 'fecha_inicio', 'fecha_fin', 'justificante', 'codigo_permiso__nombre', 'codigo_permiso__id', 'codigo_permiso')
     return JsonResponse(list(permisosEmpleados), safe=False)
 
 
@@ -5237,7 +5237,7 @@ def datosPermisosRetribuidosSolicitados(request, year=None):
     if year is None:
         year = datetime.now().year
 
-    permisosSolicitados = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(year=year,empleado=empleado).values('id', 'empleado__nombre', 'empleado__apellidos', 'empleado', 'year', 'dias_solicitados', 'fecha_solicitud', 'estado__nombre', 'estado__id', 'estado', 'fecha_inicio', 'fecha_fin', 'justificante', 'codigo_permiso__nombre', 'codigo_permiso__id', 'codigo_permiso')
+    permisosSolicitados = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(year=year,empleado=empleado).order_by('-fecha_inicio').values('id', 'empleado__nombre', 'empleado__apellidos', 'empleado', 'year', 'dias_solicitados', 'fecha_solicitud', 'estado__nombre', 'estado__id', 'estado', 'fecha_inicio', 'fecha_fin', 'justificante', 'codigo_permiso__nombre', 'codigo_permiso__id', 'codigo_permiso')
     
     return JsonResponse(list(permisosSolicitados), safe=False)
 
@@ -5553,7 +5553,7 @@ def solicitarVacaciones(request):
     cambios = []
     vacaciones = []
     if VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, year=int(datetime.now().year)).exists():
-        vacacionesEncontradas = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, year=int(datetime.now().year)).values('id','tipo_vacaciones__nombre', 'year', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'dias_habiles_consumidos', 'estado__nombre', 'estado__id','fecha_solicitud', 'tipo_vacaciones__color')
+        vacacionesEncontradas = VacacionesTimetrackpro.objects.using("timetrackpro").filter(empleado=empleado, year=int(datetime.now().year), estado__in=EstadosSolicitudes.objects.using("timetrackpro").filter(vacaciones=1, id__in=(9, 10))).values('id','tipo_vacaciones__nombre', 'year', 'fecha_inicio', 'fecha_fin', 'dias_consumidos', 'dias_habiles_consumidos', 'estado__nombre', 'estado__id','fecha_solicitud', 'tipo_vacaciones__color')
         for v in vacacionesEncontradas:
             vacaciones.append(v)
 

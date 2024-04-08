@@ -44,8 +44,7 @@
             </div>
             {% endif %}
 
-            <table id="tabla_permisos_retribuidos" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
-    data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+            <table id="tabla_permisos_retribuidos" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
     data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
     data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-row-style="rowStyle"></table>
           </div>
@@ -148,9 +147,10 @@
 
 
   <script>
+
     $("#tabla_permisos_retribuidos").bootstrapTable({
     method: "get",
-    locale: navigator.language,
+    locale: navigator.language,    
     url: "{% url 'timetrackpro:datos-lista-permisos-retribuidos' %}",
     cache: false, 
     columns: [   
@@ -202,9 +202,15 @@
         wrapped: true,
         formatter: function(value, row) {
           var nombre = row.nombre;
-          var div = '<div class="col-10"><h6 class="mb-0 text-sm">'+ nombre +'</h6></div>';
+          var div = '<div class="col-10"><h6 class="mb-0 text-sm text-wrap">'+ nombre +'</h6></div>';
           return div;
         }
+      },
+      {
+        title: "Tipología",
+        field: "nombre",
+        // esconder columna
+        visible: false,
       },     
       {
         title: "Duración",
@@ -291,6 +297,7 @@
     search: true,
     sortName: "id",
     sortOrder: "asc",
+    
   });
 
 

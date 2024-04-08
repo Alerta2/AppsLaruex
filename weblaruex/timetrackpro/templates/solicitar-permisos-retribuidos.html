@@ -57,7 +57,7 @@
         </div>
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
-            <table id="permisos_retribuidos_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            <table id="permisos_retribuidos_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
         </div>
       </div>
@@ -79,7 +79,7 @@
         </div>
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
-            <table  id="permisos_retribuidos_solicitados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            <table  id="permisos_retribuidos_solicitados" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
         </div>
       </div>
@@ -131,8 +131,8 @@
             <div class="col-xl-12 mt-2">
               <label class="text-sm">Permisos</label>
               <input id="inputPermisos" list="permisosRetribuidos"  class="form-select">
-              <input type="number" id="id_permiso" name="id_permiso"  class="form-control" hidden>
-              <datalist id="permisosRetribuidos">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
+              <input type="number" id="id_permiso" name="id_permiso"  class="form-control"  hidden>
+              <datalist id="permisosRetribuidos">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.cod_uex }}-{{ p.nombre }}</option>{% endfor %}</datalist>
             </div>
           </div>
           
@@ -193,7 +193,7 @@
                       <label class="col-form-label text-sm">Permisos</label>
                       <input id="inputPermisosCalendario" list="permisosRetribuidosCalendario"  class="form-select">
                       <input type="number" id="id_permiso_calendario" name="id_permiso"  class="form-control" hidden>
-                      <datalist id="permisosRetribuidosCalendario" class="text-sm">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
+                      <datalist id="permisosRetribuidosCalendario" class="text-sm">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.cod_uex }}-{{ p.nombre }}</option>{% endfor %}</datalist>
                 </div>
               </div>
               <div class="row">
@@ -440,7 +440,19 @@
           var div = '<div><h6 class="mb-0 text-sm">'+nombre+'</h6></div>';
           return div;
         }
-      },    
+      },
+      {
+        title: "Nombre",
+        field: "empleado__nombre",
+        // esconder columna
+        visible: false,
+      },  
+      {
+        title: "Apellidos",
+        field: "empleado__apellidos",
+        // esconder columna
+        visible: false,
+      },     
       {
         title: "Fecha inicio",
         field: "fecha_inicio",
@@ -574,6 +586,18 @@
           var div = '<div><h6 class="mb-0 text-sm">'+nombre+'</h6></div>';
           return div;
         }
+      }, 
+      {
+        title: "Nombre",
+        field: "empleado__nombre",
+        // esconder columna
+        visible: false,
+      },  
+      {
+        title: "Apellidos",
+        field: "empleado__apellidos",
+        // esconder columna
+        visible: false,
       },    
       {
         title: "Fecha inicio",
@@ -683,9 +707,7 @@
     return str.replace(/\s/g, '').replace(/[^\w\s]/gi, '');
 }
 
-
-
-  document.getElementById('inputPermisos').addEventListener('input', function() {
+document.getElementById('inputPermisos').addEventListener('input', function() {
       const nombreSeleccionado = this.value;
       // busco dentro de la lista de opciones el id del permiso seleccionado
       const idValue = document.getElementById('id_permiso');
@@ -706,6 +728,7 @@
       }
 
   });
+
 
   document.getElementById('inputPermisosCalendario').addEventListener('input', function() {
       const nombreSeleccionado = this.value;
