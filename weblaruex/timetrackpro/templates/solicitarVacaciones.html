@@ -76,7 +76,7 @@
           <p class="text-sm"><strong class="text-info">Aún no ha seleccionado vacaciones</strong></p>
           {% else %}
           <div class="table-responsive ms-3 me-3">
-            <table  id="vacaciones_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+            <table  id="vacaciones_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>
           {% endif %}
           
@@ -104,7 +104,7 @@
         
         <div class="card-body pt-0 p-3" >
           <div class="table-responsive ms-3 me-3">
-                <table  id="cambio_vacaciones_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+                <table  id="cambio_vacaciones_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
           </div>     
         </div>
         {% endif %}
@@ -337,7 +337,6 @@ $("#vacaciones_solicitadas").bootstrapTable({
       {
         title: "",
         halign:"center",
-        sortable: true,
         align: "center",
         formatter: function(value, row) {
           //var tipoVacaciones = row.id_periodo_cambio__tipo_vacaciones;
@@ -375,6 +374,18 @@ $("#vacaciones_solicitadas").bootstrapTable({
           var div = '<div>'+'<h6 class="mb-0 text-sm text-primary">'+empleado+'</h6>'+'<h6 class="mb-0 text-sm">'+tipoVacaciones+'</h6>'+'</div>';
           return div;
         }
+      },  
+      {
+        title: "Nombre",
+        field: "empleado__nombre",
+        // esconder columna
+        visible: false,
+      }, 
+      {
+        title: "Apellidos",
+        field: "empleado__apellidos",
+        // esconder columna
+        visible: false,
       },    
       {
         title: "Fecha inicio",
@@ -496,7 +507,19 @@ $("#cambio_vacaciones_solicitadas").bootstrapTable({
           var div = '<div>'+'<h6 class="mb-0 text-sm text-primary">'+empleado+'</h6>'+'<h6 class="mb-0 text-sm">'+tipoVacaciones+'</h6>'+'</div>';
           return div;
         }
-      },    
+      },
+      {
+        title: "Nombre",
+        field: "empleado__nombre",
+        // esconder columna
+        visible: false,
+      }, 
+      {
+        title: "Apellidos",
+        field: "empleado__apellidos",
+        // esconder columna
+        visible: false,
+      },     
       {
         title: "Nueva Fecha inicio",
         field: "fecha_inicio",

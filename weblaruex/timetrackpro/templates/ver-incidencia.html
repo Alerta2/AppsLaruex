@@ -74,10 +74,9 @@
           enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row">
-            <div class="col-xl-8 mx-auto my-2" >
+            <div class="col-xl-8 mx-auto my-2">
               <label class="text-sm">Nuevo estado</label>
               <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
-                
                 <option value="1" {% if incidencia.estado == 1 %} selected {% endif %}>Pendiente</option>
                 <option value="2" {% if incidencia.estado == 2 %} selected {% endif %}>Rechazado</option>
                 <option value="3" {% if incidencia.estado == 3 %} selected {% endif %}>Resuelta</option>
