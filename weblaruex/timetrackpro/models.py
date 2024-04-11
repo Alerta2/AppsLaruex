@@ -596,5 +596,3 @@ class MonitorizaMensajesTipo(models.Model):
     class Meta:
         managed = False
         db_table = 'monitoriza_mensajes_tipo'
-
-

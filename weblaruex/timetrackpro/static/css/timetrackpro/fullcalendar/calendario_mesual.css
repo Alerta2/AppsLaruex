@@ -4,7 +4,9 @@
     height: 100%;
 }
 
-
+.fc-license-message{
+  display:none !important
+}
 .fc-theme-standard .fc-scrollgrid{
   border-color: transparent;
   background-color: transparent;
