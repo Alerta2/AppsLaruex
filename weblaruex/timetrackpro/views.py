@@ -1684,7 +1684,13 @@ def verRegistro(request, id):
         email_from = settings.EMAIL_HOST_USER_TIMETRACKPRO
         destinatariosList = [settings.EMAIL_ADMIN_TIMETRACKPRO, settings.EMAIL_DIRECTOR_TIMETRACKPRO]
 
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        # intentar enviar el correo
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        except:
+            pass
+
+        # comprobar si el método send_mail ha dado un error si lo ha dado continuar 
         enviarTelegram(subject, mensajeDestinatario)
 
 
@@ -2191,8 +2197,14 @@ def notificarErrorEnFichaje(request):
         mailSolicitante = [correoEmpleado,]
 
         nuevoErrorRegistrado = ErroresRegistroNotificados(id_empleado=idEmpleado.id_usuario, hora=hora, motivo=motivo, estado=estado, quien_notifica=registrador, hora_notificacion=horaNotificacion)
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        try:
+            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        except:
+            pass
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        except:
+            pass
         enviarTelegram(subject, mensajeDestinatario)
         
         nuevoErrorRegistrado.save(using='timetrackpro')
@@ -3923,8 +3935,10 @@ def cambiarEstadoVacaciones(request, id):
         fechaFin = str(vacaciones.fecha_fin)
         subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estadoSolicitud).replace('\n', '').replace('\r', '')
         mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<estado>", estadoSolicitud).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
-
-        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+        except:
+            pass
 
         return redirect('timetrackpro:solicitar-vacaciones')
     else:
@@ -4032,8 +4046,10 @@ def cambiarEstadoCambioVacaciones(request, id):
         fechaFin = str(cambioVacaciones.fecha_fin_nueva)
         subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estadoSolicitud).replace('\n', '').replace('\r', '')
         mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<estado>", estadoSolicitud).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
-
-        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+        except:
+            pass
         return redirect('timetrackpro:ver-cambio-vacaciones-seleccionadas', id=id)
     else:
         return redirect('timetrackpro:sin-permiso')
@@ -4142,7 +4158,10 @@ def cambiarEstadoAsuntosPropios(request, id=None):
         fechaFin = str(asunto.fecha_fin)
         subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estadoSolicitud).replace("<tipoAsunto>", tipo).replace('\n', '').replace('\r', '')
         mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin).replace("<tipoAsunto>", tipo).replace("<estado>", estadoSolicitud)
-        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+        except:
+            pass
 
         return redirect('timetrackpro:solicitar-asuntos-propios')
     else:
@@ -4244,8 +4263,14 @@ def solicitarModificarAsuntosPropios(request):
 
         solicitudModificacionAsuntosPropios = CambiosAsuntosPropios(id_periodo_cambio=asuntoPropio, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado)
         solicitudModificacionAsuntosPropios.save(using='timetrackpro')
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        try:
+            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        except:
+            pass
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        except:
+            pass
         enviarTelegram(subject, mensajeDestinatario)
     return redirect('timetrackpro:solicitar-asuntos-propios')
 
@@ -4804,7 +4829,7 @@ def solicitarAsuntosPropios(request, year=None):
 
         empleadoSustituto = request.POST.get("sustituto")
 
-        if empleadoSustituto != "0" and empleadoSustituto != 0:        
+        if empleadoSustituto != "0" and empleadoSustituto != 0 and empleadoSustituto != None:        
             sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0]
             nombreSustituto = sustituto.nombre + " " + sustituto.apellidos 
     
@@ -4888,8 +4913,14 @@ def solicitarAsuntosPropios(request, year=None):
             year = fechaInicio.split("-")[0]
             nuevoAsuntoPropio = AsuntosPropios(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, estado=estado, fecha_solicitud=fechaSolicitud, year=year, recuperable=recuperable, descripcion=descripcion, tareas_a_sustituir=tareasASustituir, sustituto=sustituto)
             nuevoAsuntoPropio.save(using='timetrackpro')
-            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+            try:
+                send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+            except:
+                pass
+            try:
+                send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+            except:
+                pass
             enviarTelegram(subject, mensajeDestinatario)
             return redirect('timetrackpro:solicitar-asuntos-propios', year=year)
     infoVista = {
@@ -5030,9 +5061,14 @@ def solicitarPermisosRetribuidos(request, year=None):
 
         nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso, motivo_solicitud=motivoSolicitud)
         nuevoPermiso.save(using='timetrackpro')
-        
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        try:
+            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        except:
+            pass
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        except:
+            pass
         enviarTelegram(subject, mensajeDestinatario)
         alerta["activa"] = True
         alerta["icono"] = iconosAviso["success"]
@@ -5154,8 +5190,14 @@ def solicitarPermisoRetribuidoCalendario(request, year=None):
 
         nuevoPermiso = PermisosYAusenciasSolicitados(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_solicitados=diasSolicitados, estado=estado, fecha_solicitud=fechaSolicitud, year=year, codigo_permiso=codigoPermiso, motivo_solicitud=motivoSolicitud)
         nuevoPermiso.save(using='timetrackpro')
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        try:
+            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        except:
+            pass
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        except:
+            pass
         enviarTelegram(subject, mensajeDestinatario)
         alerta["activa"] = True
         alerta["icono"] = iconosAviso["success"]
@@ -5342,7 +5384,10 @@ def cambiarEstadoSolicitudPermisoRetribuido(request, id=None):
         subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estado).replace('\n', '').replace('\r', '')
         mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", nombreEmpleado).replace("<estado>", estado).replace("<apellidosSolicitante>", apellidosEmpleado).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
 
-        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+        except:
+            pass
 
         return redirect('timetrackpro:ver-solicitud-permisos-retribuidos', id=id)
     else:
@@ -5672,9 +5717,14 @@ def solicitarVacaciones(request):
         else:
             nuevoRegistroVacaciones = VacacionesTimetrackpro(empleado=empleado, tipo_vacaciones=tipoVacaciones, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, fecha_solicitud=fechaSolicitud, year=year, estado=estado,dias_habiles_consumidos=diasHabilesConsumidos)
             nuevoRegistroVacaciones.save(using='timetrackpro')
-
-            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+            try:
+                send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+            except:
+                pass
+            try:
+                send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+            except:
+                pass
             enviarTelegram(subject, mensajeDestinatario)
             
             return redirect('timetrackpro:solicitar-vacaciones')   
@@ -5768,9 +5818,14 @@ def solicitarModificarVacaciones(request):
 
         solicitudModificacionVacaciones = CambiosVacacionesTimetrackpro(id_periodo_cambio=vacaciones, solicitante=solicitante, fecha_inicio_actual=fechaInicioActual, fecha_fin_actual=fechaFinActual, dias_actuales_consumidos=diasConsumidosActual, dias_habiles_actuales_consumidos=diasHabilesConsumidosActual, fecha_solicitud=fechaSolicitud, fecha_inicio_nueva=fechaNuevaInicio, fecha_fin_nueva=fechaNuevaFin, dias_nuevos_consumidos=diasConsumidosNuevos, motivo_solicitud=motivoCambio, estado=estado, dias_habiles_nuevos_consumidos=diasHabilesConsumidosNuevos)
         solicitudModificacionVacaciones.save(using='timetrackpro')
-
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        try:
+            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        except:
+            pass
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        except:
+            pass
         enviarTelegram(subject, mensajeDestinatario)
     return redirect('timetrackpro:solicitar-vacaciones')
 
@@ -5952,11 +6007,12 @@ def agregarAsuntosPropiosCalendario(request):
 
         empleadoSustituto = request.POST.get("sustituto_calendario")
         nombreSustituto = ""
-        if empleadoSustituto != "0" and empleadoSustituto != 0:       
+        if empleadoSustituto != "0" and empleadoSustituto != 0 and empleadoSustituto != None:       
             sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0] 
             nombreSustituto = sustituto.nombre + " " + sustituto.apellidos
         else:
             sustituto = None
+            nombreSustituto = "Ninguno"  
 
         '''
         <nombreSolicitante> - nombre del usuario que solicita el cambio
@@ -6034,8 +6090,14 @@ def agregarAsuntosPropiosCalendario(request):
             year = request.POST.get("year_actual")
             nuevoAsuntoPropio = AsuntosPropios(empleado=empleado, fecha_inicio=fechaInicio, fecha_fin=fechaFin, dias_consumidos=diasConsumidos, estado=estado, fecha_solicitud=fechaSolicitud, year=year, recuperable=recuperable, descripcion=descripcion, tareas_a_sustituir=tareasASustituir, sustituto=sustituto)
             nuevoAsuntoPropio.save(using='timetrackpro')
-            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+            try:
+                send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+            except:
+                pass
+            try:
+                send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+            except:
+                pass
             enviarTelegram(subject, mensajeDestinatario)
             return redirect('timetrackpro:solicitar-asuntos-propios', year=year)
  
@@ -6171,9 +6233,14 @@ def notificarDatosErroneos(request):
 
         mailSolicitante = [correoEmpleado,]
         error = ProblemasDetectadosTimeTrackPro(usuario=usuario, estado=estado, fecha_registro=fechaRegistro, problema_detectado=motivo, tipo=tipo)
-
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        try:
+            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        except:
+            pass
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        except:
+            pass
         error.save(using='timetrackpro')
 
         return redirect('timetrackpro:ver-incidencia', id=error.id)   
@@ -6263,8 +6330,14 @@ def notificarErroresApp(request):
 
         error = ProblemasDetectadosTimeTrackPro(usuario=usuario, estado=estado, fecha_registro=fechaRegistro, problema_detectado=motivo, tipo=tipo)
         error.save(using='timetrackpro')
-        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        try:
+            send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+        except:
+            pass
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+        except:
+            pass
         return redirect('timetrackpro:ver-incidencia', id=error.id)    
      
     return render(request,"notificar-incidencia.html", infoVista)
@@ -6588,8 +6661,14 @@ def enviarMensajeViaje(request, empleado, viaje):
 
     mensajeTipoDestinatario = MonitorizaMensajesTipo.objects.using("spd").filter(id=57)[0]
     mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<nombreSolicitante>", empleado.nombre).replace("<apellidosSolicitante>", empleado.apellidos).replace("<url>", url).replace("<fechaInicio>", viaje.fecha_inicio).replace("<fechaFin>", viaje.fecha_fin).replace("<lugar>", viaje.lugar).replace("<motivo>", viaje.motivo_viaje)
-    send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
-    send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+    try:
+        send_mail(subject, mensajeSolicitante, email_from, mailSolicitante)
+    except:
+        pass
+    try:
+        send_mail(subject, mensajeDestinatario, email_from, destinatariosList)
+    except:
+        pass
     enviarTelegram(subject, mensajeDestinatario, '42')
 
     return redirect('timetrackpro:viajes')
@@ -6811,7 +6890,10 @@ def cambiarEstadoViaje(request, id=None):
             fechaFin = str(viaje.fecha_fin)
             subject = mensajeTipoDestinatario.mensaje.replace('\n', '').replace('\r', '')
             mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<estado>", estadoSolicitud).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
-            send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+            try:
+                send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+            except:
+                pass
 
         return redirect('timetrackpro:ver-viaje', id=viaje.id)
     else:
@@ -6868,8 +6950,10 @@ def cambiarEstadoVacacionesPruebas(request, id):
         fechaFin = str(vacaciones.fecha_fin)
         subject = mensajeTipoDestinatario.mensaje.replace("<estado>", estadoSolicitud).replace('\n', '').replace('\r', '')
         mensajeDestinatario = mensajeTipoDestinatario.descripcion.replace("<estado>", estadoSolicitud).replace("<url>", url).replace("<fechaInicio>", fechaInicio).replace("<fechaFin>", fechaFin)
-
-        send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+        try:
+            send_mail(subject, mensajeDestinatario, email_from, mailSolicitante)
+        except:
+            pass
 
         return redirect('timetrackpro:solicitar-vacaciones')
     else:
