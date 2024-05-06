@@ -286,6 +286,7 @@ $("#informe_empleados").bootstrapTable({
         var vacaciones = row.vacaciones;
         var asuntosPropios = row.asuntosPropios;
         var jornadaDiaria = jornada / 5;
+        var observaciones = row.observaciones;
         jornadaDiaria = Math.round(jornadaDiaria * 100) / 100;
         
         hora = Math.round(hora * 100) / 100;
@@ -294,14 +295,28 @@ $("#informe_empleados").bootstrapTable({
         // calcular el porcentaje de completado
         var porcentaje = (hora / jornadaDiaria)*100;
         porcentaje = Math.round(porcentaje * 100) / 100;
+        
+        var resultadoPermisos = "";
+        var resultadoVacaciones = "";
+        var resultadoAsuntosPropios = "";
+        var fichajeInpar = "";
+        var observaciones_text = "";  
 
         switch (true) {
           case (hora == 0):
-            resultadoPermisos = '<h6 class="text-sm mb-0">'+permisos +'</h6>';
-            resultadoVacaciones = '<h6 class="text-sm mb-0">'+vacaciones +'</h6>';
-            resultadoAsuntosPropios = '<h6 class="text-sm mb-0">'+asuntosPropios +'</h6>';
-            resultado = row.observaciones + ' (nº de fichajes:' + row.fichajes + ')' +'\n';
-            div = '<div><h6 class="text-sm mb-0"><i class="fa fa-clock text-secondary fa-lg me-2" aria-hidden="true"></i>'+resultado +'</h6>'+ resultadoPermisos+ resultadoVacaciones +resultadoAsuntosPropios+ '</div>';
+            if (permisos > 0){
+              resultadoPermisos = '<h6 class="text-sm mb-0">'+permisos +'</h6>';
+            }
+            if (vacaciones > 0){
+              resultadoVacaciones = '<h6 class="text-sm mb-0">'+vacaciones +'</h6>';
+            }
+            if (asuntosPropios > 0){
+              resultadoAsuntosPropios = '<h6 class="text-sm mb-0">'+asuntosPropios +'</h6>';
+            }
+            fichajeInpar = '<h6 class="text-sm mb-0">nº de fichajes registrados: '+ row.fichajes +'</h6>';
+            observaciones_text = '<h6 class="text-sm mb-0 text-primary"><i class="fa-solid fa-triangle-exclamation fa-lg me-2" aria-hidden="true"></i>'+ observaciones +'</h6>';
+
+            div = '<div>' +observaciones_text + fichajeInpar + resultadoPermisos+ resultadoVacaciones +resultadoAsuntosPropios+ '</div>';
             break;   
           case (porcentaje > 99):
             resultado = hora + ' horas ';

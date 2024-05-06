@@ -187,14 +187,15 @@
         hora = Math.round(hora * 100) / 100;
         var correcto = row.correcto;
         var jornada = row.jornada;
-        var permisos = row.diasPermisos;
+        var permisos = row.diasPorPermisoDescontar;
         var vacaciones = row.diasVacaciones;
         var asuntosPropios = row.diasAsuntosPropios;
         var festivos = row.festivos;
+        var horasPermisos = permisos * 7.5;
         var horasFestivos = festivos * 7.5;
         var horasVacaciones = vacaciones * 7.5;
         var horasAsuntosPropios = asuntosPropios * 7.5;
-        horaPorcentaje = hora + horasFestivos + horasVacaciones + horasAsuntosPropios;
+        horaPorcentaje = hora + horasPermisos + horasFestivos + horasVacaciones + horasAsuntosPropios;
         console.log(horaPorcentaje);
         hora = Math.round(hora * 100) / 100;
         var resultado = "";
@@ -211,7 +212,7 @@
               resultadoVacaciones = '<h6 class="text-sm mb-0">' + vacaciones + '</h6>';
               resultadoAsuntosPropios = '<h6 class="text-sm mb-0">' + asuntosPropios + '</h6>';
               resultado = row.observaciones + ' (nº de fichajes:' + row.fichajes + ')' + '\n';
-              textHora = '<h6 class="text-sm mb-0"><i class="fa fa-clock text-secondary fa-lg me-2" aria-hidden="true"></i>' + resultado + '</h6>' + resultadoPermisos + resultadoVacaciones + resultadoAsuntosPropios + '';
+              textHora = '<h6 class="text-sm mb-0"><i class="fa fa-clock text-secondary fa-lg me-2" aria-hidden="true"></i>' + resultado + '</h6>' + resultadoPermisos + resultadoVacaciones + resultadoAsuntosPropios + '' ;
               break;
             case (porcentaje >= 99):
               textHora = '<h6 class="text-sm mb-0 "><i class="fa fa-clock fa-lg me-2 text-success" aria-hidden="true"></i>' + hora + ' horas </h6>';
@@ -228,7 +229,7 @@
         } else {
           textHora = '<h6 class="text-sm mb-0 text-white"><i class="fa-solid fa-clock text-white fa-lg me-2" aria-hidden="true"></i>' + hora + ' horas</h6>';
         }
-        var divHora = '<div>' + textHora + '</div>';
+        var divHora = '<div>' + textHora  +'</div>';
         return divHora;
       }
     },
@@ -245,8 +246,12 @@
         var horasFestivos = festivos * 7.5;
         var vacaciones = row.vacaciones;
         var asuntosPropios = row.asuntosPropios;
-        var permisos = row.diasPermisos;
-        
+        var permisos = row.diasPorPermisoDescontar;
+        if (permisos == null || permisos == undefined || permisos == "null") {
+          permisos = 0;
+        }
+      
+        //var permisos = row.diasPermisos;
         var vacaciones = row.diasVacaciones;
         var asuntosPropios = row.diasAsuntosPropios;
         
@@ -282,9 +287,9 @@
         if (correcto == "si") {
           textCorrecto = '<h6 class="text-sm mb-0"><i class="fa fa-user-circle fa-lg me-2" aria-hidden="true"></i>' + correcto + '</h6>';
         } else {
-          textCorrecto = '<h6 class="text-sm mb-0 text-white"><i class="fa fa-user-circle fa-lg me-2" aria-hidden="true"></i>' + correcto + '</h6>';
+          textCorrecto = '<h6 class="text-sm mb-0 text-white"><i class="fa fa-user-circle fa-lg me-2" aria-hidden="true"></i> '+  correcto + '</h6>';
         }
-        var divCorrecto = '<div>' + textCorrecto + '</div>';
+        var divCorrecto = '<div>' + textCorrecto +' </div>';
         return div;
       }
     },
@@ -301,28 +306,46 @@
         var permisos = row.diasPermisos;
         var vacaciones = row.diasVacaciones;
         var asuntosPropios = row.diasAsuntosPropios;
+        var permisos_retribuidos = row.diasPorPermisoDescontar;
         var textPermisos = "";
 
         var correcto = row.correcto;
         var textObservaciones = "";
         if (correcto == "si") {
-          if (permisos > 0 || vacaciones > 0 || asuntosPropios > 0) {
-            textPermisos = '<h6 class="text-sm text-info mb-0"><i class="fa-solid fa-circle-exclamation fa-lg me-2" aria-hidden="true"></i> nº Permisos o ausencias: ' + permisos + '\n' + 'nº Asuntos Propios: ' + asuntosPropios + '\n' + 'nº Vacaciones: ' + vacaciones + '</h6>';
+          if (permisos_retribuidos > 0 || permisos > 0 || vacaciones > 0 || asuntosPropios > 0) {
+            var permisos_retribuidos_text = "";
+            var asuntosPropios_text = "";
+            var vacaciones_text = "";
+            if (permisos_retribuidos > 0) {
+              if (permisos_retribuidos > 1) {
+                permisos_retribuidos_text = "<h6 class='text-sm text-secondary mb-0 d-flex justify-content-start'><i class='fa-kit fa-solid-calendar-days-circle-check mt-2 fa-lg me-2' aria-hidden='true'></i>" + permisos_retribuidos + " día de permisos retribuidos</h6>";
+              } else {
+                permisos_retribuidos_text = "<h6 class='text-sm text-secondary mb-0 d-flex justify-content-start'><i class='fa-kit fa-solid-calendar-days-circle-check mt-2 fa-lg me-2' aria-hidden='true'></i>" + permisos_retribuidos + " días de permisos retribuidos</h6>";
+              }
+            }
+            if (asuntosPropios > 0) {
+              if (asuntosPropios > 1) {
+                asuntosPropios_text = "<h6 class='text-sm text-secondary mb-0 d-flex justify-content-start mt-0'><i class='fa-kit fa-solid-calendar-days-user fa-lg me-2 mt-2' aria-hidden='true'></i>" + asuntosPropios + " días asuntos propios</h6>";
+              } else {
+                asuntosPropios_text = "<h6 class='text-sm text-secondary mb-0 d-flex justify-content-start'><i class='fa-kit fa-solid-calendar-days-user fa-lg me-2 mt-2' aria-hidden='true'></i>" + asuntosPropios + "  de asuntos propios</h6>";
+              }
+            }
+            if (vacaciones > 0) {
+              vacaciones_text = "<h6 class='text-sm text-secondary mb-0 d-flex justify-content-start'><i class='fa-kit fa-solid-tree-decorated-user mt-2 fa-lg me-2' aria-hidden='true'></i>nº Vacaciones: " + vacaciones + "</h6>";
+            }
+            textPermisos ="<div>"+ permisos_retribuidos_text + asuntosPropios_text + vacaciones_text +"</div>";
           } else {
             textPermisos = '<h6 class="text-sm mb-0"></h6>';
           }
 
           if (festivos > 0) {
-
-            textObservaciones = '<h6 class="text-sm text-info mb-0"><i class="fa-solid fa-circle-exclamation fa-lg me-2" aria-hidden="true"></i> Existen festivos para ese periodo nº festivos ' + festivos + '</h6>';
-          } else {
-            textObservaciones = '<h6 class="text-sm mb-0">--</h6>';
+            textObservaciones = '<h6 class="text-sm text-primary d-flex justify-content-start mb-0"><i class="fa-solid fa-party-horn fa-lg me-2" aria-hidden="true"></i>'+ festivos + ' festivos en ese periodo</h6>';
           }
 
         } else {
           textObservaciones = '<h6 class="text-sm mb-0 text-white"><i class="fa-solid fa-circle-exclamation fa-lg me-2" aria-hidden="true"></i>' + observaciones + '</h6>';
         }
-        var div = '<div>' + textObservaciones + textPermisos + '</div>';
+        var div = '<div>' + textObservaciones + textPermisos+'</div>';
         return div;
       }
     },

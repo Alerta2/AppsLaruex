@@ -1332,10 +1332,10 @@ def comprobarPermisosEmpleado(idUsuario, fechaInicio, fechaFin=None):
     asuntosPropios = "No hay asuntos propios solicitados para la fecha seleccionada"
     vacaciones = "No hay vacaciones solicitadas para la fecha seleccionada"
     # compruebo si el usuario ha solicitado alguna ausencia para ese dia
-    if PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin, estado__id__in=estadosAceptadosPermisos).exists():
+    if PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin, estado__id__in=estadosAceptadosPermisos, codigo_permiso__recuperable=0).exists():
         permisos = "El empleado tiene una ausencia solicitada para la fecha seleccionada"
         # cuento los dias de ausencia solicitados por el empleado
-        diasPermisos = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin, estado__id__in=estadosAceptadosPermisos).count()
+        diasPermisos = PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin, estado__id__in=estadosAceptadosPermisos,codigo_permiso__recuperable=0).count()
     if AsuntosPropios.objects.using("timetrackpro").filter(empleado=empleado, fecha_inicio__gte=fechaInicio, fecha_fin__lte=fechaFin, estado__id=11).exists():
         asuntosPropios = "El empleado tiene un asunto propio solicitado para la fecha seleccionada"
         # cuanto los dias de asuntos propios solicitados por el empleado
@@ -1479,6 +1479,29 @@ def calcularHoras(usuarios, fechaInicio, fechaFin):
                 informe.append({"empleado": e, "dia": d[0], "horas": 0, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": len(registrosDiaEmpleado), "horas_fichadas":list(fichajesHechos), "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivo": festivo})
     return informe
 
+def comprobarPermisoDia(idUsario, dia):
+    # if el día no es sábado ni domingo
+    if dia.weekday() != 5 and dia.weekday() != 6:
+        if PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=idUsario, fecha_inicio__gte=dia, fecha_inicio__lte=dia).exists() or PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=idUsario, fecha_fin__gte=dia, fecha_fin__lte=dia).exists() or PermisosYAusenciasSolicitados.objects.using("timetrackpro").filter(empleado=idUsario, fecha_inicio__lte=dia, fecha_fin__gte=dia).exists():
+            print("----- permiso encontrado")
+            return True
+    return False
+
+def obtenerTiempoTotalPermiso(idUsuario, fechaInicio, fechaFin):
+    # obtener fechas entre fechaInicio y fechaFin
+    diasFechas = []
+    for n in range(int ((fechaFin - fechaInicio).days)+1):
+        diasFechas.append(fechaInicio + timedelta(n))
+
+
+    diasPorPermisoDescontar = 0
+    for d in diasFechas:
+        if comprobarPermisoDia(idUsuario, d):
+            diasPorPermisoDescontar = diasPorPermisoDescontar + 1
+
+    return diasPorPermisoDescontar
+
+
 def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
     """
     The function "calcularHorasSemanales" calculates the weekly working hours for a list of employees
@@ -1521,6 +1544,8 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
             else:
                 jornadaLaboral=jornada
             permisos, asuntosPropios, vacaciones, diasPermisos, diasAsuntosPropios, diasVacaciones = comprobarPermisosEmpleado(empleado.id_usuario.id, inicioSemana, finSemana)
+            # si hay diasPermiso comprobar si el permiso es recuperable 
+            diasPorPermisoDescontar = obtenerTiempoTotalPermiso(empleado.id_usuario.id, inicioSemana, finSemana)
             #festivos = comprobarFestivos(inicioSemana, finSemana)
             festivos = comprobarFestivosSemanas(inicioSemana, finSemana)
         
@@ -1546,7 +1571,7 @@ def calcularHorasSemanales (usuarios, fechaInicio, fechaFin):
             if len(diasErrores) > 0:                
                 informe.append({"empleado": e, "semana": s[0], "horas": horas, "correcto": "no", "observaciones": "No se puede hacer el cálculo por fichaje impar", "fichajes": diasFichados, "diasErrores": diasErrores, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
             else:
-                informe.append({"empleado": e, "semana": s[0], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": diasFichados, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos})
+                informe.append({"empleado": e, "semana": s[0], "horas": horas, "correcto": "si", "observaciones": "", "fichajes": diasFichados, "nombreEmpleado": empleado.id_usuario.nombre + " " + empleado.id_usuario.apellidos, "inicioSemana": inicioSemana, "finSemana": finSemana, "jornada": jornadaLaboral, "permisos": permisos, "asuntosPropios": asuntosPropios, "vacaciones": vacaciones, "diasPermisos": diasPermisos, "diasAsuntosPropios": diasAsuntosPropios, "diasVacaciones": diasVacaciones, "festivos": festivos, "diasPorPermisoDescontar": diasPorPermisoDescontar})
     return informe
 
 

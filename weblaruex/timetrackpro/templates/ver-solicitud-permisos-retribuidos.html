@@ -151,7 +151,7 @@
               <label class="text-sm">Permisos</label>
               <input id="inputPermisosModificar" list="permisosRetribuidosModificar"  value="{{solicitud.codigo_permiso.nombre|safe}}" class="form-select">
               <input type="number" id="id_permiso_modificar" name="id_permiso_modificar" value="{{solicitud.codigo_permiso.id|safe}}" class="form-control" hidden>
-              <datalist id="permisosRetribuidosModificar">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</datalist>
+              <datalist id="permisosRetribuidosModificar">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.cod_uex }}-{{ p.nombre }}</option>{% endfor %}</datalist>
             </div>
           </div>
           <div class="row">
@@ -448,20 +448,30 @@
     }
   }
 
+  function normalizeString(str) {
+    // Elimina espacios en blanco, saltos de línea y caracteres especiales
+    return str.replace(/\s/g, '').replace(/[^\w\s]/gi, '');
+}
+
+  // MODIFICAR
   document.getElementById('inputPermisosModificar').addEventListener('input', function() {
-      const inputText = this.value;
-      const datalist = document.getElementById('permisosRetribuidosModificar');
-      const options = datalist.getElementsByTagName('option');
-      const id_permiso = document.getElementById('id_permiso_modificar');
-    
-      for (const option of options) {
-        option.textContent.replace(/\s/g, '');
-          if (option.textContent === inputText) {
+      const nombreSeleccionado = this.value;
+      const idValue = document.getElementById('id_permiso_modificar');
+      // obtengo el valor de la opción seleccionada
+      
+      // normalizo el texto del input
+
+
+      for (const option of document.getElementById('permisosRetribuidosModificar').getElementsByTagName('option')) {
+          const optionText = normalizeString(option.textContent);
+          const nombreSeleccionadoText = normalizeString(nombreSeleccionado);
+          if (optionText === nombreSeleccionadoText) {
               const selectedOptionId = option.getAttribute('data-id');
-              id_permiso.value = selectedOptionId;
+              idValue.value = selectedOptionId;
               break;
           }
       }
+
   });
 
 
