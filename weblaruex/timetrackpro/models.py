@@ -289,6 +289,7 @@ class PermisosRetribuidos(models.Model):
     solicitud_dias_naturales_antelacion = models.IntegerField(blank=True, null=True)
     pas = models.IntegerField()
     pdi = models.IntegerField()
+    recuperable = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
