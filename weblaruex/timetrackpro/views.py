@@ -4197,7 +4197,7 @@ def solicitarModificarAsuntosPropios(request):
     if request.method == 'POST':
         # obtenemos los datos del empleado
         user = RelEmpleadosUsuarios.objects.using("timetrackpro").filter(id_auth_user=request.user.id)[0]
-        idEmpleado = user.id_empleado.id
+        idEmpleado = user.id_usuario.id
         solicitante = EmpleadosTimetrackpro.objects.using("timetrackpro").filter(id=idEmpleado)[0]
         estado = EstadosSolicitudes.objects.using("timetrackpro").filter(id=9)[0]
         # obtenemos los datos del formulario
@@ -4829,7 +4829,7 @@ def solicitarAsuntosPropios(request, year=None):
 
         empleadoSustituto = request.POST.get("sustituto")
 
-        if empleadoSustituto != "0" and empleadoSustituto != 0 and empleadoSustituto != None:        
+        if empleadoSustituto != "0" and empleadoSustituto != 0 and empleadoSustituto != None and empleadoSustituto != "":        
             sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0]
             nombreSustituto = sustituto.nombre + " " + sustituto.apellidos 
     
@@ -6007,7 +6007,7 @@ def agregarAsuntosPropiosCalendario(request):
 
         empleadoSustituto = request.POST.get("sustituto_calendario")
         nombreSustituto = ""
-        if empleadoSustituto != "0" and empleadoSustituto != 0 and empleadoSustituto != None:       
+        if empleadoSustituto != "0" and empleadoSustituto != 0 and empleadoSustituto != None  and empleadoSustituto != "":       
             sustituto = Sustitutos.objects.using("timetrackpro").filter(id=empleadoSustituto)[0] 
             nombreSustituto = sustituto.nombre + " " + sustituto.apellidos
         else:
@@ -6538,7 +6538,7 @@ def datosViajes(request, year=None):
     if year == None:
         year = datetime.now().year  
     viajes=[]
-    viajes = ViajesTimeTrackPro.objects.using("timetrackpro").filter(fecha_inicio__year=year).values('id', 'solicitante__nombre', 'solicitante__id', 'solicitante', 'solicitante__apellidos', 'lugar', 'fecha_solicitud', 'fecha_inicio', 'fecha_fin', 'motivo_viaje', 'estado','estado__id','estado__nombre', 'motivo_rechazo', 'vehiculo')
+    viajes = ViajesTimeTrackPro.objects.using("timetrackpro").filter(fecha_inicio__year=year).order_by('-fecha_inicio').values('id', 'solicitante__nombre', 'solicitante__id', 'solicitante', 'solicitante__apellidos', 'lugar', 'fecha_solicitud', 'fecha_inicio', 'fecha_fin', 'motivo_viaje', 'estado','estado__id','estado__nombre', 'motivo_rechazo', 'vehiculo')
     return JsonResponse(list(viajes), safe=False)
 
 @login_required
@@ -6643,7 +6643,7 @@ def enviarMensajeViaje(request, empleado, viaje):
     <url>
         
     '''
-    url = 'http://alerta2.es/private/timetrackpro/solicitud-viaje/' + str(viaje.id) + '/'
+    url = 'http://alerta2.es/private/timetrackpro/ver-viaje/' + str(viaje.id) + '/'
     # convertir a direcciones de correo
     if empleado.email != "" and empleado.email != None:
         correoEmpleado = convertirAMail(empleado.email)
