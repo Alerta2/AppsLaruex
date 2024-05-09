@@ -49,13 +49,13 @@ def comprobarHabilitacion(id_user, id_hab):
         habilitaciones = Habilitaciones.objects.using("docLaruex").values_list('id', flat=True)
         cargoEncontrado = "Técnico"
         if RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id_user, id_habilitacion=id_hab).exists():
-            cargoEncontrado = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id_user, id_habilitacion=id_hab).values('tipo').first()
+            cargoEncontrado = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id_user, id_habilitacion=id_hab).values('tipo').first().get('tipo')
         return list(habilitaciones),cargoEncontrado,"Director"
     elif RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id_user,id_habilitacion__titulo__in=['Administración y Secretaría']).exists():
         habilitaciones = Habilitaciones.objects.using("docLaruex").values_list('id', flat=True)
         cargoEncontrado = "Nada"
         if RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id_user, id_habilitacion=id_hab).exists():
-            cargoEncontrado = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id_user, id_habilitacion=id_hab).values('tipo').first()
+            cargoEncontrado = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id_user, id_habilitacion=id_hab).values('tipo').first().get('tipo')
         return list(habilitaciones),cargoEncontrado,"Secretaria"
     else:
         habilitaciones = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id_user).values_list('id_habilitacion', flat=True)

@@ -194,19 +194,14 @@
 </form>
 </div> <!-- END ModalAgregarProyecto -->
 
-<!-- ============= Tablas ============= -->
-
 <!-- Tabla con lista de proyectos -->
-
-    <table id="tabla_contactos" data-toggle="table" data-search="true" data-show-columns="true"
-      data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
-      data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
-      data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-search-accent-neutralise="true">
-    </table>
-
+  <table id="tabla_contactos" data-toggle="table" data-search="true" data-show-columns="true"
+    data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+    data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+    data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-search-accent-neutralise="true">
+  </table>
 
 <script type="text/javascript">
-
   $('#tabla_contactos').bootstrapTable({
     method: 'get',
     url: "{% url 'docLaruex:docLaruexContactosDatos' %}",
@@ -249,7 +244,6 @@
       field: "action",
       align: "center",
       formatter: function (value, row) {
-        
         var botonVerContacto = '<a href="/private/docLaruex/contacto/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
         var botonModificarContacto = '<a href="/private/docLaruex/editarContacto/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#9768b2"></i></a>';
 

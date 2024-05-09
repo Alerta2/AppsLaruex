@@ -1,55 +1,11 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+{% endblock %}
 
 {% block content %}
-<style>
-    ul.pagination li .page-link {
-      background-color: rgb(255, 255, 255) !important;
-      color: rgb(41, 68, 87);
-  
-    }
-  
-    ul.pagination li.active .page-link {
-      background-color: rgb(41, 68, 87) !important;
-      border-color: rgb(41, 68, 87) !important;
-    }
-  
-    ul.pagination li .page-link:hover {
-      filter: brightness(85%);
-  
-    }
-  
-    ul.pagination li.active .page-link:hover {
-      filter: brightness(120%);
-  
-    }
-  
-    .btn-light {
-      color: rgb(41, 68, 87);
-    }
-  
-    th {
-      color: rgb(41, 68, 87);
-    }
-     /* estilo añadirFichero PDF*/
-     .addFicheroPDF {
-        color: rgb(161, 16, 32);
-    }
-
-    .addFicheroPDF:hover {
-        color: rgb(99, 10, 20);
-    }
-    .add:hover {
-    color: #ce8312;
-  }
-
-    .file-upload {
-        border: 1px solid #ccc;
-        display: inline-block;
-        padding: 6px 12px;
-        cursor: pointer;
-    }
-  </style>
 
 <!-- breadcrumb   -->
 <div class="card-body">

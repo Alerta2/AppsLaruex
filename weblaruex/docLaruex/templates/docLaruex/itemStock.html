@@ -150,7 +150,7 @@
               
               <div class="row">
                 <div class="col-lg-3 col-md-4 label">Último precio</div>
-                <div class="col-lg-9 col-md-8">{{ultimoProveedor.coste}} €</div>
+                <div class="col-lg-9 col-md-8">{{ultimoProveedor.coste}} € <span class="text-info">({{ultimoProveedor.cantidad|floatformat:-2}}  {{ultimoProveedor.unidad__nombre}}) </span></div>
               </div>
 
               <div class="row">
@@ -397,7 +397,7 @@
               {% csrf_token %}
 
                 <div class="row mb-3">
-                  <label class="text-center">¿Estás seguro de eliminar el proveedor {{itemStock.item}}?</label>
+                  <label class="text-center">¿Estás seguro de eliminar el item {{itemStock.item}}?</label>
                 </div>
                 <div class="text-center">
                   <button id="eliminarStock" type="submit" class="btn btn-danger" onclick="crearAviso('guardarEliminarProveedor', 'Proveedor {{ proveedor.nombre }} eliminado con éxito', 'alert-success', 3000)">Eliminar</button>
@@ -700,6 +700,7 @@
 
 
 <script type="text/javascript">
+    var administrador = "{{ administrador }}";
     $('#tabla_retiradas_stock').bootstrapTable({
         method: 'get',
         url: "/private/docLaruex/retiradasStockDatos/{{itemStock.id}}",
@@ -740,6 +741,16 @@
             formatter: function (value, row) {
               var empleado = row.empleado__first_name +" "+ row.empleado__last_name;
               return (empleado);
+            }
+        },{
+            title: '',
+            field: '',
+            align: "center",
+            visible:(administrador == "True"),
+            formatter: function (value, row) {
+              var botonDevolverStock = '<a href="/private/docLaruex/devolverStock/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-rotate-left fa-lg eliminarProceso" ></i></a>';
+
+              return botonDevolverStock;
             }
         },
     ],
