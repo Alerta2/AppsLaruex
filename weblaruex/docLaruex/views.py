@@ -2079,7 +2079,6 @@ def InfoVerObjeto(request, id):
             
             if TareasProgramadas.objects.using("docLaruex").filter(id=registro.id_tarea_programada.id).exists():
                 tarea = TareasProgramadas.objects.using("docLaruex").filter(id=registro.id_tarea_programada.id).values()[0]
-                print('\033[91m'+'tarea: ' + '\033[92m', tarea)
 
         #comprobamos si el formato tiene un cargo
         if formato is not None:
@@ -2613,6 +2612,10 @@ def editarObjeto(request, id):
                     grupo = GrupoEquipos.objects.using("docLaruex").filter(id=request.POST.get("grupoEquipoEditar"))[0]
                     equipo.grupo = grupo
 
+                if request.POST.get("proveedorEquipoEditar"):
+                    proveedor = Proveedor.objects.using("docLaruex").filter(id=request.POST.get("proveedorEquipoEditar"))[0]
+                    equipo.proveedor = proveedor
+
                 if 'altaUexEditar' in request.POST:
                     checkbox = request.POST['altaUexEditar']
                     if checkbox == "on":
@@ -2843,8 +2846,9 @@ def editarObjeto(request, id):
                 equipo = Equipo.objects.using('docLaruex').filter(id=id)[0]
                 tipoEquipo = TipoEquipo.objects.using('docLaruex').values('id','nombre') 
                 fabricante = Fabricante.objects.using('docLaruex').values('id','nombre')
+                proveedores = Proveedor.objects.using('docLaruex').values('id','nombre')
                 gruposEquipos = GrupoEquipos.objects.using('docLaruex').values('id','nombre')
-                return render(request,"docLaruex/editarEquipo.html",{"itemsMenu": itemsMenu, "equipo": equipo, "tipoEquipo":tipoEquipo, "fabricante":fabricante, "habilitaciones":list(habilitaciones), "administrador":administrador, "gruposEquipos":list(gruposEquipos)})
+                return render(request,"docLaruex/editarEquipo.html",{"itemsMenu": itemsMenu, "equipo": equipo, "tipoEquipo":tipoEquipo, "fabricante":fabricante, "habilitaciones":list(habilitaciones), "administrador":administrador, "gruposEquipos":list(gruposEquipos), "proveedores":list(proveedores)})
 
             elif objeto.tipo == "Ubicacion": 
                 
@@ -5012,7 +5016,7 @@ def verItemStock (request, id):
     itemStock = Stock.objects.using("docLaruex").filter(id=id).values('id','item','descripcion','num_contenedor','num_estanteria','id_ubicacion','id_ubicacion__id__nombre','id_ubicacion__id','unidad__id','unidad__nombre','cantidad', 'min_cantidad', 'categoria','categoria__categoria','avisado','urgente').first()
     infoProveedor = RelStockProveedores.objects.using("docLaruex").filter(item=id).values('id','fecha','coste','proveedor','proveedor__id','proveedor__nombre', 'proveedor__telefono','cantidad','unidad', 'coste_unitario')
     proveedores = Proveedor.objects.using("docLaruex").order_by('nombre').values('id','nombre')
-    ultimoProveedor = RelStockProveedores.objects.using("docLaruex").filter(item=id).order_by('-fecha').values('id','fecha','coste','proveedor','proveedor__id','proveedor__nombre', 'proveedor__telefono','cantidad','unidad', 'coste_unitario').first()
+    ultimoProveedor = RelStockProveedores.objects.using("docLaruex").filter(item=id).order_by('-fecha').values('id','fecha','coste','proveedor','proveedor__id','proveedor__nombre', 'proveedor__telefono','cantidad','unidad', 'coste_unitario', 'unidad__nombre').first()
     
 
     habilitacionesUsuario = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=request.user.id).values('id','tipo','fecha','id_habilitacion','id_habilitacion__id', 'id_habilitacion__titulo')
@@ -5046,7 +5050,9 @@ def agregarStock(request):
     nuevoStock.save(using='docLaruex')
 
     if request.POST.get("informacionProveedor") == "1":
-        nuevoProveedor = RelStockProveedores(item=nuevoStock, fecha=request.POST.get("fechaCompraProveedor"), coste=request.POST.get("costeProveedor"), proveedor=Proveedor.objects.using('docLaruex').get(id=request.POST.get("proveedor")), cantidad=cantidad, unidad=unidad, coste_unitario=request.POST.get("costeUnitarioProveedor"))
+        costeTotal = request.POST.get("costeProveedor")
+        costeUnitario = float(costeTotal) / float(cantidad)
+        nuevoProveedor = RelStockProveedores(item=nuevoStock, fecha=request.POST.get("fechaCompraProveedor"), coste=costeTotal, proveedor=Proveedor.objects.using('docLaruex').get(id=request.POST.get("proveedor")), cantidad=cantidad, unidad=unidad, coste_unitario=costeUnitario)
         nuevoProveedor.save(using='docLaruex')
     return listadoStock(request)
 
@@ -5063,7 +5069,7 @@ El usuario debe estar autenticado.
 
 -------------------------------------------''' 
 @login_required
-def retirarStock (request, item):  
+def retirarStock(request, item):  
     error = None
     objetoItem = Stock.objects.using("docLaruex").filter(id=item).get()
     objetoEmpleado = AuthUser.objects.using("docLaruex").filter(id=request.POST['empleadoQueRetira']).get()
@@ -5084,6 +5090,35 @@ def retirarStock (request, item):
     stock.save(using="docLaruex")
 
     return redirect('docLaruex:docLaruexVerItemStock', id=item)
+
+
+'''-------------------------------------------
+                                Módulo: devolverStock
+
+- Descripción: 
+
+
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+
+-------------------------------------------''' 
+@login_required
+def devolverStock(request, id):
+    administrador = esAdministrador(request.user.id)
+    if administrador:
+        retirada = RegistroRetiradaStock.objects.using("docLaruex").filter(id=id).get()
+        item = retirada.item.id
+        cantidad = retirada.cantidad
+        stock = Stock.objects.using('docLaruex').filter(id=item)[0]
+        stock.cantidad += cantidad
+        stock.save(using="docLaruex")
+        retirada.delete()
+        return redirect('docLaruex:docLaruexVerItemStock', id=item)
+    else:
+        return redirect('docLaruex:docLaruexAccesoDenegado')
+ 
  
 
 
@@ -5289,6 +5324,39 @@ def eliminarStock(request, id):
     RegistroRetiradaStock.objects.using('docLaruex').filter(item=stock).delete()
     stock.delete(using="docLaruex")
     return eliminadoExito(request)
+
+
+'''------------------------------------------
+                                Módulo: solicitarMaterial
+
+- Descripción: 
+Este módulo se encarga de obtener una lista de todas las habilitaciones existentes en el sistema y mostrarla en una vista HTML.
+
+- Precondiciones:
+El usuario debe estar autenticado y haber iniciado sesión en el sistema. Además, el usuario debe tener permisos de administrador en el sistema.
+
+- Postcondiciones:
+El sistema devolverá una vista HTML con la lista de todas las habilitaciones existentes en el sistema. Si el usuario no tiene permisos de administrador, se le mostrará una vista HTML de acceso denegado.
+-------------------------------------------'''
+@login_required
+def solicitarMaterial(request):
+    itemsMenu = MenuBar.objects.using("docLaruex").values()
+    usuarios = AuthUser.objects.using("docLaruex").order_by('first_name').values()
+    administrador = esAdministrador(request.user.id)
+    itemsAlmacenes = list(Stock.objects.using("docLaruex").filter(cantidad__lt=F('min_cantidad')).values('id','item','descripcion','num_estanteria','num_contenedor','id_ubicacion','id_ubicacion__id__nombre','id_ubicacion__id','unidad__id','unidad__nombre','cantidad', 'min_cantidad', 'categoria', 'categoria__id'))
+
+    habilitaciones = Habilitaciones.objects.using("docLaruex").order_by('titulo').values()
+    # Desde aquí es desde donde se pasan los datos para realizar el bucle que muestra los usuarios/empleados
+    if administrador:
+        return render(request, 'docLaruex/solicitarMaterial.html', {"itemsMenu": itemsMenu,  "administrador": administrador,"usuarios":usuarios, "habilitaciones":habilitaciones, "itemsAlmacenes":itemsAlmacenes})
+    else:
+        return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})
+
+@login_required
+def materialDisponible(request):
+    stockDisponible = Stock.objects.using('docLaruex').order_by('id').values('id', 'item', 'descripcion', 'num_contenedor', 'num_estanteria', 'id_ubicacion__id__nombre', 'id_ubicacion__id', 'unidad__nombre', 'cantidad', 'min_cantidad', 'categoria__categoria')
+    return JsonResponse(list(stockDisponible), safe=False)
+
 
 '''-------------------------------------------
                                 Módulo: contacto

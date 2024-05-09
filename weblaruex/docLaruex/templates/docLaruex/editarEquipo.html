@@ -111,7 +111,7 @@
           </div>
 
           <div class="row my-2">
-            <div class="col-md-8">
+            <div class="col-md-6">
               <label for="nuevoNombre" class="form-label">Nombre</label>
               <input type="text" class="form-control" name="nuevoNombre" id="nuevoNombre" value="{{equipo.id.nombre}}">
             </div>
@@ -122,9 +122,25 @@
             </div>
 
             <div class="col-md-2">
-              <label for="nuevoPrecio" class="form-label">Importe</label>
+              <label for="nuevoPrecio" class="form-label">Proveedor</label>
               <input type="number" step="0.01" placeholder="{{equipo.precio}}" class="form-control" name="nuevoPrecio"
                 id="nuevoPrecio" value="{{equipo.precio|safe}}" oninput="calcularPrecioSinIva(this.value)">
+            </div>
+
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="proveedorEquipoEditar">Proveedor</label>
+                <select class="form-select" id="proveedorEquipoEditar" name="proveedorEquipoEditar">
+                  <option value="{{equipo.proveedor.id}}" selected hidden>
+                    {{equipo.proveedor.nombre}}
+                  </option>
+                  {% for proveedor in proveedores %}
+                  <option value="{{proveedor.id}}">
+                    {{proveedor.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
           </div>
 

@@ -604,6 +604,10 @@ urlpatterns = [
     path('private/docLaruex/retirarStock/<slug:item>/',
          retirarStock, name='docLaruexRetirarStock'),
 
+     # devuelve una retirada el item de stock 
+    path('private/docLaruex/devolverStock/<slug:id>/',
+         devolverStock, name='docLaruexDevolverStock'),
+
     # Rellanado de la página con el listado de retiradas de un item no inventariables en concreto 
     path('private/docLaruex/retirarStockUbicacion/<slug:item>/',
          retirarStockUbicacion, name='docLaruexRetirarStockUbicacion'),
@@ -620,6 +624,14 @@ urlpatterns = [
     # Elimina un un item de Stock en particular 
     path('private/docLaruex/eliminarStock/<slug:id>/',
          eliminarStock, name='docLaruexEliminarStock'), 
+
+
+    # Elimina un un item de Stock en particular 
+    path('private/docLaruex/solicitarMaterial/',
+         solicitarMaterial, name='docLaruexSolicitarMaterial'),    
+     # Elimina un un item de Stock en particular 
+    path('private/docLaruex/materialDisponible/',
+         materialDisponible, name='docLaruexMaterialDisponible'),  
     ################### Generación de PDF ####################
 
     #url(r'^simple_pdf/$', PDFTemplateView.as_view(template_name='reportEquipo.html', filename='report_Equipo.pdf'), name='report_Equipo'),

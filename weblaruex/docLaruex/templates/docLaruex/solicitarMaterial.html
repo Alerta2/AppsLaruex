@@ -1,0 +1,627 @@
+{% extends "base/base_docLaruex.html" %}
+{% load static %}
+
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
+{% block content %}
+
+<div class="row">
+  <div class="col-3 d-flex justify-content-end ">
+    <img src="{% static 'niceAdminAssets' %}/img/laruex.png" class="img-fluid" alt="Responsive image"
+      style="max-width: 50%; max-height: 80%;">
+  </div>
+  <div class="col-6 d-flex justify-content-center">
+    <h5 class="card-title" style="color: #005f73; text-align: center;">Hoja de solicitud de adquisiciones de materiales productos, reactivos y servicios</h5>
+  </div>
+
+  <div class="col-3 d-flex justify-content-start my-auto">
+    <img src="{% static 'niceAdminAssets' %}/img/Alerta2.png" class="img-fluid" alt="Responsive image"
+    style="max-width: 60%; ">
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">   
+    <button id="imprimir" class="cta" onclick="window.print()">
+      <span>Imprimir</span>
+      <svg viewBox="0 0 13 10" height="10px" width="15px">
+        <path d="M1,5 L11,5"></path>
+        <polyline points="8 1 12 5 8 9"></polyline>
+      </svg>
+    </button>
+  </div>
+</div>
+<!-- Tabla con la información más destacada del inventario-->
+<div class="row mx-auto d-flex justify-content-center">
+  <div class="col-5">
+    <input type="text" id="filtroMaterial" class="form-control my-3" placeholder="Buscar por material...">
+
+    <table id="tabla_material_disponible" class="table table-sm my-4" style="margin-left: auto; margin-right: auto;" id="tabla-pedidos">
+      <thead>
+        <tr>
+          <th colspan="100" style="color: #005f73;" class="text-center">MATERIAL DISPONIBLE</th>
+        </tr>
+        <tr>
+          <th scope="col" style="color: #005f73;" class="text-center">Cantidad disponible</th>
+          <th scope="col" style="color: #005f73;" class="text-center">Material</th>        
+
+          <th scope="col" style="color: #005f73;" class="text-center">Formato</th>
+          <th scope="col" style="color: #005f73;" class="text-center">¿Es urgente?</th>
+          <th scope="col" style="color: #005f73;" class="text-center" id="colEliminar"> </th>
+        </>
+      </thead>
+      <tbody>
+        {% for itemStock in itemsAlmacenes %}
+        <tr id="fila_{{ itemStock.id }}">
+          <td class="text-center align-middle"> 
+            <div class="row">
+              <div id="resta" class="col-md-1 offset-md-1" onclick="resta('cantidad_{{ itemStock.id }}')">
+                <i class="fa-solid fa-minus"style="color:#001219"></i>
+              </div>
+              <div class="col-md-1 offset-md-1" id="cantidad_{{ itemStock.id }}">{{ itemStock.min_cantidad|floatformat }}
+              </div>
+              <div id="suma" class="col-md-1 offset-md-1" onclick="suma('cantidad_{{ itemStock.id }}')">
+                <i class="fa-solid fa-plus" style="color:#005f73"></i>
+              </div>
+            </div>
+            
+          </td>
+
+
+          <td class="text-center align-middle">{{ itemStock.item }}</td>
+          <td class="text-center align-middle text-wrap">{{ itemStock.unidad__nombre }}</td>
+
+
+          {% if itemStock.urgente == "1" %}
+          <td class="text-center align-middle">Si</td>
+          {% else %}
+          <td class="text-center align-middle">No</td>
+          {% endif %}          
+          <td class="text-center align-middle" id="colEliminar2">
+            <div onclick="eliminarFila('fila_{{ itemStock.id }}')"><i class="fa-solid fa-x" style="color:9B2226"></i></div>
+          </td>
+        </tr>            
+        {% endfor %}
+
+      </tbody>
+    </table>
+  </div>
+  <div class="col-lg-1 col-12 my-auto text-center">
+    <i id="flechas" class="fa-solid fa-arrow-right fa-3x" style="color: rgb(41,68,87)"></i>
+  </div>
+  
+  <div class="col-5">
+    <input type="text" id="filtroMaterial" class="form-control my-3" placeholder="Buscar por material...">
+
+    <table id="tabla_material_solicitado" class="table table-sm my-4" style="margin-left: auto; margin-right: auto;" id="tabla-pedidos">
+      <thead>
+        <tr>
+          <th colspan="100" style="color: #005f73;" class="text-center">MATERIAL SOLICITADO</th>
+        </tr>
+        <tr>
+          <th scope="col" style="color: #005f73;" class="text-center">Cantidad solicitada</th>
+          <th scope="col" style="color: #005f73;" class="text-center">Material</th>        
+
+          <th scope="col" style="color: #005f73;" class="text-center">Formato</th>
+          <th scope="col" style="color: #005f73;" class="text-center">¿Es urgente?</th>
+          <th scope="col" style="color: #005f73;" class="text-center" id="colEliminar"> </th>
+        </>
+      </thead>
+      <tbody>
+        {% for itemStock in itemsAlmacenes %}
+        <tr id="fila_{{ itemStock.id }}">
+          <td class="text-center align-middle"> 
+            <div class="row">
+              <div id="resta" class="col-md-1 offset-md-1" onclick="resta('cantidad_{{ itemStock.id }}')">
+                <i class="fa-solid fa-minus"style="color:#001219"></i>
+              </div>
+              <div class="col-md-1 offset-md-1" id="cantidad_{{ itemStock.id }}">{{ itemStock.min_cantidad|floatformat }}
+              </div>
+              <div id="suma" class="col-md-1 offset-md-1" onclick="suma('cantidad_{{ itemStock.id }}')">
+                <i class="fa-solid fa-plus" style="color:#005f73"></i>
+              </div>
+            </div>
+            
+          </td>
+
+
+          <td class="text-center align-middle">{{ itemStock.item }}</td>
+          <td class="text-center align-middle text-wrap">{{ itemStock.unidad__nombre }}</td>
+
+
+          {% if itemStock.urgente == "1" %}
+          <td class="text-center align-middle">Si</td>
+          {% else %}
+          <td class="text-center align-middle">No</td>
+          {% endif %}          
+          <td class="text-center align-middle" id="colEliminar2">
+            <div onclick="eliminarFila('fila_{{ itemStock.id }}')"><i class="fa-solid fa-x" style="color:9B2226"></i></div>
+          </td>
+        </tr>            
+        {% endfor %}
+
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<div class="row" >
+  <div class="col-8 d-flex align-items-end justify-content-start">
+    <h5>Fecha de propuesta del pedido <strong>{% now "d" %} de {% now "F" %} de {% now "Y" %}</strong></h5>
+  </div>
+  <div class="col-4 d-flex justify-content-end">
+    <img src="{% static 'niceAdminAssets' %}/img/Sello_laruex.png" class="img-fluid" alt="Responsive image"
+      style=" max-width: 50%;">
+  </div>
+</div>
+
+<!-- breadcrumb   -->
+<div class="card-body">
+  <nav>
+    <h5 class="card-title">Solicitar material</h5>
+    <ol class="breadcrumb" style="background-color:#fff !important">
+      <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
+            class="bi bi-house-door"></i></a></li>
+      <li class="breadcrumb-item active" style="font-size: large;">Solicitar material</li>
+    </ol>
+  </nav>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    
+    <div class="row justify-content-center">
+      <div class="col-lg-5">
+          <h5 class="card-title text-center">Material disponible</h5>
+          <table class="table-sm table-hover" id="tabla_stock" data-search="true"
+            data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+      </div>
+      <div class="col-lg-1 col-12 my-auto text-center">
+        <i id="flechas" class="fa-solid fa-arrow-right-arrow-left fa-3x" style="color: rgb(41,68,87)"></i>
+      </div>
+      <div class="col-lg-5">
+          <h5 class="card-title text-center">Material seleccionado</h5>
+          <table id="tabla_stock_seleccionado" class="table-sm table-hover" data-search="true"
+            data-buttons-class="light" data-pagination="true" data-id-field="id" data-page-list="[10]"
+            data-toolbar="#toolbar"></table>
+      </div>
+    </div>
+  </div>
+        
+</div>
+      <input type="text" id="idUsuarioActual" value="{{ id }}" hidden name="idUsuarioActual" data-rule="required" />
+      <input type="text" id="idUsuariosSeleccionados" value="{{ id }}" hidden name="idUsuariosSeleccionados"
+        data-rule="required" />
+
+<script type="text/javascript">
+  // Función para realizar el filtrado por nombre de material
+  function filtrarMaterial() {
+    const input = document.getElementById('filtroMaterial');
+    const filtro = input.value.toUpperCase();
+    const tabla = document.getElementById('tabla_material_disponible');
+    const filas = tabla.getElementsByTagName('tr');
+
+    // Recorrer todas las filas de la tabla, excepto la primera (encabezados)
+    for (let i = 0; i < filas.length; i++) {
+      const columnaMaterial = filas[i].getElementsByTagName('td')[1]; // Segunda columna (Material)
+
+      if (columnaMaterial) {
+        const textoMaterial = columnaMaterial.textContent || columnaMaterial.innerText;
+
+        // Ocultar la fila si no coincide con el filtro de búsqueda
+        if (textoMaterial.toUpperCase().indexOf(filtro) > -1) {
+          filas[i].style.display = ''; // Mostrar la fila
+        } else {
+          filas[i].style.display = 'none'; // Ocultar la fila
+        }
+      }
+    }
+  }
+
+  // Agregar un evento de escucha al campo de búsqueda
+  document.getElementById('filtroMaterial').addEventListener('keyup', filtrarMaterial);
+
+
+  function suma(id){
+    console.log(id);
+    idElemento= "#"+id;
+    valor = parseFloat($(idElemento).text(), 10);
+    valor = valor + 1.0;
+    $(idElemento).text(valor);
+  }
+  
+  function resta(id){
+    console.log(id);
+    idElemento= "#"+id;
+    valor = parseFloat($(idElemento).text(), 10);
+    if (valor > 0)
+      valor = valor - 1.0;
+    $(idElemento).text(valor);
+  }
+
+  function eliminarFila(id){
+    idElemento= "#"+id;
+    $(idElemento).remove();
+  }
+
+  // Obtener la tabla y los botones de agregar y eliminar
+  const tablaPedidos = document.getElementById("tabla-pedidos");
+  const botonesAgregar = document.querySelectorAll(".btn-agregar");
+  const botonesEliminar = document.querySelectorAll(".btn-eliminar");
+
+  // Función para agregar unidades a un pedido
+  function agregarUnidad(event) {
+    const filaPedido = event.target.closest("tr"); // Obtener la fila del pedido
+    const inputCantidad = filaPedido.querySelector("input[type='number']"); // Obtener el input de cantidad
+    const cantidadActual = parseInt(inputCantidad.value); // Obtener la cantidad actual
+    inputCantidad.value = cantidadActual + 1; // Agregar una unidad
+  }
+
+  // Función para eliminar unidades de un pedido
+  function eliminarUnidad(event) {
+    const filaPedido = event.target.closest("tr"); // Obtener la fila del pedido
+    const inputCantidad = filaPedido.querySelector("input[type='number']"); // Obtener el input de cantidad
+    const cantidadActual = parseInt(inputCantidad.value); // Obtener la cantidad actual
+    if (cantidadActual > 1) { // Solo eliminar si hay más de una unidad
+      inputCantidad.value = cantidadActual - 1; // Eliminar una unidad
+    }
+  }
+
+  // Agregar eventos de clic a los botones de agregar y eliminar
+  botonesAgregar.forEach((boton) => {
+    boton.addEventListener("click", agregarUnidad);
+  });
+
+  botonesEliminar.forEach((boton) => {
+    boton.addEventListener("click", eliminarUnidad);
+  });
+
+  $('#tabla_stock').bootstrapTable({
+    method: 'get',
+    url: "{% url 'docLaruex:docLaruexMaterialDisponible' %}",
+    cache: false,
+    columns: [{
+      title: 'Artículo',
+      field: 'item',
+      align: "center"
+    }, {
+      title: 'Cantidad Disponible',
+      field: 'cantidad',
+      align: "center",
+      sortable: true,
+    },{
+      title: 'Unidad',
+      field: 'unidad__nombre',
+      align: "center",
+      sortable: true,
+    },  {
+      title: "Acciones",
+      field: "action",
+      align: "center",
+      formatter: function (value, row) {
+        
+        var botonSolicitarMaterial = '<a href="/private/docLaruex/eliminarHabilitacion/' + habilitacion +'/" class="mx-1" title="Eliminar Habilitacion" ><i class="fa-solid fa-xmark fa-lg" style="color:#ae2012"></i></a>';
+
+            return (botonSolicitarMaterial);
+      },
+    },
+    ],
+    locale: "es-ES",
+    search: true,
+    sortName: 'id_habilitacion',
+    sortOrder: 'desc',
+    // compruebo si la habilitacion es funcional si es funcional hago que en la tabla se vea en verde
+    rowStyle: function (row, index) {
+      var funcional = row.funcional;
+      if (funcional == 1) {
+        return {
+          classes: 'table-info'
+        }
+      }
+      else {
+        return {
+          classes: 'table-white'
+        }
+      }
+    },
+
+  });
+  $('#tabla_stock_seleccionado').bootstrapTable({
+    method: 'get',
+    url: "/private/docLaruex/stockDatosSeleccionados",
+    cache: false,
+    columns: [{
+      title: 'Empleado',
+      field: 'id_usuario',
+      align: "center",
+      formatter: function (value, row) {
+        return (
+          row.id_usuario__first_name + " " + row.id_usuario__last_name
+        );
+      },
+    },{
+      title: 'Habilitación',
+      field: 'id_habilitacion__titulo',
+      align: "center"
+    }, {
+      title: 'Cargo',
+      field: 'tipo',
+      align: "center"
+    },  {
+      title: 'Fecha de Inicio',
+      field: 'fecha',
+      align: "center",
+      sortable: "true",
+      formatter: function (value, row) {
+        var fecha = new Date(row.fecha);
+        return (
+          $.datepicker.formatDate("dd-mm-yy", fecha)
+        );
+      },
+    },{
+      title: 'De la aplicación',
+      field: 'id_habilitacion__funcional',
+      align: "center",
+      sortable: true,
+      formatter: function (value, row) {
+        var funcional = row.id_habilitacion__funcional;
+        if (funcional == 1) {
+          return "Si"
+        }
+        else {
+          return "No"
+        }
+      }
+    },{
+      title: "Acciones",
+      field: "action",
+      align: "center",
+      formatter: function (value, row) {
+        var habilitacion = row.id_habilitacion__id;
+        var usuario = row.id_usuario__id;
+        
+        var botonEliminarHabilitacion = '<a href="/private/docLaruex/eliminarHabilitacionUsuario/' + habilitacion + '/' + usuario +'/" class="mx-1" title="Eliminar Habilitacion" ><i class="fa-solid fa-xmark fa-lg" style="color:#ae2012"></i></a>';
+
+        var admin = '{{administrador}}';
+        if (admin == 'True') { 
+            return (botonEliminarHabilitacion);
+        }
+      },
+    },
+    ],
+    locale: "es-ES",
+    search: true,
+    sortName: 'id_habilitacion',
+    sortOrder: 'desc',
+    // compruebo si la habilitacion es funcional si es funcional hago que en la tabla se vea en verde
+    rowStyle: function (row, index) {
+      var funcional = row.id_habilitacion__funcional;
+      if (funcional == 1) {
+        return {
+          classes: 'table-info'
+        }
+      }
+      else {
+        return {
+          classes: 'table-white'
+        }
+      }
+    },
+  });
+
+  $(".accordion").collapse();
+
+
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
+  function addZero(i) {
+    if (i < 10) { i = "0" + i }
+    return i;
+  }
+
+
+  /*
+    ------------ TABLAS Y FUNCIONES DEL MODAL ASOCIAR USUARIOS ------------
+  */
+
+  //tabla del modal asociar objetos
+  $("#tabla_usuarios_para_asociar").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/docLaruex/habilitacionesDatosAsociar",
+    cache: false,
+    columns: [
+      {
+        title: "ID",
+        field: "id",
+        align: "center",
+      }, {
+        title: 'Empleado',
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            row.first_name + " " + row.last_name
+          );
+        },
+      }, {
+        title: "",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            '<div onclick="addValueTable(' + row.id + ', &apos;' + row.first_name + '&apos;, &apos;' + row.last_name + '&apos;)" class="mx-1" title="select"><i class="fa-solid fa-angles-right fa-lg" style="color:#68B29E"></i></div>'
+          );
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+  function addZero(i) {
+    if (i < 10) {
+      i = "0" + i;
+    }
+    return i;
+  }
+
+
+  function addValueTable(id, first_name, last_name) {
+    $("#tabla_usuarios_para_asociar_seleccionados").bootstrapTable('insertRow', {
+      index: 0,
+      row: {
+        id: id,
+        nombre: first_name + " " + last_name,
+      }
+    });
+  }
+
+  // tatbla de elementos seleccionados
+  $("#tabla_usuarios_para_asociar_seleccionados").bootstrapTable({
+    locale: navigator.language,
+    cache: false,
+    columns: [
+      {
+        title: "ID",
+        field: 'id',
+        align: "center",
+      }, {
+        title: "Empleado",
+        field: 'nombre',
+        align: "center"
+      }, {
+        title: "Cargo",
+        field: 'tipo',
+        align: "center",
+        formatter: function (value, row) {
+          return ( 
+            '<select class="form-select" data-rule="required" id="cargoHabilitacion'+row.id.toString()+'" name="cargoHabilitacion"><option value="Responsable">Responsable</option><option value="Técnico" selected="selected">Técnico</option><option value="Supervisor">Supervisor</option><option value="Sustituto">Sustituto</option></select>'
+
+          );
+        },
+      }, {
+        title: "",
+        field: "action",
+        align: "center",
+        formatter: function (value, row) {
+          return (
+            '<div onclick="deleteValue(' + row.id + ')" class="mx-1" ><i class="fa-solid fa-xmark fa-lg" style="color:#F52220"></i></div>'
+
+          );
+        },
+      },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+  function deleteValue(id) {
+    $("#tabla_usuarios_para_asociar_seleccionados").bootstrapTable('remove', {
+      field: 'id',
+      values: [id]
+    })
+  }
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioAsociarHabilitacion").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    $table = $("#tabla_usuarios_para_asociar_seleccionados");
+    var idSeleccionado = "";
+    var cargoIDSeleccionado = "";
+    for (let value of $table.bootstrapTable('getData')) {
+      console.log("info file");
+      console.log(value);
+      idSeleccionado = idSeleccionado + value["id"] +"@" + document.getElementById('cargoHabilitacion'+value["id"].toString()).value + "#";
+      
+      console.log(idSeleccionado);
+    }
+    
+    $("#idUsuariosSeleccionados").val(idSeleccionado);
+    console.log($("#idUsuariosSeleccionados").val());
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    
+    $.ajax({
+      url: "/private/docLaruex/asociarHabilitacion/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        $table.bootstrapTable('removeAll');
+        $("#idUsuariosSeleccionados").val("");
+        $('#tabla_relacion_habilitaciones').bootstrapTable('refresh');
+        $('#cerrarAsociar').trigger('click');
+      }
+    });
+  });
+
+    // cambiamos la funcionalidad del boton submit del formulario
+    $("#formularioAsociarHabilitacionTodosUsuarios").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    
+    $.ajax({
+      url: "/private/docLaruex/asociarHabilitacionTodosUsuarios/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        $('#tabla_relacion_habilitaciones').bootstrapTable('refresh');
+        $('#cerrarAsociarTodos').trigger('click');
+      }
+    });
+  });
+
+  // cambiamos la funcionalidad del boton submit del formulario
+  $("#formularioHabilitaciones").submit(function (e) {
+    // cancelamos el funcionamiento por defecto del boton submit
+    e.preventDefault();
+    // capturamos la información del formulario 
+    var data = new FormData(this);
+    // ejecuta una url/action con la capacidad de gestionar la salida
+    $.ajax({
+      url: "/private/docLaruex/agregarHabilitacion/",
+      type: "POST",
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      // gestiono el return del view
+      success: function () {
+        document.location.reload();
+      }
+    });
+  });
+
+  function getSelecionados (){
+    // get value of selected  element in select box
+    var usuarioSeleccionado = document.getElementById("usuarioSeleccionado").value;
+
+    // actualizar la tabla con los seleccionados
+    $("#tabla_relacion_habilitaciones").bootstrapTable('refresh', {url: "/private/docLaruex/habilitacionesDatosRelacionados/" + usuarioSeleccionado + "/"});
+  }
+
+
+
+
+</script>
+{% endblock %}
