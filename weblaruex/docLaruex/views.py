@@ -1102,11 +1102,12 @@ def ListadoProveedores(request):
     itemsMenu = MenuBar.objects.using("docLaruex").values()
     habilitacionesUsuario = comprobarHabilitaciones(request.user.id)    
     administrador = esAdministrador(request.user.id)
+    secretaria = esSecretaria(request.user.id)
 
     proveedores = Proveedor.objects.using("docLaruex").values()
     # Desde aquí es desde donde se pasan los datos para realizar el bucle que muestra los usuarios/empleados
     if Habilitaciones.objects.using("docLaruex").filter(id__in=habilitacionesUsuario) or administrador:
-        return render(request, 'docLaruex/listaProveedores.html', {"itemsMenu": itemsMenu,"administrador": administrador,"habilitacionesUsuario":list(habilitacionesUsuario),"proveedores":proveedores})
+        return render(request, 'docLaruex/listaProveedores.html', {"itemsMenu": itemsMenu,"administrador": administrador,"habilitacionesUsuario":list(habilitacionesUsuario),"proveedores":proveedores, "secretaria":secretaria})
     else:
         return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})
 
