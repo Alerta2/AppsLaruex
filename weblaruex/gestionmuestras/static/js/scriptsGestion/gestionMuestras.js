@@ -5,24 +5,22 @@ function consultarInfoAlicuota(id){
         url: '/private/gestionmuestras/infoAlicuota/'+id+'/',
         type: 'GET',
         success: function(response){
-            $('#modalTratamientosAlicuota_titulo').html('Procesos de la alicuota ' + id + ' en el LARUEX');
-            $('#modalTratamientosAlicuota_contenido').html('');
-            let tabla = '<table class="table table-striped table-responsive"><thead><tr><th scope="col">Identificador</th><th scope="col">Codigo Reducido</th><th scope="col">Tratamiento</th><th scope="col">Fecha Inicio</th><th scope="col">Fecha Fin</th><th scope="col">Analista</th><th scope="col">Paso</th></tr></thead><tbody>';
-            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            $('#modalTratamientosAlicuotaContenido').html(response);
+        },
+        error: function(error){
+            console.log(error);
+        }
+    });
+    
+}
 
-            for (let index = 0; index < response.length; index++) {
-                const element = response[index];
-                console.log(typeof element["fecha_fin"]);
-                // convert string to date and time
-                element["fecha_inicio"] = new Date(element["fecha_inicio"]);
-                element["fecha_fin"] = new Date(element["fecha_fin"]);
-
-                // informacion : 'identificador','cod_reducido','tratamiento__descripcion','fecha_inicio','fecha_fin','analista__nombre','paso_actual'
-                tabla += '<tr><th scope="row">'+element["identificador"]+'</th><td>'+element["cod_reducido"]+'</td><td>'+element["tratamiento__descripcion"]+'</td><td>'+element["fecha_inicio"].toLocaleDateString('es-ES', options)+'</td><td>'+element["fecha_fin"].toLocaleDateString('es-ES', options)+'</td><td>'+element["analista__nombre"]+'</td><td>'+element["paso_actual"]+'</td></tr>';
-                $('#modalTratamientosAlicuota_contenido').append('</tbody></table>');
-            }
-            tabla += '</tbody></table>';
-            $('#modalTratamientosAlicuota_contenido').append(tabla);
+function consultarInfoAlicuotaMuestras(id){
+    // call url /private/gestionmuestras/infoAlicuota/id/ using ajax
+    $.ajax({
+        url: '/private/gestionmuestras/infoAlicuotaMedidas/'+id+'/',
+        type: 'GET',
+        success: function(response){
+            $('#modalMedidasAlicuotaContenido').html(response);
         },
         error: function(error){
             console.log(error);
@@ -32,8 +30,12 @@ function consultarInfoAlicuota(id){
 }
 
 // funcion que borra los datos asociados a una alicuota y refresca la tabla en caso de ser necesario
+
 function borrarAlicuota(id, tabla){
-    
+    rellenarModalGenerico("Borrar alicuota", "¿Está seguro que quiere borrar la alicuota de id " + id + "?", "borrarAlicuotaConfirmado("+id+",'"+tabla+"')", "Si", "No")
+}
+
+function borrarAlicuotaConfirmado(id, tabla){
     // call url /private/gestionmuestras/infoAlicuota/id/ using ajax
     $.ajax({
         url: '/private/gestionmuestras/borrarAlicuota/'+id+'/',
@@ -50,6 +52,10 @@ function borrarAlicuota(id, tabla){
 
 // funcion que duplica una alicuota, el tratamiento y refresca la tabla en caso de ser necesario
 function duplicarAlicuota(id, determinacion, usuario, tabla){
+    rellenarModalGenerico("Duplicar alicuota", "¿Está seguro que quiere duplicar la alicuota de id " + id + "?", "duplicarAlicuotaConfirmado("+id+","+ determinacion+","+usuario+",'"+tabla+"')", "Si", "No")
+}
+
+function duplicarAlicuotaConfirmado(id, determinacion, usuario, tabla){
     $.ajax({
         url: '/private/gestionmuestras/duplicarAlicuota/',
         type: 'POST',
@@ -66,7 +72,6 @@ function duplicarAlicuota(id, determinacion, usuario, tabla){
             console.log(error);
         }
     });
-    
 }
 
 
@@ -152,5 +157,17 @@ function aumentarEtiqueta(codigo){
     }
 }
 
+function rellenarModalGenerico(titulo, contenido, funcion, textoSi, textoNo){
+    $('#modalConfirmGenericoLabel').html(titulo);
+    $('#modalConfirmGenericoBody').html(contenido);
+    $('#modalConfirmGenericoSi').html(textoSi);
+    $('#modalConfirmGenericoNo').html(textoNo);
+    console.log(funcion);
+    $('#modalConfirmGenericoSi').attr('onclick', funcion+";$('#modalConfirmGenerico').modal('hide');");
+    // muestro modal
+    $('#modalConfirmGenerico').modal('show');
+}
 
-
+function eliminarDiv(id){
+    document.getElementById(id).remove();
+}

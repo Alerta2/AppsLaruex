@@ -1,0 +1,188 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+
+
+{% block modal %}
+{% endblock %}
+
+{% block content %}
+
+
+
+
+
+<div class="pagetitle">
+  <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesListadoMuestras' %}">Listado</a></li>
+      </ol>
+  </nav>
+</div>
+
+
+<!-- Informacion muestra -->
+<section class="section dashboard mb-2">
+  <!-- Info programa cards -->
+  <div class="col-12">
+    <div class="row">
+      <div class="col-12 border border-dark text-left">
+        <p><strong>CLIENTE:</strong> {{muestra.cliente.descripcion}}</p>
+        <p><strong>DOMICILIO/POBLACIÓN/PROVINCIA:</strong>{{muestra.cliente.direccion}}</p>
+        <p><strong>TELÉFONO/FAX/EMAIL:</strong>{{muestra.cliente.telefono}}/{{muestra.cliente.fax}}/{{muestra.cliente.email}}</p>
+      </div>
+
+      <!-- información de la muestra -->
+      <div class="col-12 text-left">
+        <div class="row">
+          <div class="col-4 border border-dark">
+            <p><strong>Tipo de muestra:</strong> {{muestra.codigo_recogida.codigo_csn.tipo.descripcion}} <sup>(1)</sup></p>
+            <p><strong>Descripción de la muestra muestra:</strong> {{muestra.codigo_recogida.codigo_csn.nombre}}</p>
+            <p><strong>Referencia LARUEX:</strong> {{muestra.identificador}}</p>
+          </div>
+          <div class="col-4 border border-dark">
+            <p><strong>Procedencia:</strong> {{muestra.codigo_recogida.codigo_procedencia.nombre}} <sup>(1)</sup></p>
+            <p><strong>Referencia cliente:</strong> {{muestra.referencia_cliente}} <sup>(1)</sup></p>
+          </div>
+          <div class="col-4 border border-dark">
+            <p><strong>Fecha de recogida:</strong> {{muestra.fecha_hora_recogida_ref|date:"d.m.Y H:i"}} <sup>(1)</sup></p>
+            <p><strong>Fecha de recepción:</strong> {{muestra.fecha_hora_recepcion|date:"d.m.Y H:i"}}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 border border-dark">
+        <p class="notas">NOTAS:</p>
+        <p class="notas"><sup>(1)</sup> La muestra y los datos que la acompañan han sido recolectados y remitidos por el cliente, no asumiendo el LARUEX la veracidad de los mismos, no estando amparados por la acreditación de ENAC.</p>
+        <p class="notas"><sup>(2)</sup> Los presentes resuiltados corresponden exclusivamente a la muestra analizada, tal y como ha sido recepcionada en el LARUEX, y cuyos datos se especifican en la cabecera del informe. Los resultados han sido calculados a fecha de toma de muestra aportada por el cliente.</p>
+        <p class="notas"><sup>(3)</sup> Este informe no puede reproducirse parcialmente sin el permiso escrito de la Dirección del LARUEX</p>
+    </div>
+    </div>  
+  </div>
+</section>
+<!-- End Info programa -->
+
+<!-- Seleccion de alicuotas informe -->
+<section class="section dashboard mb-2">
+  <div class="col-12">
+    <div class="row">
+      {% for key, values in encontrados.items %}
+        <div class="col-12 border border-dark text-left">
+          <h3>{{ key|upper }}</h3>
+          {% if values == True %}
+            {% if key|upper == "DIT" %}
+              <div class="row">
+                <p class="col-4">Necesario realizar {{key|upper}}</p>
+                <div class="col-4">
+                  <button class="btn btn-primary" onclick="calcularDIT()">Calcular DIT</button>
+                </div>
+                <div id="calculado_DIT" class="col-4"></div>
+              </div>
+            {% endif %}
+            
+          {% elif values == False %}
+            
+          {% else %}
+            <div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Identificador</th>
+                    <th>Actividad</th>
+                    <th>Error</th>
+                    <th>AMD</th>
+                    <th>Alcance</th>
+                    <th>Tratamiento Alcance</th>
+                    <th>Resultado calculado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for v in values %}
+                    <tr>
+                      <td>{{ v.alicuota.identificador }}</td>
+                      <td>{{ v.medida.actividad|floatformat:2 }}</td>
+                      <td>{{ v.medida.actividad_error|floatformat:2 }}</td>
+                      <td>{{ v.medida.amd|floatformat:2 }}</td>
+                      <td>{{ v.tratamientoAlcance.alcance }} </td>
+                      <td>{{ v.tratamientoAlcance.descripcion }}</td>
+                      <td id="calculado_{{ key|upper }}_{{ v.medida.id }}"></td>
+                      <td>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="{{ key|upper }}_{{ v.medida.id }}" name="{{ key|upper }}_{{ v.medida.id }}" value='{"id":"{{ v.alicuota.identificador }}", "medida_id":"{{ v.medida.id }}" ,"actividad":"{{ v.medida.actividad|floatformat:2 }}" ,"error":"{{ v.medida.actividad_error|floatformat:2 }}", "amd":"{{ v.medida.amd|floatformat:2 }}" ,"alcance":"{{ v.tratamientoAlcance.alcance }}" }' id="flexCheckDefault" onclick="calcularResultado('{{ key|upper }}_{{ v.medida.id }}')">
+                          <label class="form-check-label" for="flexCheckDefault">
+                            Marcar
+                          </label>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+<!-- End Seleccion de alicuotas informe -->
+
+<script>
+   function calcularResultado(id){
+    if ($("#"+id).is(':checked')){
+      var datos = JSON.parse(document.getElementById(id).value);
+      var amd = datos.amd;
+      var resultado = "";
+      if (datos.alcance > amd){
+        amd = datos.alcance;
+      }
+      if (datos.actividad < amd){
+        resultado = "< " + amd;
+      }
+      else{
+        resultado = datos.actividad + "±" + datos.error + "   AMD ( " + amd + " )";
+      }
+      document.getElementById('calculado_'+id).innerHTML = resultado;
+    }
+    else{
+      document.getElementById('calculado_'+id).innerHTML = "";
+    }
+  }
+  function calcularDIT(){
+    alfa = $("td[id^=calculado_ALFA]").html();
+    alfaVal = true;
+    beta = $("td[id^=calculado_BETARESTO]").html();
+    betaVal = true;
+    tritio = $("td[id^=calculado_TRITIO]").html();
+    tritioVal = true;
+
+    if (alfa == "" || beta == "" || tritio == ""){
+      crearAviso("DIT","Debe seleccionar las alicuotas de Alfa, Beta y Tritio");
+    }
+    else{
+      var dit = "";
+      if (alfa.includes("±") && parseFloat(alfa.split("±")[0])>0.1){
+        alfaVal = false;
+      }
+      if (beta.includes("±") && parseFloat(beta.split("±")[0])>1.0){
+        betaVal = false;
+      }
+      if (tritio.includes("±") && parseFloat(tritio.split("±")[0])>100.0){
+        tritioVal = false;
+      }
+      if (alfaVal && betaVal && tritioVal){
+        crearAviso("DIT","Los valores de Alfa, Beta y Tritio son correctos");
+        document.getElementById('calculado_DIT').innerHTML = "< 0.1";
+      }
+      else{
+        crearAviso("DIT","Los valores de Alfa, Beta y Tritio no son correctos");
+        document.getElementById('calculado_DIT').innerHTML = "> 0.1";
+      }
+    }
+  }
+</script>
+
+{% endblock %}

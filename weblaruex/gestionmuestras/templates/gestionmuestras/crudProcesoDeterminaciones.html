@@ -1,0 +1,192 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+
+<!-- modal confirm delete cod muestra -->
+<div class="modal fade" id="modalConfirmDeleteProcesoDeterminaciones" tabindex="-1" aria-labelledby="modalConfirmDeleteProcesoDeterminacionesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmDeleteProcesoDeterminacionesLabel">Eliminar ProcesoDeterminaciones</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea eliminar el ProcesoDeterminaciones?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="confirmarBorrado()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal confirm delete cod muestra -->
+
+<!-- modal to add or edit a cod muestra -->
+<div class="modal fade" id="modalAddEditProcesoDeterminaciones" tabindex="-1" aria-labelledby="modalAddEditProcesoDeterminacionesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAddEditProcesoDeterminacionesLabel">Nuevo ProcesoDeterminaciones</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="formModal" class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal to add or edit a cod muestra -->
+
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<section class="section mx-5">
+    <a href="{%url 'gestionmuestras:gestmuesGraficosRelacionesTratamientos' %}" class="btn btn-outline-primary">Gráficos Relaciones Tratamientos</a>
+</section>
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <table class="table"
+            id="table"
+            data-toggle="table"
+            data-pagination="true"
+            data-page-size="25"
+            data-height="800"
+            data-search="true"
+            data-show-columns="true"
+            data-show-refresh="true"
+            data-show-columns-toggle-all="true"
+            data-show-fullscreen="true"
+            data-buttons="buttons"
+            data-buttons-class="light"
+            data-show-export="true"
+            data-url="/private/gestionmuestras/gestionProcesoDeterminacionesDatos/">
+        </table>
+    </div>
+    <!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+<script>
+    // tabla para mostrar los ProcesoDeterminaciones
+    // parámetros: id_determinacion__identificador, id_determinacion__nombre, id_tratamiento__identificador, id_tratamiento__descripcion, id_muestra_codigo__codigo
+    $('#table').bootstrapTable({
+        columns: [
+            {
+                title: 'Identificador Determinacion',
+                field: 'id_determinacion',
+                sortable: true
+            },
+            {
+                title: 'Nombre Determinacion',
+                field: 'id_determinacion__nombre',
+                sortable: true
+            },
+            {
+                title: 'Identificador Tratamiento',
+                field: 'id_tratamiento__identificador',
+                sortable: true
+            },
+            {
+                title: 'Descripcion Tratamiento',
+                field: 'id_tratamiento__descripcion',
+                sortable: true
+            },
+            {
+                title: 'Codigo Muestra',
+                field: 'id_muestra_codigo__codigo',
+                sortable: true
+            }
+        ],
+        locale: "es-ES",
+        search: true,
+        sortName: 'doc',
+        sortOrder: 'asc',
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+    })
+
+    function dateFormat(value, row, index) {
+        return moment(value).format('DD/MM/YYYY HH:mm');
+    }
+
+    function buttons () {
+        return {
+          btnAdd: {
+            text: 'Nuevo Frase',
+            icon: 'bi-plus',
+            event: function () {
+                $.ajax({
+                url: '/private/gestionmuestras/gestionProcesoDeterminacionesNuevo/',
+                type: 'GET',
+                success: function(response){
+                    $('#formModal').html(response);
+                    $('#modalAddEditProcesoDeterminaciones').modal('show');
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+            },
+            attributes: {
+              title: 'Nuevo ProcesoDeterminaciones',
+            }
+          }
+        }
+    }
+    let codigoAuxiliar = "";
+    function borrarProcesoDeterminaciones(identificador){
+        codigoAuxiliar = identificador;
+        $('#modalConfirmDeleteProcesoDeterminaciones').modal('show');
+    }
+    function confirmarBorrado(){
+        $('#modalConfirmDeleteProcesoDeterminaciones').modal('hide');
+        $.ajax({
+            url: '/private/gestionmuestras/gestionProcesoDeterminacionesBorrar/',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}', 'identificador': codigoAuxiliar
+            },
+            success: function(response){
+                $('#table').bootstrapTable('refresh');
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    }
+    function editarProcesoDeterminaciones(identificador){
+        $.ajax({
+            url: '/private/gestionmuestras/gestionProcesoDeterminacionesEditar/',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}', 
+                'consulta': 1,
+                'identificador': identificador
+            },
+            success: function(response){
+                $('#formModal').html(response);
+                $('#modalAddEditProcesoDeterminaciones').modal('show');
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -132,6 +132,26 @@
         </style>
     </head>
     <body>
+        <!-- modal confirm generico-->
+        <div class="modal fade" id="modalConfirmGenerico" tabindex="-1" aria-labelledby="modalConfirmGenericoLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalConfirmGenericoLabel">Eliminar Tratamiento</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modalConfirmGenericoBody">
+                        ¿Está seguro que desea eliminar el Tratamiento?
+                    </div>
+                    <div class="modal-footer">
+                        <button id="modalConfirmGenericoNo" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button id="modalConfirmGenericoSi" type="button" class="btn btn-danger" onclick="">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end modal confirm delete cod muestra -->
+
         <!-- modal selector de etiquetas -->
         <!-- Modal -->
         <div class="modal fade" id="selectorEtiquetasModal" tabindex="-1" role="dialog" aria-labelledby="selectorEtiquetasModalLabel" aria-hidden="true">

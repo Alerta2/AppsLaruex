@@ -369,6 +369,38 @@ class ParametrosMuestraEditarForm(forms.Form):
             Submit('submit', 'Enviar')
         )
 
+# form para gestion de las procedencias
+# parametros: codigo, nombre
+class ProcedenciasForm(forms.Form):
+    codigo = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'XX'}))
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'nombre'}))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Row(
+                Column('codigo', css_class='form-group col-md-6 mb-0'),
+                Column('nombre', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            Submit('submit', 'Enviar')
+        )
+
+class ProcedenciasEditarForm(forms.Form):
+    codigo = forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    nombre = forms.CharField(widget=forms.TextInput())
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Row(
+                Column('codigo', css_class='form-group col-md-6 mb-0'),
+                Column('nombre', css_class='form-group col-md-6 mb-0'),
+                css_class='form-row'
+            ),
+            Submit('submit', 'Enviar')
+        )
+
 # form para gestion de relacion de control con tratamiento
 # parametros: identificador, tipo_control, codigo, id_muestra_historico
 class RelacionControlTratamientoForm(forms.Form):

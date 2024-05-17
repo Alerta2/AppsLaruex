@@ -21,6 +21,43 @@
 <section class="section dashboard">
     <!-- Info programa cards -->
     <div class="col-12" class="table-responsive">
+        <div id="toolbar">
+            <div class="row">
+
+                <div class="col-lg-3 col-md-8 col-8">
+                    <label class="text-sm" >Mes</label>
+                    <select class="form-control" aria-label="Mes" id="mes"
+                    name="mes" aria-describedby="text-addon">
+                        <option value="-1" selected hidden>Mes actual</option>
+                        <option value="ENERO">Enero</option>
+                        <option value="FEBRERO">Febrero</option>
+                        <option value="MARZO">Marzo</option>
+                        <option value="ABRIL">Abril</option>
+                        <option value="MAYO">Mayo</option>
+                        <option value="JUNIO">Junio</option>
+                        <option value="JULIO">Julio</option>
+                        <option value="AGOSTO">Agosto</option>
+                        <option value="SEPTIEMBRE">Septiembre</option>
+                        <option value="OCTUBRE">Octubre</option>
+                        <option value="NOVIEMBRE">Noviembre</option>
+                        <option value="DICIEMBRE">Diciembre</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-8 col-8">
+                    <label class="text-sm" >Recogido</label>
+                    <select class="form-control" aria-label="Recogido" id="Recogido"
+                    name="recogido" aria-describedby="text-addon">
+                        <option selected value="-1">Todo</option>
+                        <option value="0">No</option>
+                        <option value="1">Sí</option>
+                    </select>
+                </div>
+                <div class="col-lg-1 col-md-4 col-4 my-auto">
+                    <button type="submit" value="submit" class="btn btn-outline-secondary w-100 mt-4 mb-0" onclick="actualizarTablaMes()">Filtrar</button> 
+                </div>
+            </div>
+
+        </div>
         <table class="table"
             id="table"
             data-toggle="table"
@@ -37,7 +74,7 @@
             data-show-export="true"
             data-detail-view="true"
             data-detail-formatter="detailFormatter"
-            data-url="/private/gestionmuestras/consultarMuestrasRecogerDatos/">
+            data-url="{% url 'gestionmuestras:gestmuesConsultarMuestrasRecogerDatos' %}">
             <thead>
             </thead>
         </table>
@@ -46,7 +83,7 @@
 </section>
 <!-- End Info programa -->
 
-<script>
+<script type="text/javascript">
     // parametros de la tabla 'n_recogida__numero', 'n_recogida__csn__nombre', 'n_recogida__procedencia__nombre', 'n_recogida__memoria__descripcion', 'csn__nombre', 'recoge', 'n_recogida__suministra', 'suministra', 'observaciones', 'n_recogida__observaciones', 'recogido', 'fecha_recogida_inicial', 'fecha_recogida_final', 'fecha_recepcion', 'conservacion', 'nfiltro', 'ibomba', 'mes'
     $('#table').bootstrapTable({
         columns: [
@@ -82,35 +119,51 @@
             {field: 'csn__nombre', title: 'CSN', sortable: true},
             {field: 'recoge', title: 'Recoge', sortable: true},
             {
-                title: 'Fecha Recogida Inicial', 
+                title: 'Fecha Recogida ', 
                 sortable: true, 
                 align: 'center',
                 formatter: function (value, row) {
                     // if value is null, return '-'
-                    
-                    console.log(row.fecha_recogida_inicial);
-                    if (row.fecha_recogida_inicial == null) 
+                    fecha1 = "-"
+                    fecha2 = "-"
+                    if (row.fecha_recogida_inicial != null)
+                        fecha1 = moment(row.fecha_recogida_inicial).format('DD/MM/YYYY HH:mm');
+                    if (row.fecha_recogida_final != null) 
+                        fecha2 = moment(row.fecha_recogida_final).format('DD/MM/YYYY HH:mm');
+                    if (fecha1 == "-" && fecha2 == "-")
                         return '-';
                     else
-                        return moment(value).format('DD/MM/YYYY HH:mm');
+                        if (fecha1 == fecha2)
+                            return fecha1;
+                        else
+                            return 'I:' + fecha1 + '<br>F:' + fecha2;
                 }
-
             },
             {
-                title: 'Fecha Recogida Final', 
+                field: 'fecha_recepcion', 
+                title: 'Fecha Recepción', 
                 sortable: true, 
-                align: 'center',
                 formatter: function (value, row) {
                     // if value is null, return '-'
-                    if (row.fecha_recogida_final == null) 
+                    if (row.fecha_recepcion == null) 
                         return '-';
                     else
                         return moment(value).format('DD/MM/YYYY HH:mm');
                 }
             },
-            {field: 'fecha_recepcion', title: 'Fecha Recepción', sortable: true, formatter: 'dateFormat'},
             {field: 'mes', title: 'Mes', sortable: true},
-        ],
+            {
+                title: 'Acciones',
+                formatter: function (value, row) {
+                  // si usuario es administrador
+                  let botones = '<div class="btn-group">';
+                  {% if perms.auth.gestion_recolector %}
+                    botones += '<a class="btn" onclick="" data-toggle="tooltip" data-placement="bottom" title="Recoger muestra"><i class="fad fa-hand-holding-box fa-2x" style="--fa-primary-color: #0400ff; --fa-secondary-color: #0400ff;"></i></a>';
+                  {% endif %}
+                  botones += '</div>';
+                  return botones;
+                }
+            }],
         exportDataType: "",
         exportTypes: ['pdf', 'xml', 'csv', 'json'],
     })
@@ -135,15 +188,19 @@
     }
     function detailFormatter(index, row) {
         var html = []
-        html.push('<p><b>Observacion general:</b> ' + value + '</p>')
-        html.push('<p><b>Observacion particular:</b> ' + value + '</p>')
+        html.push('<p><b>Observacion general:</b> ' + row.n_recogida__observaciones + '</p>')
+        html.push('<p><b>Observacion particular:</b> ' + row.observaciones + '</p>')
         if (row.conservacion != 'nan')
-            html.push('<p><b>Conservación:</b> ' + value + '</p>')
+            html.push('<p><b>Conservación:</b> ' + row.conservacion + '</p>')
         if (row.nfiltro != 0)
-            html.push('<p><b>Nº Filtro:</b> ' + value + '</p>')
+            html.push('<p><b>Nº Filtro:</b> ' + row.nfiltro + '</p>')
         if (row.ibomba != 0)
-            html.push('<p><b>Bomba:</b> ' + value + '</p>')
+            html.push('<p><b>Bomba:</b> ' + row.ibomba + '</p>')
         return html.join('')
     }
-</script>>
+    function actualizarTablaMes() {
+        var urlEditar = "{% url 'gestionmuestras:gestmuesConsultarMuestrasRecogerDatos' mes='mes' recogido='recogido' %}".replace('mes', $('#mes').val()).replace('recogido', $('#Recogido').val());
+        $("#table").bootstrapTable('refresh', {url: urlEditar});
+    }
+</script>
 {% endblock %}

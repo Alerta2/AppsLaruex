@@ -12,6 +12,7 @@ from gestionmuestras.models_nuevo import *
 
 from datetime import datetime
 import pytz
+import PyPDF2
 
 # procesamiento de codigos viejos
 
@@ -313,3 +314,156 @@ def comprobarHistoricoRecogida(recogida, fecha, cliente, suministrador, estado, 
         return historico
     else:
         return HistoricoRecogida.objects.using('gestion_muestras').filter(cod_antiguo=cod_antiguo).get()
+    
+
+def parsearFicheroGamma(fichero):
+    """
+    Parsea el fichero de laboratorio de radiactividad ambiental y devuelve un diccionario con los datos.
+
+    Args:
+    fichero: Ruta al fichero.
+
+    Returns:
+    Diccionario con los datos del fichero.
+    """
+    date_format = '%d/%m/%Y %H:%M:%S'
+
+    datos = {}
+    with open(fichero, 'rb') as pdfFileObj:
+        pdfReader = PyPDF2.PdfReader(pdfFileObj)
+        pageObj = pdfReader.pages[0]
+        fichero = pageObj.extract_text()
+        lineas = fichero.split("\n")
+        
+
+        # Parsear la cabecera del fichero
+        detector = ""
+        for linea in lineas[:15]:
+            if re.match(r'^Detector+', linea):
+                datos['detector'] = linea.split(":")[1].strip()
+            elif re.match(r'^Fichero GENIE+', linea):
+                datos['muestra'] = linea.split(":")[1].split("-")[0].strip()
+                detector = "genie"
+            if re.match(r'^Fichero GAMMAVISION+', linea):
+                datos['muestra'] = linea.split(":")[1].split("-")[0].strip()
+                detector = "gammavision"
+            elif re.match(r'^Fecha/Hora Correción Decay+', linea):
+                date_str = (linea.split(":")[1].strip()+":"+linea.split(":")[2].strip()+":00").replace("  ", " ")
+                datos['fecha_hora_correccion_decay'] = datetime.strptime(date_str, date_format)
+            elif re.match(r'^Fecha/Hora Análisis+', linea):
+                date_str = (linea.split(":")[1].strip()+":"+linea.split(":")[2].strip()+":00").replace("  ", " ")
+                datos['fecha_hora_analisis'] = datetime.strptime(date_str, date_format)
+            elif re.match(r'^Cantidad de muestra+', linea):
+                datos['cantidad_muestra'] = linea.split(":")[1].strip()
+            elif re.match(r'^Unidades de la media+', linea):
+                datos['unidades_media'] = linea.split(":")[1].strip().replace(("Nº Submuestras"), "").strip().replace(" ", "")
+            elif re.match(r'^Tiempo de contaje+', linea):
+                datos['tiempo_contaje'] = int(linea.split(":")[1].replace("Seg.", "").strip())
+            elif re.match(r'^Fichero de Fondo+', linea):
+                datos['fichero_fondo_utilizado'] = linea.strip().split(':')[-1].strip()
+            elif re.match(r'^Geometría del Calibrado+', linea):
+                datos['geometria_calibrado'] = linea.split(":")[1].strip()
+
+        # find the index that start with ISOTOPO
+        if detector == "genie":
+            for i, linea in enumerate(lineas):
+                if re.match(r'^ISOTOPO\s+', linea):
+                    break
+            i = i + 2
+        elif detector == "gammavision":
+            for i, linea in enumerate(lineas):
+                if 'ACTIVIDAD CORREGIDA' in linea:
+                    break
+            i = i + 3
+        isótopos = []
+
+        for linea in lineas[i:]:
+            if "--------------------------" in linea:
+                break
+            else:
+                if detector == "genie":
+                    valores = linea.split()
+                    if len(valores) == 5:
+                        isotopo = {"iso": valores[0], "lid": valores[1], "actividad": float(valores[2]), "error": valores[4]}
+                    else:
+                        isotopo = {"iso": valores[0], "lid": valores[1], "actividad": 0.0, "error": 0.0}
+                    isótopos.append(isotopo)
+                elif detector == "gammavision":
+                    if "HALFLIVES" not in linea:
+                        valores = linea.split()
+                        if len(valores) == 5:
+                            isotopo = {"iso": valores[0], "lid": valores[4], "actividad": float(valores[1]), "error": valores[3]}
+                        else:
+                            isotopo = {"iso": valores[0], "lid": valores[3], "actividad": 0.0, "error": 0.0}
+                        isótopos.append(isotopo)
+        # Parsear la tabla de isótopos
+        
+
+        datos['isotopos'] = isótopos
+
+    return datos
+    
+    '''
+    dir = "C:/Users/jbaezami/Downloads/Jose luis/Analizar"
+    # list files in dir
+    for f in os.listdir(dir):
+        if f.endswith(".pdf"):
+            datosEspectrometria = parsearFicheroGamma(dir+"/"+f)
+            muestra = HistoricoRecogida.objects.using('gestion_muestras').get(identificador=datosEspectrometria['muestra'])
+            alicuotas = RelacionHistoricoMuestraAnaliticas.objects.using('gestion_muestras').filter(id_historico_recogida=muestra)
+            if alicuotas.filter(id_analiticas__identificador=8).exists():
+                insertarDatosEspectrometria(alicuotas.filter(id_analiticas__identificador=8).get(), datosEspectrometria)
+            elif alicuotas.filter(id_analiticas__identificador=24).exists():
+                insertarDatosYodo(alicuotas.filter(id_analiticas__identificador=24).get(), datosEspectrometria)
+    '''
+def insertarDatosEspectrometria(alicuota, datos):
+    """
+    Inserta los datos de un fichero de espectrometría en la base de datos.
+
+    Args:
+    alicuota: Alicuota de E(Gamma) a la que pertenecen los datos.
+    datos: Diccionario con los datos del fichero.
+
+    Returns:
+    None.
+    """
+
+    for dato in datos["isotopos"]:
+        if not RelacionAlicuotasMedidas.objects.using('gestion_muestras').filter(id_alicuota=alicuota, determinacion_medida=DeterminacionMedidaInforme.objects.using('gestion_muestras').filter(nombre_medida=dato["iso"]).get()).exists():
+            print("Insertando medida", dato["iso"], dato["actividad"], dato["error"], dato["lid"], datos["fecha_hora_analisis"], datos["tiempo_contaje"], datos["unidades_media"], alicuota.cantidad_muestra_analizada)
+
+            cod_reducido = RelacionAnaliticasTratamiento.objects.using('gestion_muestras').filter(id_muestra_analitica=alicuota)[0].cod_reducido
+            RelacionAlicuotasMedidas(id_alicuota=alicuota, cod_reducido=cod_reducido, determinacion_medida=DeterminacionMedidaInforme.objects.using('gestion_muestras').filter(nombre_medida=dato["iso"]).get(), fecha_analisis=datos["fecha_hora_analisis"], actividad=dato["actividad"], actividad_error=dato["error"], amd=dato["lid"], tiempo_medida=datos["tiempo_contaje"], cantidad=alicuota.cantidad_muestra_analizada, rendimiento=1, seleccionado=0).save(using='gestion_muestras')
+
+
+
+def insertarDatosYodo(alicuota, datos):
+    for dato in datos["isotopos"]:
+        if dato["iso"] == "I-131" and not RelacionAlicuotasMedidas.objects.using('gestion_muestras').filter(id_alicuota=alicuota, determinacion_medida=DeterminacionMedidaInforme.objects.using('gestion_muestras').filter(identificador=41).get()).exists():
+            print("Insertando medida", dato["iso"], dato["actividad"], dato["error"], dato["lid"], datos["fecha_hora_analisis"], datos["tiempo_contaje"], datos["unidades_media"], alicuota.cantidad_muestra_analizada)
+
+            cod_reducido = RelacionAnaliticasTratamiento.objects.using('gestion_muestras').filter(id_muestra_analitica=alicuota)[0].cod_reducido
+            RelacionAlicuotasMedidas(id_alicuota=alicuota, cod_reducido=cod_reducido, determinacion_medida=DeterminacionMedidaInforme.objects.using('gestion_muestras').filter(identificador=41).get(), fecha_analisis=datos["fecha_hora_analisis"], actividad=dato["actividad"], actividad_error=dato["error"], amd=dato["lid"], tiempo_medida=datos["tiempo_contaje"], cantidad=alicuota.cantidad_muestra_analizada, rendimiento=1, seleccionado=0).save(using='gestion_muestras')
+
+
+def obtenerDatosBetaTotalContadores(alicuota):
+    alicuota = RelacionHistoricoMuestraAnaliticas.objects.using('gestion_muestras').filter(identificador=alicuota).get()
+    muestraContadores = Muestra.objects.using('alfabeta').filter(clave=alicuota.id_historico_recogida.identificador).get()
+    alicuotasContadores = Alicuota.objects.using('alfabeta').filter(muestra_clave=muestraContadores)
+    for alicuotaContadores in alicuotasContadores:
+        medidas = Actividadeficienciabeta.objects.using('alfabeta').filter(medida__icontains=alicuotaContadores.codigoreducido+"-")
+        for m in medidas:
+            infoMedida = Medida.objects.using('alfabeta').filter(id=m.medida).get()
+            cod_reducido = RelacionAnaliticasTratamiento.objects.using('gestion_muestras').filter(id_muestra_analitica=alicuota)[0].cod_reducido
+            RelacionAlicuotasMedidas(id_alicuota=alicuota, cod_reducido=cod_reducido, determinacion_medida=DeterminacionMedidaInforme.objects.using('gestion_muestras').filter(identificador=2).get(), fecha_analisis=infoMedida.fecha, actividad=m.actividad, actividad_error=m.errorrecuento, amd=m.actividadminimadetectable, tiempo_medida=infoMedida.tiempo, cantidad=alicuota.cantidad_muestra_analizada, rendimiento=m.rq, seleccionado=0).save(using='gestion_muestras')
+
+def obtenerDatosYodoContadores(alicuota):
+    alicuota = RelacionHistoricoMuestraAnaliticas.objects.using('gestion_muestras').filter(identificador=alicuota).get()
+    muestraContadores = Muestra.objects.using('alfabeta').filter(clave=alicuota.id_historico_recogida.identificador).get()
+    alicuotasContadores = Alicuota.objects.using('alfabeta').filter(muestra_clave=muestraContadores, tipoanalitica__nombre="Radioyodos")
+    for alicuotaContadores in alicuotasContadores:
+        medidas = Actividadeficienciabeta.objects.using('alfabeta').filter(medida__icontains=alicuotaContadores.codigoreducido+"-")
+        for m in medidas:
+            infoMedida = Medida.objects.using('alfabeta').filter(id=m.medida).get()
+            cod_reducido = RelacionAnaliticasTratamiento.objects.using('gestion_muestras').filter(id_muestra_analitica=alicuota)[0].cod_reducido
+            RelacionAlicuotasMedidas(id_alicuota=alicuota, cod_reducido=cod_reducido, determinacion_medida=DeterminacionMedidaInforme.objects.using('gestion_muestras').filter(identificador=41).get(), fecha_analisis=infoMedida.fecha, actividad=m.actividad, actividad_error=m.errorrecuento, amd=m.actividadminimadetectable, tiempo_medida=infoMedida.tiempo, cantidad=alicuota.cantidad_muestra_analizada, rendimiento=m.rq, seleccionado=0).save(using='gestion_muestras')

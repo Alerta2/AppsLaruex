@@ -1,0 +1,246 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- modal búsqueda de nuevos resultados -->
+<div class="modal fade" id="modalBusqueda" tabindex="-1" role="dialog" aria-labelledby="modalBusquedaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalBusquedaLabel">Búsqueda de nuevos resultados</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="busquedaNuevosResultados"><i>Buscando nuevos resultados...</i></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>    
+
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <div id="toolbar">
+            <div class="row">
+                <!-- selectores para los siguientes parametros memorias, clientes, estados , tipoMuestra-->
+                <div class="col-lg-3 col-md-8 col-8">
+                    <label class="text-sm" >Memorias</label>
+                    <select class="form-control" aria-label="Memorias" id="Memorias"
+                    name="memorias" aria-describedby="text-addon">
+                        <option value="">Todas</option>
+                        {% for memoria in memorias %}
+                            <option value="{{ memoria.codigo_memoria }}">{{ memoria.memoria }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-8 col-8">
+                    <label class="text-sm" >Clientes</label>
+                    <input list="ClientesList" class="form-control" aria-label="Clientes" id="Clientes"
+                    name="clientes" aria-describedby="text-addon">
+                    <datalist id="ClientesList">
+                        <option value="">Todos</option>
+                        {% for cliente in clientes %}
+                            <option value="{{ cliente.identificador }}">{{ cliente.nombre }}</option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+                <div class="col-lg-3 col-md-8 col-8">
+                    <label class="text-sm" >Estados</label>
+                    <select class="form-control" aria-label="Estados" id="Estados"
+                    name="estados" aria-describedby="text-addon">
+                        <option value="">Todos</option>
+                        {% for estado in estados %}
+                            <option value="{{ estado.identificador_estado }}">{{ estado.descripcion }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-8 col-8">
+                    <label class="text-sm" >Tipo muestras</label>
+                    <select class="form-control" aria-label="tipoMuestra" id="tipoMuestra"
+                    name="tipoMuestra" aria-describedby="text-addon">
+                        <option value="">Todos</option>
+                        {% for tipo in tipoMuestra %}
+                            <option value="{{ tipo.codigo }}">{{ tipo.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+                <div class="col-lg-1 col-md-4 col-4 my-auto">
+                    <button type="submit" value="submit" class="btn btn-outline-secondary w-100 mt-4 mb-0" onclick="filtrarTabla()">Filtrar</button> 
+                </div>
+            </div>
+
+        </div>
+        <table class="table"
+            id="table"
+            data-toggle="table"
+            data-pagination="true"
+            data-page-size="100"
+            data-height="800"
+            data-search="true"
+            data-show-columns="true"
+            data-show-refresh="true"
+            data-show-columns-toggle-all="true"
+            data-show-fullscreen="true"
+            data-buttons="buttons"
+            data-buttons-class="light"
+            data-show-export="true"
+            data-filter-control="true"
+            data-detail-view="true"
+            data-detail-formatter="detailFormatter"
+            data-url="{% url 'gestionmuestras:gestmuesListadoMuestrasInformeDatos' %}">
+            <thead></thead>
+        </table>
+    </div>
+    <!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+<script type="text/javascript">
+    // parametros de la tabla 'identificador', 'codigo_recogida__codigo_csn__nombre','cliente__nombre','codigo_recogida__codigo_procedencia__nombre', 'codigo_recogida__codigo_memoria__memoria', 'recepcionado_por__nombre', 'fecha_hora_recogida', 'fecha_hora_recepcion', 'estado_de_muestra__descripcion', 'referencia_cliente'
+    $('#table').bootstrapTable({
+        columns: [
+            {
+                field: 'identificador',
+                title: 'Identificador',
+                sortable: true,
+            },
+            {
+                field: 'codigo_recogida__codigo_csn__nombre',
+                title: 'Tipo',
+                sortable: true,
+            },
+            {
+                field: 'cliente__nombre',
+                title: 'Cliente',
+                sortable: true,
+            },
+            {
+                field: 'codigo_recogida__codigo_procedencia__nombre',
+                title: 'Procedencia',
+                sortable: true,
+            },
+            {
+                field: 'codigo_recogida__codigo_memoria__memoria',
+                title: 'Memoria',
+                sortable: true,
+            },
+            {
+                field: 'fecha_hora_recogida',
+                title: 'Fecha recogida',
+                sortable: true,
+                formatter: function (value, row) {
+                    // if value is null, return '-'
+                    if (row.fecha_hora_recogida == null) 
+                        return '-';
+                    else
+                        return moment(value).format('DD/MM/YYYY HH:mm');
+                }
+            },
+            {
+                field: 'fecha_hora_recepcion',
+                title: 'Fecha recepción',
+                sortable: true,
+                formatter: function (value, row) {
+                    // if value is null, return '-'
+                    if (row.fecha_hora_recepcion == null) 
+                        return '-';
+                    else
+                        return moment(value).format('DD/MM/YYYY HH:mm');
+                }
+            },
+            {
+                field: 'estado_de_muestra__descripcion',
+                title: 'Estado',
+                sortable: true,
+            },
+            {
+                field: 'referencia_cliente',
+                title: 'Referencia',
+                sortable: true,
+            },
+            {
+                title: 'Acciones',
+                formatter: function (value, row) {
+                  // si usuario es administrador
+                  let botones = '<div class="btn-group">';
+                    
+                    botones += '<a class="btn" href="/private/gestionmuestras/infoMuestra/'+row.identificador+'/" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Consultar muestra"><i class="far fa-info-circle fa-2x"></i></a>';
+                    botones += '<a class="btn" href="'+"{% url 'gestionmuestras:gestmuesSelecionInforme' %}?muestra="+row.identificador+'" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Selección informe"><i class="far fa-file-alt fa-2x"></i></a>';
+                    botones += '<a class="btn" href="'+"{% url 'gestionmuestras:gestmuesGeneracionInforme' %}?muestra="+row.identificador+'" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Generación informe"><i class="fal fa-file-certificate fa-2x"></i></a>';
+                    botones += '</div>';
+                    return botones;
+                }
+            }],
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+    })
+
+    function dateFormat(value, row, index) {
+        return moment(value).format('DD/MM/YYYY HH:mm');
+    }
+
+    function buttons () {
+        return {
+          btnAdd: {
+            text: 'Add new row',
+            icon: 'fas fa-tasks',
+            event: function () {
+                $('#modalBusqueda').modal('show');
+                $.ajax({
+                    url: "{% url 'gestionmuestras:gestmuesCalculosMedidasExistentes' %}",
+                    method: "GET",
+                    success: function(response) {
+                        $("#busquedaNuevosResultados").html(response);
+                    },
+                    error: function(error) {
+                        $("#busquedaNuevosResultados").html("<h2>Error de petición</h2>");
+                    }
+                });
+            },
+            attributes: {
+              title: 'Búsqueda de nuevos resultados'
+            }
+          }
+        }
+    }
+    function detailFormatter(index, row) {
+        var html = []
+        html.push('<p><b>Observacion general:</b> ' + row.n_recogida__observaciones + '</p>')
+        html.push('<p><b>Observacion particular:</b> ' + row.observaciones + '</p>')
+        if (row.conservacion != 'nan')
+            html.push('<p><b>Conservación:</b> ' + row.conservacion + '</p>')
+        if (row.nfiltro != 0)
+            html.push('<p><b>Nº Filtro:</b> ' + row.nfiltro + '</p>')
+        if (row.ibomba != 0)
+            html.push('<p><b>Bomba:</b> ' + row.ibomba + '</p>')
+        return html.join('')
+    }
+    function filtrarTabla() {
+        var urlEditar = "{% url 'gestionmuestras:gestmuesListadoMuestrasInformeDatos' %}?memoria="+document.getElementById("Memorias").value+"&cliente="+document.getElementById("Clientes").value+"&estado="+document.getElementById("Estados").value+"&tipoMuestra="+document.getElementById("tipoMuestra").value;
+        $("#table").bootstrapTable('refresh', {url: urlEditar});     
+    }
+</script>
+{% endblock %}

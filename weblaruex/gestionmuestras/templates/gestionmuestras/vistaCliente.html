@@ -1,0 +1,163 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+
+
+{% block modal %}
+
+{% endblock %}
+
+{% block content %}
+
+
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12">
+      <div class="row">
+        <!-- Card -->
+        <div class="col-sm-12">
+          <div class="card info-card sales-card">
+            <div class="card-body">
+              <h5 class="card-title">Versión <span>| 1.0</span></h5>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <img src="{% static 'img/logos/logo_laruex.png' %}" alt="Logo" title="Logo Laruex - Ir a Inicio" width="60px"/>
+                </div>
+                <div class="ps-3">
+                  <h6>Gestor de informes</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div><!-- End Card -->
+    </div><!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+    <!-- Info programa cards -->
+    <div class="col-12">
+        <div class="row">
+          <!-- Card -->
+          <div class="col-sm-4">
+            <div class="card info-card sales-card">
+              <div class="card-body">
+                <h5 class="card-title">Información del usuario <span>| {{ usuario.nombre }}</span></h5>
+                    <div class="ps-3">
+                        <table>
+                            <tr>
+                                <td><strong>Última conexión:</strong></td>
+                                <td>{{ usuario.last_login }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Contraseña:</strong></td>
+                                <td>{{ usuario.password|slice:":20" }}...</td>
+                            </tr>
+                        </table>
+                    </div>
+              </div>
+            </div>
+            <div class="card info-card sales-card">
+              <div class="card-body">
+                <h5 class="card-title">Información del cliente <span>| {{ cliente.nombre }}</span></h5>
+                    <div class="ps-3">
+                        <table>
+                            <tr>
+                                <td><strong>Cliente:</strong></td>
+                                <td>{{ cliente.descripcion }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dirección:</strong></td>
+                                <td>{{ cliente.direccion }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Teléfono:</strong></td>
+                                <td>{{ cliente.telefono }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fax:</strong></td>
+                                <td>{{ cliente.fax }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email:</strong></td>
+                                <td>{{ cliente.email }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>NIF/CIF:</strong></td>
+                                <td>{{ cliente.nif }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Persona Contacto:</strong></td>
+                                <td>{{ cliente.persona_contacto }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Idioma:</strong></td>
+                                <td>{{ cliente.idioma }}</td>
+                            </tr>
+                        </table>
+                    </div>
+              </div>
+            </div>
+          </div><!-- End Card -->
+          <!-- card muestras -->
+            <div class="col-sm-8">
+                <div class="card info-card sales-card">
+                    <div class="card-body">
+                        <table
+                            id="table"
+                            data-toggle="table"
+                            data-search="true"
+                            data-pagination="true"
+                            data-page-size="10"
+                            data-show-columns="true"
+                            data-show-columns-toggle-all="true"
+                            data-show-fullscreen="true"
+                            data-buttons="buttons"
+                            data-buttons-class="light"
+                            data-show-export="true">
+                            <thead>
+                                <tr class="tr-class-1">
+                                    <th data-field="name">Identificador</th>
+                                    <th data-field="tipo_muestra" data-sortable="true">Muestra</th>
+                                    <th data-field="procedencia" data-sortable="true">Procedencia</th>
+                                    <th data-field="fecha_recepcion" data-sortable="true" data-visible="false">Fecha de recepción</th>
+                                    <th data-field="fecha_recogida" data-sortable="true">Fecha de recogida</th>
+                                    <th data-field="referencia_cliente" data-sortable="true">Referencia</th>
+                                    <th data-field="estado" data-sortable="true">Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for muestra in muestras %}
+                                    <tr class="tr-class-1">
+                                        <td>{{ muestra.identificador }}</td>
+                                        <td>{{ muestra.codigo_recogida__codigo_csn__nombre }}</td>
+                                        <td>{{ muestra.codigo_recogida__codigo_procedencia__nombre }}</td>
+                                        <td>{{ muestra.fecha_hora_recepcion|date:"d.m.Y H:i" }}</td>
+                                        <td>{{ muestra.fecha_hora_recogida_ref|date:"d.m.Y H:i" }}</td>
+                                        <td>{{ muestra.referencia_cliente }}</td>
+                                        <td class="text-center" data-toggle="tooltip" data-placement="bottom" title="{{ muestra.estado_de_muestra__descripcion }}">{{ muestra.estado_de_muestra__icono|safe }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-primary mx-1" onclick="" data-toggle="tooltip" data-placement="top" title="Descarga de Informe"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+      </div><!-- End Grid cards -->
+  </section>
+
+<script type="text/javascript">
+$('#table').bootstrapTable({
+    exportDataType: "",
+    exportTypes: ['pdf', 'excel']
+});
+
+</script>
+<!-- End Botones -->
+{% endblock %}

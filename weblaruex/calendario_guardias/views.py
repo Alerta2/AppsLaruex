@@ -1647,6 +1647,7 @@ def createCalendarRotatorio(request):
         #Obtengo al personal implicado en las guardias del area seleccionada con el nuevo orden rotacional
         personal= CalendarioPersonal.objects.using("guardias").filter(id_area__id_area = int(area), operativo = 1).values('id_usuario').order_by('id_usuario')
         personal = ListadoPersonal(personal, UltimoUsuario, area)
+        print("PERSONAL ASIGNAR", personal)
 
         #Obtengo el listado de semanas completo (num semana, fecha inicio, fecha fin)
         df_semanas = getListadoSemanas(int(year))

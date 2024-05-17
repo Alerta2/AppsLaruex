@@ -102,12 +102,20 @@
                 sortable: "true"
             },{
                 title: 'FECHA RECOGIDA',
-                field: 'fecha_hora_recogida',
-                sortable: "true"
+                sortable: "true",
+                formatter: function (value, row) {
+                    nuevaHora = new Date(value);
+                    nuevaHora.setHours(nuevaHora.getHours() - 2);
+                    return moment(nuevaHora).format('DD/MM/YYYY HH:mm');
+                }
             },{
                 title: 'FECHA RECEPCION',
-                field: 'fecha_hora_recepcion',
-                sortable: "true"
+                sortable: "true",
+                formatter: function (value, row) {
+                    nuevaHora = new Date(value);
+                    nuevaHora.setHours(nuevaHora.getHours() - 2);
+                    return moment(nuevaHora).format('DD/MM/YYYY HH:mm');
+                }
             },{
                 title: 'REFERENCIA',
                 field: 'referencia_cliente',

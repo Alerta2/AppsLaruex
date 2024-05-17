@@ -11,6 +11,44 @@
 
 {% block content %}
 
+
+<!-- Modal acceder a control -->
+<div class="modal fade" id="modalControles" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Muestras de control existentes</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+          <!-- Tabla de controlesTratatamiento -->
+          <table class="table">
+              <thead>
+              <tr>
+                  <th>Tipo Control</th>
+                  <th>Codigo</th>
+                  <th>Muestra</th>
+                  <th>Accion</th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for control in controlesTratamiento %}
+                  <tr>
+                  <td>{{ control.tipo_control }}</td>
+                  <td>{{ control.codigo }}</td>
+                  <td>{{ control.id_muestra_historico.identificador }}</td>
+                  <td>
+                      <a href="/private/gestionmuestras/infoMuestra/{{control.id_muestra_historico.identificador}}" class="btn btn-primary">Acceder</a>
+                  </td>
+                  </tr>
+              {% endfor %}
+              </tbody>
+          </table>
+          </div>
+      </div>
+  </div>
+</div><!-- Modal controles-->
+
 <!-- Info programa -->
 <section class="section dashboard">
     <!-- Info programa cards -->
@@ -91,6 +129,7 @@
                     </div>
                 </div>
             </div>
+            {% if perms.auth.insercion_muestras %}
             <a href="{% url 'gestionmuestras:gestmuesInsertarMuestra' %}" class="card-body">
               <h5 class="card-title"></h5>
               <div class="d-flex align-items-center">
@@ -102,13 +141,141 @@
                   </div>
               </div>
             </a>
+            <a href="" class="card-body" data-toggle="tooltip" data-placement="bottom" data-bs-toggle="modal" data-bs-target="#modalControles" title="Generar Control">
+              <h5 class="card-title"></h5>
+              <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="fas fa-ballot-check"></i>
+                  </div>
+                  <div class="ps-3">
+                      <h6>Generar Control</h6>
+                  </div>
+              </div>
+            </a>
+            {% endif %}
           </div>
         </div>
       <!-- End Card -->
-      <!-- Card Administracion -->
+
+      {% if perms.auth.gestion_tecnico %}
+      <!-- Card Alicuotas -->
+        <div class="col-xxl-3 col-lg-4 col-md-6 col-sm-12">
+          <!-- Card notificacion asignaciones -->
+          <div class="card info-card sales-card p-4">
+            <h6>Nuevas alicuotas asignadas:</h6>
+            <table class="table"
+              id="tableNotificacionAsignaciones"
+              data-url="{% url 'gestionmuestras:gestmuesNotificacionesPendientes' %}">
+              <thead></thead>
+            </table>
+
+            <script type="text/javascript">
+              $('#tableNotificacionAsignaciones').bootstrapTable({
+                columns: [
+                  {
+                    field: 'id_alicuota',
+                    title: 'Alicuota'
+                  },
+                  {
+                    field: 'id_alicuota__id_analiticas__nombre',
+                    title: 'Determinacion'
+                  },
+                  {
+                      field: 'fecha_asignacion',
+                      title: 'Fecha',
+                      sortable: true,
+                      formatter: function (value, row) {
+                          // if value is null, return '-'
+                          if (row.fecha_asignacion == null) 
+                              return '-';
+                          else
+                              return moment(value).format('DD/MM/YYYY HH:mm');
+                      }
+                  },
+                  {
+                      title: 'Acción',
+                      formatter: function (value, row) {
+                        // si usuario es administrador
+                        let botones = '<div class="btn-group">';
+                        botones += '<div class="btn" onclick="verificarNotificado('+row.id+')" data-toggle="tooltip" data-placement="bottom" title="Verificar notificación de la alicuota '+row.id+'"><i class="fas fa-check"></i></div>';
+                        botones += '</div>';
+                        return botones;
+                      }
+                  }
+                ]
+              });
+
+              function verificarNotificado(id){
+                $.ajax({
+                  type: "POST",
+                  url: "{% url 'gestionmuestras:gestmuesVerificarNotificado' %}",
+                  data: {
+                    'id': id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                  },
+                  success: function(data){
+                    $('#tableNotificacionAsignaciones').bootstrapTable('refresh');
+                  }
+                });
+              }
+            </script>
+
+          </div>
+
+          <!-- Card Alicuotas asignadas -->
+          <div class="card info-card sales-card">
+            <a href="{% url 'gestionmuestras:gestmuesAlicuotasAsignadas' %}" class="card-body">
+              <h5 class="card-title"></h5>
+              <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="fas fa-vials"></i>
+                  </div>
+                  <div class="ps-3">
+                      <h6>Mis alicuotas</h6>
+                  </div>
+              </div>
+            </a>
+            
+          </div>
+
+           <!-- Card Control duplicadas -->
+          <div class="card info-card sales-card">
+            <a href="{% url 'gestionmuestras:gestmuesConsultaDuplicados' %}" class="card-body">
+              <h5 class="card-title"></h5>
+              <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                    <i class="fa-sharp fa-solid fa-table-pivot"></i>
+                  </div>
+                  <div class="ps-3">
+                    <h6>Control de duplicados</h6>
+                  </div>
+              </div>
+            </a>
+            
+          </div>
+        </div>
+      <!-- End Card -->
+      {% endif %}
+
+      <!-- Card Recepcion -->
         <div class="col-xxl-3 col-lg-4 col-md-6 col-sm-12">
           <div class="card info-card sales-card">
-            <a href="{% url 'gestionmuestras:gestmuesMuestrasInformes' %}" class="card-body">
+            <a href="{% url 'gestionmuestras:gestmuesMuestrasRecepcionadas' %}" class="card-body">
+              <h5 class="card-title"></h5>
+              <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="far fa-concierge-bell"></i>
+                  </div>
+                  <div class="ps-3">
+                      <h6>Muestras Recepcionadas</h6>
+                  </div>
+              </div>
+            </a>
+            
+          </div>
+          {% if perms.auth.gestion_informes %}
+          <div class="card info-card sales-card">
+            <a href="{% url 'gestionmuestras:gestmuesListadoMuestrasInforme' %}" class="card-body">
               <h5 class="card-title"></h5>
               <div class="d-flex align-items-center">
                   <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
@@ -121,26 +288,9 @@
             </a>
             
           </div>
+          {% endif %}
         </div>
       <!-- End Card -->
-
-      <!-- Card Control duplicadas -->
-      <div class="col-xxl-3 col-lg-4 col-md-6 col-sm-12">
-        <div class="card info-card sales-card">
-          <a href="{% url 'gestionmuestras:gestmuesConsultaDuplicados' %}" class="card-body">
-            <h5 class="card-title"></h5>
-            <div class="d-flex align-items-center">
-                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                  <i class="fa-sharp fa-solid fa-table-pivot"></i>
-                </div>
-                <div class="ps-3">
-                  <h6>Control de duplicados</h6>
-                </div>
-            </div>
-          </a>
-          
-        </div>
-      </div>
 
       <!-- Card Administracion -->
       <!-- only if user is administrator -->

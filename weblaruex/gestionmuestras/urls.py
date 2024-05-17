@@ -16,15 +16,23 @@ urlpatterns = [
     path('private/gestionmuestras/insertarMuestra/consultarParametrosTipo/<slug:tipo>/', consultarParametrosTipo, name='gestmuesConsultarParametrosTipo'),
     path('private/gestionmuestras/modificarMuestra/<slug:id_muestra>/', modificarMuestra, name='gestmuesModificarMuestra'),
     path('private/gestionmuestras/insertarAlicuotas/<slug:id_muestra>/', insertarAlicuotas, name='gestmuesInsertarAlicuotas'),
+    path('private/gestionmuestras/insertarParametro/', insertarParametros, name='gestmuesInsertarParametro'),
     path('private/gestionmuestras/insertarDeterminaciones/', insertarDeterminaciones, name='gestmuesInsertarDeterminaciones'),
     path('private/gestionmuestras/insertarTratamientos/', insertarTratamientos, name='gestmuesInsertarTratamientos'),
     path('private/gestionmuestras/finalizarInsercion/', finalizarInsercion, name='gestmuesFinalizarInsercion'),
     path('private/gestionmuestras/obtenerValoresUltimaMuestra/', obtenerValoresUltimaMuestra, name='gestmuesObtenerValoresUltimaMuestra'),
     path('private/gestionmuestras/obtenerComentarioRecogidaGeneral/', obtenerComentarioRecogidaGeneral, name='gestmuesObtenerComentarioRecogidaGeneral'),
+    path('private/gestionmuestras/traspasarAlicuota/', traspasarAlicuota, name='gestmuesTraspasarAlicuota'),
+
+    # recepcion
+    path('private/gestionmuestras/muestrasRecepcionadas/', muestrasRecepcionadas, name='gestmuesMuestrasRecepcionadas'),
 
     # informes
     path('private/gestionmuestras/muestrasInforme/', muestrasInforme, name='gestmuesMuestrasInformes'),
     path('private/gestionmuestras/muestrasInformeDatos/', muestrasInformeDatos, name='gestmuesMuestrasInformesDatos'),
+    path('private/gestionmuestras/consultarParametrosMuestra/<slug:id_muestra>/', consultarParametrosMuestra, name='gestmuesConsultarParametrosMuestra'),
+    path('private/gestionmuestras/consultarHojaTipo/<slug:hoja>/<slug:muestra>/', consultarHojaTipo, name='gestmuesConsultarHojaTipo'),
+    path('private/gestionmuestras/consultarHojaTipo/<slug:hoja>/<slug:muestra>/<slug:alicuota>/', consultarHojaTipo, name='gestmuesConsultarHojaTipo'),
 
     
     path('private/gestionmuestras/listadoChurros/', listadoChurros, name='gestmuesListadoChurros'),
@@ -40,9 +48,27 @@ urlpatterns = [
     # consultor de medidas
     path('private/gestionmuestras/consultorMedidas/', consultorMedidas, name='gestmuesConsultorMedidas'),
     path('private/gestionmuestras/infoAlicuota/<slug:id_alicuota>/', infoAlicuota, name='gestmuesInfoAlicuota'),
+    path('private/gestionmuestras/infoAlicuotaMedidas/<slug:id_muestra>/', infoAlicuotaMedidas, name='gestmuesInfoAlicuotaMedidas'),
 
     # finalizar muestras
     path('private/gestionmuestras/verificarMuestra/', verificarMuestra, name='gestmuesVerificarMuestra'),
+
+    path('private/gestionmuestras/listadoMuestrasInforme/', listadoMuestrasInforme, name='gestmuesListadoMuestrasInforme'),
+    path('private/gestionmuestras/listadoMuestrasInformeDatos/', listadoMuestrasInformeDatos, name='gestmuesListadoMuestrasInformeDatos'),
+    path('private/gestionmuestras/seleccionInforme/', seleccionInforme, name='gestmuesSelecionInforme'),
+    path('private/gestionmuestras/generacionInforme/', generacionInforme, name='gestmuesGeneracionInforme'),
+
+
+
+    # gestionar alicuota
+    path('private/gestionmuestras/alicuotasAsignadas/', alicuotasAsignadas, name='gestmuesAlicuotasAsignadas'),
+    path('private/gestionmuestras/alicuotasAsignadasDatos/', alicuotasAsignadasDatos, name='gestmuesAlicuotasAsignadasDatos'),
+    path('private/gestionmuestras/alicuotasAsignadasDatos/<slug:antiguas>/<slug:tecnicos>/', alicuotasAsignadasDatos, name='gestmuesAlicuotasAsignadasDatos'),
+
+    # notificaciones pendientes
+    path('private/gestionmuestras/notificacionesPendientes/', notificacionesPendientes, name='gestmuesNotificacionesPendientes'),
+    path('private/gestionmuestras/verificarNotificado/', verificarNotificado, name='gestmuesVerificarNotificado'),
+    
 
     # alfa
     path('private/gestionmuestras/capturarInformeAlfa/', capturarInformeAlfa, name='gestmuesCapturarInformeAlfa'),
@@ -57,6 +83,7 @@ urlpatterns = [
     # Consulta de muestras a recoger   
     path('private/gestionmuestras/consultarMuestrasRecoger/', consultarMuestrasRecoger, name='gestmuesConsultarMuestrasRecoger'), 
     path('private/gestionmuestras/consultarMuestrasRecogerDatos/', consultarMuestrasRecogerDatos, name='gestmuesConsultarMuestrasRecogerDatos'),
+    path('private/gestionmuestras/consultarMuestrasRecogerDatos/<slug:mes>/<slug:recogido>/', consultarMuestrasRecogerDatos, name='gestmuesConsultarMuestrasRecogerDatos'),
 
 
 
@@ -111,6 +138,13 @@ urlpatterns = [
     path('private/gestionmuestras/gestionParametroNuevo/', gestionParametroNuevo, name='gestmuesGestionParametrosNuevo'),
     path('private/gestionmuestras/gestionParametroEditar/', gestionParametroEditar, name='gestmuesGestionParametrosEditar'),
     path('private/gestionmuestras/gestionParametroBorrar/', gestionParametroBorrar, name='gestmuesGestionParametrosBorrar'),
+    
+    # urls para las procedencias
+    path('private/gestionmuestras/gestionProcedencias/', gestionProcedencias, name='gestmuesGestionProcedencias'),
+    path('private/gestionmuestras/gestionProcedenciasDatos/', gestionProcedenciasDatos, name='gestmuesGestionProcedenciasDatos'),
+    path('private/gestionmuestras/gestionProcedenciasNuevo/', gestionProcedenciasNuevo, name='gestmuesGestionProcedenciasNuevo'),
+    path('private/gestionmuestras/gestionProcedenciasEditar/', gestionProcedenciasEditar, name='gestmuesGestionProcedenciasEditar'),
+    path('private/gestionmuestras/gestionProcedenciasBorrar/', gestionProcedenciasBorrar, name='gestmuesGestionProcedenciasBorrar'),
 
 
     # urls para gestion de la relacion de controles con tratamientos
@@ -162,5 +196,24 @@ urlpatterns = [
     path('private/gestionmuestras/gestionRelacionTratamientoMuestraCodigoEditar/', gestionRelacionTratamientoMuestraCodigoEditar, name='gestmuesGestionRelacionTratamientoMuestraCodigoEditar'),
     path('private/gestionmuestras/gestionRelacionTratamientoMuestraCodigoBorrar/', gestionRelacionTratamientoMuestraCodigoBorrar, name='gestmuesGestionRelacionTratamientoMuestraCodigoBorrar'),
 
+    # urls para la gestion de los procesos en las determinaciones
+    path('private/gestionmuestras/gestionProcesoDeterminaciones/', gestionProcesoDeterminaciones, name='gestmuesGestionProceso'),
+    path('private/gestionmuestras/gestionProcesoDeterminacionesDatos/', gestionProcesoDeterminacionesDatos, name='gestmuesGestionProcesoDatos'),
+
+
+    # urls para calculos de medidas
+    path('private/gestionmuestras/calculosMedidasExistentes/', calcularMedidasExistentes, name='gestmuesCalculosMedidasExistentes'),
+
+
+    # graficos
+    path('private/gestionmuestras/graficosRelacionesTratamientos/', graficoRelacionesTratamientos, name='gestmuesGraficosRelacionesTratamientos'),
+
+    # otros
+        path('stamp/', stamp, name='stamp'),
+        path('stampDatos/', stampDatos, name='stampDatos'),
+        path('stampVerificar/<slug:id>/', stampVerificar, name='stampVerificar'),
+
+    # urls para clientes
+    path('private/gestionmuestras/vistaCliente/', vistaCliente, name='gestmuesVistaCliente'),
 
 ]

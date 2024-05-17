@@ -55,6 +55,9 @@
     </nav>
 </div>
 <!-- Info programa -->
+<section class="section mx-5">
+    <a href="{%url 'gestionmuestras:gestmuesGraficosRelacionesTratamientos' %}" class="btn btn-outline-primary">Gráficos Relaciones Tratamientos</a>
+</section>
 <section class="section dashboard">
     <!-- Info programa cards -->
     <div class="col-12" class="table-responsive">
@@ -84,6 +87,12 @@
     // parámetros: 'id_determinacion__identificador', 'id_determinacion__nombre', 'id_tratamiento__identificador', 'id_tratamiento__descripcion', 'id_tratamiento__medida'
     $('#table').bootstrapTable({
         columns: [
+            {
+                title: 'Identificador',
+                field: 'identificador',
+                sortable: true,
+                visible: false
+            },
             {
                 title: 'ID Determinación',
                 field: 'id_determinacion__identificador',

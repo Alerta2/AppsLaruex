@@ -37,7 +37,7 @@
             <!-- div para botones de ayuda alineados a la derecha-->
             <div class="d-flex flex-row-reverse">
                 <!-- boton de carga de últimos valores insertados -->
-                <button type="button" class="btn btn-outline-primary mx-1" onclick="obtenerUltimaMuestra();cargarParametros();" data-toggle="tooltip" data-placement="top" title="Carga de valores de la última muestra insertada"><i class="fa-solid fa-cloud-arrow-down fa-xl"></i></button>
+                <button type="button" class="btn btn-outline-primary mx-1" onclick="obtenerUltimaMuestra();setTimeout(function() {cargarParametros();}, 1000 );" data-toggle="tooltip" data-placement="top" title="Carga de valores de la última muestra insertada"><i class="fa-solid fa-cloud-arrow-down fa-xl"></i></button>
             </div>
             <!-- fin del div de botones de ayuda -->
 
@@ -107,6 +107,32 @@
                 </div>
                 <div class="row">
                     <div class="card-header my-4">Información de fechas</div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="parametro_109" class="form-label">¿Proporcionan fecha de recogida?</label>
+                            </div>
+                            <div class="col-12">
+                                <select id="parametro_109" name="parametro_109" class="form-select">
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="parametro_110" class="form-label">¿Proporcionan hora de recogida?</label>
+                            </div>
+                            <div class="col-12">
+                                <select id="parametro_110" name="parametro_110" class="form-select">
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-6 col-md-12">
                         <div class="row">
                             <div class="col-12">
@@ -184,29 +210,29 @@
                             </div>
                         </div>
                     </button>
-                    <!-- Basic Modal -->
+                    <!-- Modal parametros -->
                     <div class="modal fade" id="modalParametroNuevo" tabindex="-1">
                         <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Agregar parámetro</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <label for="inputParametroAdicional" class="form-label">Parámetro adicional:</label>
-                                <select id="inputParametroAdicional" name="inputParametroAdicional" class="form-select">
-                                    {% for p in parametros %}
-                                        <option>{{ p.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                <button type="button" class="btn btn-primary" onclick="agregarParametro()" data-bs-dismiss="modal">Cargar</button>
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Agregar parámetro</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <label for="inputParametroAdicional" class="form-label">Parámetro adicional:</label>
+                                    <select id="inputParametroAdicional" name="inputParametroAdicional" class="form-select">
+                                        {% for p in parametros %}
+                                            <option id="param_{{p.identificador}}" value="{{p.identificador}}" data-tipo="{{p.tipo}}">{{ p.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    <button type="button" class="btn btn-primary" onclick="agregarParametro()" data-bs-dismiss="modal">Cargar</button>
+                                </div>
                             </div>
                         </div>
-                        </div>
-                    </div><!-- End Basic Modal-->
+                    </div><!-- Modal parametros-->
                 </div>
                 <!--
                 <div class="row">
@@ -295,6 +321,7 @@
 
     // carga los parámetros cuando cambia el tipo de muestra medida
     function cargarParametros(){
+        console.log("consultando");
         $.ajax({  
             type: "GET",
             dataType: "json",
@@ -306,7 +333,25 @@
                     var valor = "";
                     if (data.parametros[i].valor_recomendado != null)
                         valor = data.parametros[i].valor_recomendado;
-                    $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'>"+data.parametros[i].parametro__descripcion+":</label><input type='text' id='"+data.parametros[i].parametro__nombre+"' name='"+data.parametros[i].parametro__nombre+"' value='"+valor+"' class='form-control'>");
+                    tipo = JSON.parse(data.parametros[i].parametro__tipo);
+                    
+                    if (tipo == null) {
+                        $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'><strong>"+data.parametros[i].parametro__nombre+"</strong>. "+data.parametros[i].parametro__descripcion+":</label><input type='text' id='"+data.parametros[i].parametro__nombre+"' name='parametro_"+data.parametros[i].parametro__identificador+"' value='"+valor+"' class='form-control' required>");
+                    } else if (tipo["tipo"] == "float") {
+                        $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'><strong>"+data.parametros[i].parametro__nombre+"</strong>. "+data.parametros[i].parametro__descripcion+":</label><input type='number' step='any' id='"+data.parametros[i].parametro__nombre+"' name='parametro_"+data.parametros[i].parametro__identificador+"' value='"+valor+"' class='form-control' min='0.0' step='0.01' required>");
+                    } else if (tipo["tipo"] == "select") {
+                        var opciones = tipo["valores"].split(",");
+                        var select = "<select id='"+data.parametros[i].parametro__nombre+"' name='parametro_"+data.parametros[i].parametro__identificador+"' class='form-select' required>";
+                        for (var j = 0; j < opciones.length; j++) {
+                            select += "<option>"+opciones[j]+"</option>";
+                        }
+                        select += "</select>";
+                        $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'><strong>"+data.parametros[i].parametro__nombre+"</strong>. "+data.parametros[i].parametro__descripcion+":</label>"+select+"</div>");
+                    } else if (tipo["tipo"] == "datetime") {
+                        $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'><strong>"+data.parametros[i].parametro__nombre+"</strong>. "+data.parametros[i].parametro__descripcion+":</label><input type='datetime-local' id='"+data.parametros[i].parametro__nombre+"' name='parametro_"+data.parametros[i].parametro__identificador+"' value='"+valor+"' class='form-control' required>");
+                    } else if (tipo["tipo"] == "int") {
+                        $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'><strong>"+data.parametros[i].parametro__nombre+"</strong>. "+data.parametros[i].parametro__descripcion+":</label><input type='number' id='"+data.parametros[i].parametro__nombre+"' name='parametro_"+data.parametros[i].parametro__identificador+"' value='"+valor+"' class='form-control' min='0' step='1' required>");
+                    }
                 }
             }
 
@@ -316,7 +361,7 @@
     // copia el texto seleccionado en el textarea de comentario particular
     function copiarTexto(){
         idtexto++;
-        $("#inputComentarioParticular").val($("#inputComentarioParticular").val()+idtexto+") "+$("#textosPredefinidos").val()+"\n");
+        $("#inputComentarioParticular").val($("#inputComentarioParticular").val()+idtexto+") "+$("#textosPredefinidos").val());
     }
     
     // carga los parámetros cuando cambia el tipo de muestra medida
@@ -344,8 +389,30 @@
 
     // agrega un parametro adicional
     function agregarParametro(){
+        console.log("#param_"+$("#inputParametroAdicional").val());
+        console.log($("#param_"+$("#inputParametroAdicional").val()).data("tipo"));
+        console.log($("#param_"+$("#inputParametroAdicional").val()).html());
+
         // deberia consultar el parametro en una funcion de view y devolver o bien un input o bien un select en funcion del tipo de parametro con un switch case. Despues hacer el replace con el placeholder detras
-        $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#inputParametroAdicional").val()+":</label><input type='text' id='"+$("#inputParametroAdicional").val()+"' name='"+$("#inputParametroAdicional").val()+"' class='form-control'></div><div id='placeHolderParametro' hidden></div>");
+        if ($("#param_"+$("#inputParametroAdicional").val()).data("tipo")["tipo"] == null){
+            $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#param_"+$("#inputParametroAdicional").val()).html()+":</label><input type='text' id='"+$("#inputParametroAdicional").val()+"' name='parametro_"+$("#param_"+$("#inputParametroAdicional").val()).val()+"' class='form-control'></div><div id='placeHolderParametro' hidden></div>");
+        } else if ($("#param_"+$("#inputParametroAdicional").val()).data("tipo")["tipo"] == "float") {
+            $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#param_"+$("#inputParametroAdicional").val()).html()+":</label><input type='number' step='any' id='"+$("#inputParametroAdicional").val()+"' name='parametro_"+$("#param_"+$("#inputParametroAdicional").val()).val()+"' class='form-control' min='0.0' step='0.01'></div><div id='placeHolderParametro' hidden></div>");
+        } else if ($("#param_"+$("#inputParametroAdicional").val()).data("tipo")["tipo"] == "select") {
+            var opciones = $("#param_"+$("#inputParametroAdicional").val()).data("tipo")["valores"].split(",");
+            var select = "<select id='"+$("#inputParametroAdicional").val()+"' name='parametro_"+$("#param_"+$("#inputParametroAdicional").val()).val()+"' class='form-select'>";
+            for (var j = 0; j < opciones.length; j++) {
+                select += "<option>"+opciones[j]+"</option>";
+            }
+            select += "</select>";
+            $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#param_"+$("#inputParametroAdicional").val()).html()+":</label>"+select+"</div><div id='placeHolderParametro' hidden></div>");
+        } else if ($("#param_"+$("#inputParametroAdicional").val()).data("tipo")["tipo"] == "datetime") {
+            $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#param_"+$("#inputParametroAdicional").val()).html()+":</label><input type='datetime-local' id='"+$("#inputParametroAdicional").val()+"' name='parametro_"+$("#param_"+$("#inputParametroAdicional").val()).val()+"' class='form-control'></div><div id='placeHolderParametro' hidden></div>");
+        } else if ($("#param_"+$("#inputParametroAdicional").val()).data("tipo")["tipo"] == "int") {
+            $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#param_"+$("#inputParametroAdicional").val()).html()+":</label><input type='number' id='"+$("#inputParametroAdicional").val()+"' name='parametro_"+$("#param_"+$("#inputParametroAdicional").val()).val()+"' class='form-control' min='0' step='1'></div><div id='placeHolderParametro' hidden></div>");
+        }
+            
+        
         $("#inputParametroAdicional").val($("#inputParametroAdicional option:first").val());
     }
     
