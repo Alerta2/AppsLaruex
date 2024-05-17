@@ -1,0 +1,175 @@
+{% extends "base/base_spida.html" %}
+
+{% load static %}
+
+{% block imports %}
+<style>
+    /* Header/Logo Title */
+.header {
+  padding: 60px;
+  text-align: center;
+  background: #1abc9c;
+  font-size: 30px;
+      background:#fff url(../../static/img/spida/documentacion/rainy-10.gif) center center / cover no-repeat ;
+   /* background-size:cover;
+    background-repeat:  no-repeat;
+    background-attachment: fixed;
+    background-position: center;*/
+     background-position: bottom;
+}
+
+.header h1{
+    font-family: 'Brush Script MT', cursive;
+    font-size:100px;
+}
+
+
+@media (min-width: 500px) {
+    .header h1{
+      font-size: 100px;
+    }
+}
+
+@media (max-width: 500px) {
+    .header h1{
+      font-size: 60px;
+    }
+}
+
+html, body{
+  background: #343A40;
+}
+
+#content{
+  background-color: #343A40;
+}
+
+.card {
+  box-shadow: 0 4px 8px 0 rgba(110,201,136,0.7);
+  transition: 0.3s;
+  border-radius:25px 25px 25px 25px;
+  &:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.4);
+  }
+  a {
+    color: initial;
+    &:hover {
+      text-decoration: initial;
+    }
+  }
+  .text-muted i {
+    margin: 0 10px;
+  }
+}
+
+.card-text{
+  text-align: justify;
+}
+
+.card-img-top {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 25px 25px 0px 0px;
+}
+
+.card-title{
+			font-family: 'Brush Script MT', cursive;
+			font-size:30px;
+			text-align:center;
+			color: #49A1A4;
+			font-weight: bold;
+}
+
+#resultado{
+    color: #ffffff
+}
+
+.form-group {
+    margin-right: 15px;
+}
+
+.form-inline {
+    margin-bottom: 30px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="header">
+  <h1>Cámaras de Spida</h1>
+  <!--<p>En esta sección podreis consultar los eventos de inundación registrados y monitorizados por la Red Spida</p>-->
+</div>
+
+<div class="container">
+
+  <div class="row">
+    <div class="col">
+      <p class="text-left" style="color: #fff;margin-top:25px ">Selecciona la estación a consultar:</p>
+    </div>
+  </div>
+
+      <!-- formulario para seleccionar la estacion -->
+      <form id="formularioCamara" class="form-inline" method="post">
+        {% csrf_token %}
+        <!-- select de la estacion a consultar -->
+	<div class="form-group mb-6">
+	  <label for="estacion" class="sr-only">estacion</label>
+          <select name="estacion" id="estacion" class="form-control">
+	    {% for camara in camaras %}
+            <option value="{{camara.id}}">{{camara.descripcion}}</option>
+	    {% endfor %}
+          </select>
+	</div>
+        <!-- boton de enviar -->
+        <button type="submit" class="btn btn-primary">Consultar</button>
+      </form>
+
+  <div class="row">
+    <div class="col">
+      <p class="text-center" id='resultado' style="color: #fff;"> </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <img id="imagenEstacion" src="" class="img-fluid">
+    </div>
+  </div>
+</div>
+
+
+<script>
+  $("#formularioCamara").submit(function (e) {
+      //var nombre_estacion=$('#estacion').getValue();
+      var selectEstaciones = document.getElementById('estacion');
+      var nombreEstacion = selectEstaciones.options[selectEstaciones.selectedIndex].text;
+      $("#resultado").html("Descargando imagen de <b>" + nombreEstacion + "</b>");
+
+      // cancelamos el funcionamiento por defecto del boton submit
+      e.preventDefault();
+      // capturamos la información del formulario
+      var data = new FormData(this);
+      // ejecuta una url/action con la capacidad de gestionar la salida
+      $.ajax({
+	  url: "/private/spida/consultarCamaras/",
+	  type: "POST",
+	  data: data,
+	  cache: false,
+	  contentType: false,
+	  processData: false,
+	  // gestiono el return del view
+	  success: function (data) {
+	      if (data.resultado == true){
+		  $("#resultado").html('Imagen descargada de <b>' + data.descripcion + '</b> con fecha Local: <b>' + data.fechahora_local + '</b> Utc: <b>' + data.fechahora_utc) + '</b>';
+		  $("#imagenEstacion").attr("src", "{% static 'spidacam/'%}" + data.imagen + '?' + new Date().getTime());
+	      } else {
+		  $("#resultado").html('No ha sido posible descargar la imagen de ' + nombreEstacion );
+		  $("#imagenEstacion").attr("src", "");
+	      }
+	  }
+      });
+  });
+</script>
+{% endblock %}

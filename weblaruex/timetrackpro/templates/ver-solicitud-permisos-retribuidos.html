@@ -1,0 +1,551 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+  <div class="row d-flex justify-content-center">
+    
+    <h3 class="text-info text-gradient">Permiso solicitado</h3>
+    <h4 class="text-secondary">Solicitado el {{solicitud.fecha_solicitud}}</h4>
+    <div class="col-12 col-xl-8">
+     
+        <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+          <div class="row">
+            {% if not solicitud.justificante %}
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalAddJustificante">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-cloud-arrow-up fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm"> Agregar Justificante</div>
+            </button>
+            </div>
+            {% endif %}
+
+            {% if director or administrador %}
+              {% if solicitud.justificante %}
+              <div class="col">
+              <button class="botonLinkFestivos" data-toggle="modal" data-target="#modalActualizarJustificante">       
+                <div class="sign-Btn-link"><i class="fa-kit fa-solid-file-rotate fa-lg" style="color: #ffffff;"></i></div>
+                <div class="text text-sm">  Actualizar</div>
+              </button>
+              </div>
+              {% endif %}
+            {% endif %}
+
+            {% if administrador %}
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalEditarSolicitudPermisosRetribuidos">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-pen fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Editar</div>
+            </button>
+            </div>
+            {% endif %}
+
+            {% if administrador or director %}
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalCambiarEstado">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-sign-hanging fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Cambiar estado</div>
+            </button>
+            </div>
+            {% endif %}
+
+            {% if administrador %}
+            <div class="col">
+              <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarPermisosRetribuidos">             
+               <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
+               <div class="text text-sm">Eliminar</div>
+             </button>
+             </div>
+             {% endif %}
+          </div>
+        </div>
+      <div class="row">
+        <div class="col">
+
+          <div class="card ">
+            <div class="card-header pb-0 p-3">
+            </div>
+            <div class="card-body pt-0 p-3">
+
+              <ul class="list-group font-weight-bold">
+                {% if solicitud.estado.id == 18 %}  
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-dark">Pendiente de justificante</span></li>
+                {% elif solicitud.estado.id == 19 %}
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-danger">Rechazada</span></li>
+                {% elif solicitud.estado.id == 20 %}
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-info">Aceptada</span></li>
+                {% else %}
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg d-flex justify-content-end"><span class="badge badge-sm bg-gradient-success">Justificada</span></li>
+                {% endif %}
+
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><span class="h3 font-weight-bolder mb-0"><i class="fa-solid fa-calendar text-dark me-3"></i>{{solicitud.fecha_inicio|date:"d M Y"}} {% if solicitud.fecha_inicio != solicitud.fecha_fin %} - {{solicitud.fecha_fin|date:"d M Y"}}{% endif %}</span></li>
+
+                <li class="list-group-item border-0 ps-0 pt-2 text-lg"><span class="h5 font-weight-bolder mb-0">{{solicitud.empleado.nombre}} {{solicitud.empleado.apellidos}}</span></li>
+
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><span class="h5 text-muted mb-0">{{solicitud.codigo_permiso.cod_uex}} - {{solicitud.codigo_permiso.nombre}}</span></li>
+
+                <li class="list-group-item border-0 ps-0 pt-1 text-lg"><span class="h5 font-weight-bolder mb-0">Motivo:</span></li>
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><span class="h5 text-muted mb-0">{{solicitud.motivo_solicitud}}</span></li>
+                <hr class="separacion">
+                {% if solicitud.motivo_estado_solicitud %}
+                <li class="list-group-item border-0 ps-0 pt-0 text-lg"><span class="h5 text-muted mb-0">{{solicitud.motivo_estado_solicitud}}</span></li>
+                {% endif %}
+                {% if solicitud.justificante %}
+                <li class="list-group-item border-0 ps-0 pt-2 text-lg text-center"><a href="{% get_media_prefix %}/timetrackpro/justificantes/{{solicitud.justificante}}" title="Descargar justificante" download><button type="button" class="btn bg-gradient-primary d-flex align-items-center mx-auto text-md"><i class="fa-duotone fa-file-pdf me-2 fa-3x"></i>Descargar Justificante</button></a></li> 
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </div>
+    {% if solicitud.motivo_estado_solicitud %}
+    <div class="col">
+
+      <div class="card ">
+        <div class="card-header pb-0 p-3">
+        </div>
+        <div class="card-body pt-0 p-3">
+          <ul class="list-group font-weight-bold">
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><strong>Motivo del rechazo</strong><p>{{solicitud.motivo_estado_solicitud}}</p></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalEditarSolicitudPermisosRetribuidos" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEditarSolicitudPermisosRetribuidos"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar solicitud asuntos propios</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioModificarSolicitud" action="{% url 'timetrackpro:modificar-solicitud-permiso-retribuido' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="number" class="form-control" name="id_solicitu_modificar" id="id_solicitu_modificar" value="{{solicitud.id|safe}}" min="1" required hidden>
+          <div class="row">
+            <div class="col-xl-6">
+              <label class="col-form-label">Fecha de inicio</label>
+                <input type="date" class="form-control" aria-label="Fecha inicial de las vacaciones" aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" value="{{solicitud.fecha_inicio|safe}}" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_solicitados')">
+            </div>
+            
+            <div class="col-xl-6">
+              <input type="number" class="form-control" name="dias_solicitados" id="dias_solicitados" value="{{solicitud.dias_solicitados|safe}}" min="1" required hidden >
+
+                <label class="col-form-label">Fecha de fin</label>
+
+                <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
+                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" value="{{solicitud.fecha_fin|safe}}" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_solicitados')">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-12 col-md-12">
+              <label class="text-sm">Permisos</label>
+              <input id="inputPermisosModificar" list="permisosRetribuidosModificar"  value="{{solicitud.codigo_permiso.nombre|safe}}" class="form-select">
+              <input type="number" id="id_permiso_modificar" name="id_permiso_modificar" value="{{solicitud.codigo_permiso.id|safe}}" class="form-control" hidden>
+              <datalist id="permisosRetribuidosModificar">{% for p in permisos %}<option data-id="{{ p.id }}">{{ p.cod_uex }}-{{ p.nombre }}</option>{% endfor %}</datalist>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label class="col-form-label">Motivo de la solicitud</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique los motivos del rechazo" id="motivoSolicitud" name="motivoSolicitud" aria-describedby="text-addon">{{solicitud.motivo_solicitud}}</textarea>
+              </div>
+            </div>
+          </div>
+          {% if solicitud.motivo_estado_solicitud %} 
+          <div class="row">
+            <div class="col">
+              <label class="col-form-label">Motivo del rechazo</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique los motivos del rechazo" id="motivoEditar" name="motivoEditar" aria-describedby="text-addon">{{solicitud.motivo_estado_solicitud}}</textarea>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <div class="row" id="descripcionRecuperacion" hidden>
+            <div class="col" >
+              <label class="col-form-label">Descripcion de recuparación</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique como va a recuperar los días solicitados." id="descripcion" name="descripcion" aria-describedby="text-addon">{{solicitud.descripcion}}</textarea>
+              </div>
+            </div>
+          </div>
+        </div> 
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonEditar">Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalCambiarEstado" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalCambiarEstado"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Aceptar o rechazar el solicitud</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarEstadoAsuntosPropios" action="{% url  'timetrackpro:cambiar-estado-permisos-retribuidos' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Nuevo estado</label>
+              <input class="form-control" type="text" value="{{ solicitud.id }}" id="id_permiso" name="id_permiso" hidden>
+              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
+                <option value="18" {% if solicitud.estado.id == 18 %} selected {% endif %}>Pendiente de justicante</option>
+                <option value="19" {% if solicitud.estado.id == 19 %} selected {% endif %}>Rechazada</option>
+                <option value="20" {% if solicitud.estado.id == 20 %} selected {% endif %}>Aceptada</option>
+                {% if administrador %}
+                <option value="21" {% if solicitud.estado.id == 21 %} selected {% endif %}>Justificada</option>
+                {% endif %}
+              </select>
+            </div>
+            
+          </div>
+          <div class="row"  id="rowMotivo">
+            <div class="col-xl-8 mx-auto my-2">
+              <label class="text-sm" id="labelMotivo">Motivo</label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el error" aria-label="Indique el motivo por el que se rechaza" id="motivo" name="motivo" aria-describedby="text-addon"></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonModificar" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalEliminarPermisosRetribuidos" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEliminarPermisosRetribuidos"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar solicitud</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEliminarPermisoRetribuido" action="{% url 'timetrackpro:eliminar-permisos-retribuidos' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            
+            <input class="form-control" type="text" value="{{ solicitud.id }}" id="id_permiso_eliminar" name="id_permiso_eliminar" hidden>
+            <div class="col-xl-8 mx-auto my-2" >
+              <h6>¿Está seguro/a de eliminar la solicitud?</h6>
+              <span>{{solicitud.empleado.nombre}} {{solicitud.empleado.apellidos}} - {{solicitud.fecha_inicio|date:'d' }} de {{solicitud.fecha_inicio|date:'M' }} de {{solicitud.fecha_inicio|date:'Y' }} a {{solicitud.fecha_fin|date:'d' }} de {{solicitud.fecha_fin|date:'M' }} de {{solicitud.fecha_fin|date:'Y' }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-danger" id="botonEliminar">Eliminar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalAddJustificante" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+
+          <h5 class="modal-title" id="TituloModal"><strong>Agregar justificante</strong> </h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <form id="formularioModalAddJustificante" action="/private/timetrackpro/justificar-solicitud-permisos-retribuidos/" method="POST"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="text" id="id_permiso_justificar" name="id_permiso_justificar" value="{{solicitud.id}}" hidden>
+            <div class="row" id="rowImagen" hidden>
+              <div class="col d-flex justify-content-center">
+                <img class="w-30 rounded" id="imagenPrevia" src="" alt="" >
+
+              </div>
+            </div>
+
+            <div class="row mt-2 mb-2" id="labelImagenSeleccionada" hidden>
+              <div class="col d-flex justify-content-center">
+                  <div class="my-auto d-flex align-items-center ">
+
+                  <i class="fa-duotone fa-circle-check fa-4x" style="--fa-primary-color: #2ab24c; --fa-secondary-color: #2ab24c;"></i>           
+                  <label class="col-form-label text-muted" id="nombreImagenSeleccionada"></label>
+                  
+                  </div>
+              </div>
+            </div>
+            <div class="row container mb-2" id="selectorImagen">
+              <div class="col d-flex justify-content-center">
+                
+                <a href=""  title="subir-imagen" data-toggle="modal"  ><i id="iconoInput" class="fa-duotone fa-file-plus fa-4x"></i></a>
+        
+
+                <input type="file" id="justificante" name="justificante" accept="image/*"
+                onchange="previsualizarImagen()" style="display:none">
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              {% if user.is_authenticated %}
+              <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+              {% endif %}
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalActualizarJustificante" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+
+          <h5 class="modal-title" id="TituloModal"><strong>Actualizar justificante</strong> </h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <form id="formularioModalActualizarJustificante" action="/private/timetrackpro/actualizar-justificante-solicitud-permisos-retribuidos/{{solicitud.id}}/" method="POST"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row" id="rowImagen_actualizar" hidden>
+              <div class="col d-flex justify-content-center">
+                <img class="w-30 rounded" id="imagenPrevia_actualizar" src="" alt="" >
+
+              </div>
+            </div>
+
+            <div class="row mt-2 mb-2" id="labelImagenSeleccionada_actualizar" hidden>
+              <div class="col d-flex justify-content-center">
+                  <div class="my-auto d-flex align-items-center ">
+
+                  <i class="fa-duotone fa-circle-check fa-4x" style="--fa-primary-color: #2ab24c; --fa-secondary-color: #2ab24c;"></i>           
+                  <label class="col-form-label text-muted" id="nombreImagenSeleccionada_actualizar"></label>
+                  
+                  </div>
+              </div>
+            </div>
+            <div class="row container mb-2" id="selectorImagen_actualizar">
+              <div class="col d-flex justify-content-center">
+                
+                <a href=""  title="subir-imagen_actualizar" data-toggle="modal"><i id="iconoInput_actualizar" class="fa-duotone fa-file-plus fa-4x"></i></a>
+        
+
+                <input type="file" id="justificante_actualizar" name="justificante_actualizar" accept="image/*"
+                onchange="previsualizarImagenActualizar()" style="display:none">
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              {% if user.is_authenticated %}
+              <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+              {% endif %}
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+
+  function mostrarTextArea (){
+    if($('#estado').val() == 19){
+      $('#botonModificar').attr('disabled', true);
+      $('#rowMotivo').show();
+      $('#motivo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+    }else{
+      
+      $('#botonModificar').attr('disabled', false);
+      
+      $('#rowMotivo').hide();
+    }
+  }
+
+
+
+
+    // compruebo si en textarea de motivoEliminación hay algo escrito
+  // si hay algo escrito, habilito el boton de guardar
+  // si no hay nada escrito, deshabilito el boton de guardar
+  $(document).ready(function(){
+    $('#motivoEliminacion').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonEliminar').attr('disabled', false);
+    })
+  });
+
+
+  function calcularDias(inicio, fin, dias_solicitados){
+    fecha_inicio = document.getElementById(inicio).value;
+    fecha_fin = document.getElementById(fin).value;
+    // comparo si la fecha de inicio es mayor a la fecha de fin
+    if (fecha_fin == ""){
+      fecha_fin = fecha_inicio;
+      document.getElementById(fin).value = fecha_inicio;
+    }
+    dias_solicitados = document.getElementById(dias_solicitados);
+
+    if (fecha_inicio > fecha_fin && fecha_fin != ""){
+      alert("La fecha de inicio no puede ser mayor a la fecha de fin");
+      document.getElementById(inicio).value = "";
+      document.getElementById(fin).value = "";
+      dias_solicitados.value = "";
+    }
+    else{
+      // obtener la diferencia en dias entre las dos fechas
+      var fecha1 = new Date(fecha_inicio);
+      var fecha2 = new Date(fecha_fin);
+      var diff = fecha2.getTime() - fecha1.getTime();
+      var dias = diff / (1000 * 60 * 60 * 24);
+      dias = dias + 1;
+      dias_solicitados.value = dias;
+    }
+  }
+
+  function normalizeString(str) {
+    // Elimina espacios en blanco, saltos de línea y caracteres especiales
+    return str.replace(/\s/g, '').replace(/[^\w\s]/gi, '');
+}
+
+  // MODIFICAR
+  document.getElementById('inputPermisosModificar').addEventListener('input', function() {
+      const nombreSeleccionado = this.value;
+      const idValue = document.getElementById('id_permiso_modificar');
+      // obtengo el valor de la opción seleccionada
+      
+      // normalizo el texto del input
+
+
+      for (const option of document.getElementById('permisosRetribuidosModificar').getElementsByTagName('option')) {
+          const optionText = normalizeString(option.textContent);
+          const nombreSeleccionadoText = normalizeString(nombreSeleccionado);
+          if (optionText === nombreSeleccionadoText) {
+              const selectedOptionId = option.getAttribute('data-id');
+              idValue.value = selectedOptionId;
+              break;
+          }
+      }
+
+  });
+
+
+  // JavaScript para activar el input cuando se hace clic en el enlace
+document.querySelector("a[title='subir-imagen']").addEventListener("click", function (e) {
+e.preventDefault(); // Evita que el enlace redireccione
+document.getElementById("justificante").click(); // Simula un clic en el input
+});
+  function previsualizarImagen() {
+  var archivoInput = document.getElementById('justificante');
+  var imagenPrevia = document.getElementById('imagenPrevia');
+  var rowImagen = document.getElementById('rowImagen');
+  var selector = document.getElementById('selectorImagen');
+  var etiqueta = document.getElementById('labelImagenSeleccionada');
+  var nombreImagen = document.getElementById('nombreImagenSeleccionada');
+  var iconoInput = document.getElementById('iconoInput');
+  if (archivoInput.files && archivoInput.files[0]) {
+    var lector = new FileReader();
+
+    lector.onload = function(e) {
+      rowImagen.removeAttribute("hidden");
+      imagenPrevia.src = e.target.result;
+      imagenPrevia.style.display = 'block';
+    }
+    selector.style.display = 'none';
+    //eliminar atributo hidden de la etiqueta
+    etiqueta.removeAttribute("hidden");
+    nombreImagen.innerHTML = archivoInput.files[0].name;
+
+    lector.readAsDataURL(archivoInput.files[0]);
+
+    iconoInput.setAttribute("hidden", "true");
+  } else {
+    imagenPrevia.src = '';
+    imagenPrevia.style.display = 'none';
+  }
+}
+
+
+// JavaScript para activar el input cuando se hace clic en el enlace
+document.querySelector("a[title='subir-imagen_actualizar']").addEventListener("click", function (e) {
+e.preventDefault(); // Evita que el enlace redireccione
+document.getElementById("justificante_actualizar").click(); // Simula un clic en el input
+});
+function previsualizarImagenActualizar() {
+  var archivoInput = document.getElementById('justificante_actualizar');
+  var imagenPrevia = document.getElementById('imagenPrevia_actualizar');
+  var rowImagen = document.getElementById('rowImagen_actualizar');
+  var selector = document.getElementById('selectorImagen_actualizar');
+  var etiqueta = document.getElementById('labelImagenSeleccionada_actualizar');
+  var nombreImagen = document.getElementById('nombreImagenSeleccionada_actualizar');
+  var iconoInput = document.getElementById('iconoInput_actualizar');
+  if (archivoInput.files && archivoInput.files[0]) {
+    var lector = new FileReader();
+
+    lector.onload = function(e) {
+      rowImagen.removeAttribute("hidden");
+      imagenPrevia.src = e.target.result;
+      imagenPrevia.style.display = 'block';
+    }
+    selector.style.display = 'none';
+    //eliminar atributo hidden de la etiqueta
+    etiqueta.removeAttribute("hidden");
+    nombreImagen.innerHTML = archivoInput.files[0].name;
+
+    lector.readAsDataURL(archivoInput.files[0]);
+
+    iconoInput.setAttribute("hidden", "true");
+  } else {
+    imagenPrevia.src = '';
+    imagenPrevia.style.display = 'none';
+  }
+}
+  
+
+</script>
+{% endblock %}

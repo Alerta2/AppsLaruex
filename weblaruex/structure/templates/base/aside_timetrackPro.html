@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+{% load static %}
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
+  <div class="sidenav-header">
+    <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+    <a class="navbar-brand m-0" href="{% url 'timetrackpro:home' %}">
+      <img src="{% static 'img/control1.jpeg' %}" class="navbar-brand-img h-100" alt="main_logo">
+      <span class="ms-1 font-weight-bold">TimeTrackPro</span>
+    </a>
+  </div>
+  <hr class="horizontal dark mt-0">
+  <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+    <ul class="navbar-nav">
+      {% for n in navBar %}
+      <li class="nav-item">
+        {% if n.url|slice:'1:' == request.path|slice:'1:' %}
+        <a class="nav-link active" href="{{ n.url }}">
+          <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+            <i class="{{ n.icono }}" style="color: #ffffff;"></i>
+          </div>
+          <span class="nav-link-text ms-1">{{n.nombre}}</span>
+        </a>
+        {% else %}
+          <a class="nav-link" href="{{ n.url }}">
+            <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="{{ n.icono }}"  style="color: #1E3050;"></i>
+            </div>
+            <span class="nav-link-text ms-1">{{n.nombre}}</span>
+          </a>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="sidenav-footer mx-3 ">
+    <div class="card card-background shadow-none card-background-mask-secondary" id="sidenavCard">
+      <div class="full-background background-timetrackpro-white"></div>
+      <div class="card-body text-start p-3 w-100">
+        <div class="docs-info">
+          <h6 class="text-white up mb-0">Tienes dudas</h6>
+          <p class="text-xs font-weight-bold">Consulta la documentación sobre vacaciones y días de asuntos propios</p>
+          <a href="{{irDocumentacionUex}}" target="_blank" class="btn btn-white btn-sm w-100 mb-0">Ir a la documentación</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+ 

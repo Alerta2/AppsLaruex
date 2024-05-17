@@ -1,39 +1,14 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
 
+{% block imports %}
+  <link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+
+{% endblock %}
+
 {% block content %}
-<style>
-  /*--------------------------------------------------------------
-  # Añadir Imagen
-  --------------------------------------------------------------*/
-  .addImagen {
-    color: rgb(16, 108, 161);
-  }
-
-  .addImagen:hover {
-    color: rgb(10, 59, 99);
-  }
-
-  .imagen-upload {
-    border: 1px solid #ccc;
-    display: inline-block;
-    padding: 6px 12px;
-    cursor: pointer;
-  }
-  .form-check-input:checked {
-    background-color: #087B6C;
-    border-color: #087B6C;
-  }
-
-  .form-check-input:focus {
-    outline: 0;
-    box-shadow: 0 0 0 0.25rem rgba(16, 223, 161, 0.432);
-  }
-
-</style>
 
   <div>
-
     <nav>
       <ol class="breadcrumb" style="background-color:#fff !important">
         <li class="breadcrumb-item" style="font-size: large;"><a href="\private/docLaruex/"><i
@@ -136,7 +111,7 @@
           </div>
 
           <div class="row my-2">
-            <div class="col-md-8">
+            <div class="col-md-6">
               <label for="nuevoNombre" class="form-label">Nombre</label>
               <input type="text" class="form-control" name="nuevoNombre" id="nuevoNombre" value="{{equipo.id.nombre}}">
             </div>
@@ -147,9 +122,25 @@
             </div>
 
             <div class="col-md-2">
-              <label for="nuevoPrecio" class="form-label">Importe</label>
+              <label for="nuevoPrecio" class="form-label">Proveedor</label>
               <input type="number" step="0.01" placeholder="{{equipo.precio}}" class="form-control" name="nuevoPrecio"
                 id="nuevoPrecio" value="{{equipo.precio|safe}}" oninput="calcularPrecioSinIva(this.value)">
+            </div>
+
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="proveedorEquipoEditar">Proveedor</label>
+                <select class="form-select" id="proveedorEquipoEditar" name="proveedorEquipoEditar">
+                  <option value="{{equipo.proveedor.id}}" selected hidden>
+                    {{equipo.proveedor.nombre}}
+                  </option>
+                  {% for proveedor in proveedores %}
+                  <option value="{{proveedor.id}}">
+                    {{proveedor.nombre}}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
           </div>
 
@@ -204,25 +195,23 @@
               </div>
             </div>
           </div>
+          <div class="row my-2 ">
+            <div class="col-6 d-flex justify-content-center mx-auto mt-4">
+              <div class="d-block shadow-xl border-radius-xl" style="position: relative; display: inline-block;">
+               
 
-
-          <div class="row my-2">
-            <div class="col-12 d-flex justify-content-center">
-              <div class="form-group">
-                <label for="nuevaImagenEquipo">
-                  <i class="fa-duotone fa-image fa-6x addImagen"></i>
-                </label>
-                <input type="file" class="form-control-file" style="display: none; visibility: none;"
-                  id="nuevaImagenEquipo" name="nuevaImagenEquipo" onchange="mostrarNombreImagen(this.value)" />
-                <div class="text-center"><strong id="mostrarNombreNuevaImagen"><br></strong>
-                  <spam id="imagen-name"></spam>
-                </div>
+                <img  id="actual-foto-equipo" src="{% if equipo.id.ruta %}{% static 'img/timetrackpro/usuarios/' %}{{empleado.id_usuario.img}}{% endif %}" class="img-fluid shadow border-radius-xl" style="max-width: 100%; height: auto;">
+                
+                  <a href=""  title="subir-nueva-imagen-equipo" data-toggle="modal" data-target="#modalFormulario" ><i id="iconoSubirImagen" class="fa-kit fa-solid-image-pen {% if equipo.id.ruta %} fa-2xl {% else %} fa-5x {% endif %}addImagen"></i></a>
+                 
+      
+                  <input type="file" id="nuevaImagenEquipo" name="nuevaImagenEquipo" accept="image/*"
+                  onchange="previsualizarImagen()" style="display:none">
               </div>
             </div>
           </div>
+
         </div>
-
-
         <div class="row my-2">
           <div class="text-center">
             <button type="reset" class="btn btn-secondary"
@@ -283,15 +272,29 @@ function calcularPrecioSinIva(value){
     });
   });
 
-  // mostramos el nombre de la imagen en el input de adjuntar archivo y cambiamos el label del boton de adjuntar archivo
-  function mostrarNombreImagen(value) {
 
-    document.getElementById('imagen-name').innerHTML = value;
+  // JavaScript para activar el input cuando se hace clic en el enlace
+  document.querySelector("a[title='subir-nueva-imagen-equipo']").addEventListener("click", function (e) {
+  e.preventDefault(); // Evita que el enlace redireccione
+  document.getElementById("nuevaImagenEquipo").click(); // Simula un clic en el input
+});
 
-    document.getElementById('mostrarNombreNuevaImagen').style.display = 'none';
+// Función para previsualizar la imagen seleccionada
+function previsualizarImagen() {
+  var input = document.getElementById("nuevaImagenEquipo");
+  var imagen = document.getElementById("actual-foto-equipo");
+  var icono = document.getElementById("iconoSubirImagen");
+
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      imagen.src = e.target.result;
+      icono.classList.replace("fa-5x", "fa-2xl");
+      icono.setAttribute("style", "position: absolute; bottom: 1.5rem; right: 0.625rem;");
+    };
+    reader.readAsDataURL(input.files[0]);
   }
-
-
+}
 </script>
 
 {% endblock %}

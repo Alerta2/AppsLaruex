@@ -25,6 +25,7 @@ from django.db.models import F
 from django.db.models import Max, OuterRef, Subquery
 from django.db.models import Q
 from django.forms.models import model_to_dict
+from calendario_guardias.models import MonitorizaApps
 
 
 # crear archivo ZIP
@@ -216,7 +217,10 @@ def verUsuario (request, id):
     print ("-------------------")
     contactoUsuario = Curriculum.objects.using("docLaruex").filter(id_usuario=id).values('id_usuario','id_usuario','id_usuario__first_name','id_usuario__last_name','id_usuario__email','id_usuario__is_active','id_usuario__is_staff','id_usuario__is_superuser','id_usuario__last_login','id_usuario__date_joined','id_usuario__username','id_usuario__password','id_usuario__is_superuser','id_usuario__is_staff','id_usuario__is_active','id_usuario__date_joined','id_usuario__last_login', 'id_contacto', 'id_contacto__id', 'id_contacto__nombre', 'id_contacto__telefono', 'id_contacto__telefono_fijo','id_contacto__email','id_contacto__direccion','id_contacto__info_adicional','id_contacto__puesto','id_contacto__extension', 'id__id_habilitacion',).first()
     
-    habilitacionesUsuario = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id).values('id','tipo','fecha','id_habilitacion','id_habilitacion__id', 'id_habilitacion__titulo')
+    habilitacionesUsuario = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id, id_habilitacion__funcional=0).values('id','tipo','fecha','id_habilitacion','id_habilitacion__id', 'id_habilitacion__titulo')
+
+    # obtener las habilitaciones del usuario descartando aquellas que sean funcionalidades
+    habilitacionesUsuarioFuncionales = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=id, id_habilitacion__funcional=1).values('id','tipo','fecha','id_habilitacion','id_habilitacion__id', 'id_habilitacion__titulo')
 
     contactoUserNombre = Contacto.objects.using("docLaruex").filter(nombre__icontains=nombreyApellidos).values('id','nombre','telefono','telefono_fijo','email','info_adicional','id_habilitacion','puesto','direccion','empresa','extension','img','dni','fecha_nacimiento','tipo_contacto').first()
     
@@ -225,7 +229,7 @@ def verUsuario (request, id):
     print ("-------------------")
     administrador = esAdministrador(request.user.id)
     if (request.user.id == usuario.id) or administrador:
-        return render(request, 'docLaruex/usuario.html', {"itemsMenu": itemsMenu, "usuario": usuario, "contactoUsuario": contactoUsuario, "administrador": administrador, "habilitacionesUsuario": list(habilitacionesUsuario), "contactoUserNombre":contactoUserNombre})
+        return render(request, 'docLaruex/usuario.html', {"itemsMenu": itemsMenu, "usuario": usuario, "contactoUsuario": contactoUsuario, "administrador": administrador, "habilitacionesUsuario": list(habilitacionesUsuario), "contactoUserNombre":contactoUserNombre, "habilitacionesUsuarioFuncionales":list(habilitacionesUsuarioFuncionales)})
     else:
         return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})
 
@@ -372,12 +376,8 @@ Este módulo se encarga de cargar la información de la tabla que muestra todos 
     Se devuelve un JSON con la información de la tabla que muestra todos los objetos disponibles en el sistema que corresponden a las habilitaciones del usuario y que no son de tipo Equipo o Ubicación.
 -------------------------------------------'''
 def DatosObjetos(request):
-    objetos = Objeto.objects.using('docLaruex').filter(id_habilitacion__in=comprobarHabilitaciones(request.user.id)).exclude(tipo__in = ['Equipo', 'Ubicacion']).order_by('-fecha_subida').values('id', 'padre__id', 'padre__nombre',
-                                                                                 'nombre', 'fecha_subida', 'ruta', 'tipo', 'creador__first_name', 'creador__last_name', 'visible', 'icono', 'id_estado__nombre','id_estado__id',  'ruta_editable')
+    objetos = Objeto.objects.using('docLaruex').filter(id_habilitacion__in=comprobarHabilitaciones(request.user.id)).filter(propietario__isnull=True).exclude(tipo__in = ['Equipo', 'Ubicacion', 'Curriculum']).order_by('-fecha_subida').values('id', 'padre__id', 'padre__nombre', 'nombre', 'fecha_subida', 'ruta', 'tipo', 'creador__first_name', 'creador__last_name', 'visible', 'icono', 'id_estado__nombre','id_estado__id',  'ruta_editable')
     return JsonResponse(list(objetos), safe=False)
-
-    
-
 
 '''------------------------------------------
 - Descripción:
@@ -801,7 +801,10 @@ def agregarAnexo(request, id_curriculum):
 
     #actualizamos la base de datos de formaciones asociadas a curriculums   
     print("--- cargo formaciones ---")  
-    formaciones = FormacionCurriculum(id_curriculum=curriculum, titulo=request.POST.get("tituloFormacion"), descripcion=request.POST.get("descripcionFormacion"), horas=request.POST.get("horasFormacion"),  fecha_inicio=request.POST.get("fechaInicioFormacion"), fecha_fin=request.POST.get("fechaFinFormacion"))
+    horas = None
+    if request.POST.get("horasFormacion") != "":
+        horas = request.POST.get("horasFormacion")
+    formaciones = FormacionCurriculum(id_curriculum=curriculum, titulo=request.POST.get("tituloFormacion"), descripcion=request.POST.get("descripcionFormacion"), horas=horas,  fecha_inicio=request.POST.get("fechaInicioFormacion"), fecha_fin=request.POST.get("fechaFinFormacion"))
     formaciones.save(using='docLaruex')  
     print("--- guardo formaciones ---")  
 
@@ -866,7 +869,13 @@ def agregarFormacionCurriculum(request, id_curriculum):
 
     #actualizamos la base de datos de formaciones asociadas a curriculums   
     print("--- cargo formaciones ---")  
-    formaciones = FormacionCurriculum(id_curriculum=curriculum, titulo=request.POST.get("tituloFormacion"), descripcion=request.POST.get("descripcionFormacion"), horas=request.POST.get("horasFormacion"),  fecha_inicio=request.POST.get("fechaInicioFormacion"), fecha_fin=request.POST.get("fechaFinFormacion"))
+    horas = None
+    if request.POST.get("horasFormacion") != "":
+        horas = request.POST.get("horasFormacion")
+    fechaInicio = None
+    if request.POST.get("fechaInicioFormacion") != "":
+        fechaInicio = request.POST.get("fechaInicioFormacion")
+    formaciones = FormacionCurriculum(id_curriculum=curriculum, titulo=request.POST.get("tituloFormacion"), descripcion=request.POST.get("descripcionFormacion"), horas=horas,  fecha_inicio=fechaInicio, fecha_fin=request.POST.get("fechaFinFormacion"))
     formaciones.save(using='docLaruex')  
     print("--- guardo formaciones ---")  
 
@@ -916,8 +925,7 @@ El sistema devolverá una respuesta en formato JSON con la información de los d
 -------------------------------------------'''
 @login_required
 def DatosDocumentos(request):
-    documentos = Documento.objects.using('docLaruex').filter(id_doc__id_habilitacion__in=comprobarHabilitaciones(request.user.id)).order_by('-id_doc').values('id_doc', 'id_doc__nombre', 'id_doc__fecha_subida', 'editable',
-                                                                                 'fecha_actualizacion', 'num_modificaciones', 'id_doc__tipo', 'id_doc__creador__first_name',  'id_doc__creador__last_name', 'id_doc__ruta')
+    documentos = Documento.objects.using('docLaruex').filter(id_doc__id_habilitacion__in=comprobarHabilitaciones(request.user.id), id_doc__propietario__isnull=True).order_by('-id_doc').values('id_doc', 'id_doc__nombre', 'id_doc__fecha_subida', 'editable', 'fecha_actualizacion', 'num_modificaciones', 'id_doc__tipo', 'id_doc__creador__first_name',  'id_doc__creador__last_name', 'id_doc__ruta')
     docsExistentes = []
     salida = []
     for d in documentos:
@@ -1094,11 +1102,12 @@ def ListadoProveedores(request):
     itemsMenu = MenuBar.objects.using("docLaruex").values()
     habilitacionesUsuario = comprobarHabilitaciones(request.user.id)    
     administrador = esAdministrador(request.user.id)
+    secretaria = esSecretaria(request.user.id)
 
     proveedores = Proveedor.objects.using("docLaruex").values()
     # Desde aquí es desde donde se pasan los datos para realizar el bucle que muestra los usuarios/empleados
     if Habilitaciones.objects.using("docLaruex").filter(id__in=habilitacionesUsuario) or administrador:
-        return render(request, 'docLaruex/listaProveedores.html', {"itemsMenu": itemsMenu,"administrador": administrador,"habilitacionesUsuario":list(habilitacionesUsuario),"proveedores":proveedores})
+        return render(request, 'docLaruex/listaProveedores.html', {"itemsMenu": itemsMenu,"administrador": administrador,"habilitacionesUsuario":list(habilitacionesUsuario),"proveedores":proveedores, "secretaria":secretaria})
     else:
         return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})
 
@@ -1119,7 +1128,7 @@ Devuelve los datos de los proveedores en formato JSON.
 @login_required
 def DatosProveedores(request):
     proveedores = Proveedor.objects.using('docLaruex').order_by('id').values(
-        'id','nombre', 'cif', 'direccion', 'telefono', 'telefono_2', 'fax', 'correo', 'correo_2', 'web', 'comentarios')
+        'id','nombre', 'cif', 'direccion', 'telefono', 'telefono_2', 'fax', 'correo', 'correo_2', 'web', 'comentarios', 'baja')
     return JsonResponse(list(proveedores), safe=False)
     
 '''------------------------------------------
@@ -1145,7 +1154,9 @@ def agregarProveedor(request):
     fax = request.POST.get("prefijoFax") + request.POST.get("fax")
 
 
-    nuevoProveedor = Proveedor(nombre=request.POST.get("nombre"),cif=request.POST.get("cif"), telefono=telefono, telefono_2=telefono2, fax=fax, correo=request.POST.get("correo"),correo_2=request.POST.get("correo2"), web=request.POST.get("web"), direccion=request.POST.get("direccion"), comentarios=request.POST.get("comentarios"))
+
+
+    nuevoProveedor = Proveedor(nombre=request.POST.get("nombre"),cif=request.POST.get("cif"), telefono=telefono, telefono_2=telefono2, fax=fax, correo=request.POST.get("correo"),correo_2=request.POST.get("correo2"), web=request.POST.get("web"), direccion=request.POST.get("direccion"), comentarios=request.POST.get("comentarios"), baja=0)
     nuevoProveedor.save(using='docLaruex')
     
     return render(request, 'docLaruex/listaProveedores.html', {"itemsMenu": itemsMenu})
@@ -1169,12 +1180,12 @@ El proveedor debe existir en la base de datos.
 def verProveedor(request, id):
     
     itemsMenu = MenuBar.objects.using("docLaruex").values()
-    proveedor = Proveedor.objects.using('docLaruex').values('id','nombre', 'cif', 'direccion', 'telefono', 'telefono_2', 'fax', 'correo', 'correo_2', 'web', 'comentarios').filter(id=id)[0]
+    proveedor = Proveedor.objects.using('docLaruex').values('id','nombre', 'cif', 'direccion', 'telefono', 'telefono_2', 'fax', 'correo', 'correo_2', 'web', 'comentarios', 'baja').filter(id=id)[0]
 
     return render(
             request,
             "docLaruex/proveedor.html",
-            {"itemsMenu": itemsMenu, "proveedor": proveedor, "administrador": esAdministrador(request.user.id)})
+            {"itemsMenu": itemsMenu, "proveedor": proveedor, "administrador": esAdministrador(request.user.id), "secretaria": esSecretaria(request.user.id)})
 
 
 
@@ -1209,6 +1220,7 @@ def editarProveedor(request, id):
         proveedor.fax = request.POST['nuevoPrefijoFax'] + request.POST['nuevoFax']
         proveedor.correo = request.POST['nuevoCorreo']
         proveedor.correo_2 = request.POST['nuevoCorreo2']
+        proveedor.baja = request.POST['estadoProveedor']
         
         proveedor.web = request.POST['nuevaWeb']
         proveedor.comentarios = request.POST['nuevosComentarios']
@@ -1839,7 +1851,7 @@ Se retorna una lista de objetos JSON con la información de las habilitaciones r
 def DatosHabilitacionesRelacionadas(request, id):   
     if esAdministrador(request.user.id):
         relacionHabilitacionesUsuarios = RelUsuarioHabilitaciones.objects.using('docLaruex').filter(id_usuario=id).order_by('-id_habilitacion').values(
-            'id_habilitacion', 'id_usuario', 'id_usuario__first_name', 'id_usuario__last_name', 'id_usuario__id', 'id_habilitacion__titulo', 'id_habilitacion__id', 'tipo', 'fecha')
+            'id_habilitacion', 'id_usuario', 'id_usuario__first_name', 'id_usuario__last_name', 'id_usuario__id', 'id_habilitacion__titulo', 'id_habilitacion__id', 'tipo', 'fecha', 'id_habilitacion__funcional')
 
         habilitacionesExistentes = []
         salida = []
@@ -1869,7 +1881,7 @@ Se retorna una lista de objetos JSON con la información de las habilitaciones r
 def DatosHabilitaciones(request):
     if esAdministrador(request.user.id):
         habilitaciones = Habilitaciones.objects.using('docLaruex').order_by('id').values(
-            'id','titulo')
+            'id','titulo', 'funcional')
         return JsonResponse(list(habilitaciones), safe=False)
 
 '''------------------------------------------
@@ -1887,7 +1899,13 @@ Se agrega una nueva habilitación con el título especificado en la base de dato
 @login_required
 def agregarHabilitacion(request):
     if esAdministrador(request.user.id):
-        nuevaHabilitacion = Habilitaciones(titulo=request.POST.get("titulo"))
+        funcional = 0 
+        if 'funcional' in request.POST:
+            checkbox = request.POST['funcional']
+            if checkbox == "on":
+                funcional = 1
+
+        nuevaHabilitacion = Habilitaciones(titulo=request.POST.get("titulo"), funcional=funcional)
         nuevaHabilitacion.save(using='docLaruex')
         
         return JsonResponse({"documento": "ok"}, safe=False)
@@ -2006,6 +2024,7 @@ def InfoVerObjeto(request, id):
     secretaria = esSecretaria(request.user.id)
     direccion = esDirector(request.user.id)
 
+
     objeto = Objeto.objects.using("docLaruex").filter(id=id)[0]
     responsables = Responsables.objects.using(
         "docLaruex").order_by('first_name').values('id', 'first_name', 'last_name')
@@ -2021,7 +2040,11 @@ def InfoVerObjeto(request, id):
     procedimientosExistentes = Procedimiento.objects.using(
         "docLaruex").values_list('id_doc__nombre', flat=True).distinct()
 
-
+    print("OBJETO", objeto)
+    print("OBJETO TIPO: ", objeto.padre)
+    print("OBJETO PROPIETARIO: ", objeto.propietario)
+    if (objeto.propietario) and (objeto.propietario.id != request.user.id and not administrador and not direccion):
+        return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})
     #habilitacionNecesaria = comprobarHabilitacionObjeto(id)
     
     if objeto.tipo == "Procedimiento":
@@ -2057,7 +2080,6 @@ def InfoVerObjeto(request, id):
             
             if TareasProgramadas.objects.using("docLaruex").filter(id=registro.id_tarea_programada.id).exists():
                 tarea = TareasProgramadas.objects.using("docLaruex").filter(id=registro.id_tarea_programada.id).values()[0]
-                print('\033[91m'+'tarea: ' + '\033[92m', tarea)
 
         #comprobamos si el formato tiene un cargo
         if formato is not None:
@@ -2075,7 +2097,7 @@ def InfoVerObjeto(request, id):
         habilitacionesUsuario, cargo, rol = comprobarHabilitacion(request.user.id, objeto.id_habilitacion.id)
         formaciones = FormacionCurriculum.objects.using("docLaruex").filter(id_curriculum=id).values('titulo','descripcion','horas','ruta','fecha_inicio','fecha_fin')
         if Curriculum.objects.using("docLaruex").filter(id=id, id_usuario=request.user.id) or (Curriculum.objects.using("docLaruex").filter(id=id) and administrador) or (Curriculum.objects.using("docLaruex").filter(id=id) and direccion):
-            curriculum = Curriculum.objects.using("docLaruex").filter(id=id).values('id','id__id','id_usuario__id', 'id_usuario__first_name', 'id_usuario__last_name', 'id_contacto__id','id_contacto__telefono','id_contacto__telefono_fijo','id_contacto__email','id_contacto__direccion','id_contacto__info_adicional','id_contacto__puesto', 'id_contacto__nombre','id_contacto__extension', 'id__id_habilitacion','id__tipo', 'id__nombre', 'id__tipo','id__ruta').first()
+            curriculum = Curriculum.objects.using("docLaruex").filter(id=id).values('id','id__id','id_usuario__id', 'id_usuario__first_name', 'id_usuario__last_name', 'id_contacto__id','id_contacto__telefono','id_contacto__telefono_fijo','id_contacto__email','id_contacto__direccion','id_contacto__info_adicional','id_contacto__puesto', 'id_contacto__nombre','id_contacto__extension', 'id__id_habilitacion','id__tipo', 'id__nombre', 'id__tipo','id__ruta', 'id__fecha_subida').first()
                  
             media= "/media/archivos"
             return render(
@@ -2174,11 +2196,34 @@ def InfoVerObjeto(request, id):
 
         tarea = None
         registro = None
+        tareas = []
+        
+        registros = []
         if TareasProgramadas.objects.using("docLaruex").filter(id_objeto=str(objeto.id)).exists():
             tarea = TareasProgramadas.objects.using("docLaruex").filter(id_objeto=str(objeto.id)).values('id', 'fecha_proximo_mantenimiento')[0]
+            tareas = TareasProgramadas.objects.using("docLaruex").order_by('fecha_proximo_mantenimiento').filter(id_objeto=str(objeto.id)).values('id', 'fecha_proximo_mantenimiento')
 
-            if RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).exists():
-                registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).order_by('-id').values('id', 'estado', 'estado__id')[0]
+            # comprobamos si tareas tiene más de un elemento
+            if len(tareas) > 1:
+                # tareas = tareas[1:] #eliminamos la primera tarea, pues ya la hemos obtenido antes
+                # obtengo el último registro de cada tarea
+                for t in tareas:
+                    if RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=t['id']).exists():
+                        registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=t['id']).order_by('-id').values('id', 'estado', 'estado__id', 'id_tarea_programada', 'id_tarea_programada','fecha_programada')[0]
+                        # agrego información del evento al registro
+                        registro['evento'] = TareasProgramadas.objects.using("docLaruex").filter(id=t['id']).values('id_evento__nombre','id_evento__id', 'id_evento__tipo_evento','id_evento__procedimiento_asociado', 'id_evento__estado', 'id_evento__periodicidad', 'id_evento__formato_asociado', 'observaciones')[0]
+                        registros.append(registro)
+
+
+            else: 
+                if RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).exists():
+                    registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).order_by('-id').values('id', 'estado', 'estado__id', 'id_tarea_programada', 'fecha_programada')[0]
+                    # agrego información del evento asociado a la tarea
+                    registro['evento'] = TareasProgramadas.objects.using("docLaruex").filter(id=tarea['id']).values('id_evento__nombre','id_evento__id', 'id_evento__tipo_evento','id_evento__procedimiento_asociado', 'id_evento__estado', 'id_evento__periodicidad', 'id_evento__formato_asociado', 'observaciones')[0]
+                    registros.append(registro)
+
+            # if RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).exists():
+            #     registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).order_by('-id').values('id', 'estado', 'estado__id')[0]
 
          #comprobamos si el formato tiene un cargo
         if ubicacion is not None:
@@ -2187,7 +2232,7 @@ def InfoVerObjeto(request, id):
             return render(
                 request,
                 "docLaruex/ubicacion.html",
-                {"itemsMenu": itemsMenu, "ubicacion": ubicacion, "habilitacionesUsuario": list(habilitacionesUsuario),  "media":media, "cargo":cargo, "estados":estados, "administrador":administrador, "habilitaciones":list(habilitaciones), "tipoUbicaciones":list(tipoUbicaciones), "llave":llave, "llavesUbicadas":llavesUbicadas, "tarea":tarea, "registro":registro, "padres":list(padres)}
+                {"itemsMenu": itemsMenu, "ubicacion": ubicacion, "habilitacionesUsuario": list(habilitacionesUsuario),  "media":media, "cargo":cargo, "estados":estados, "administrador":administrador, "habilitaciones":list(habilitaciones), "tipoUbicaciones":list(tipoUbicaciones), "llave":llave, "llavesUbicadas":llavesUbicadas, "tarea":tarea, "registro":registro, "padres":list(padres), "tareas":list(tareas), "registros":list(registros), "itemsRegistros":range(len(registros))}
             )
         else:
             return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})
@@ -2196,12 +2241,32 @@ def InfoVerObjeto(request, id):
     elif objeto.tipo == "Equipo":
         tarea = None
         registro = None
+        registros = []
+        tareas = []
         if TareasProgramadas.objects.using("docLaruex").filter(id_objeto=str(objeto.id)).exists():
             tarea = TareasProgramadas.objects.using("docLaruex").filter(id_objeto=str(objeto.id)).values('id', 'fecha_proximo_mantenimiento')[0]
-
-            if RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).exists():
-                registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).order_by('-id').values('id', 'estado', 'estado__id')[0]
+            tareas = TareasProgramadas.objects.using("docLaruex").order_by('fecha_proximo_mantenimiento').filter(id_objeto=str(objeto.id)).values('id', 'fecha_proximo_mantenimiento')
+        # comprobamos si tareas tiene más de un elemento 
         
+            if len(tareas) > 1:
+                # tareas = tareas[1:] #eliminamos la primera tarea, pues ya la hemos obtenido antes
+                # obtengo el último registro de cada tarea
+                for t in tareas:
+                    if RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=t['id']).exists():
+                        registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=t['id']).order_by('-id').values('id', 'estado', 'estado__id', 'id_tarea_programada', 'id_tarea_programada','fecha_programada')[0]
+                        # agrego información del evento al registro
+                        registro['evento'] = TareasProgramadas.objects.using("docLaruex").filter(id=t['id']).values('id_evento__nombre','id_evento__id', 'id_evento__tipo_evento','id_evento__procedimiento_asociado', 'id_evento__estado', 'id_evento__periodicidad', 'id_evento__formato_asociado', 'observaciones')[0]
+                        registros.append(registro)
+
+
+            else: 
+                if RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).exists():
+                    registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea['id']).order_by('-id').values('id', 'estado', 'estado__id', 'id_tarea_programada', 'fecha_programada')[0]
+                    # agrego información del evento asociado a la tarea
+                    registro['evento'] = TareasProgramadas.objects.using("docLaruex").filter(id=tarea['id']).values('id_evento__nombre','id_evento__id', 'id_evento__tipo_evento','id_evento__procedimiento_asociado', 'id_evento__estado', 'id_evento__periodicidad', 'id_evento__formato_asociado', 'observaciones')[0]
+                    registros.append(registro)
+
+  
         habilitacionesUsuario, cargo, rol = comprobarHabilitacion(request.user.id, objeto.id_habilitacion.id)
         
         #genera un código_laruex consecutivo
@@ -2233,7 +2298,7 @@ def InfoVerObjeto(request, id):
             return render(
                 request,
                 "docLaruex/equipo.html",
-                {"ultimoCodigo": ultimoCodigo,"itemsMenu": itemsMenu, "equipo": equipo, "historicoUbicaciones": historicoUbicaciones, "ubicacionActual":ubicacionActual, "restoUbicaciones":restoUbicaciones, "tipoDocumentos":tipoDocumentos, "ubicaciones":list(ubicaciones), "habilitaciones":list(habilitaciones), "habilitacionesUsuario": list(habilitacionesUsuario),"administrador": administrador, "estados":estados, "cargo":cargo, "proveedores":list(proveedores), "rol":rol, "tarea":tarea, "registro":registro}
+                {"ultimoCodigo": ultimoCodigo,"itemsMenu": itemsMenu, "equipo": equipo, "historicoUbicaciones": historicoUbicaciones, "ubicacionActual":ubicacionActual, "restoUbicaciones":restoUbicaciones, "tipoDocumentos":tipoDocumentos, "ubicaciones":list(ubicaciones), "habilitaciones":list(habilitaciones), "habilitacionesUsuario": list(habilitacionesUsuario),"administrador": administrador, "estados":estados, "cargo":cargo, "proveedores":list(proveedores), "rol":rol, "tarea":tarea, "registro":registro, "tareas":list(tareas), "registros":list(registros), "itemsRegistros":range(len(registros))}
             ) 
         else:
             return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})
@@ -2291,7 +2356,7 @@ def verFabricante(request, id):
     return render(
             request,
             "docLaruex/fabricante.html",
-            {"itemsMenu": itemsMenu, "fabricante": fabricante, "administrador": esAdministrador(request.user.id)})# Devuelve No editable un archivo dado un ID
+            {"itemsMenu": itemsMenu, "fabricante": fabricante, "administrador": esAdministrador(request.user.id), "secretaria":esSecretaria(request.user.id)})# Devuelve No editable un archivo dado un ID
 
 '''------------------------------------------
                                 Módulo: editarFabricante
@@ -2398,7 +2463,7 @@ def editarObjeto(request, id):
     objeto = Objeto.objects.using('docLaruex').filter(id=id)[0]
     administrador = esAdministrador(request.user.id)
 
-    if esAdministrador(request.user.id) or objeto.tipo == "Equipo":
+    if esAdministrador(request.user.id) or objeto.tipo == "Equipo" or objeto.tipo == "Curriculum":
         estados = Estado.objects.using("docLaruex").values()
         habilitaciones = Habilitaciones.objects.using('docLaruex').values()
 
@@ -2548,21 +2613,25 @@ def editarObjeto(request, id):
                     grupo = GrupoEquipos.objects.using("docLaruex").filter(id=request.POST.get("grupoEquipoEditar"))[0]
                     equipo.grupo = grupo
 
+                if request.POST.get("proveedorEquipoEditar"):
+                    proveedor = Proveedor.objects.using("docLaruex").filter(id=request.POST.get("proveedorEquipoEditar"))[0]
+                    equipo.proveedor = proveedor
+
                 if 'altaUexEditar' in request.POST:
                     checkbox = request.POST['altaUexEditar']
                     if checkbox == "on":
                         equipo.alta_uex = 1
                 else:
                     equipo.alta_uex = 0
-
-                if request.POST.get('nuevaImagenEquipo') is None:
+                
+                if 'nuevaImagenEquipo' in request.FILES:
                     if objeto.ruta is not None:
                         # find file name matches with *
+                        rutaImagen = settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
                         imagenOld = glob.glob(settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) +  '.*')
+
                         if imagenOld:
                             os.remove(imagenOld[0])
-                            rutaImagen = settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
-                            imagen = str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
                         subirDocumento(request.FILES['nuevaImagenEquipo'], rutaImagen)
 
                     else:
@@ -2571,10 +2640,19 @@ def editarObjeto(request, id):
                         rutaImagen = settings.MEDIA_ROOT + 'archivos/Equipo/' + str(id) + '.' + request.FILES['nuevaImagenEquipo'].name.split('.')[-1]
                         
                         subirDocumento(request.FILES['nuevaImagenEquipo'], rutaImagen)
-                        objeto.ruta = imagen
-                objeto.save(using="docLaruex")
-                equipo.save(using="docLaruex")
-                return HttpResponseRedirect('/private/docLaruex/verObjeto/'+id+'/') 
+                        objeto.ruta = imagen 
+                    objeto.save(using="docLaruex")
+                    equipo.save(using="docLaruex")
+                    return HttpResponseRedirect('/private/docLaruex/verObjeto/'+id+'/') 
+
+
+                elif 'nuevaImagenEquipo' in request.POST and request.POST['nuevaImagenEquipo'] != "":
+                    equipo.save(using="docLaruex")
+                    return HttpResponseRedirect('/private/docLaruex/verObjeto/'+id+'/') 
+                else: 
+                    equipo.save(using="docLaruex")
+                    return HttpResponseRedirect('/private/docLaruex/verObjeto/'+id+'/') 
+
             
             elif objeto.tipo == "Ubicacion":     
                 ubicacion = Ubicaciones.objects.using('docLaruex').filter(id=id)[0]       
@@ -2769,8 +2847,9 @@ def editarObjeto(request, id):
                 equipo = Equipo.objects.using('docLaruex').filter(id=id)[0]
                 tipoEquipo = TipoEquipo.objects.using('docLaruex').values('id','nombre') 
                 fabricante = Fabricante.objects.using('docLaruex').values('id','nombre')
+                proveedores = Proveedor.objects.using('docLaruex').values('id','nombre')
                 gruposEquipos = GrupoEquipos.objects.using('docLaruex').values('id','nombre')
-                return render(request,"docLaruex/editarEquipo.html",{"itemsMenu": itemsMenu, "equipo": equipo, "tipoEquipo":tipoEquipo, "fabricante":fabricante, "habilitaciones":list(habilitaciones), "administrador":administrador, "gruposEquipos":list(gruposEquipos)})
+                return render(request,"docLaruex/editarEquipo.html",{"itemsMenu": itemsMenu, "equipo": equipo, "tipoEquipo":tipoEquipo, "fabricante":fabricante, "habilitaciones":list(habilitaciones), "administrador":administrador, "gruposEquipos":list(gruposEquipos), "proveedores":list(proveedores)})
 
             elif objeto.tipo == "Ubicacion": 
                 
@@ -3005,10 +3084,11 @@ Retorna un objeto JSON que contiene la lista de archivos asociados a un document
 -------------------------------------------'''
 @login_required
 def archivosAsociados(request, id_documento):
+
     archivoAsociado = RelacionDocumentaciones.objects.using('docLaruex').filter(id_doc__id=id_documento,id_doc__id_habilitacion__in=comprobarHabilitaciones(request.user.id)).values(
-        'id_relacionado', 'id_relacionado__id','id_relacionado__nombre', 'id_relacionado__tipo', 'id_relacionado__id_habilitacion','id_relacionado__id_habilitacion__id','id_relacionado__id_habilitacion__titulo','id_relacionado__creador__last_name', 'id_relacionado__creador__first_name', 'id_relacionado__fecha_subida', 'id_relacionado__id_estado__id', 'id_relacionado__id_estado__nombre')
+        'id_relacionado', 'id_relacionado__id','id_relacionado__nombre', 'id_relacionado__tipo', 'id_relacionado__id_habilitacion','id_relacionado__id_habilitacion__id','id_relacionado__id_habilitacion__titulo','id_relacionado__creador__last_name', 'id_relacionado__creador__first_name', 'id_relacionado__fecha_subida', 'id_relacionado__id_estado__id', 'id_relacionado__id_estado__nombre', 'id_relacionado__propietario')
     archivoAsociadoInverso = RelacionDocumentacionesInverso.objects.using('docLaruex').filter(id_doc__id=id_documento,id_doc__id_habilitacion__in=comprobarHabilitaciones(request.user.id)).values(
-        'id_relacionado', 'id_relacionado__id','id_relacionado__nombre', 'id_relacionado__tipo', 'id_relacionado__id_habilitacion','id_relacionado__id_habilitacion__id','id_relacionado__id_habilitacion__titulo', 'id_relacionado__creador__last_name', 'id_relacionado__creador__first_name', 'id_relacionado__fecha_subida', 'id_relacionado__id_estado__id', 'id_relacionado__id_estado__nombre')
+        'id_relacionado', 'id_relacionado__id','id_relacionado__nombre', 'id_relacionado__tipo', 'id_relacionado__id_habilitacion','id_relacionado__id_habilitacion__id','id_relacionado__id_habilitacion__titulo', 'id_relacionado__creador__last_name', 'id_relacionado__creador__first_name', 'id_relacionado__fecha_subida', 'id_relacionado__id_estado__id', 'id_relacionado__id_estado__nombre', 'id_relacionado__propietario')
     salida = list(archivoAsociado) + list(archivoAsociadoInverso)
     return JsonResponse(salida, safe=False)
 
@@ -3368,7 +3448,7 @@ def eliminarFormato(request, objetoEliminar):
         RegistroTareaProgramada.objects.using('docLaruex').filter(id_formato=formato).delete()
     
 
-    if Eventos.objects.using('docLaruex').filter(procedimiento_asociado=formato).exists():
+    if Eventos.objects.using('docLaruex').filter(formato_asociado=formato).exists():
         evento = Eventos.objects.using('docLaruex').filter(formato_asociado=formato)[0]
         evento.formato_asociado = None
         evento.save(using="docLaruex")
@@ -3820,15 +3900,21 @@ Se crea un nuevo objeto de tipo Documento en la tabla Documentos de la base de d
 def agregarDocumento(request, nuevoObjeto):
     if request.POST.get("tipoDocumento") is not None:
         tipoDocumento=TipoDocumentos.objects.using("docLaruex").filter(id=request.POST.get("tipoDocumento")).get()
+        if tipoDocumento.id == 6 or tipoDocumento.id == 10:
+            print("es un tipo 6")
+            auxPropietario = PropietariosDocumentos.objects.using("docLaruex").filter(id=nuevoObjeto.creador.id).get()
+            nuevoObjeto.propietario = auxPropietario
+            print("Propietario", nuevoObjeto.propietario)
+            nuevoObjeto.save(using='docLaruex')
     else:
         tipoDocumento = TipoDocumentos.objects.using("docLaruex").filter(id=99).get()
 
     # si no hay fecha de actualización obtener fecha actual
     if(request.POST.get("fechaActualizacion") == '' or request.POST.get("fechaActualizacion") == None):
 
-        fechaActualizacion = datetime.now();
+        fechaActualizacion = datetime.now()
     else:
-        fechaActualizacion = request.POST.get("fechaActualizacion");
+        fechaActualizacion = request.POST.get("fechaActualizacion")
     
     if request.POST.get("versionDocumento") is not None:
         nuevoDocumento = Documento(id_doc=nuevoObjeto, editable=request.POST.get(
@@ -4032,6 +4118,44 @@ def subirDocumento(f, destino):
         for chunk in f.chunks():
             destination.write(chunk)
 
+
+'''-------------------------------------------
+                                Módulo: datosCalendario
+
+- Descripción: 
+Proporciona información de las tareas programadas en la vista de calendario
+
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+Devuelve una lista con los eventos que se van a mostrar en el calendario
+
+-------------------------------------------'''
+@login_required
+def datosCalendario(request):
+
+
+    tareas = TareasProgramadas.objects.using('docLaruex').values('id','id_evento__nombre','fecha_proximo_mantenimiento','id_evento__tipo_evento__color')
+    # creo una lista vacía para guardar los datos de los festivos
+    salida = []
+
+    # recorro los festivos y los guardo en la lista
+    for tarea in tareas:
+        # inserto los datos en la lista siguiendo la estructura que requiere el calendario
+        fechaFormateada = tarea['fecha_proximo_mantenimiento'].strftime("%Y-%m-%d")
+        salida.append({
+            'id':tarea['id'],
+            'title':tarea['id_evento__nombre'],
+            'start':fechaFormateada,
+            'color':'#ffffff',
+            'borderColor': tarea['id_evento__tipo_evento__color'],
+            'textColor': tarea['id_evento__tipo_evento__color']            
+        })
+
+    # devuelvo la lista en formato json
+    return JsonResponse(salida, safe=False)                
+
 '''-------------------------------------------
                                 Módulo: calendario
 
@@ -4047,7 +4171,10 @@ El usuario debe estar autenticado.
 @login_required
 def calendario(request):
     itemsMenu = MenuBar.objects.using("docLaruex").values()
-    return render(request, "docLaruex/fullCalendar.html",{"itemsMenu":itemsMenu})
+    return render(request, "docLaruex/calendario.html",{"itemsMenu":itemsMenu})
+
+
+
 
 '''-------------------------------------------
                                 Módulo: consultarArchivo
@@ -4064,9 +4191,13 @@ El usuario debe estar autenticado.
 @login_required
 def consultarArchivo(request, id):
     objeto = Objeto.objects.using('docLaruex').filter(id=id)[0]
+        
+    administrador = esAdministrador(request.user.id)
+    direccion = esDirector(request.user.id)
+
     ruta = settings.MEDIA_ROOT + 'archivos/' + objeto.tipo + '/' + objeto.ruta
     # compruebo si la ruta devuelve algo 
-    if os.path.exists(ruta):
+    if os.path.exists(ruta) and ((not objeto.propietario) or (objeto.propietario.id == request.user.id or administrador or direccion)):
         return FileResponse(open(ruta, 'rb'))
     else:
         return JsonResponse({'status': 'error', 'message': 'El archivo no esta disponible, compruebe que la ruta y el archivo tengan la misma extensión'})
@@ -4876,7 +5007,7 @@ def verItemStock (request, id):
     datas = []
     fechas = []
 
-    datos = RelStockProveedores.objects.using("docLaruex").filter(item=id).values('proveedor__nombre', 'coste', 'cantidad', 'unidad__nombre', 'fecha')
+    datos = RelStockProveedores.objects.using("docLaruex").filter(item=id).values('proveedor__nombre', 'coste', 'cantidad', 'unidad__nombre', 'fecha', 'coste_unitario')
     for dato in datos:
         labels.append(dato["proveedor__nombre"])
         datas.append("Precio: " + str(dato["coste"]) +" \n"+ "Cantidad: " + str(dato["cantidad"]) + " \n"+ "Formato: " + str(dato["unidad__nombre"]))
@@ -4884,9 +5015,9 @@ def verItemStock (request, id):
 
 
     itemStock = Stock.objects.using("docLaruex").filter(id=id).values('id','item','descripcion','num_contenedor','num_estanteria','id_ubicacion','id_ubicacion__id__nombre','id_ubicacion__id','unidad__id','unidad__nombre','cantidad', 'min_cantidad', 'categoria','categoria__categoria','avisado','urgente').first()
-    infoProveedor = RelStockProveedores.objects.using("docLaruex").filter(item=id).values('id','fecha','coste','proveedor','proveedor__id','proveedor__nombre', 'proveedor__telefono','cantidad','unidad')
+    infoProveedor = RelStockProveedores.objects.using("docLaruex").filter(item=id).values('id','fecha','coste','proveedor','proveedor__id','proveedor__nombre', 'proveedor__telefono','cantidad','unidad', 'coste_unitario')
     proveedores = Proveedor.objects.using("docLaruex").order_by('nombre').values('id','nombre')
-    ultimoProveedor = RelStockProveedores.objects.using("docLaruex").filter(item=id).order_by('-fecha').values('id','fecha','coste','proveedor','proveedor__id','proveedor__nombre', 'proveedor__telefono','cantidad','unidad').first()
+    ultimoProveedor = RelStockProveedores.objects.using("docLaruex").filter(item=id).order_by('-fecha').values('id','fecha','coste','proveedor','proveedor__id','proveedor__nombre', 'proveedor__telefono','cantidad','unidad', 'coste_unitario', 'unidad__nombre').first()
     
 
     habilitacionesUsuario = RelUsuarioHabilitaciones.objects.using("docLaruex").filter(id_usuario=request.user.id).values('id','tipo','fecha','id_habilitacion','id_habilitacion__id', 'id_habilitacion__titulo')
@@ -4920,7 +5051,9 @@ def agregarStock(request):
     nuevoStock.save(using='docLaruex')
 
     if request.POST.get("informacionProveedor") == "1":
-        nuevoProveedor = RelStockProveedores(item=nuevoStock, fecha=request.POST.get("fechaCompraProveedor"), coste=request.POST.get("costeProveedor"), proveedor=Proveedor.objects.using('docLaruex').get(id=request.POST.get("proveedor")), cantidad=cantidad, unidad=unidad)
+        costeTotal = request.POST.get("costeProveedor")
+        costeUnitario = float(costeTotal) / float(cantidad)
+        nuevoProveedor = RelStockProveedores(item=nuevoStock, fecha=request.POST.get("fechaCompraProveedor"), coste=costeTotal, proveedor=Proveedor.objects.using('docLaruex').get(id=request.POST.get("proveedor")), cantidad=cantidad, unidad=unidad, coste_unitario=costeUnitario)
         nuevoProveedor.save(using='docLaruex')
     return listadoStock(request)
 
@@ -4937,7 +5070,7 @@ El usuario debe estar autenticado.
 
 -------------------------------------------''' 
 @login_required
-def retirarStock (request, item):  
+def retirarStock(request, item):  
     error = None
     objetoItem = Stock.objects.using("docLaruex").filter(id=item).get()
     objetoEmpleado = AuthUser.objects.using("docLaruex").filter(id=request.POST['empleadoQueRetira']).get()
@@ -4958,6 +5091,35 @@ def retirarStock (request, item):
     stock.save(using="docLaruex")
 
     return redirect('docLaruex:docLaruexVerItemStock', id=item)
+
+
+'''-------------------------------------------
+                                Módulo: devolverStock
+
+- Descripción: 
+
+
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+
+-------------------------------------------''' 
+@login_required
+def devolverStock(request, id):
+    administrador = esAdministrador(request.user.id)
+    if administrador:
+        retirada = RegistroRetiradaStock.objects.using("docLaruex").filter(id=id).get()
+        item = retirada.item.id
+        cantidad = retirada.cantidad
+        stock = Stock.objects.using('docLaruex').filter(id=item)[0]
+        stock.cantidad += cantidad
+        stock.save(using="docLaruex")
+        retirada.delete()
+        return redirect('docLaruex:docLaruexVerItemStock', id=item)
+    else:
+        return redirect('docLaruex:docLaruexAccesoDenegado')
+ 
  
 
 
@@ -5031,7 +5193,7 @@ def agregarUnidadesStockProveedor (request, item):
     stock.cantidad += float(request.POST['cantidadAgregadaProveedor'])
     stock.save(using="docLaruex")
     
-    nuevoProveedor =  RelStockProveedores(item=stock, fecha=request.POST.get("fechaAgregarStockProveedor"), coste=request.POST.get("costeAgregarStockProveedor"), proveedor=Proveedor.objects.using('docLaruex').get(id=request.POST.get("proveedorAgregarStock")), cantidad=request.POST['cantidadAgregadaProveedor'], unidad=stock.unidad)
+    nuevoProveedor =  RelStockProveedores(item=stock, fecha=request.POST.get("fechaAgregarStockProveedor"), coste=request.POST.get("costeAgregarStockProveedor"), proveedor=Proveedor.objects.using('docLaruex').get(id=request.POST.get("proveedorAgregarStock")), cantidad=request.POST['cantidadAgregadaProveedor'], unidad=stock.unidad, coste_unitario=request.POST.get("costeUnitarioAgregarStockProveedor"))
     nuevoProveedor.save(using='docLaruex')
 
     return HttpResponseRedirect('/private/docLaruex/verItemStock/'+item+'/')
@@ -5040,7 +5202,6 @@ def agregarUnidadesStockProveedor (request, item):
                                 Módulo: DatosRetiradasStock
 
 - Descripción: 
-
 
 - Precondiciones:
 El usuario debe estar autenticado.
@@ -5092,7 +5253,6 @@ El usuario debe estar autenticado.
 -------------------------------------------'''
 @login_required
 def editarStock(request, id):
-
     itemsMenu = MenuBar.objects.using("docLaruex").values()
     itemStock = Stock.objects.using('docLaruex').filter(id=id)[0]
     ubicaciones = Ubicaciones.objects.using('docLaruex').order_by('-id__padre').values('id','tipo_ubicacion', 'tipo_ubicacion__nombre','id__nombre', 'id__padre__nombre', 'id__padre__id', 'id__padre')
@@ -5100,8 +5260,7 @@ def editarStock(request, id):
     unidades = UnidadesStock.objects.using('docLaruex').order_by('nombre').values()
 
     if request.method == 'POST':
-        print("POST", request.POST)
-        itemStock.nombre = request.POST['nuevoNombre']
+        itemStock.item = request.POST['nuevoNombre']
         itemStock.id_ubicacion =  Ubicaciones.objects.using("docLaruex").filter(id=request.POST['nuevaUbicacion'])[0]
         itemStock.categoria = CategoriasStock.objects.using("docLaruex").filter(id=request.POST['nuevaCategoria'])[0]
         
@@ -5145,7 +5304,7 @@ El usuario debe estar autenticado.
 @login_required
 def DatosHistoricoProveedores(request, id):
     itemStock = Stock.objects.using("docLaruex").filter(id=id)[0]
-    historicoProveedores =RelStockProveedores.objects.using("docLaruex").filter(item=itemStock).values('fecha', 'coste', 'proveedor__id', 'proveedor__nombre', 'cantidad', 'unidad__nombre')
+    historicoProveedores =RelStockProveedores.objects.using("docLaruex").filter(item=itemStock).values('fecha', 'coste', 'proveedor__id', 'proveedor__nombre', 'cantidad', 'unidad__nombre', 'coste_unitario')
     return JsonResponse(list(historicoProveedores), safe=False)
             
 '''-------------------------------------------
@@ -5166,6 +5325,39 @@ def eliminarStock(request, id):
     RegistroRetiradaStock.objects.using('docLaruex').filter(item=stock).delete()
     stock.delete(using="docLaruex")
     return eliminadoExito(request)
+
+
+'''------------------------------------------
+                                Módulo: solicitarMaterial
+
+- Descripción: 
+Este módulo se encarga de obtener una lista de todas las habilitaciones existentes en el sistema y mostrarla en una vista HTML.
+
+- Precondiciones:
+El usuario debe estar autenticado y haber iniciado sesión en el sistema. Además, el usuario debe tener permisos de administrador en el sistema.
+
+- Postcondiciones:
+El sistema devolverá una vista HTML con la lista de todas las habilitaciones existentes en el sistema. Si el usuario no tiene permisos de administrador, se le mostrará una vista HTML de acceso denegado.
+-------------------------------------------'''
+@login_required
+def solicitarMaterial(request):
+    itemsMenu = MenuBar.objects.using("docLaruex").values()
+    usuarios = AuthUser.objects.using("docLaruex").order_by('first_name').values()
+    administrador = esAdministrador(request.user.id)
+    itemsAlmacenes = list(Stock.objects.using("docLaruex").filter(cantidad__lt=F('min_cantidad')).values('id','item','descripcion','num_estanteria','num_contenedor','id_ubicacion','id_ubicacion__id__nombre','id_ubicacion__id','unidad__id','unidad__nombre','cantidad', 'min_cantidad', 'categoria', 'categoria__id'))
+
+    habilitaciones = Habilitaciones.objects.using("docLaruex").order_by('titulo').values()
+    # Desde aquí es desde donde se pasan los datos para realizar el bucle que muestra los usuarios/empleados
+    if administrador:
+        return render(request, 'docLaruex/solicitarMaterial.html', {"itemsMenu": itemsMenu,  "administrador": administrador,"usuarios":usuarios, "habilitaciones":habilitaciones, "itemsAlmacenes":itemsAlmacenes})
+    else:
+        return render(request,"docLaruex/accesoDenegado.html", {"itemsMenu": itemsMenu})
+
+@login_required
+def materialDisponible(request):
+    stockDisponible = Stock.objects.using('docLaruex').order_by('id').values('id', 'item', 'descripcion', 'num_contenedor', 'num_estanteria', 'id_ubicacion__id__nombre', 'id_ubicacion__id', 'unidad__nombre', 'cantidad', 'min_cantidad', 'categoria__categoria')
+    return JsonResponse(list(stockDisponible), safe=False)
+
 
 '''-------------------------------------------
                                 Módulo: contacto
@@ -5615,19 +5807,22 @@ def DarBajaEquipo(request,id):
     fecha_baja=datetime.now()
     if 'fechaBaja' in request.POST:
         fecha_baja=request.POST.get("fechaBaja")
-    fecha_fin_mantenimiento=datetime.now()
-    
-    tarea = TareasProgramadas.objects.using('docLaruex').filter(id_objeto=id)[0]
-    estadoCancelado = EstadoTareas.objects.using("docLaruex").filter(id=5)[0]
-    estados = [1,2,4]
 
-    registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea, estado__id__in=estados)[0]
+    fecha_fin_mantenimiento=datetime.now()
+
+    if TareasProgramadas.objects.using('docLaruex').filter(id_objeto=id).exists():
+        tarea = TareasProgramadas.objects.using('docLaruex').filter(id_objeto=id)[0]
+        estadoCancelado = EstadoTareas.objects.using("docLaruex").filter(id=5)[0]
+        estados = [1,2,4]
+
+        registro = RegistroTareaProgramada.objects.using("docLaruex").filter(id_tarea_programada=tarea, estado__id__in=estados)[0]
     
-    registro.fecha=fecha_fin_mantenimiento
-    registro.estado = estadoCancelado
-    registro.observaciones = "Mantenimiento cancelado por baja del equipo. \nMotivo: " + request.POST.get("motivoBaja")
-    registro.empleado = AuthUser.objects.using("docLaruex").filter(id=request.user.id)[0]
-    registro.save(using='docLaruex')
+        registro.fecha=fecha_fin_mantenimiento
+        registro.estado = estadoCancelado
+        registro.observaciones = "Mantenimiento cancelado por baja del equipo. \nMotivo: " + request.POST.get("motivoBaja")
+        registro.empleado = AuthUser.objects.using("docLaruex").filter(id=request.user.id)[0]
+        registro.save(using='docLaruex')
+
     Equipo.objects.using('docLaruex').filter(id=id).update(fecha_baja=fecha_baja, motivo_baja=request.POST.get("motivoBaja"))
     
     return ListadoObjetosPorTipo(request,"Equipo")
@@ -6870,7 +7065,7 @@ ModelChoiceField: Campo para selección de un objeto de modelo.
 ModelMultipleChoiceField: Campo para selección múltiple de objetos de modelo.
 '''
 
-def crearFieldTipo(tipo):
+def crearFieldTipo(tipo, opciones=None):
     if tipo == "datetime":
         return forms.DateTimeField(input_formats=['%d/%m/%Y %H:%M:%S'], widget=forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}))
     elif tipo == "date":
@@ -6887,7 +7082,9 @@ def crearFieldTipo(tipo):
     elif tipo == "float":
         return forms.FloatField(widget=forms.NumberInput(attrs={'type': 'number', 'step':'0.01', 'placeholder':'15.23', 'class':'form-control'}))
     elif tipo == "select":
-        return forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control'}))
+        #return forms.ChoiceField(widget=forms.Select(attrs={'class':'form-control'}))
+        return forms.ChoiceField(choices=[(opcion, opcion) for opcion in opciones], widget=forms.Select(attrs={'class':'form-control'}))
+
     elif tipo == "file":
         return forms.FileField(widget=forms.FileInput(attrs={'class':'form-control-file'}))
     else:
@@ -6897,8 +7094,22 @@ def crearFieldTipo(tipo):
 
 def form_from_json(json_data):
     form = forms.Form()
-    for field in json_data:
-        form.fields[field] = crearFieldTipo(json_data[field])
+    saltar = False
+    for field, tipo in json_data.copy().items():
+        if saltar:
+            saltar = False
+        else:
+            print("field:", field)
+            print("--- tipo:", tipo)
+            if tipo == "select":
+                print("es un select")
+                opciones = json_data.get(f"{field}_opciones", [])  # Puedes agregar opciones específicas para cada campo "select"
+                print("opciones:", opciones)
+                form.fields[field] = crearFieldTipo(tipo, opciones)
+                saltar = True
+            else:
+                form.fields[field] = crearFieldTipo(tipo)
+
     return form
 
 
@@ -6930,16 +7141,13 @@ def DatosEquiposUbicaciones(request):
 
 - Descripción: 
 
-
 - Precondiciones:
 El usuario debe estar autenticado.
 
 - Postcondiciones:
-
 -------------------------------------------'''
 @login_required
 def DatosEquiposUbicacionesFiltro(request, tipo):
-    
     tipoFiltrado = tipo.split(',')
     equipos = Equipo.objects.using('docLaruex').filter(id__id_habilitacion__in=comprobarHabilitaciones(request.user.id), id__tipo__in=tipoFiltrado).order_by('-id').values('id', 'id__padre','id__nombre', 'id__ruta', 'id__fecha_subida','id__tipo','tipo_equipo__nombre', 'cod_laruex', 'id__creador', 'id__id_estado', 'cod_uex', 'id__icono', 'fabricante', 'fabricante__nombre', 'num_serie', 'descripcion','fecha_alta','fecha_baja', 'precio','modelo', 'id__padre__nombre')  
     print('\033[91m'+'equipos: ' + '\033[92m', equipos)
@@ -7343,4 +7551,144 @@ def datosTareasProximas(request):
         
 
     return JsonResponse(list(tareasFiltradas), safe=False)
+
+
+
+'''------------------------------------------
+                                Módulo: verMantenimientosAsociados
+
+- Descripción: 
+Este módulo se encarga de mostrar la información de los mantenimientos asociados a una ubicación o a un equipo.
+
+- Precondiciones:
+El usuario debe haber iniciado sesión.
+Se debe haber seleccionado una ubicacion u equipo existente en la base de datos para visualizar su información.
+
+- Postcondiciones:
+Se debe mostrar la información detallada del objeto seleccionado.
+El objeto debe existir debe existir en la base de datos.
+Deben existir mantenimientos asociados en la base de datos de lo contrario mostrá una página que indica que no existen.
+-------------------------------------------'''   
+@login_required
+def verMantenimientosAsociados(request, id):
+    itemsMenu = MenuBar.objects.using("docLaruex").values()
+
+    if TareasProgramadas.objects.using("docLaruex").filter(id_objeto=id).exists():
+        
+        objeto = Objeto.objects.using('docLaruex').filter(id=id)[0]
+
+        return render(request,"docLaruex/listaMantenimientosAsociados.html",{"itemsMenu": itemsMenu, "objeto":objeto, "administrador": esAdministrador(request.user.id)})
+    else:
+        return render(request,"docLaruex/404_sinMantenimientos.html", {"itemsMenu": itemsMenu})
+
+
+'''------------------------------------------
+                                Módulo: datosMantenimientosAsociados
+
+- Descripción: 
+Este módulo es utilizado para obtener una lista de tareas en el sistema que pueden ser asociados a una habilitación específica. Retorna una lista de objetos JSON con la información de las tareas.
+
+- Precondiciones:
+ 
+El usuario debe estar autenticado en el sistema.
+
+- Postcondiciones:
+
+Se retorna una lista de objetos JSON con la información de los usuarios.
+
+-------------------------------------------'''       
+@login_required
+def datosMantenimientosAsociados(request,id):
+        mantenimientos = TareasProgramadas.objects.using("docLaruex").filter(id_objeto=id,id_objeto__id_habilitacion__in=comprobarHabilitaciones(request.user.id), id_evento__estado__id=2).values( 'id', 'id_evento', 'id_evento__id', 'id_evento__nombre', 'id_evento__tipo_evento__nombre', 'id_evento__procedimiento_asociado', 'id_evento__procedimiento_asociado__id_doc__nombre', 'fecha_proximo_mantenimiento', 'fecha_ultimo_mantenimiento', 'fecha_inicial','id_objeto', 'id_objeto__id', 'id_objeto__nombre', 'id_objeto__tipo', 'id_evento__periodicidad__id', 'id_evento__periodicidad__cantidad', 'id_evento__periodicidad__unidad')
+        return JsonResponse(list(mantenimientos), safe=False)
+
+
+'''------------------------------------------
+                                Módulo: operatividadAplicaciones
+
+- Descripción: 
+Este módulo se encarga de mostrar una lista de aplicaciones que se están ejecutando en el sistema.
+
+- Precondiciones:
+El usuario debe estar autenticado.
+
+- Postcondiciones:
+Se muestra la lista de aplicaciones que se están ejecutando en el sistema.
+-------------------------------------------'''
+@login_required
+def operatividadAplicaciones(request):
+    itemsMenu = MenuBar.objects.using("docLaruex").values()    
+    administrador = esAdministrador(request.user.id)
+    return render(request, 'docLaruex/listaOperatividadAplicaciones.html', {"itemsMenu": itemsMenu, "administrador": administrador})
+
+
+'''------------------------------------------
+                                Módulo: DatosOperatividadAplicaciones
+
+- Descripción: 
+Este módulo es utilizado para obtener el listado de procesos que se están ejecutando en el sistema.
+
+- Precondiciones:
+El usuario debe haber iniciado sesión en la aplicación.
+
+- Postcondiciones:
+Devuelve los datos de los fabricantes de equipos en formato JSON.
+
+-------------------------------------------'''
+@login_required
+def datosOperatividadAplicaciones(request):
+
+    apps = MonitorizaApps.objects.using('guardias').order_by('nombre').annotate(proxima_ejecucion = F('proxima_ejecucion_utc'), ultima_ejecucion = F('ultima_ejecucion_utc')).values('nombre','descripcion', 'nombre_proceso', 'proxima_ejecucion', 'ultima_ejecucion', 'segundos_ejecucion', 'num_periodos_alarma', 'ejecutar', 'nombre_ejecutable')
+
+    return JsonResponse(list(apps), safe=False)
+
+
+'''------------------------------------------
+                                Módulo: paralizarProcesoAplicaciones
+
+- Descripción: 
+Este módulo se encarga de paralizar un proceso de la base de datos.
+
+- Precondiciones:
+El usuario debe estar autenticado y ser administrador.
+
+- Postcondiciones:
+Paraliza el proceso de la base de datos y redirige a la página de operatividad de aplicaciones.
+-------------------------------------------'''
+@login_required
+def paralizarProcesoAplicaciones(request, proceso, nombre):
+
+    administrador = esAdministrador(request.user.id)
+    if not administrador:
+        return render(request,"docLaruex/accesoDenegado.html")
+
+    procesoSeleccionado = MonitorizaApps.objects.using('guardias').filter(nombre_proceso=proceso).filter(nombre_ejecutable=nombre)[0]
+    procesoSeleccionado.ultima_ejecucion_utc = None
+    procesoSeleccionado.proxima_ejecucion_utc = None
+    procesoSeleccionado.save(using='guardias')
+
+    return redirect('docLaruex:docLaruexOperatividadAplicaciones')
+
+
+    '''------------------------------------------
+                                Módulo: eliminarProcesoAplicaciones
+
+- Descripción: 
+Este módulo se encarga de eliminar un proceso de la base de datos.
+- Precondiciones:
+El usuario debe estar autenticado y ser administrador.
+
+- Postcondiciones:
+elimina el proceso de la base de datos y redirige a la página de operatividad de aplicaciones.
+-------------------------------------------'''
+@login_required
+def eliminarProcesoAplicaciones(request, proceso, nombre):
+    administrador = esAdministrador(request.user.id)
+    if not administrador:
+        return render(request,"docLaruex/accesoDenegado.html")
+
+    procesoSeleccionado = MonitorizaApps.objects.using('guardias').filter(nombre_proceso=proceso).filter(nombre_ejecutable=nombre)[0]
+    procesoSeleccionado.delete(using='guardias')
+
+    return redirect('docLaruex:docLaruexOperatividadAplicaciones')
 

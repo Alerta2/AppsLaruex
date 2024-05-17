@@ -1,0 +1,185 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block imports %}
+{% endblock %}
+{% block content %}
+
+  <div class="row d-flex justify-content-center">
+    <div class="col col-lg-11 col-xl-11">
+      <div class="card card-plain">
+        <div class="card-header pb-0 text-left bg-transparent">
+          <h1 class="font-weight-bolder text-primary text-gradient">Relación de días solicitados</h1>
+          <p class="mb-0">Información sobre los dias solicitados por los empleados</p>
+        </div>
+        <div class="card-body">
+          <table  id="relacion-empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script> 
+var admin = "{{ administrador }}";
+var year = "{{ year }}";
+$("#relacion-empleados").bootstrapTable({
+  method: "get",
+  locale: navigator.language,
+  url: "{% url 'timetrackpro:datos-dias-totales-empleados' year=year %}",
+  cache: false, 
+  columns: [{
+      title: "Empleado",
+      field: "empleado",
+      align: "left",
+      width:"5",
+      sortable: true,
+      formatter: function(value, row) {
+        var nombre = row.empleado.nombre;
+        var apellidos = row.empleado.apellidos;
+        var textNombre = "";
+        textNombre = '<h6 class="text-sm mb-0"><i class="fa fa-user-circle text-secondary fa-lg me-2" aria-hidden="true"></i>'+nombre + " "+ apellidos +'</h6>';
+        var divNombre = '<div>'+textNombre +'</div>';
+        return divNombre ;
+      }
+    },
+    {
+      title: "Dias de Asuntos propios Solicitados",
+      field: "asuntosPropios",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      formatter: function(value, row) {
+        var asuntosPropiosTotales = 7;
+        var asuntosPropios = row.asuntosPropios;
+        var textNombre = "";
+        if (asuntosPropios >= asuntosPropiosTotales){
+          textNombre = '<h6 class="text-sm mb-0 text-danger">'+asuntosPropios + "/" + asuntosPropiosTotales +'</h6>';
+        }
+        else{
+          textNombre = '<h6 class="text-sm mb-0">'+asuntosPropios + "/" + asuntosPropiosTotales +'</h6>';
+        }
+        var divNombre = '<div>'+textNombre +'</div>';
+        return divNombre ;
+      }
+    },
+    {
+      title: "Ausencias Solicitadas",
+      field: "ausencias",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      formatter: function(value, row) {
+        var ausencias = row.ausencias;
+        var divNombre = '<div><h6 class="text-sm mb-0">'+ausencias +'</h6></div>';
+        if (ausencias == 0){
+          var divNombre = '<div><h6 class="text-sm mb-0">--</h6></div>';
+        }
+        return divNombre ;
+      }
+    },
+    {
+      title: "Dias Recuperables Solicitados",
+      field: "diasRecuperables",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      formatter: function(value, row) {
+        var asuntosPropios = row.asuntosPropiosRecuperables;
+        var divNombre = '<div><h6 class="text-sm mb-0"> -- </h6></div>';
+        if (asuntosPropios != 0){
+          divNombre = '<div><h6 class="text-sm mb-0 text-danger">'+asuntosPropios +'</h6></div>';
+        }
+        return divNombre ;
+      }
+    },
+    {
+      title: "Dias de Vacaciones Solicitados",
+      field: "vacaionesSolicitadas",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      formatter: function(value, row) {
+        var vacacionesTotales = 22
+        var vacaciones = row.vacaciones;
+        var textNombre = "";
+        if (vacaciones >= vacacionesTotales){
+          textNombre = '<h6 class="text-sm mb-0 text-danger">'+vacaciones + "/" + vacacionesTotales +'</h6>';
+        }
+        else{
+          textNombre = '<h6 class="text-sm mb-0">'+vacaciones + "/" + vacacionesTotales +'</h6>';
+        }
+
+        var divNombre = '<div>'+textNombre +'</div>';
+        return divNombre ;
+      }
+    },
+    {
+      title: "Semana Santa",
+      field: "hora",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      width:"100",
+      formatter: function(value, row) {
+        var disfrutadas = row.semanaSanta;
+        switch(disfrutadas){
+          case 0:
+            estado = '<span class="badge badge-xs bg-gradient-secondary">No Disfrutadas</span>'
+            break;
+          case 1:
+            estado = '<span class="badge badge-xs bg-gradient-warning">Solicitadas</span>'
+            break;
+          case 2:
+            estado = '<span class="badge badge-xs bg-gradient-danger">Disfrutadas</span>'
+            break;
+          default:
+            estado = '<span class="badge badge-xs bg-gradient-secondary">--</span>'
+        }
+
+        var divNombre = '<div><h6 class="text-xs mb-0">'+estado +'</h6></div>';
+
+        return divNombre ;
+      }
+    },
+    {
+      title: "Navidad",
+      field: "hora",
+      halign:"center",
+      sortable: true,
+      align: "center",
+      width:"100",
+      formatter: function(value, row) {
+        var disfrutadas = row.navidad;
+        switch(disfrutadas){
+          case 0:
+            estado = '<span class="badge badge-xs bg-gradient-secondary">No Disfrutadas</span>'
+            break;
+          case 1:
+            estado = '<span class="badge badge-xs bg-gradient-warning">Solicitadas</span>'
+            break;
+          case 2:
+            estado = '<span class="badge badge-xs bg-gradient-danger">Disfrutadas</span>'
+            break;
+          default:
+            estado = '<span class="badge badge-xs bg-gradient-secondary">--</span>'
+        }
+        var divNombre = '<div><h6 class="text-xs mb-0">'+estado +'</h6></div>';
+        return divNombre ;
+      }
+    },
+  ],
+  search: true,
+  pagination: true,
+  onPostHeader: function() {
+    // Agregar la clase al elemento th-inner de las cabeceras
+    $('#relacion-empleados th').find('.th-inner').addClass('wrap-text');
+  }
+
+
+
+});
+
+</script>
+
+{% endblock %}

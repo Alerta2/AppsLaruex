@@ -272,3 +272,5 @@ class ZonaMeteoalertaAemet(models.Model):
         managed = False
         db_table = 'zona_meteoalerta_aemet'
         unique_together = (('id_zona_meteo_aemet', 'nombre'),)
+
+

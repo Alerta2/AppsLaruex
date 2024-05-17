@@ -1,0 +1,193 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-header pb-0 d-flex align-items-center">
+            <h5>Errores al fichar Registrados</h5>
+      </div>
+      <div class="card-body px-0 pt-0 pb-2">
+        <div class="table-responsive p-0">
+          
+
+          <div class="mx-4">
+            <div id="toolbar">
+  
+              <button class="botonLink" onclick="irA(2)">
+                <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+                <div class="text text-sm">Notificar error</div>
+              </button>
+            </div>
+
+            <table  id="tabla_errores_insertados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+idFilter = '{{idFilter}}';
+
+  url = '{% url "timetrackpro:datos-errores-notificados" %}';
+
+  if (idFilter != 'None') {
+    url = "{% url 'timetrackpro:datos-errores-notificados' %}" + idFilter ;
+  }
+
+console.log(url)
+$("#tabla_errores_insertados").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: url ,
+    cache: false, 
+    columns: [
+      {
+        title: "Empleado",
+        field: "id_empleado__nombre",
+
+        halign:"left",
+        sortable: true,
+        align: "left",
+        width:"30",
+        formatter: function(value, row) {
+          var nombreEmpleado = row.id_empleado__nombre;
+          var id = row.id_empleado__id;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombreEmpleado+'</h6><p class="text-xs text-secondary mb-0">ID: '+ id +'</p></div>';
+          return div;
+        }
+      },
+      {
+        title: "Fecha de error",
+        field: "hora",
+        align: "center",
+        width:"40",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.hora;
+
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+          // obtengo la hora
+          var hora = fechaLectura.split("T")[1].split("Z")[0];
+          hora = hora.split(":")[0] + ":" + hora.split(":")[1];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha + ' '+ hora+'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Motivo",
+        align: "center",
+        formatter: function(value, row) {
+          var motivo = row.motivo;      
+          var div = '<span class="text-sm font-weight-bold text-wrap mb-0">'+ motivo +'</span>';
+          return div;
+        }
+      },{
+        title: "Notificado por",
+        align: "center",
+        width:"40",
+        formatter: function(value, row) {
+          var insertador = row.quien_notifica__first_name + " " + row.quien_notifica__last_name;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ insertador +'</span>';
+          return div;
+        }
+
+      },
+      {
+        title: "Estado",
+        align: "center",
+        width:"40",
+        formatter: function(value, row) {
+          var estado = row.estado;
+          var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
+          
+          if (estado == 2)
+            var div = '<span class="badge badge-sm bg-gradient-warning">Rechazado</span>';
+          
+          if (estado == 3)
+          var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
+
+          return div;
+        }
+      },
+      {
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+
+          var botonVer = '<a href="/private/timetrackpro/ver-error-registro-notificado/' + row.id + '/" class="mx-1" title="ver error"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+
+          return botonVer;
+                  
+
+        },
+      },
+    ],
+    search: true,
+    
+  });
+
+
+
+function mostrarNombreRegistro() {
+  var archivoInput = document.getElementById('archivoSeleccionado');
+  var selector = document.getElementById('selectorDocumento');
+  var etiqueta = document.getElementById('labelRegistroSeleccionado');
+  var nombreArchivo = document.getElementById('nombreArchivoSeleccionado');
+
+  if (archivoInput.files && archivoInput.files[0]) {
+    var lector = new FileReader();
+
+
+    selector.style.display = 'none';
+    //eliminar atributo hidden de la etiqueta
+    etiqueta.removeAttribute("hidden");
+    nombreArchivo.innerHTML = archivoInput.files[0].name;
+
+    lector.readAsDataURL(archivoInput.files[0]);
+  } 
+}
+
+function irA(opcion) {
+  switch (opcion) {
+      case 2:
+        // abrir en una nueva pestaña
+        //window.location.href = "{% url 'timetrackpro:empleados' %}";
+        window.open("{% url 'timetrackpro:notificar-error-fichaje' %}", "_blank");
+
+        break;
+      default:
+        break;
+  }
+}
+
+
+
+</script>
+
+{% endblock %}

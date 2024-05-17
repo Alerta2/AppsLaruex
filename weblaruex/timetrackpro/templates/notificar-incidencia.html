@@ -1,0 +1,65 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+<h3 class="font-weight-bolder text-info text-gradient">Hola {{request.user.first_name}} {{request.user.last_name}}</h3>
+<p class="mb-4" id="textSeleccionado">Rellena el siguiente formulario para reportar la incidencia detectada.</p>  
+
+
+  <div class="page-header min-vh-75">
+       
+    <div class="container"> 
+  
+      <form action="{{formulario}}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="row">
+          <div class="col-8 mx-auto">
+            <div class="card bg-gradient-dark" id="mesYearDiv">
+              <div class="card-body">
+                <div class="row">
+                  <div class="mb-3">
+                    <input type="number" class="form-control" id="idEmpleado" name="idEmpleado" value="{{request.user.id}}" aria-label="Año al que aplica" aria-describedby="text-addon" hidden>                  
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="mb-3">
+
+                  <label class="col-form-label text-white">Descripción del problema</label>
+
+                  <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Describe detalladamente el problema detectado" id="motivoError" name="motivoError" aria-describedby="text-addon" rows="10" maxlength="900" required></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="mx-auto pb-3">
+
+                <button class="btn btn-outline-white  p-2 mx-2 mb-0" type="submit" data-bs-toggle="tooltip" data-bs-placement="top" title="Notificar error" id="notificarError" disabled>
+                  Notificar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+    </form>
+    </div>
+  </div>
+
+<script>
+
+  // compruebo si en textarea de motivoEliminación hay algo escrito
+  // si hay algo escrito, habilito el boton de guardar
+  // si no hay nada escrito, deshabilito el boton de guardar
+  $(document).ready(function(){
+    $('#motivoError').keyup(function(){
+      if($(this).val().length > 10)
+        $('#notificarError').attr('disabled', false);
+    })
+  });
+
+
+ </script>
+
+
+{% endblock %}

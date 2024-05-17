@@ -277,7 +277,6 @@
           <div class="row d-flex justify-content-center">
             <div class=" card col-md-auto shadow-lg rounded">
               <h6  class="pt-2 d-flex justify-content-center" style="background-color: #ffffff;">   
-              
                 {% if cargo == "Técnico" or cargo == "Responsable" or administrador%}
                   {% if formato.editable == 1 %}
                     <!-- Boton que actualizar el formato  -->
@@ -768,7 +767,7 @@
 
             <!-- Footer del ModalAsociarFormato -->
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">
+              <button id="formularioAsociarFormatoCerrar"  type="button" class="btn btn-secondary" data-dismiss="modal">
                 Cerrar
               </button>
               <button type="submit" value="submit" class="btn btn-primary">
@@ -2088,6 +2087,7 @@
 
 
   $("#formularioAsociarFormato").submit(function (e) {
+    e.preventDefault();
     console.log("envio el formato");
     // capturamos la información del formulario 
     var data = new FormData(this);
@@ -2103,6 +2103,8 @@
       success: function (data) {
         console.log("He agregado el formato");
         console.log(data);
+        $('formularioAsociarFormatoCerrar').trigger('click');
+        location.reload();
       }
     });
   });

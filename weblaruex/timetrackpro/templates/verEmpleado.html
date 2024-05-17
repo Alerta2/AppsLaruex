@@ -1,0 +1,427 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+  <div class="row d-flex justify-content-center">
+    <div class="col-12 col-xl-4 d-flex align-items-center">
+        <div class="d-block shadow-xl border-radius-xl">
+          {% if usuario.img %}
+          <img src="{% static 'img/timetrackpro/usuarios/' %}{{usuario.img}}" alt="img-blur-shadow" class="img-fluid shadow border-radius-xl">
+          {% else %}
+          <img src="{% static 'img/timetrackpro/usuarios/not_found.jpeg' %}" alt="img-blur-shadow" class="img-fluid shadow border-radius-xl h-75">
+          {% endif %}
+        </div>
+    </div>
+    <div class="col-12 col-xl-4">
+      {% if not userDjango%}
+        <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+          <div class="row">
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalAsociarUsuario">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-link fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Asociar Usuario</div>
+            </button>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+        
+
+      <div class="card">
+        <div class="card-header pb-0 p-3">
+          <div class="row">
+            <div class="col-md-8 d-flex align-items-center">
+              <div class="row">
+                
+                <h6 class="mb-2">
+                  {% if empleado %}   
+                  {{empleado.id_usuario.nombre}} {{empleado.id_usuario.apellidos}}
+                    
+                    {% if empleado.id_auth_user.is_active %}
+                    <i class="text-success text-gradient text-md font-weight-bold fa-solid fa-circle-check"></i>
+                    {% else %}
+                    <i class="icon-danger font-weight-bold fa-solid fa-exclamation fa-xl" title="no tiene asociado usuario, tarjeta o usuario de la app"></i>
+                    {% endif %}
+
+                  {% else %}
+                  {{usuario.nombre}} {{usuario.apellidos}}
+                    <i class="icon-danger font-weight-bold fa-solid fa-exclamation fa-xl" title="no tiene asociado usuario, tarjeta o usuario de la app"></i>
+                  {% endif %}
+
+                </h6>
+
+              </div>
+            </div>
+            {% if administrador  %}
+            <div class="col-md-4 text-end">
+              <a href="{% url 'timetrackpro:editar-empleado' id=usuario.id %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar datos del empleado">
+                <i class="fa-solid fa-user-pen text-secondary fa-xl"></i>
+              </a>
+
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="card-body pt-0 p-3" >
+            <p class="text-sm">
+              {{usuario.puesto}}
+            </p>
+            
+            <p class="text-sm"><strong class="text-dark">Fecha de alta: </strong>{{usuario.fecha_alta_app|date:"d M Y"}}</p>
+            
+            {% if usuario.fecha_baja_app %}
+              <p class="text-sm"><strong class="text-dark">Fecha de baja: </strong>{{usuario.fecha_baja_app|date:"d M Y"}}</p>
+            {% endif %}
+      
+        </div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header pb-0 p-3">
+        </div>
+        <div class="card-body pt-0 p-3">
+          <ul class="list-group">
+
+            <li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">D.N.I:</strong> &nbsp;{{usuario.dni}}</li>
+
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-sm"><strong class="text-dark">Fecha de Nacimiento:</strong> &nbsp;{{usuario.fecha_nacimiento|date:"d M Y"}}</li>
+
+            
+            <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Dirección:</strong> &nbsp; {{usuario.direccion}}</li>
+
+            {% if usuario.extension %}
+            <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Extensión:</strong> &nbsp; {{usuario.extension}}</li>
+            {% endif %}
+
+            <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Teléfono:</strong> &nbsp; +34 {{usuario.telefono|slice:"0:3"}} {{usuario.telefono|slice:"3:6"}} {{usuario.telefono|slice:"6:9"}}</li>
+
+            {% if usuario.telefono2 %}
+            <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Teléfono:</strong> &nbsp; +34 {{usuario.telefono2|slice:"0:3"}} {{usuario.telefono2|slice:"3:6"}} {{usuario.telefono2|slice:"6:9"}}</li>
+            {% endif %}
+
+            <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Email:</strong> &nbsp; {{usuario.email}}</li>
+
+            {% if usuario.email2 %}
+            <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Email:</strong> &nbsp; {{usuario.email2}}</li>
+            {% endif %}
+
+            {% if usuario.info_adicional %}
+            <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Información adicional</strong></li>
+            <li class="list-group-item border-0 ps-0 text-sm">{{usuario.info_adicional}}</li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+      {% if empleado.id_tarjeta_acceso %}
+      <div class="card mt-4">
+        <div class="card-header pb-0 p-3">
+          
+          <div class="row">
+            <div class="col-md-8 d-flex align-items-center">
+              <div class="row">
+                
+                <h6 class="mb-2">
+                  Tarjeta de acceso 
+
+                </h6>
+              </div>
+            </div>
+            {% if administrador %}
+            <div class="col-md-4 text-end">
+              <a href="{% url 'timetrackpro:editar-empleado' id=usuario.id %}">
+                <i class="fa-kit fa-solid-address-card-pen text-secondary fa-xl" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar datos tarjeta de acceso"></i>
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-body pt-0 p-3">
+          <p class="text-md">
+            
+            {% if empleado.id_tarjeta_acceso.activo == 1 %}
+            <i class="text-success text-gradient text-md font-weight-bold fa-solid fa-address-card"></i>
+            <strong class="text-success">{{empleado.id_tarjeta_acceso.id_tarjeta|slice:"0:4"}} {{empleado.id_tarjeta_acceso.id_tarjeta|slice:"4:8"}}</strong>
+
+            {% else %}
+            <i class="text-danger text-gradient text-sm font-weight-bold fa-solid fa-address-card"></i>
+            <strong class="text-danger">{{empleado.id_tarjeta_acceso.id_tarjeta|slice:"0:4"}} {{empleado.id_tarjeta_acceso.id_tarjeta|slice:"4:8"}}</strong>
+
+            {% endif %}
+            
+          </p>
+          <p class="text-md">
+
+            {% if tarjeta.fecha_alta %}
+            <p class="text-sm"><strong class="text-dark">Activada: </strong>{{tarjeta.fecha_alta|date:"d M Y"}}</p>
+            {% endif %}
+
+            {% if tarjeta.fecha_baja %}
+            <p class="text-sm"><strong class="text-dark">Desactivada: </strong>{{tarjeta.fecha_baja|date:"d M Y"}}</p>
+            {% endif %}
+          </p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="col-12 mt-4">
+      <div class="card mb-4">
+        <div class="card-header pb-0 p-3">
+          <h4>Accesos y permisos</h4>
+        </div>
+        <div class="card-body p-3 ">
+          <div class="row">
+            <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+              <div class="card card-blog card-plain">
+                <div class="card-body px-1 pb-0">
+                  <h5>Fichar</h5>
+                  <p class="mb-4 text-sm">Maquinas donde el empleado puede registrar la entrada y salida de su jornada laboral.</p>
+                  <ul class="list-group">
+
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" {% if empleado.id_empleado.maquina_laboratorio == 1 %} checked {% endif %} disabled>                       
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >Laboratorio</label>
+                        </div>                
+                      </div>
+                    </li> 
+
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" {% if empleado.id_empleado.maquina_alerta2 == 1 %} checked {% endif %} disabled>                       
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >Alerta2</label>
+                        </div>
+                      </div>
+                    </li> 
+
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" {% if empleado.id_empleado.maquina_departamento == 1 %} checked {% endif %} disabled>
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >Departamento</label>
+                        </div>
+                      </div>
+                    </li> 
+                    
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+              <div class="card card-blog card-plain">
+                <div class="card-body px-1 pb-0">
+                  <h5>Acceso a instalaciones</h5>
+                  <p class="mb-4 text-sm">Localizaciones con acceso restringido a las que el usuario tiene acceso.</p>
+                  <ul class="list-group">
+                    
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.acceso_laboratorios == 1 %} checked {% endif %} disabled>                       
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >Laboratorio</label>
+                        </div>                
+                      </div>
+                    </li> 
+
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.acceso_alerta2 == 1 %} checked {% endif %} disabled>                       
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >Alerta2</label>
+                        </div>                
+                      </div>
+                    </li> 
+
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" {% if tarjeta.acceso_cpd == 1 %} checked {% endif %} disabled>                       
+                        <div class="form-check form-switch ps-0">
+                          <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" >CPD</label>
+                        </div>                
+                      </div>
+                    </li> 
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-xl-0 mb-4">
+              <div class="card card-blog card-plain">
+                <div class="card-body px-1 pb-0">
+                  <h5>Permisos de Django</h5>
+                  <p class="mb-4 text-sm">Permisos propios de las aplicaciones Django que tiene el usuario, esto no se corresponde con las habilitaciones</p>
+                  <ul class="list-group">
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault" {% if userDjango.is_superuser == 1 %} checked {% endif %} disabled>
+                        <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault">SuperUser</label>
+                      </div>
+                    </li>
+                    <li class="list-group-item border-0 px-0">
+                      <div class="form-check form-switch ps-0">
+                        <input class="form-check-input ms-auto" type="checkbox" id="flexSwitchCheckDefault1" {% if userDjango.is_staff == 1 %} checked {% endif %} disabled>
+                        <label class="form-check-label text-body ms-3 text-truncate w-80 mb-0" for="flexSwitchCheckDefault1">Staff</label>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalAsociarUsuario" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAsociarUsuario"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Asociar a {{usuario.nombre}} {{usuario.apellidos}}</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioAsociarUsuario" action="{% url 'timetrackpro:asociar-usuario' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group">
+            <input type="text" class="form-control" id="userApp" name="userApp" data-rule="required" readonly
+              value="{{usuario.id}}" style="display: none;" />
+          </div>
+          <div class="row">
+            <div class="col-xl-4">
+              <label class="text-sm">Nombre en máquinas de registro</label>
+
+              {% if empleado %} 
+                <input class="form-control" type="text" name="empleado_maquina" value="{{empleado.id_empleado.id}}" hidden>
+                <input class="form-control" type="text" value="{{empleado.id_empleado.nombre}}" readonly>
+                    
+              {% else %}
+              <select class="form-select" data-rule="required" id="empleado_maquina" name="empleado_maquina" {% if empleado %} disabled {% endif %}>
+                {% for e in empleados %}
+                <option value="{{e.id}}" >
+                  {{e.nombre}} 
+                </option>
+                {% endfor %}
+              </select>
+              {% endif %}
+
+            </div>
+            <div class="col-xl-4">
+              <label class="text-sm">Identificador en la aplicación</label>
+              {% if empleado.id_auth_user %} 
+                  <input type="text" name="usuariosDjango" value="{{empleado.id_auth_user.id}}" hidden>
+                  <input type="text" value="{{empleado.id_auth_user.first_name}} {{empleado.id_auth_user.last_name}}" readonly>
+                    
+              {% else %}
+              <select class="form-select" data-rule="required" id="usuariosDjango" name="usuariosDjango" {% if empleado.id_auth_user %} disabled {% endif %}>
+                <option value="0">Sin usuario en apps Django</option>
+                {% for u in usuariosApp %}
+                <option value="{{u.id}}" >
+                  {{u.first_name}} {{u.last_name}}
+                </option>
+                {% endfor %}
+              </select>
+              {% endif %}
+            </div>
+            
+            <div class="col-xl-4">
+
+
+                {% if empleado.id_tarjeta_acceso %} 
+                  <input type="text" name="tarjeta_empleado" value="{{ empleado.id_tarjeta_acceso.id}}" hidden>
+                {% else %}
+                <label class="text-sm">Tarjeta identificativa</label>
+                <select class="form-select" id="tarjeta_empleado" name="tarjeta_empleado"  onchange="mostrarDatosTarjeta()" {% if tarjeta %} disable  {% endif %}>
+                    <option value="0" selected>
+                      Sin tarjeta
+                    </option>
+                    {% for t in tarjetas %}
+                      <option value="{{t.id}}">
+                        {{ t.nombre }} {{ t.apellidos }} - {{ t.id_tarjeta }}
+                      </option>
+                    {% endfor %}
+                </select>
+                {% endif %}
+
+            </div>
+          </div>
+
+          <div class="row mt-4" id="datosIDTarjeta" {% if not tarjeta %} hidden {% endif %} >
+            <div class="col text-center ">
+              <i class="fa-solid fa-address-card icon-colored-info font-weight-bold fa-xl"></i>
+              {% if tarjeta %} 
+              <label class="text-sm align-middle ">{{tarjeta.id_tarjeta}}</label>
+              {% else %}
+              <label class="text-sm align-middle" id="label_id_tarjeta"></label>
+              {% endif %}
+            </div>
+          </div>
+          <div class="row" id="datosNombreTarjeta" {% if not tarjeta %} hidden {% endif %}>
+            <div class="col text-center">
+              <i class="fa-solid fa-user icon-colored-info font-weight-bold fa-xl"></i>
+              
+              {% if tarjeta %} 
+              <label class="text-sm align-middle ">{{tarjeta.nombre}} {{tarjeta.apellidos}}</label>
+              {% else %}
+              <label class="text-sm align-middle" id="label_nombre_tarjeta"></label>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary">Guardar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+  function mostrarDatosTarjeta() {
+    var divDatosTarjeta = document.getElementById("datosIDTarjeta");
+    var divDatosNombreTarjeta = document.getElementById("datosNombreTarjeta");
+
+    // mostrar el div
+    divDatosTarjeta.removeAttribute("hidden");
+    divDatosNombreTarjeta.removeAttribute("hidden");
+
+    // Obtén el elemento select
+    var select = document.getElementById("idTarjeta");
+
+    // Obtén la opción seleccionada
+    var selectedOption = select.options[select.selectedIndex];
+
+    // Obtén el texto de la opción seleccionada
+    var optionText = selectedOption.text.trim();
+
+    // Separa el texto en las partes correspondientes (nombre, apellido y número de tarjeta)
+    var parts = optionText.split('-');
+    var nombreApellidos = parts[0];
+    console.log(nombreApellidos);
+    var numeroTarjeta = parts[1];
+
+    // Obtén el elemento label para el número de tarjeta
+    var labelIdTarjeta = document.getElementById("label_id_tarjeta");
+
+    // Obtén el elemento label para el nombre y apellido de la tarjeta
+    var labelNombreApellidoTarjeta = document.getElementById("label_nombre_tarjeta");
+
+    // Asigna los valores a los labels correspondientes
+    labelIdTarjeta.innerHTML = numeroTarjeta;
+    labelNombreApellidoTarjeta.innerHTML = nombreApellidos;
+  }
+  </script>
+
+{% endblock %}

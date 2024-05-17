@@ -1,0 +1,970 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block imports %}
+  <!-- fullcalendar-->
+<!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.9/index.global.min.js'></script> -->
+<link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" />
+<script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar.js' %}"></script>
+<script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar_es.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_mesual.css' %}" />
+  <!-- disponible para configuración servidor-->
+  <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
+{% endblock %}
+{% block content %}
+  <div class="row d-flex justify-content-center">
+    <div class="col-12 col-xl-6 ">
+        <div class="d-block shadow-xl border-radius-xl">
+          <div class="row ">
+            <div class="col m-3">
+
+              <div id="calendarioMensual">
+              </div>
+            </div>
+
+          </div>
+      </div>
+    </div>
+    <div class="col-12 col-xl-6">
+      {% if not userDjango%}
+      <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+        <div class="row">
+          {% if asuntos %}
+          <div class="col">
+           <button class="botonLinkFestivos" data-toggle="modal" data-target="#modalSolicitarModificarAsuntosPropios">             
+            <div class="sign-Btn-link">
+              <i class="fa-kit fa-solid-calendar-days-pen fa-lg ms-2" style="color: #ffffff;"></i></div>
+            <div class="text text-sm">Solicitar cambio</div>
+          </button>
+          </div>
+          {% endif %}
+          <div class="col">
+          <button class="botonLink" data-toggle="modal" data-target="#modalSolicitarAsuntosPropios">    
+            
+            <div class="sign-Btn-link">
+              <i class="fa-solid fa-plus fa-lg " style="color: #ffffff;"></i>
+          </div>
+            <div class="text text-sm">Solicitar días</div>
+          </button>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if administrador or director %}
+      <div class="card">
+        <div class="card-header pb-0 p-3">
+          <div class="row">
+            <div class="col-md-8 d-flex align-items-center">
+              <div class="row">
+                <h5 class="mb-2">
+                  Días asuntos propios solicitados por los empleados
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body pt-0 p-3" >
+          <div class="table-responsive ms-3 me-3">
+            <table id="asuntos_propios_empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+          </div>
+        </div>
+      </div>
+        
+    {% endif %}
+      
+    {% if not director %}
+      <div class="card mt-2">
+        <div class="card-header pb-0 p-3">
+          <div class="row">
+            <div class="col-md-8 d-flex align-items-center">
+              <div class="row">
+                <h5 class="mb-2">
+                  Días asuntos propios solicitados 
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body pt-0 p-3" >
+          <div class="table-responsive ms-3 me-3">
+            <table  id="asuntos_propios_solicitados" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+      {% if cambios %} 
+ 
+      <div class="card mt-4">
+        <div class="card-header pb-0 p-3">
+          <div class="row">
+            <div class="col-md-8 d-flex align-items-center">
+              <div class="row">
+                
+                <h5 class="mb-2">
+                  Cambio Solicitados
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body pt-0 p-3" >
+          <div class="table-responsive ms-3 me-3">
+
+            <table  id="ausencias_solicitadas" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[5,10, 25, 50, 100, All]" data-toolbar="#toolbar" data-filter-control="true"></table>
+          </div>     
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+  <div id="modalSolicitarAsuntosPropios" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalSolicitarAsuntosPropios"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Solicitar días de asuntos propios</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioSolicitarAsuntosPropios" action="{% url 'timetrackpro:solicitar-asuntos-propios' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-6">
+              <label class="col-form-label">Fecha de inicio</label>
+              <div class="">
+                <input type="date" class="form-control" aria-label="Fecha inicial de las vacaciones"
+                  aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            
+            <div class="col-xl-6 mt-2"   >
+              <input type="number" class="form-control" name="dias_consumidos" id="dias_consumidos"  min="1" required hidden>
+
+              <button type="button" class="btn btn-primary " id="botonMostarColumnaOculta" onclick="mostrarColumnaOculta(this.id, 'colFechaFin' )">Solicitar varios dias</button>
+              <div class="" id="colFechaFin" hidden>
+                <label class="col-form-label">Fecha de fin</label>
+
+                <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
+                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" onchange="calcularDias('fecha_inicio','fecha_fin', 'dias_consumidos')">
+              </div>  
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6 col-md-4">
+              <label for="recuperable" class="col-form-label">¿Es recuperable?</label>
+                <select class="form-control" id="recuperable" name="recuperable">
+                  <option value="0" selected>No</option> 
+                  <option value="1">Si</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-4">
+              <label for="sustituto" class="col-form-label">Sustituto</label>
+              <input id="inputSustituto" list="sustitutos" class="form-select">
+              <input type="number" id="sustituto" name="sustituto"  class="form-control" hidden>
+              <datalist id="sustitutos">
+                <option data-id="0">Ninguno</option>
+                {% for s in sustitutos %}
+                <option data-id="{{s.id}}">{{s.nombre}} {{s.apellidos}}</option>
+                {% endfor %}
+              </datalist>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label class="col-form-label">Tareas a sustituir</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique las tareas que deben ser sustituidas." id="tareas_a_sustituir" name="tareas_a_sustituir" aria-describedby="text-addon"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="row" id="descripcionRecuperacion" hidden>
+            <div class="col" >
+              <label class="col-form-label">Indique cómo va a recuperar las horas</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique como va a recuperar los días solicitados." id="descripcion" name="descripcion" aria-describedby="text-addon"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn btn-primary" id="guardarSolicitarAsuntosPropios" disabled>Guardar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalSolicitarModificarAsuntosPropios" tabindex="-2" role="dialog" class="modal fade modal-lg" aria-labelledby="modalSolicitarModificarAsuntosPropios"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modificar Asuntos propios</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioModificarVacaciones" action="{% url 'timetrackpro:solicitar-modificar-asuntos-propios' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row  d-flex justify-content-center">
+            <div class="col-xl-10">
+              <label class="col-form-label">Seleccione el día de asuntos propios</label>
+              {{ asuntos|json_script:"listaAsuntos" }}
+              
+              <div class=" mb-2">
+                <select class="form-control" aria-label="Nombre en el dispositivo" id="asuntos_modificar"
+                name="asunto_modificar" aria-describedby="text-addon" onchange="mostrarInfoAsunto()" >
+                {% for a in asuntos %} 
+
+                <option value="{{a.id}}">{% if a.fecha_fin != a.fecha_inicio %} Del {{a.fecha_inicio|date:"d M"}} al {{a.fecha_fin|date:"d M Y"}}{% else %} {{a.fecha_inicio}} {% endif %}</option>
+                
+                {% endfor %}
+
+              </select>
+              
+              </div>
+
+            </div>
+          </div>
+          
+          <div class="row d-flex justify-content-center mb-2">
+            <div class="col-xl-4"  id="divFechaInicioActual" hidden>
+              <label class="col-form-label text-muted">Fecha inicio actual</label>
+
+              <input type="date" class="form-control" name="fechaActualInicio" id="fechaActualInicio"  style="background-color: #dbdbdf;">
+            </div>
+            <div class="col-xl-4"  id="divFechaFinActual" hidden>
+              <label class="col-form-label text-muted">Fecha fin actual</label>
+              <input type="date" class="form-control" name="fechaActualFin" id="fechaActualFin" style="background-color: #dbdbdf;" >
+            </div>
+            
+            <div class="col-xl-2"  id="divDiasActualesConsumidos" hidden>
+              <label class="col-form-label text-muted">Dias</label>
+
+              <input type="number" class="form-control" name="dias_actuales_consumidos" id="dias_actuales_consumidos"  min="1"  style="background-color: #dbdbdf;">
+
+            </div>
+
+          </div>
+
+          <div class="row d-flex justify-content-center mb-2">
+            <div class="col-xl-5">
+              <label class="col-form-label">Nueva fecha de inicio</label>
+
+              <input type="date" class="form-control" name="fechaInicioNueva" id="fechaInicioNueva" >
+            </div>
+            <div class="col-xl-5">
+              <label class="col-form-label">Nueva fecha de fin</label>
+
+              <input type="date" class="form-control" name="fechaFinNueva" id="fechaFinNueva"  onchange="calcularDias('fechaInicioNueva','fechaFinNueva', 'dias_nuevos_consumidos')">
+              <input type="number" class="form-control" name="dias_nuevos_consumidos" id="dias_nuevos_consumidos"  min="1" hidden>
+
+            </div>
+          </div>
+          <div class="row d-flex justify-content-center">
+            <div class="col-xl-10">
+              <label class="col-form-label">Motivo de la solicitud</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique cual es el motivo por el que desea solicitar un cambio en sus vacaciones" id="motivo_cambio" name="motivo_cambio" aria-describedby="text-addon" required></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit" class="btn btn-primary" id="guardarModificarAsuntosPropios" disabled>Guardar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <! -- Modal Agregar Festivo -->
+  <div id="modalAgregarAsuntosPropiosDesdeCalendario" tabindex="-1" role="dialog" class="modal fade modal-lg"
+    aria-labelledby="modalAgregarAsuntosPropiosDesdeCalendario" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:agregar-asuntos-propios-desde-calendario' %}" method="POST"
+      enctype="multipart/form-data">
+      {% csrf_token %}
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="tituloModalAgregarDesdeCalendario"></h5>
+              <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <input class="form-control" type="text" id="year_actual" name="year_actual" hidden>
+                <div class="col-xl-6">
+                  <label class="col-form-label">Fecha de inicio</label>                  
+                  <div class="">
+                    <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                      aria-describedby="text-addon" name="fecha_inicio_seleccionada" id="fecha_inicio_seleccionada" onchange="calcularDias('fecha_inicio_seleccionada','fecha_fin_seleccionada', 'dias_seleccionados_consumidos')">
+                  </div>
+                </div>
+                <div class="col-xl-6">
+                  <label class="col-form-label">Fecha de Fin</label>                  
+                  <div class="">
+                    <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                      aria-describedby="text-addon" name="fecha_fin_seleccionada" id="fecha_fin_seleccionada"  onchange="calcularDias('fecha_inicio_seleccionada','fecha_fin_seleccionada', 'dias_seleccionados_consumidos')">
+                      <input type="number" class="form-control" name="dias_seleccionados_consumidos" id="dias_seleccionados_consumidos"  min="1" hidden>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-6 col-md-4">
+                  <label for="recuperable_calendario" class="col-form-label">¿Es recuperable?</label>
+                    <select class="form-control" id="recuperable_calendario" name="recuperable_calendario">
+                      <option value="0" selected>No
+                      </option>
+                      <option value="1">Si
+                      </option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-4">
+                  <label for="sustituto_calendario" class="col-form-label">Sustituto</label>
+                  <input id="inputSustitutoCalendario" list="sustitutos_calendario" class="form-select">
+                  <input type="number" id="sustituto_calendario" name="sustituto_calendario"  class="form-control" hidden>
+                  <datalist id="sustitutos_calendario">
+                    <option data-id="0">Ninguno</option>
+                    {% for s in sustitutos %}
+                    <option data-id="{{s.id}}">{{s.nombre}} {{s.apellidos}}</option>
+                    {% endfor %}
+                  </datalist>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <label class="col-form-label">Tareas a sustituir</label>
+                  <div class="mb-3">
+                    <textarea type="text" class="form-control" placeholder="Indique las tareas que deben ser sustituidas." id="tareas_a_sustituir_calendario" name="tareas_a_sustituir_calendario" aria-describedby="text-addon"></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="row" id="descripcionRecuperacionCalendario" hidden>
+                <div class="col" >
+                  <label class="col-form-label">Descripcion</label>
+                  <div class="mb-3">
+                    <textarea type="text" class="form-control" placeholder="Indique como va a recuperar los días solicitados." id="descripcion_calendario" name="descripcion_calendario" aria-describedby="text-addon"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="modal-footer">
+              {% if user.is_authenticated %}
+              <button type="submit" value="submit" class="btn btn-primary">Guardar</button>
+              {% endif %}
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
+            </div>
+        </div>
+      
+      </form>
+    </div>
+  </div>
+
+  <div id="modalCambiarEstado" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalCambiarEstado"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modificar el estado de la solicitud</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioCambiarEstado" action="/private/timetrackpro/cambiar-estado-vacaciones/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto">
+              <p class="text-md text-italic text-dark font-weight-bold">Información de la solicitud:</p>
+              <p class="text-sm text-italic text-secondary font-weight-bold font-italic" id="infoModificarNombre"></p>
+              <p class="text-sm text-italic text-secondary font-weight-bold font-italic" id="infoModificarInicio"></p>
+              <p class="text-sm text-italic text-secondary font-weight-bold font-italic" id="infoModificarFin"></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Nuevo estado</label>
+              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
+                
+                <option value="9">Pendiente</option>
+                <option value="10">Rechazado</option>
+                <option value="11">Aceptado</option>
+              </select>
+            </div>
+            
+          </div>
+          <div class="row" id="rowMotivo" >
+            <div class="col-xl-8 mx-auto my-2"  >
+              <label class="text-sm" id="labelMotivo">Motivo del cambio de estado </label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el error" aria-label="Indique el motivo por el que se ha modificado el error" id="motivo" name="motivo" aria-describedby="text-addon"></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonModificar" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+<script>
+  mostrarTextArea();
+  function mostrarTextArea (){
+    if($('#estado').val() == 10){
+      
+      $('#botonModificar').attr('disabled', true);
+      $('#rowMotivo').show();
+      $('#motivo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+    }else{
+      
+      $('#botonModificar').attr('disabled', false);
+      
+      $('#rowMotivo').hide();
+    }
+  }
+  
+
+  function mostrarColumnaOculta(id, columna){
+    console.log(id)
+    console.log(columna)
+    // Ocultar el botón
+    document.getElementById(id).hidden = true;
+    // Mostrar la columna específica
+    document.getElementById(columna).hidden = false;
+  }
+
+  
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarDiv = document.getElementById('calendarioMensual');
+    var initialDate = '{{initialDate}}';
+    var calendar = new FullCalendar.Calendar(calendarDiv, {
+      initialDate: initialDate, // will be parsed as local
+      themeSystem: 'bootstrap5',
+      events: "{% url 'timetrackpro:datos-calendario-asuntos-propios' %}",      
+      eventTextColor: '#2f5d6e', // color del texto de los eventos
+      height: 650, // indico el maximo de alto que puede tener el calendario
+      locale: 'es', // el idioma del calendario
+      handleWindowResize: true, // si se puede redimensionar el calendario
+      initialView: 'dayGridMonth', // la vista inicial del calendario
+      buttonText: { // los textos de los botones
+        today: 'Hoy',
+        month: 'Mes',
+        day: 'Día',
+      }, 
+      headerToolbar: { // la barra superior donde se encuentra el titulo y los botones
+        left: 'prev,next',
+        center: 'title',
+        right:'today',
+      },
+      // Esta función se ejecutará cuando se haga clic en un día en el calendario         
+      dateClick: function(info) {
+        // se obtiene la fecha seleccionada
+        const meses = {
+            "01": "Enero",
+            "02": "Febrero",
+            "03": "Marzo",
+            "04": "Abril",
+            "05": "Mayo",
+            "06": "Junio",
+            "07": "Julio",
+            "08": "Agosto",
+            "09": "Septiembre",
+            "10": "Octubre",
+            "11": "Noviembre",
+            "12": "Diciembre",
+          };
+        // se obtiene la fecha seleccionada
+        var dia = info.dateStr.substring(8, 10);
+        dia = dia.replace(/^0+/, '');
+        var mes = meses[info.dateStr.substring(5, 7)];
+        var year = info.dateStr.substring(0, 4);
+
+        // se muestra el modal para agregar el festivo
+        var label = document.getElementById("tituloModalAgregarDesdeCalendario");
+        label.innerHTML = "Solicitar " + dia + " de " + mes + " del " + year + " como día de asuntos propios";
+
+        // se obtiene el año actual
+        var yearActual = document.getElementById("year_actual");
+        yearActual.value = year;
+
+        var fechaInicio = document.getElementById("fecha_inicio_seleccionada");
+        fechaInicio.value = info.dateStr;
+
+        var fechaFin = document.getElementById("fecha_fin_seleccionada");
+        fechaFin.value = info.dateStr;
+
+        var diasConsumidos = document.getElementById("dias_seleccionados_consumidos");
+        diasConsumidos.value = 1;
+        
+        // modifico el index del calendario
+        // se muestra el modal
+        $('#modalAgregarAsuntosPropiosDesdeCalendario').modal('show');
+        },
+    });
+    calendar.render(); // renderizo el calendario
+    calendar.updateSize(); // actualizo el tamaño del calendario
+  });
+
+  function calcularDias(inicio, fin, dias_consumidos){
+    fecha_inicio = document.getElementById(inicio).value;
+    fecha_fin = document.getElementById(fin).value;
+    // comparo si la fecha de inicio es mayor a la fecha de fin
+    if (fecha_fin == ""){
+      fecha_fin = fecha_inicio;
+      document.getElementById(fin).value = fecha_inicio;
+    }
+    dias_consumidos = document.getElementById(dias_consumidos);
+    botonGuardarSolicitar = document.getElementById("guardarSolicitarAsuntosPropios");
+    botonGuardarModificar = document.getElementById("guardarModificarAsuntosPropios");
+
+    if (fecha_inicio > fecha_fin && fecha_fin != ""){
+      alert("La fecha de inicio no puede ser mayor a la fecha de fin");
+      document.getElementById(inicio).value = "";
+      document.getElementById(fin).value = "";
+    }
+    else{
+      botonGuardarSolicitar.removeAttribute("disabled");
+      botonGuardarModificar.removeAttribute("disabled");
+    }
+
+    // obtener la diferencia en dias entre las dos fechas
+    var fecha1 = new Date(fecha_inicio);
+    var fecha2 = new Date(fecha_fin);
+    var diff = fecha2.getTime() - fecha1.getTime();
+    var dias = diff / (1000 * 60 * 60 * 24);
+    dias = dias + 1;
+    if (dias > 6){
+      alert("No se pueden solicitar más de 6 días de asuntos propios");
+      document.getElementById(inicio).value = "";
+      document.getElementById(fin).value = "";
+    }else{
+      dias_consumidos.value = dias;
+    }
+  }
+
+  
+  function mostrarInfoAsunto(){ 
+    // obtengo el id de las vacaciones que desea modificar
+    var idSelect = document.getElementById("vacaciones_modificar").value;
+
+    // obtengo los campos de fecha inicio y fin actual
+    var fechaInicioActual = document.getElementById("fechaActualInicio");
+    var fechaFinActual = document.getElementById("fechaActualFin");
+    var divFechaInicioActual = document.getElementById("divFechaInicioActual");
+    divFechaInicioActual.removeAttribute("hidden");
+    var divFechaFinActual = document.getElementById("divFechaFinActual");
+    divFechaFinActual.removeAttribute("hidden");
+
+    var diasActualesConsumidos = document.getElementById("divDiasActualesConsumidos");
+    divDiasActualesConsumidos.removeAttribute("hidden");
+    var diasConsumidosActuales = document.getElementById("dias_actuales_consumidos");
+
+    // se obtiene la lista de vacaciones
+    var mylist = JSON.parse(document.getElementById('listaAsuntos').textContent);
+
+    for (var i = 0; i < mylist.length; i++) {
+      if ( mylist[i].id == parseInt(idSelect)) {
+        fechaInicioActual.value = mylist[i].fecha_inicio;
+        fechaInicioActual.setAttribute("readonly", true);
+        fechaFinActual.value = mylist[i].fecha_fin;
+        fechaFinActual.setAttribute("readonly", true);
+        diasConsumidosActuales.value = mylist[i].dias_consumidos;
+        diasConsumidosActuales.setAttribute("readonly", true);
+        
+        console.log(mylist[i]);
+      }
+    }
+  }
+
+  // forzar cierre del modal
+  function forzarCierre(){
+    $('#modalAgregarAsuntosPropiosDesdeCalendario').modal('hide');
+  }
+
+  $("#asuntos_propios_empleados").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-asuntos-propios-empleados' year=currentYear %}",
+    cache: false, 
+    columns: [
+      {
+        title: "Empleado",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombre = row.empleado__nombre +" "+ row.empleado__apellidos;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombre+'</h6></div>';
+          return div;
+        }
+      },
+      {
+        title: "Nombre",
+        field: "empleado__nombre",
+        // esconder columna
+        visible: false,
+      }, 
+      {
+        title: "Apellidos",
+        field: "empleado__apellidos",
+        // esconder columna
+        visible: false,
+      },     
+      {
+        title: "Fecha inicio",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_inicio;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },{
+        title: "Fecha fin",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_fin;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Días",
+        align: "center",
+        formatter: function(value, row) {
+          var dias = row.dias_consumidos;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Estado",
+        align: "center",
+        formatter: function(value, row) {
+          var estado = row.estado;
+          var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
+          if (estado == 10)
+          var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+
+          if (estado == 11)
+          var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
+          if (estado == 12)
+            var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
+          
+          return div;
+        }
+      },
+      {
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          administrador = "{{administrador}}";
+          director = "{{director}}";
+
+          var botonCambiarEstado = '<a href="" title="Cambiar estado solicitud de asuntos propios" data-toggle="modal" data-target="#modalCambiarEstado" onclick="$('+"'#formularioCambiarEstado').attr('action', '/private/timetrackpro/cambiar-estado-asuntos-propios/"+ row.id +"/');"+'" class="mx-1"><i class="fa-solid fa-flag"></i></a>';
+
+          var botonVer = '<a href="/private/timetrackpro/ver-solicitud-asuntos-propios/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+          if (administrador == "True" ||  director == "True" )
+            return botonVer + botonCambiarEstado;
+          else
+            return botonVer;     
+                  
+
+        },
+      },
+    ],
+    search: true,
+    // obtener los valores de la row seleccionada en la tabla y mostrarlos en el modal
+    onClickRow: function(row, $element) {
+      // obtener los valores de la row seleccionada
+      var estado = row.estado;
+      var nombre = "Nombre: " + row.empleado__nombre +" "+ row.empleado__apellidos;
+      var fecha_inicio = "Fecha inicio: " + row.fecha_inicio;
+      var fecha_fin = "Fecha fin: " + row.fecha_fin;
+
+      $("#infoModificarNombre").text(nombre);
+      $("#infoModificarInicio").text(fecha_inicio);
+      $("#infoModificarFin").text(fecha_fin);
+
+      $("#estado").val(estado);
+    },
+  });
+
+
+  $("#asuntos_propios_solicitados").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-asuntos-propios-solicitados' year=currentYear %}",
+    cache: false, 
+    columns: [
+      {
+        title: "Empleado",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombre = row.empleado__nombre +" "+ row.empleado__apellidos;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombre+'</h6></div>';
+          return div;
+        }
+      },  
+      {
+        title: "Nombre",
+        field: "empleado__nombre",
+        // esconder columna
+        visible: false,
+      }, 
+      {
+        title: "Apellidos",
+        field: "empleado__apellidos",
+        // esconder columna
+        visible: false,
+      },      
+      {
+        title: "Fecha inicio",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_inicio;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },      {
+        title: "Fecha fin",
+        field: "fecha_fin",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_fin;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Días",
+        align: "center",
+        formatter: function(value, row) {
+          var dias = row.dias_consumidos;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ dias +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "Estado",
+        align: "center",
+        formatter: function(value, row) {
+          var estado = row.estado;
+          var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
+          if (estado == 10)
+          var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+          if (estado == 11)
+          var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
+          if (estado == 12)
+            var div = '<span class="badge badge-sm bg-gradient-warning">Cambio solicitado</span>';
+          return div;
+        }
+      },
+      {
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          administrador = "{{administrador}}";
+          director = "{{director}}";
+
+          var botonCambiarEstado = '<a href="" title="Cambiar estado solicitud de asuntos propios" data-toggle="modal" data-target="#modalCambiarEstado" onclick="$('+"'#formularioCambiarEstado').attr('action', '/private/timetrackpro/cambiar-estado-asuntos-propios/"+ row.id +"/');"+'" class="mx-1"><i class="fa-solid fa-flag"></i></a>';
+
+          var botonVer = '<a href="/private/timetrackpro/ver-solicitud-asuntos-propios/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+          if (administrador == "True" ||  director == "True" )
+            return botonVer + botonCambiarEstado;
+          else
+            return botonVer;     
+                  
+
+        },
+      },
+    ],
+    search: true,
+    // obtener los valores de la row seleccionada en la tabla y mostrarlos en el modal
+    onClickRow: function(row, $element) {
+      // obtener los valores de la row seleccionada
+      var estado = row.estado;
+      var nombre = "Nombre: " + row.empleado__nombre +" "+ row.empleado__apellidos;
+      var fecha_inicio = "Fecha inicio: " + row.fecha_inicio;
+      var fecha_fin = "Fecha fin: " + row.fecha_fin;
+
+      $("#infoModificarNombre").text(nombre);
+      $("#infoModificarInicio").text(fecha_inicio);
+      $("#infoModificarFin").text(fecha_fin);
+
+      $("#estado").val(estado);
+    },
+  });
+
+  document.getElementById('inputSustitutoCalendario').addEventListener('input', function() {
+        const inputText = this.value;
+        const datalist = document.getElementById('sustitutos_calendario');
+        const options = datalist.getElementsByTagName('option');
+        const sustitutoCalendarioSeleccionado = document.getElementById('sustituto_calendario');
+
+        for (const option of options) {
+            if (option.textContent === inputText) {
+                const selectedOptionId = option.getAttribute('data-id');
+                sustitutoCalendarioSeleccionado.value = selectedOptionId;
+                console.log('ID de la opción seleccionada:', selectedOptionId);
+                break;
+            }
+        }
+    });
+    
+  document.getElementById('recuperable_calendario').addEventListener('change', function() {
+    const recuperable = this.value;
+    const descripcionRecuperacionCalendario = document.getElementById('descripcionRecuperacionCalendario');
+    if (recuperable == 1){
+      descripcionRecuperacionCalendario.removeAttribute("hidden");
+    }else{
+      descripcionRecuperacionCalendario.setAttribute("hidden", true);
+    }
+  });
+
+
+  document.getElementById('inputSustituto').addEventListener('input', function() {
+      const inputText = this.value;
+      const datalist = document.getElementById('sustitutos');
+      const options = datalist.getElementsByTagName('option');
+      const sustitutoSeleccionado = document.getElementById('sustituto');
+
+      for (const option of options) {
+          if (option.textContent === inputText) {
+              const selectedOptionId = option.getAttribute('data-id');
+              sustitutoSeleccionado.value = selectedOptionId;
+              console.log('ID de la opción seleccionada:', selectedOptionId);
+              break;
+          }
+      }
+  });
+  
+  document.getElementById('recuperable').addEventListener('change', function() {
+      const recuperable = this.value;
+      const descripcionRecuperacion = document.getElementById('descripcionRecuperacion');
+      if (recuperable == 1){
+        descripcionRecuperacion.removeAttribute("hidden");
+      }else{
+        descripcionRecuperacion.setAttribute("hidden", true);
+      }
+    });
+
+</script>
+
+{% endblock %}

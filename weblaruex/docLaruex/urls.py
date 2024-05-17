@@ -400,6 +400,10 @@ urlpatterns = [
     path('private/docLaruex/calendario/',
          calendario, name='docLaruexCalendario'),
 
+     # muestra los datos para rellanar el calendario
+    path('private/docLaruex/datosCalendario/',
+         datosCalendario, name='docLaruexDatosCalendario'),
+
 
 # ---------------------------------------------------------
 #                         FORMATOS 
@@ -600,6 +604,10 @@ urlpatterns = [
     path('private/docLaruex/retirarStock/<slug:item>/',
          retirarStock, name='docLaruexRetirarStock'),
 
+     # devuelve una retirada el item de stock 
+    path('private/docLaruex/devolverStock/<slug:id>/',
+         devolverStock, name='docLaruexDevolverStock'),
+
     # Rellanado de la página con el listado de retiradas de un item no inventariables en concreto 
     path('private/docLaruex/retirarStockUbicacion/<slug:item>/',
          retirarStockUbicacion, name='docLaruexRetirarStockUbicacion'),
@@ -616,6 +624,14 @@ urlpatterns = [
     # Elimina un un item de Stock en particular 
     path('private/docLaruex/eliminarStock/<slug:id>/',
          eliminarStock, name='docLaruexEliminarStock'), 
+
+
+    # Elimina un un item de Stock en particular 
+    path('private/docLaruex/solicitarMaterial/',
+         solicitarMaterial, name='docLaruexSolicitarMaterial'),    
+     # Elimina un un item de Stock en particular 
+    path('private/docLaruex/materialDisponible/',
+         materialDisponible, name='docLaruexMaterialDisponible'),  
     ################### Generación de PDF ####################
 
     #url(r'^simple_pdf/$', PDFTemplateView.as_view(template_name='reportEquipo.html', filename='report_Equipo.pdf'), name='report_Equipo'),
@@ -721,7 +737,6 @@ urlpatterns = [
     path('private/docLaruex/editarEvento/<slug:id>/', editarEvento, name='docLaruexEditarEvento'), 
     path('private/docLaruex/equiposUbicacionesDatos', DatosEquiposUbicaciones, name='docLaruexEquiposUbicacionesDatos'),
     path('private/docLaruex/equiposUbicacionesDatosFiltro/<str:tipo>/', DatosEquiposUbicacionesFiltro, name='docLaruexEquiposUbicacionesDatosFiltro'),
-    
     path('private/docLaruex/formatoDatosFiltrados/<slug:procedimiento>/', formatosDatosFiltrados, name='docLaruexFormatosDatosFiltrados'),
     
 # ---------------------------------------------------------
@@ -742,5 +757,23 @@ urlpatterns = [
     path('private/docLaruex/eliminarRegistroTarea/<slug:id>/', eliminarRegistroTarea, name='docLaruexEliminarRegistroTarea'),
     path('private/docLaruex/tareasProximas', tareasProximas, name='docLaruexTareasProximas'),
     path('private/docLaruex/tareasProximasDatos', datosTareasProximas, name='docLaruexTareasProximasDatos'),
+
+    #vista de los mantenimientos asociados al equipo o ubicacion
+
+    path('private/docLaruex/verMantenimientosAsociados/<slug:id>/', verMantenimientosAsociados, name='docLaruexVerMantenimientosAsociados'), 
+    path('private/docLaruex/datosMantenimientosAsociados/<slug:id>/', datosMantenimientosAsociados, name='docLaruexMantenimientosAsociadosDatos'),
+    
+
+
+    
+# ---------------------------------------------------------
+#              OPERATIVIDAD DE LAS APLICACIONES 
+# ---------------------------------------------------------
+    path('private/docLaruex/operatividadAplicaciones', operatividadAplicaciones, name='docLaruexOperatividadAplicaciones'),
+    path('private/docLaruex/datosOperatividadAplicaciones', datosOperatividadAplicaciones, name='docLaruexDatosOperatividadAplicaciones'),
+    path('private/docLaruex/eliminarProceso/<str:proceso>/<str:nombre>/', eliminarProcesoAplicaciones, name='docLaruexEliminarProceso'),
+    path('private/docLaruex/paralizarProceso/<str:proceso>/<str:nombre>/', paralizarProcesoAplicaciones, name='docLaruexParalizarProceso'),
+
+
 ]
 

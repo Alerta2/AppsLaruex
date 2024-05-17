@@ -1,0 +1,141 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+  <div class="row d-flex justify-content-center">
+    
+    <h3 class="text-primary text-gradient">Jornada de {{jornada.id_empleado.nombre}} {{jornada.id_empleado.apellidos}}</h3>
+    <div class="col-12 col-xl-4">
+      {% if administrador %}
+        <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+          <div class="row">
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalEditarJornada">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-pen fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Editar</div>
+            </button>
+            </div>
+            <div class="col">
+              <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarIncidencia">             
+               <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
+               <div class="text text-sm">Eliminar</div>
+             </button>
+             </div>
+          </div>
+        </div>
+      {% endif %}
+      <div class="card ">
+        <div class="card-header pb-0 p-3">
+        </div>
+        <div class="card-body pt-0 p-3">
+          <ul class="list-group font-weight-bold">
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i>{{jornada.id_empleado.nombre}} {{jornada.id_empleado.apellidos}}</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i><strong>Inicio: </strong> {{jornada.fecha_inicio|date:"d M Y"}} </li>
+            {% if jornada.fecha_fin %} 
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i><strong>Fin: </strong> {{jornada.fecha_fin|date:"d M Y"}} </li>
+            {% endif %}
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i>{{jornada.horas_semanales}} horas</li>
+          </ul>
+          {% if jornada.observaciones %}
+          <hr class="separacion">
+
+          <ul class="list-group font-weight-bold">
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg text-primary">Resolución</li>
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{jornada.fecha_resolucion|date:"d M Y"}}</li>
+
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg">{{jornada.observaciones}}</li>
+          </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalEditarJornada" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEditarJornada"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modificar estado de la incidencia nº {{incidencia.id}}</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:editar-jornada' id=jornada.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-4" id="inputFechaFin">
+              <label>Horas</label>
+              <div class="">
+                <input type="number" class="form-control" placeholder="37,5" aria-label="Horas semanales que dura la jornada" id="horas" name="horas" min="0.5" max="37.5" step="0.5" aria-describedby="text-addon" value="{{jornada.horas_semanales|safe}}">
+              </div>
+            </div>
+            <div class="col-xl-4">
+              <label>Inicio</label>
+              <div class="">
+                <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                  aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" value="{{jornada.fecha_inicio|safe}}">
+              </div>
+            </div>
+            <div class="col-xl-4" id="inputFechaFin">
+              <label>Fin</label>
+              <div class="">
+                <input type="date" class="form-control" aria-label="Fecha final de la festividad"
+                  aria-describedby="text-addon" name="fecha_fin" id="fecha_fin" value="{{jornada.fecha_fin|safe}}">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonModificar">Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalEliminarIncidencia" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEliminarIncidencia"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar jornada nº {{jornada.id}}</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:eliminar-jornada' id=jornada.id %}" method="POST"
+            enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+
+              <div class="col-xl-8 mx-auto my-2" >
+                <h6>¿Está seguro/a de eliminar la jornada seleccionada?</h6>
+                <span>{{jornada.id_empleado.nombre}} {{jornada.id_empleado.apellidos}}</span>
+                <br>
+                <span>{{jornada.horas_semanales|safe}} horas</span>
+                
+              </div>
+              
+            </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated and administrador  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonEliminar" >Eliminar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

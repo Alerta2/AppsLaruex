@@ -1,0 +1,105 @@
+CONDA
+Listar: conda env list
+Crear nuevo entorno: conda create --prefix=/ruta/.../nombreentorno python=3.8
+Activar: conda activate nombreentorno
+Instalar: conda install nombreentorno
+Exportar: conda env export > environment.yml
+Crear desde yml: conda env create -f environment.yml
+
+DJANGO
+python django-admin startproject nombreProyecto # crear un proyecto nuevo
+python manage.py startapp nombreApp # crear una app nueva
+python manage.py runserver #arrancar el servidor django
+python manage.py inspectdb --database=nombreDB > app/nombreFicheroModel.py # autogenerar los model desde bases de datos
+
+python manage.py inspectdb --database=timetrackpro > TimeTrackPro/models2.py # autogenerar los model desde bases de datos
+
+python manage.py inspectdb --database=docLaruex > docLaruex/models2.py
+
+python manage.py migrate # Consolidar cambios en los model
+python manage.py collectstatic # cargar los archivos estaticos de la app nuevos
+python manage.py makemessages --all # cargar mensajes para traducir
+django-admin compilemessages # compilar traducciones
+
+# ejecutar en el servidor varias apps a la vez es necesario configurar varios puertos 
+python manage.py runserver 7000 # iniciar la ejecución del servidor en un puerto determinado
+python manage.py runserver 127.0.0.1:7000 # iniciar la ejecución del servidor en un puerto determinado
+python manage.py runserver 0:7000 # iniciar la ejecución del servidor en un puerto determinado
+
+## CODIGOS UTILES
+
+definir función que llame a un view
+
+
+## TOOLTIP EN UN div. Al pasar el raton por encima se muesta un popup con la información deseada
+-- en el javascript
+// activación del tooltiptext de bootstrap
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+
+-- en el html, por ejemplo, sustituimos el title por el texto que queremos mostrar. debemos incluir en el div el data-tooltip, el data-placement y el tooltip
+<i class="fas fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="Texto tooltip." ></i>
+
+
+## Método python para cambiar idioma de la página
+def translate(language):
+    cur_language = get_language()
+    try:
+        activate(language)
+        cur_language = get_language()
+    finally:
+        activate(cur_language)
+
+
+# TRUCOS
+-- Para ver que div descuadra la web añadir lo siguiente al css
+* {
+    outline: 1px solid red;
+}
+
+
+Available subcommands manage.py:
+
+[auth]
+    changepassword
+    createsuperuser
+
+[background_task]
+    process_tasks
+
+[contenttypes]
+    remove_stale_contenttypes
+
+[django]
+    check
+    compilemessages
+    createcachetable
+    dbshell
+    diffsettings
+    dumpdata
+    flush
+    inspectdb
+    loaddata
+    makemessages
+    makemigrations
+    migrate
+    sendtestemail
+    shell
+    showmigrations
+    sqlflush
+    sqlmigrate
+    sqlsequencereset
+    squashmigrations
+    startapp
+    startproject
+    test
+    testserver
+
+[sessions]
+    clearsessions
+
+[staticfiles]
+    collectstatic
+    findstatic
+    runserver

@@ -1,0 +1,355 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-header pb-0 d-flex align-items-center">
+            <h5>Registros insertados</h5>
+            <a class="ps-2" title="Añadir registros de jornada" data-toggle="modal" data-target="#modalAgregarRegistros"><i class="fa-solid fa-plus fa-xs botonAgregar"></i></a>
+      </div>
+      <div class="card-body px-0 pt-0 pb-2">
+        <div class="table-responsive p-0">
+          
+                  
+          <div class="mx-4">
+            <div id="toolbar">
+              <div class="row">
+                <div class="col">
+                  <label class="text-sm" >Sección</label>
+    
+                  <select class="form-control" aria-label="Seccion" id="seccion"
+                  name="seccion" aria-describedby="text-addon" >
+                    <option value="1" selected>Todos</option>
+                    <option value="2">Alerta2</option>
+                    <option value="3">Departamento</option>
+                    <option value="4">Laboratorios</option>
+                  </select>
+                </div>
+                <div class="col">
+                  <label class="text-sm" >Mes</label>
+    
+                  <select class="form-control" aria-label="Mes" id="mes"
+                  name="mes" aria-describedby="text-addon">
+                    <option selected hidden>Mes actual</option>
+                    <option value="1">Enero</option>
+                    <option value="2">Febrero</option>
+                    <option value="3">Marzo</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Mayo</option>
+                    <option value="6">Junio</option>
+                    <option value="7">Julio</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                  </select>
+                </div>
+                <div class="col">
+                  <label class="text-sm" >Año</label>
+    
+                  <input type="text" class="form-control" value="{{yearActual}}" id="year" name="year">
+                </div>
+                <div class="col my-auto">
+                  <button type="submit" value="submit" class="btn bg-gradient-primary w-100 mt-4 mb-0" onclick="filtarTabla()">Filtrar</button>
+    
+    
+                </div>
+              </div>
+    
+            </div>
+            <table  id="tabla_archivos_insertados" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="modalAgregarRegistros" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAgregarRegistros"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Insertar nuevo registro</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form id="formularioAgregarRegistro" action="/private/timetrackpro/agregar-registro" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group">
+            <input type="text" class="form-control" id="tipoObjeto" name="tipoObjeto" data-rule="required" readonly
+              value="Equipo" style="display: none;" />
+          </div>
+          <div class="row">
+            <div class="col-xl-4 col-lg-4 mb-xl-0 mb-4">
+              <div class="form-group">
+                <label class="col-form-label" for="seccion">Sección</label>
+                <select class="form-select" data-rule="required" id="seccion" name="seccion">
+                  <option value="Alerta2">Alerta2</option>
+                  <option value="Departamento">Departamento</option>
+                  <option value="Laboratorios">Laboratorios</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-4 mb-xl-0 mb-4 ">
+              <div class="form-group">
+                <label class="col-form-label" for="mes">Mes</label>
+                <select class="form-select" data-rule="required" id="mes" name="mes">
+                  <option value="Enero">Enero</option>
+                  <option value="Febrero">Febrero</option>
+                  <option value="Marzo">Marzo</option>
+                  <option value="Abril">Abril</option>
+                  <option value="Mayo">Mayo</option>
+                  <option value="Junio">Junio</option>
+                  <option value="Julio">Julio</option>
+                  <option value="Agosto">Agosto</option>
+                  <option value="Septiembre">Septiembre</option>
+                  <option value="Octubre">Octubre</option>
+                  <option value="Noviembre">Noviembre</option>
+                  <option value="Diciembre">Diciembre</option>
+                </select>
+              </div>
+            </div>
+          
+            <div class="col-xl-4 col-lg-4 mb-xl-0 mb-4 ">
+              <div class="form-group">
+                <label class="col-form-label"for="year">Año</label>
+                <input required type="text" class="form-control" id="year" placeholder="2023" name="year" data-rule="required" pattern="[2][0][1-3]{1}[0-9]{1}"/>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            
+            <div class="col">
+              <div class="form-group">
+                {% if not user.is_authenticated  %}
+                <p class="text-center text-danger">Es necesario autenticarse para subir un documento</p>
+                {% endif %}
+                <input required type="text" class="form-control" id="registrador" name="registrador" value="{{request.user.id}}" data-rule="required" hidden/>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" id="labelRegistroSeleccionado" hidden>
+              <div class="col d-flex justify-content-center">
+                  
+                  <label class="col-form-label"><i class="fa-duotone fa-file me-2"></i>Archivo seleccionado</label>
+
+                  <label class="col-form-label text-muted mx-2" id="nombreArchivoSeleccionado"></label>
+              </div>
+
+          </div>
+          <div class="row container my-2" id="selectorDocumento">
+            <div class="col d-flex justify-content-center">
+              <label class="custom-file-upload" for="archivoSeleccionado">
+                Seleccionar un archivo
+              </label>
+              <input type="file" id="archivoSeleccionado" name="archivoSeleccionado" onchange="mostrarNombreRegistro()" style="display:none" required>
+            </div>
+          </div>
+        
+      </div>
+      <div class="modal-footer">
+        {% if user.is_authenticated  %}
+        <button type="submit" value="submit"  class="btn bg-gradient-primary">Guardar</button>
+        {% endif %}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============= Modal Eliminar Asociación ====================-->
+
+<div id="modalEliminar" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="TituloModalEliminarAsociacion"><strong>¿Estas seguro que deseas eliminar este fichero?</strong> </h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+ 
+        <form id="formularioModalEliminarAsociacion" action="/private/docLaruex/eliminarAsociacion/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <!-- indica el tipo de objeto se que va a añadir -->
+          <div class="modal-body">
+            <h6 class="text-mutted">Recuerda que al eliminar el fichero se borraran todos los fichajes de este fichero.</h6>
+          </div>
+          <div class="modal-footer">
+            {% if user.is_authenticated  %}
+            <button type="submit" value="submit"  class="btn bg-gradient-danger">Eliminar</button>
+            {% endif %}
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+<script>
+
+$("#tabla_archivos_insertados").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/timetrackpro/datos-registros-insertados",
+    cache: false, 
+    columns: [
+      {
+        title: "Archivo",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombreArchivo = row.mes +" "+ row.year;
+          var ruta = row.ruta;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombreArchivo+'</h6><p class="text-xs text-secondary mb-0">'+ ruta +'</p></div>';
+          return div;
+        }
+      },
+      {
+        title: "Sección",
+        sortable: true,
+        align: "center",
+        width:"20",
+        formatter: function(value, row) {
+          var seccion = row.seccion;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ seccion +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "FECHA DE SUBIDA",
+        field: "fecha_lectura",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_lectura;
+
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " " + mes[mesFecha] + " " + fecha.split("-")[0];
+
+          // obtengo la hora
+          var hora = fechaLectura.split("T")[1].split("Z")[0];
+          hora = hora.split(":")[0] + ":" + hora.split(":")[1];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha + ' '+ hora+'</span>';
+          return div;
+        }
+      },
+      {
+        title: "SUBIDO POR",
+        align: "center",
+        formatter: function(value, row) {
+          var insertador = row.insertador__first_name + " " + row.insertador__last_name;      
+          var div = '<span class="text-sm font-weight-bold mb-0">'+ insertador +'</span>';
+          return div;
+        }
+
+      },{
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          var administrador = "{{administrador}}";
+          var director = "{{director}}";
+          var botonVer = '<a href="/private/timetrackpro/ver-registro/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          
+          var botonDescargar = '<a href="/private/timetrackpro/descargar-fichero-maquina/' + row.id + '/" class="mx-1 text-sm" title="descargar fichero" download><i class="fa-solid fa-download fa-lg entrar"></i></a>';
+          
+          var botonEliminar = '<a href="/private/timetrackpro/eliminar-registro/' + row.id + '/" class="mx-1" title="Eliminar fichero" data-toggle="modal" data-target="#modalEliminar" onclick="$('+"'#formularioModalEliminarAsociacion').attr('action', '/private/timetrackpro/eliminar-registro/"+ row.id + "/');"+'" ><i class="fa-solid fa-trash" ></i></a>';
+
+          if (administrador == "True"){
+            return botonVer + botonDescargar + botonEliminar;
+          }else if (director == "True"){
+            return botonVer + botonDescargar;
+          }else{
+            return botonVer;
+          }                  
+        },
+      },
+    ],
+    search: true,
+    
+  });
+
+  function filtarTabla(){
+    var seccion = $("#seccion").val();
+    var mes = $("#mes").val();
+    var year = $("#year").val();
+    if (mes == "Mes actual"){
+      mes = new Date().getMonth() + 1;
+    }
+    var text = "";
+    meses = {
+      "1": "Enero",
+      "2": "Febrero",
+      "3": "Marzo",
+      "4": "Abril",
+      "5": "Mayo",
+      "6": "Junio",
+      "7": "Julio",
+      "8": "Agosto",
+      "9": "Septiembre",
+      "10": "Octubre",
+      "11": "Noviembre",
+      "12": "Diciembre",
+    };
+    var urlEditar = "{% url 'timetrackpro:datos-registros-insertados' seccion='2' year='1' mes='0'  %}".replace('0', mes).replace('1', year).replace('2', seccion);
+    console.log(urlEditar);
+    $("#tabla_archivos_insertados").bootstrapTable('refresh', {url: urlEditar});
+  }
+function mostrarNombreRegistro() {
+  var archivoInput = document.getElementById('archivoSeleccionado');
+  var selector = document.getElementById('selectorDocumento');
+  var etiqueta = document.getElementById('labelRegistroSeleccionado');
+  var nombreArchivo = document.getElementById('nombreArchivoSeleccionado');
+
+  if (archivoInput.files && archivoInput.files[0]) {
+    var lector = new FileReader();
+
+
+    selector.style.display = 'none';
+    //eliminar atributo hidden de la etiqueta
+    etiqueta.removeAttribute("hidden");
+    nombreArchivo.innerHTML = archivoInput.files[0].name;
+
+    lector.readAsDataURL(archivoInput.files[0]);
+  } 
+}
+
+
+
+</script>
+
+{% endblock %}

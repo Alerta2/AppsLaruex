@@ -1,0 +1,193 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-header pb-0">
+        <h3 class="text-primary text-gradient">Registro de {{registro.seccion}}</h3>
+        <h4 class="text-secondary">{{registro.mes}} de {{registro.year}}</h4>
+      </div>
+      <div class="card-body pt-0 pb-2 mx-1">
+        {% if administrador %}
+        <div id="toolbar">
+
+          <button class="botonLink" data-toggle="modal" data-target="#modalAgregarLineaRegistro">
+            <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+            <div class="text text-sm">Agregar fichaje</div>
+          </button>
+        </div>
+        {% endif %}
+        <div class="table-responsive p-0">
+          <table id="tabla_registros" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
+  data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+  data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+  data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-row-style="rowStyle"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalAgregarLineaRegistro" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAgregarLineaRegistro"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Insertar un nuevo fichaje</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form id="formularioAgregarRegistro" action="{% url 'timetrackpro:agregar-linea-registro' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group">
+            <input type="text" class="form-control" id="registro" name="registro" data-rule="required" readonly value="{{registro.id}}" hidden />
+          </div>
+          <div class="row d-flex justify-content-center">
+            <div class="col-xl-4 col-lg-4 mb-xl-0 mb-4">
+              <div class="form-group">
+                <label class="col-form-label" for="empleado">Empleado</label>
+                <select class="form-select" data-rule="required" id="empleado" name="empleado">
+                  {% for e in empleados %}
+                  <option value="{{e.id}}">{{e.nombre}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-4 mb-xl-0 mb-4 ">
+              <div class="form-group">
+                <label class="col-form-label" for="hora">Hora</label>
+                <input type="datetime-local" class="form-control" id="hora_registro" name="hora_registro" data-rule="required" />
+              </div>
+            </div>
+          
+          </div>
+
+        
+      </div>
+      <div class="modal-footer">
+        {% if user.is_authenticated  %}
+        <button type="submit" value="submit"  class="btn bg-gradient-primary">Guardar</button>
+        {% endif %}
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+    $("#tabla_registros").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "/private/timetrackpro/datos-registro/{{registro.id}}/",
+    cache: false, 
+    columns: [
+      {
+        title: "Usuario",
+        field: "id_empleado__nombre",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombreArchivo = row.id_empleado__nombre;
+          var maquina = row.maquina__nombre;
+          var div = '<div><h6 class="mb-0 text-sm">'+nombreArchivo+'</h6><p class="text-xs text-secondary mb-0">Máquina: '+ maquina +'</p></div>';
+          return div;
+        }
+      },
+      {
+        title: "Hora",
+        field: "hora",
+        halign:"center",
+        sortable: true,
+        align: "center",
+        formatter: function(value, row) {
+          var dateTime = row.hora;
+          var hora = dateTime.split("T");
+          hora = hora[1].split("Z")[0];
+          // obtener la hora con formato HH:mm:ss
+
+          var div = '<span class="text-secondary text-sm font-weight-bold">'+hora+'</span>';
+
+          return div;
+        }
+      },
+      {
+        title: "Fecha",
+        field: "hora",
+        halign:"center",
+        sortable: true,
+        align: "center",
+        formatter: function(value, row) {
+          const meses = {
+            "01": "Enero",
+            "02": "Febrero",
+            "03": "Marzo",
+            "04": "Abril",
+            "05": "Mayo",
+            "06": "Junio",
+            "07": "Julio",
+            "08": "Agosto",
+            "09": "Septiembre",
+            "10": "Octubre",
+            "11": "Noviembre",
+            "12": "Diciembre",
+          };
+          var dateTime = row.hora;
+          var fecha = dateTime.split("T")[0];
+          var anio = fecha.split("-")[0];
+          var mes = fecha.split("-")[1];
+          var dia = fecha.split("-")[2];
+          if (dia[0] == "0"){
+            dia = dia[1];
+          }
+          fechaFormateada = dia + " de " + meses[mes] + " de " + anio;
+
+          var div = '<span class="text-secondary text-sm font-weight-bold">'+fechaFormateada+'</span>';
+
+          return div;
+        }
+      },
+      {
+        title: "Remoto",
+        field: "remoto",
+        halign:"center",
+        sortable: true,
+        align: "center",
+        formatter: function(value, row) {
+          var remoto = row.remoto;
+          var div= '<span class="badge badge-sm bg-gradient-secondary">No</span>';
+          
+          if (remoto == 1)
+            var div = '<span class="badge badge-sm bg-gradient-warning">Sí</span>';
+
+          return div;
+        }
+        },{
+          title: "Acciones",
+          field: "action",
+          align: "center",
+          formatter: function (value, row) {
+          var verLineaRegistro = '<a href="/private/timetrackpro/ver-linea-registro/' + row.id + '/" class="mx-1" title="Abrir"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          return verLineaRegistro;
+          },
+        },
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+
+  });
+
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,165 @@
+/*!
+=========================================================
+* Tarjeta de acceso CSS
+=========================================================
+
+* Sandra Balás Sánchez
+
+=========================================================
+*/
+
+.flip-card {
+  background-color: transparent;
+  
+  width: 400px !important;
+  /* width: 240px;
+  height: 154px; */
+  /* height: 256px; */
+  height: 256px !important;
+
+  /* perspective: 1000px; */
+  color: white;
+}
+
+.logo-uex {
+  position: absolute;
+  top: 1em;
+  left: 1.4em;
+  max-height:46px;
+  max-width: 28px;
+}
+.laruex {
+  --bs-gutter-y: -1.4rem;
+  --bs-gutter-x: 5rem;
+  position: absolute;
+  left: calc(var(--bs-gutter-x) * .8);
+  right: calc(var(--bs-gutter-x) * .3);
+  top: calc(-1 * var(--bs-gutter-y));
+}
+
+.logo-laruex-anverso {
+  position: absolute;
+  top: 12em;
+  right: 1.4em;
+  max-height:48px;
+
+}
+.logo-alerta2-anverso {
+  position: absolute;
+  top: 12.7em;
+  right: 6.6em;
+  max-height:30px;
+
+}
+.logo-laruex-reverso {
+  position: absolute;
+  top: 1em;
+  left: 1.4em;
+  max-height:48px;
+}
+.logo-alerta2-reverso {
+  position: absolute;
+  top: 1.2em;
+  left: 6.6em;
+  max-height:30px;
+}
+.foto {
+  position: fixed;
+  top: 5.8em;
+  left: 1.5em;
+  border-radius: 7%;
+  max-height:124;
+  max-width:100;
+}
+
+.expiraLabel {
+  position: absolute;
+  font-weight: bold;
+  color: rgb(201, 213, 228);
+  top: 16.5em;
+  left: 1.7em;
+  font-size: .75em;
+}
+
+.fechaExpiracion {
+  position: absolute;
+  font-weight: bold;
+  
+  font-size: .75em;
+  top: 17.9em;
+  left: 1.7em;
+}
+.numeroTarjetaLabel {
+  position: absolute;
+  font-weight: bold;
+  color: rgb(201, 213, 228);
+  top: 16.5em;
+  left: 6.8em;
+  font-size: .75em;
+}
+
+.numeroTarjeta{
+  position: absolute;
+  font-weight: bold;
+  font-size: .75em;
+  top: 17.9em;
+  left: 6.8em;
+}
+
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  box-shadow: 0 8px 14px 0 rgba(0,0,0,0.2);
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 1rem;
+}
+
+
+
+.flip-card-front {
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 2px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -1px 0px inset;
+  background-image: linear-gradient(310deg, #141727 0%, #3a576f 100%);
+}
+
+.flip-card-back {
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 2px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -1px 0px inset;
+  background-image: linear-gradient(310deg, #3a576f 0%, #141727 100%);
+  transform: rotateY(180deg);
+}
+
+
+/* Modificacion del input */
+.modificarImagen{
+  color: var(--bs-secondary);
+  text-decoration: none;
+}
+.modificarImagen:hover{
+  color: var(--bs-primary);
+  text-decoration: none;
+}
+
+/* Establece estilos base para ambas clases */
+.card-reverso-mostrar, .card-anverso-mostrar {
+  width: 100%; /* Ancho 100% para adaptarse a diferentes tamaños */
+  height: auto; /* Altura automática para mantener proporciones */
+  max-width: 400px; /* Ancho máximo opcional */
+}

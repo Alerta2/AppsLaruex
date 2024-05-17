@@ -1,41 +1,14 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
 
-{% block content %}
-<style>
-    ul.pagination li .page-link {
-      background-color: rgb(255, 255, 255) !important;
-      color: rgb(41, 68, 87);
-    }
-  
-    ul.pagination li.active .page-link {
-      background-color: rgb(41, 68, 87) !important;
-      border-color: rgb(41, 68, 87) !important;
-    }
-  
-    ul.pagination li .page-link:hover {
-      filter: brightness(85%);
-  
-    }
-  
-    ul.pagination li.active .page-link:hover {
-      filter: brightness(120%);
-  
-    }
-  
-    .btn-light {
-      color: rgb(41, 68, 87);
-    }
-  
-    th {
-      color: rgb(41, 68, 87);
-    }
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
 
-    /* estilo añadirFichero PDF*/
-    .addFicheroPDF {
-      color: rgb(161, 16, 32);
-    }
-  </style>
+{% endblock %}
+
+{% block content %}
+
 
 <!-- breadcrumb   -->
 <div class="card-body">
@@ -89,9 +62,10 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
                     <label for="habilitacion">Habilitación</label>
                     <select class="form-select" data-rule="required" id="habilitacion" name="habilitacion">
                         {% for habilitacion in habilitaciones %}
-                        <option value="{{habilitacion.id}}">
+                        <option value="{{habilitacion.id}}"{% if habilitacion.id == 6 %} selected {% endif %}>
                             {{habilitacion.titulo}}
                         </option>
+                        
                         {% endfor %}
                     </select>
                 </div>
@@ -118,7 +92,7 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
                 <input type="text" class="form-control" id="nombreObjeto"
                   placeholder="Ejemplo: Solicitud de permisos " pattern="[a-zA-Z\w\s]{1,255}"
                   title="No permite guiones ni otros caracteres que no sean espacios" name="nombreObjeto"
-                  data-rule="required" />
+                  data-rule="required" required />
               </div>
             </div>
             <div class="col-3">
@@ -201,32 +175,31 @@ data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]
 
     // cambiamos la funcionalidad del boton submit del formulario
     
-    $("#habilitacion").val(69)
     $("#estado").val(1)
-    $("#formularioModal").submit(function (e) {
+$("#formularioModal").submit(function (e) {
 
-// cancelamos el funcionamiento por defecto del boton submit
-e.preventDefault();
-// capturamos la información del formulario 
-var data = new FormData(this);
-// ejecuta una url/action con la capacidad de gestionar la salida
-$.ajax({
-  url: "/private/docLaruex/agregarArchivo/",
-  type: "POST",
-  data: data,
-  cache: false,
-  contentType: false,
-  processData: false,
-  // gestiono el return del view
-  success: function () {
-    crearAviso('objetoGuardar', 'Curriculum guardado con éxito', 'alert-success', 2000)
-    $(".divFormularios").remove();
-    $("#reset").trigger("click");
-    $('#tabla_Curriculums').bootstrapTable('refresh');
-    $('#cerrar').trigger('click');
-    $("#modalFormulario").trigger('reset');
-    location.reload(true);
-  }
+  // cancelamos el funcionamiento por defecto del boton submit
+  e.preventDefault();
+  // capturamos la información del formulario 
+  var data = new FormData(this);
+  // ejecuta una url/action con la capacidad de gestionar la salida
+  $.ajax({
+    url: "/private/docLaruex/agregarArchivo/",
+    type: "POST",
+    data: data,
+    cache: false,
+    contentType: false,
+    processData: false,
+    // gestiono el return del view
+    success: function () {
+      crearAviso('objetoGuardar', 'Curriculum guardado con éxito', 'alert-success', 2000)
+      $(".divFormularios").remove();
+      $("#reset").trigger("click");
+      $('#tabla_Curriculums').bootstrapTable('refresh');
+      $('#cerrar').trigger('click');
+      $("#modalFormulario").trigger('reset');
+      location.reload(true);
+    }
 });
 });
     $('#tabla_Curriculums').bootstrapTable({

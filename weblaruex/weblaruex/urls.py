@@ -71,6 +71,11 @@ urlpatterns = [
     # Veiex
     path('', include('veiex.urls', namespace='veiex')),
 
+    # TimeTrackPro
+    path('', include('timetrackpro.urls', namespace='timetrackpro')),
+    
+
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += i18n_patterns (
@@ -84,6 +89,7 @@ urlpatterns += i18n_patterns (
     path('', include('calendario_guardias.urls', namespace='calendario_guardias')),
     path('', include('docLaruex.urls', namespace='docLaruex')),
     path('', include('veiex.urls', namespace='veiex')),
+    path('', include('timetrackpro.urls', namespace='timetrackpro')),
 )
 
 #if settings.DEBUG:

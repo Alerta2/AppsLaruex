@@ -1,71 +1,13 @@
 {% extends "base/base_docLaruex.html" %}
 {% load static %}
 
+{% block imports %}
+<link rel="stylesheet" href="{% static 'css/docLaruex/custom_docLaruex.css' %}" />
+<link rel="stylesheet" href="{% static 'css/docLaruex/boostrapTable_docLaruex.css' %}" />
+
+{% endblock %}
+
 {% block content %}
-
-
-<style>
-  ul.pagination li .page-link {
-    background-color: rgb(255, 255, 255) !important;
-    color: rgb(41, 68, 87);
-
-  }
-
-  ul.pagination li.active .page-link {
-    background-color: rgb(41, 68, 87) !important;
-    border-color: rgb(41, 68, 87) !important;
-  }
-
-  ul.pagination li .page-link:hover {
-    filter: brightness(85%);
-
-  }
-
-  ul.pagination li.active .page-link:hover {
-    filter: brightness(120%);
-
-  }
-
-  .btn-light {
-    color: rgb(41, 68, 87);
-  }
-
-  th {
-    color: rgb(41, 68, 87);
-  }
-    .add:hover {
-    color: #ce8312;
-  }
-  /*  3 estilo del campo añadir archivo*/
-
-  .addFicheroEditable {
-    color: rgb(9, 58, 65);
-  }
-
-  .addFicheroEditable:hover {
-    color: rgb(133, 198, 228);
-  }
-
-  /* estilo añadirFichero PDF*/
-  .addFicheroPDF {
-    color: rgb(161, 16, 32);
-  }
-
-  .addFicheroPDF:hover {
-    color: rgb(99, 10, 20);
-  }
-
-      /*--------------------------------------------------------------
-  # Añadir Imagen
-  --------------------------------------------------------------*/
-  .addImagen {
-    color: rgb(16, 108, 161);
-  }
-
-  .addImagen:hover {
-    color: rgb(10, 59, 99);
-  }
-</style>
 
 <!-- breadcrumb   -->
 <div class="card-body">
@@ -252,22 +194,17 @@
 </form>
 </div> <!-- END ModalAgregarProyecto -->
 
-<!-- ============= Tablas ============= -->
-
 <!-- Tabla con lista de proyectos -->
-
-    <table id="tabla_contactos" data-toggle="table" data-search="true" data-show-columns="true"
-      data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
-      data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
-      data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar">
-    </table>
-
+  <table id="tabla_contactos" data-toggle="table" data-search="true" data-show-columns="true"
+    data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+    data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+    data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-search-accent-neutralise="true">
+  </table>
 
 <script type="text/javascript">
-
   $('#tabla_contactos').bootstrapTable({
     method: 'get',
-    url: "/private/docLaruex/contactosDatos",
+    url: "{% url 'docLaruex:docLaruexContactosDatos' %}",
     cache: false,
     columns: [{
       title: 'Nombre',
@@ -307,7 +244,6 @@
       field: "action",
       align: "center",
       formatter: function (value, row) {
-        
         var botonVerContacto = '<a href="/private/docLaruex/contacto/' + row.id + '/" class="mx-1" title="Abrir" ><i class="fa-solid fa-arrow-right-to-bracket fa-lg" style="color:#68B29E"></i></a>';
         var botonModificarContacto = '<a href="/private/docLaruex/editarContacto/' + row.id + '/' + '" class="mx-1" title="Editar"><i class="fa-solid fa-money-check-pen" style="color:#9768b2"></i></a>';
 

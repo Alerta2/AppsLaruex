@@ -1,0 +1,240 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+
+{% block imports %}
+
+    <!-- fullcalendar-->
+  <!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.9/index.global.min.js'></script> -->
+
+  <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" />
+  <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar.js' %}"></script>
+  <script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar_es.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_mesual.css' %}" />
+    <!-- disponible para configuración servidor-->
+
+    <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
+
+  {% endblock %}
+
+{% block content %}
+
+
+<div class="card m-3">
+  <div class="card-body">
+    
+  <div class="row">
+    <div class="col-lg-12 ">
+      {% if administrador %}
+      <div class="d-flex justify-content-start  pb-3" style="background-color: transparent;">
+           <button class="botonLinkFestivos" data-toggle="modal" data-target="#modalAgregarFestivo">             
+            <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+            <div class="text text-sm">Agregar festivo</div>
+          </button>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+    <div id='calendarioMensual' class="mb-3 mt-3"></div>
+
+  </div>
+</div>
+
+<! -- Modal Agregar Festivo -->
+<div id="modalAgregarFestivoDesdeCalendario" tabindex="-1" role="dialog" class="modal fade modal-lg"
+  aria-labelledby="modalAgregarFestivoDesdeCalendario" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:agregar-festivo-desde-calendario' %}" method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="tituloModalAgregarDesdeCalendario"></h5>
+            <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <input class="form-control" type="text" id="year_actual" name="year_actual" hidden>
+              <div class="col-xl-6">
+                <label>Inicio</label>
+                <div class="">
+                  <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                    aria-describedby="text-addon" name="fecha_inicio_seleccionada" id="fecha_inicio_seleccionada">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xl-6">
+                <label>Festividad</label>
+                <input type="text" class="form-control" placeholder="Nombre de la festividad"
+                  aria-label="Nombre de la festividad" id="nombre_festividad_seleccionada" name="nombre_festividad_seleccionada"
+                  aria-describedby="text-addon">
+              </div>
+              <div class="col-xl-6">
+                <label>Tipo de festividad</label>
+                <select class="form-control" aria-label="Tipo de la festividad" id="tipo_festividad_seleccionada" name="tipo_festividad_seleccionada"
+                  aria-describedby="text-addon">
+                  <option selected hidden>Seleccione el tipo</option>
+                  {% for t in tipoFestivos %}
+                  <option value="{{t.id}}">{{t.nombre}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            {% if user.is_authenticated %}
+            <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+            {% endif %}
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
+          </div>
+      </div>
+    
+    </form>
+  </div>
+</div>
+
+<! -- Modal Agregar Festivo -->
+<div id="modalAgregarFestivo" tabindex="-1" role="dialog" class="modal fade modal-lg"
+  aria-labelledby="modalAgregarFestivo" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    
+    <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:agregar-festivo' %}" method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Agregar festivo</h5>
+            <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row" id="divFormularioFestivos">
+              <input class="form-control" type="text" id="year" name="year" hidden>
+              <div class="col-xl-6">
+                <label>Inicio</label>
+                <div class="">
+                  <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                    aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" onchange="obtenerFecha()">
+                </div>
+              </div>
+            </div>
+            <div class="row" id="divFormularioFestivos2" >
+              <div class="col-xl-6">
+                <label>Festividad</label>
+                <input type="text" class="form-control" placeholder="Nombre de la festividad"
+                  aria-label="Nombre de la festividad" id="nombre_festividad" name="nombre_festividad"
+                  aria-describedby="text-addon">
+              </div>
+              <div class="col-xl-6">
+                <label>Tipo de festividad</label>
+                <select class="form-control" aria-label="Tipo de la festividad" id="tipo_festividad" name="tipo_festividad"
+                  aria-describedby="text-addon">
+                  <option selected hidden>Seleccione el tipo</option>
+                  {% for t in tipoFestivos %}
+                  <option value="{{t.id}}">{{t.nombre}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            {% if user.is_authenticated %}
+            <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+            {% endif %}
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarDiv = document.getElementById('calendarioMensual');
+    var initialDate = '{{initialDate}}';
+    var calendar = new FullCalendar.Calendar(calendarDiv, {
+      initialDate: initialDate, // will be parsed as local
+
+      themeSystem: 'bootstrap5',
+      events: "{% url 'timetrackpro:datos-festivos-calendario' %}",
+      //eventColor: '#20c997', // color de los eventos
+      
+      height: 650, // indico el maximo de alto que puede tener el calendario
+      locale: 'es', // el idioma del calendario
+      handleWindowResize: true, // si se puede redimensionar el calendario
+      initialView: 'dayGridMonth', // la vista inicial del calendario
+      buttonText: { // los textos de los botones
+        today: 'Hoy',
+        month: 'Mes',
+        week: 'Semana',
+        day: 'Día',
+        list: 'Lista'
+      }, 
+      headerToolbar: { // la barra superior donde se encuentra el titulo y los botones
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      // Esta función se ejecutará cuando se haga clic en un día en el calendario         
+      dateClick: function(info) {
+        // se obtiene la fecha seleccionada
+        const meses = {
+            "01": "Enero",
+            "02": "Febrero",
+            "03": "Marzo",
+            "04": "Abril",
+            "05": "Mayo",
+            "06": "Junio",
+            "07": "Julio",
+            "08": "Agosto",
+            "09": "Septiembre",
+            "10": "Octubre",
+            "11": "Noviembre",
+            "12": "Diciembre",
+          };
+        // se obtiene la fecha seleccionada
+        var dia = info.dateStr.substring(8, 10);
+        dia = dia.replace(/^0+/, '');
+        var mes = meses[info.dateStr.substring(5, 7)];
+        var year = info.dateStr.substring(0, 4);
+        
+        // se muestra el modal para agregar el festivo
+        var label = document.getElementById("tituloModalAgregarDesdeCalendario");
+        label.innerHTML = "Agregar festivo el día " + dia + " de " + mes + " del " + year;
+
+        // se obtiene el año actual
+        var yearActual = document.getElementById("year_actual");
+        yearActual.value = year;
+
+        var fechaInicio = document.getElementById("fecha_inicio_seleccionada");
+        fechaInicio.value = info.dateStr;
+        // modifico el index del calendario
+       // se muestra el modal
+        $('#modalAgregarFestivoDesdeCalendario').modal('show');
+        },
+    });
+    calendar.render(); // renderizo el calendario
+    calendar.updateSize(); // actualizo el tamaño del calendario
+  });
+
+
+  function obtenerFecha() {
+    var fecha = document.getElementById("fecha_inicio").value;
+    var inputYear = document.getElementById("year");
+    var year = fecha.substring(0, 4);
+    fecha.value = fecha;
+    inputYear.value = year;
+  }
+
+  function forzarCierre(){
+    $('#modalAgregarFestivoDesdeCalendario').modal('hide');
+  }
+</script>
+
+
+
+    
+{% endblock %}

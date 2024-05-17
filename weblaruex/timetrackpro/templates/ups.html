@@ -1,0 +1,15 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+    <div class="row">
+      <div class="col-xl-6 d-flex justify-content-end">
+        <img class="w-50 img-fluid img-blur-shadow" src="{% static 'img/sin permiso.jpeg' %}" alt="sinPermiso" style="box-shadow: 0px 0px 15px #ccc; border-radius: 20%;
+        ">
+      </div>
+      <div class="col-xl-4 my-auto me-0">
+        <h2>{{mensaje}}</h2>
+        <a class="btn btn-primary btn-sm mb-0 me-3" href="{% url 'timetrackpro:home' %}">Volver al inicio</a>
+        <a class="btn btn-outline-primary btn-sm mb-0 me-3" href="{% url 'timetrackpro:home' %}">Abrir incidencia</a>
+      </div>
+    </div>
+{% endblock %}

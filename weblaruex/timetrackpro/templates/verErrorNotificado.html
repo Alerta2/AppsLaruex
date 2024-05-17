@@ -1,0 +1,239 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+  <div class="row d-flex justify-content-center">
+    
+    <h3 class="text-info text-gradient">Registro erroneo de  {{error.id_empleado__nombre}} {{error.id_empleado__apellidos}}</h3>
+    <h4 class="text-secondary">{{error.hora|date:"d M Y"}}</h4>
+    <div class="col-12 col-xl-4">
+      {% if administrador %}
+        <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+          <div class="row">
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalEditar">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-pen fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Editar</div>
+            </button>
+            </div>
+            <div class="col">
+             <button class="botonLink" data-toggle="modal" data-target="#modalCambiarEstado">             
+              <div class="sign-Btn-link"><i class="fa-solid fa-sign-hanging fa-lg" style="color: #ffffff;"></i></div>
+              <div class="text text-sm">Cambiar estado</div>
+            </button>
+            </div>
+            
+            <div class="col">
+              <button class="botonDelete" data-toggle="modal" data-target="#modalEliminarRegistro">             
+               <div class="sign-btn-delete"><i class="fa-solid fa-trash fa-lg" style="color: #ffffff;"></i></div>
+               <div class="text text-sm">Eliminar</div>
+             </button>
+             </div>
+          </div>
+        </div>
+        
+      {% endif %}
+        
+
+      <div class="card ">
+        <div class="card-header pb-0 p-3">
+        </div>
+        <div class="card-body pt-0 p-3">
+          
+          <ul class="list-group font-weight-bold">
+            <!-- 1- Pendiente, 2 Rechazado, 3 - Aceptado -->
+            {% if error.estado == 1 %}
+            <li class="list-group-item border-0 ps-0 text-lg text-info text-end"><i class="fa-duotone fa-sign-hanging"></i> Pendiente</li>
+            {% elif error.estado == 2 %}
+            <li class="list-group-item border-0 ps-0 text-lg text-danger text-end"><i class="fa-duotone fa-sign-hanging"></i> Rechazado</li>
+            {% else %}
+            <li class="list-group-item border-0 ps-0 text-lg text-success text-end"><i class="fa-duotone fa-sign-hanging"></i> Aceptado</li>
+            {% endif %}
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-user text-dark me-2"></i> {{error.id_empleado__nombre}} {{error.id_empleado__apellidos}}</li>
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-clock text-dark me-2"></i> {{error.hora|date:"H:i:s"}}</li>
+            
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg"><i class="fa-solid fa-calendar text-dark me-2"></i> {{error.hora|date:"d M Y"}}</li>
+            <hr class="horizontal dark my-3">
+            <li class="list-group-item border-0 ps-0 pt-0 text-lg text-center"></i> {{error.motivo}}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalEditar" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEditar"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar registro</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:editar-error-registro-notificado' id=error.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Nuevo empleado</label>
+              <select class="form-control" name="empleadoModificado" id="empleadoModificado">
+                
+              {% for e in empleados %}
+                <option value="{{e.id}}" {% if error.id_empleado == e.id %} selected {% endif %} >{{e.nombre}} </option>
+              {% endfor %}
+
+              </select>
+              
+            </div>
+            
+          </div>
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2">
+              <label class="text-sm" id="labelHora">Nueva fecha y hora </label>
+              <input class="form-control" type="datetime-local" id="hora" name="hora" value="{{error.hora|date:'Y-m-d H:i' }}" required>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2">
+
+            <label class="text-sm" id="labelMotivo">Nuevo Motivo</label>
+
+            <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el registro" aria-label="Indique el motivo de la solicitud" id="nuevoMotivoError" name="nuevoMotivoError" aria-describedby="text-addon" rows="4" required>{{error.motivo}}</textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonEditar">Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalCambiarEstado" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalCambiarEstado"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Aceptar o rechazar el registro</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:modificar-estado-error-registro-notificado' id=error.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Nuevo estado</label>
+              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
+                
+                <option value="1" {% if error.estado == 1 %} selected {% endif %}>Pendiente</option>
+                <option value="2" {% if error.estado == 2 %} selected {% endif %}>Rechazado</option>
+                <option value="3" {% if error.estado == 3 %} selected {% endif %}>Aceptado</option>
+              </select>
+            </div>
+            
+          </div>
+          <div class="row"  id="rowMotivo">
+            <div class="col-xl-8 mx-auto my-2">
+              <label class="text-sm" id="labelMotivo">Motivo del cambio de estado </label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el error" aria-label="Indique el motivo por el que se ha modificado el error" id="motivo" name="motivo" aria-describedby="text-addon"></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonModificar" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modalEliminarRegistro" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalEliminarRegistro"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Eliminar error  de {{error.nombre_empleado}}</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioEditarLineaRegistro" action="{% url 'timetrackpro:eliminar-error-registro-notificado' id=error.id %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+
+            <div class="col-xl-8 mx-auto my-2" >
+              <h6>¿Está seguro/a de eliminar el error?</h6>
+              <span>{{empleado.id_usuario.nombre}} {{empleado.id_usuario.apellidos}} - {{error.hora|date:'d' }} de {{error.hora|date:'M' }} de {{error.hora|date:'Y' }} a las {{error.hora|date:'H:i'}}</span>
+              
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonEliminar">Eliminar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+
+  function mostrarTextArea (){
+    if($('#estado').val() == 2){
+      
+      $('#botonModificar').attr('disabled', true);
+      $('#rowMotivo').show();
+      $('#motivo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+    }else{
+      
+      $('#botonModificar').attr('disabled', false);
+      
+      $('#rowMotivo').hide();
+    }
+  }
+
+
+
+
+    // compruebo si en textarea de motivoEliminación hay algo escrito
+  // si hay algo escrito, habilito el boton de guardar
+  // si no hay nada escrito, deshabilito el boton de guardar
+  $(document).ready(function(){
+    $('#motivoEliminacion').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonEliminar').attr('disabled', false);
+    })
+  });
+</script>
+{% endblock %}

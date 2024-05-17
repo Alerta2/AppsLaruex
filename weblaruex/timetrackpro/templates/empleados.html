@@ -1,0 +1,196 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h1 id="tituloPagina" class="text-center text-gradient text-primary" >Empleados</h1>
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+
+          <div class="table-responsive ms-3 me-3">
+            <div id="toolbar" class="pt-0" >
+              <div class="row my-auto">
+                <div class="col my-auto">
+                  <label class="text-sm" ></label>
+                  <a href="{% url 'timetrackpro:agregar-usuario' %}"><button class="btn btn-outline-primary" type="button">
+                  Agregar empleado
+                </button>
+              </a>
+                </div>
+              </div>
+            </div>
+            <table  id="empleados" data-locale="es-ES" data-toggle="table" data-search="true" data-search-accent-neutralise="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+
+$("#empleados").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-empleados' %}",
+    cache: false, 
+    columns: [
+        {
+        title: "",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row){
+          var imagen = row.id_usuario__img;
+          console.log("imagen",imagen)
+          var empleado = row.id_usuario__nombre +" "+ row.id_usuario__apellidos;
+          console.log("empleado",empleado)
+          var srcDefault = "{% static 'img/timetrackpro/usuarios/not_found.jpeg' %}"; 
+          var src = "{% static 'img/timetrackpro/usuarios/' %}"+imagen+"";
+          console.log("sre",src);
+          if (imagen == null)
+            src = srcDefault;
+          var imagen ='<img src="'+ src +'" class="avatar avatar-sm me-3">';
+          return imagen;
+        }
+      },
+      {
+        title: "Empleado",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        width:"200",
+        
+        formatter: function(value, row) {
+          var empleado = row.id_usuario__nombre +" "+ row.id_usuario__apellidos;
+          var puesto = row.id_usuario__puesto;
+          
+          
+          var div = '<div>'+'<h6 class="mb-0 text-sm">'+empleado+'</h6>'+'<h6 class="mb-0 text-xs text-secondary">'+puesto+'</h6>'+'</div>';
+          return div;
+        }
+      },  
+      {
+        title: "Nombre",
+        field: "id_usuario__nombre",
+        // esconder columna
+        visible: false,
+      }, 
+      {
+        title: "Apellidos",
+        field: "id_usuario__apellidos",
+        // esconder columna
+        visible: false,
+      },
+      {
+        title: "Jornada",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var jornada = row.id_empleado__horas_maxima_contrato;
+          var turno = row.id_empleado__turno;
+          if (turno == null)
+            turno = "Sin asignar";
+          if (jornada == null)
+            jornada = "37,5";
+          
+          
+          var div = '<div>'+'<h6 class="mb-0 text-sm">'+jornada+' Horas</h6>'+'<h6 class="mb-0 text-xs text-secondary">Turno: '+turno+'</h6>'+'</div>';
+          return div;
+        }
+      },
+      {
+        title: "Accesos permitidos",
+        align: "center",
+        formatter: function(value, row) {
+          var laboratorio = row.id_empleado__maquina_laboratorio;
+          var alerta2 = row.id_empleado__maquina_alerta2;
+          var departamento = row.id_empleado__maquina_departamento;
+          var divLaboratorio = '<i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> Laboratorio</span>';
+          var divAlerta2 = '<i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> Alerta2</span>';
+          var divDepartamento = '<i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> Departamento</span>';
+          if (laboratorio == 1)
+            var divLaboratorio = '<i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> Laboratorio</span>';
+          if (alerta2 == 1)
+            var divAlerta2 = '<i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> Alerta2</span>';
+          if (departamento == 1)
+            var divDepartamento = '<i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-xs font-weight-bold"> Departamento</span>';
+          var div = '<div>'+divLaboratorio+'</div>'+'<div>'+divAlerta2+'</div>'+'<div>'+divDepartamento+'</div>';
+          return div;
+        }
+      },
+      {
+        title: "Estado",
+        align: "center",
+        formatter: function(value, row) {
+          var estado = row.id_auth_user__is_active;
+          console.log("estado",estado)
+          var div = '<h6><span class="badge badge-xs bg-gradient-danger">Inactivo</span></h6>';
+          if (estado == 1)
+            var div = '<h6><span class="badge  bg-gradient-success">Activo</span></h6>';
+          return div;
+        }
+      },
+      {
+        title: "Fecha alta en la app",
+        field: "fecha_inicio",
+        align: "center",
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Enero",
+            "02": "Febrero",
+            "03": "Marzo",
+            "04": "Abril",
+            "05": "Mayo",
+            "06": "Junio",
+            "07": "Julio",
+            "08": "Agosto",
+            "09": "Septiembre",
+            "10": "Octubre",
+            "11": "Noviembre",
+            "12": "Diciembre",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.id_usuario__fecha_alta_app;
+          // obtengo la fecha
+          var fecha = fechaLectura.split("T")[0];
+          mesFecha = fecha.split("-")[1];
+          fecha = fecha.split("-")[2] + " de " + mes[mesFecha] + " de " + fecha.split("-")[0];
+
+          var div = '<span class="text-xs font-weight-bold">'+fecha +'</span>';
+          return div;
+        }
+      },
+      {
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          administrador = '{{administrador}}';
+          director = '{{director}}';
+          console.log(administrador, director)
+          var empleado = row.id_usuario__id;
+          var urlVerEmpleado = "{% url 'timetrackpro:ver-empleado' id=0 %}";
+          var urlEditarEmpleado = "{% url 'timetrackpro:editar-empleado' id=0 %}";
+          urlVerEmpleado = urlVerEmpleado.replace("0", empleado);
+          urlEditarEmpleado = urlEditarEmpleado.replace("0", empleado);
+          var botonVer = '<a href="'+urlVerEmpleado+'" class="mx-1" title="ver datos del empleado"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          var botonEditar = '<a href="'+urlEditarEmpleado+'" class="mx-1" title="editar datos del empleado"><i class="fa-solid fa-user-pen fa-lg entrar" ></i></a>';
+          if ((administrador == "True" ||  director == "True" ))
+            return '<div>'+botonVer+'</div>' + '<div>'+botonEditar+'</div>';
+          else
+            return botonVer;
+        },
+      },
+    ],
+    search: true,
+  });
+  </script>
+
+{% endblock %}

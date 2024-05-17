@@ -1,0 +1,373 @@
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block content %}
+
+
+
+<div class="row">
+  <div class="col-lg-12">
+    {% if administrador %}
+    <div class="pb-0  d-flex justify-content-start " style="background-color: transparent;">
+      <div class="row">
+        <div class="col">
+          <button class="botonLink" data-toggle="modal" data-target="#modalAgregarFestivo">
+            <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+            <div class="text text-xs">Agregar festivo</div>
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="row my-3">
+  <div class="col-lg-4 col-md-4 mb-md-0 mb-4">
+    <div class="card">
+      <div class="card-header pb-0 mb-0">
+        <h5>Información de interes  <i class="fa-duotone fa-comment-exclamation fa-fade text-danger" style="--fa-animation-duration: 2s;"></i></h5>
+      </div>
+      <div class="card-body pb-0 mb-0">
+          <p class="text-center text-md">
+            Durante el periodo de vacaciones fijado por la Uex, en el LARUEX estará la persona de guardia, el
+            informático de guardia y el técnico de laboratorio de apoyo de guardia.
+            <a class="btn btn-outline-primary btn-md mb-0 me-3 mt-4" target="_blank" href="{% url 'timetrackpro:calendario-festivos' %}"><i class="fa-solid fa-calendar me-sm-1"></i>Ver festivos desde calendario
+            </a>
+          </p>
+          
+
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-8 col-md-8 mb-md-0">
+    <div class="card">
+      <div class="card-header pb-0">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="d-flex justify-content-start">
+              <h5>Calendario Vaciones LARUEX
+              </h5><a class="ms-2" data-bs-toggle="información sobre leyendas de color" data-bs-placement="bottom"
+                title="Información sobre las leyendas de color de los festivos" data-toggle="modal" data-target="#modalInfoLeyenda">
+                <i class="fa-solid fa-info fa-lg btn bg-gradient-leyenda"></i>
+              </a>
+
+            </div>
+            {% if year %}
+            <p class="text-md mb-0">
+              <i class="fa-duotone fa-calendar-days text-info" aria-hidden="true"></i>
+              <span class="font-weight-bold ms-1">Año {{year}}</span>
+            </p>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-10 mx-auto">
+            <table  id="tabla_festivos" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<div id="modalInfoLeyenda" class="modal fade modal-sm" tabindex="-1" role="dialog" aria-labelledby="modalInfoLeyenda"
+  aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Leyenda de colores</h5>
+        <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% for tipo in tipoFestivos %}
+        <p class="text-xl">
+          <i class="fa-solid fa-party-horn {{tipo.color}}" aria-hidden="true"></i>
+          <span class="font-weight-bold ms-1">{{tipo.nombre}}</span>
+        </p>
+        {% endfor %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modalAgregarFestivo" tabindex="-1" role="dialog" class="modal fade modal-lg"
+  aria-labelledby="modalAgregarFestivo" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    
+    <form id="formularioAgregarFestivo" action="{% url 'timetrackpro:agregar-festivo' %}" method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Agregar festivo</h5>
+            <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row" id="divFormularioFestivos" >
+              <input class="form-control" type="text" id="year" name="year" hidden>
+              <div class="col-xl-6">
+                <label>Inicio</label>
+                <div class="">
+                  <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                    aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio" onchange="obtenerFecha()">
+                </div>
+              </div>
+            </div>
+            <div class="row" id="divFormularioFestivos2">
+              <div class="col-xl-6">
+                <label>Festividad</label>
+                <input type="text" class="form-control" placeholder="Nombre de la festividad"
+                  aria-label="Nombre de la festividad" id="nombre_festividad" name="nombre_festividad"
+                  aria-describedby="text-addon">
+              </div>
+              <div class="col-xl-6">
+                <label>Tipo de festividad</label>
+                <select class="form-control" aria-label="Tipo de la festividad" id="tipo_festividad" name="tipo_festividad"
+                  aria-describedby="text-addon">
+                  <option selected hidden>Seleccione el tipo</option>
+                  {% for t in tipoFestivos %}
+                  <option value="{{t.id}}">{{t.nombre}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            {% if user.is_authenticated %}
+            <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+            {% endif %}
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          </div>
+      </div>
+    
+    </form>
+  </div>
+</div>
+
+<div id="modalEditarFestivo" tabindex="-1" role="dialog" class="modal fade modal-lg"
+  aria-labelledby="modalEditarFestivo" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    
+    <form id="formularioEditarFestivo" action="{% url 'timetrackpro:editar-festivo' id=0 %}" method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="tituloEditarFestivo">Editar Festivo</h5>
+            <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-xl-6">
+                <label>Fecha Inicio</label>
+                <div class="">
+                  <input type="date" class="form-control" aria-label="Fecha inicial de la festividad"
+                    aria-describedby="text-addon" name="fecha_inicio_editar" id="fecha_inicio_editar" >
+                </div>
+              </div> 
+            </div>
+            <div class="row mt-2">
+              <div class="col-xl-6">
+                <label>Festividad</label>
+                <input type="text" class="form-control" placeholder="Nombre de la festividad"
+                  aria-label="Nombre de la festividad" id="nombre_festividad_editar" name="nombre_festividad_editar"
+                  aria-describedby="text-addon">
+              </div>
+              <div class="col-xl-6">
+                <label>Tipo de festividad</label>
+                <select class="form-control" aria-label="Tipo de la festividad" id="tipo_festividad_editar" name="tipo_festividad_editar"
+                  aria-describedby="text-addon">
+                  <option value="1">Festividad Nacional</option>
+                  <option value="2">Festividad Autonómica</option>
+                  <option value="3">Festividad Local</option>
+                  <option value="4">Festividad Uex</option>
+                  <option value="5">Festividad Facultad</option>
+                  <option value="6">Periodo no lectivo por cierre Uex</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            {% if user.is_authenticated %}
+            <button type="submit" value="submit" class="btn bg-gradient-primary">Guardar</button>
+            {% endif %}
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          </div>
+      </div>
+    
+    </form>
+  </div>
+</div>
+
+<div id="modalEliminarFestivo" tabindex="-1" role="dialog" class="modal fade modal-lg"
+  aria-labelledby="modalEliminarFestivo" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    
+    <form id="formularioEliminarFestivo" action="{% url 'timetrackpro:eliminar-festivo' id=1 %}" method="POST"
+    enctype="multipart/form-data">
+    {% csrf_token %}
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-danger">Eliminar festivo</h5>
+            <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="row d-flex justify-content-center">
+              <div class="col-xl-6" >
+                <h6 class="text-muted text-center" id="estasSeguro"></h6>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            {% if user.is_authenticated %}
+            <button type="submit" value="submit" class="btn bg-gradient-danger">Eliminar</button>
+            {% endif %}
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          </div>
+      </div>
+    
+    </form>
+  </div>
+</div>
+
+<script>
+
+  function obtenerFecha() {
+    var fecha = document.getElementById("fecha_inicio").value;
+    var inputYear = document.getElementById("year");
+    var year = fecha.substring(0, 4);
+
+    fecha.value = fecha;
+    inputYear.value = year;
+  }
+
+
+  
+
+$("#tabla_festivos").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-festivos' %}",
+    cache: false, 
+    columns: [
+      {
+        title: "FECHA",
+        field: "fecha_inicio",
+        align: "left",
+        width: 50,
+        formatter: function(value, row) {
+          const mes = {
+            "01": "Ene",
+            "02": "Feb",
+            "03": "Mar",
+            "04": "Abr",
+            "05": "May",
+            "06": "Jun",
+            "07": "Jul",
+            "08": "Ago",
+            "09": "Sep",
+            "10": "Oct",
+            "11": "Nov",
+            "12": "Dic",
+          };
+          // obtengo la fecha de lectura
+          var fechaLectura = row.fecha_inicio;
+          var fecha = fechaLectura.substring(8, 10) + " " + mes[fechaLectura.substring(5, 7)];
+          var div = '<span class="text-md font-weight-bold">'+fecha +'</span>';
+          return div;
+
+        }
+      },
+      {
+        title: "Festividad",
+        align: "left",
+        // tamaño de la columna
+        width: 100,
+        formatter: function(value, row) {
+          var festividad = row.nombre;
+          var color = row.tipo_festividad__color;
+          var icono = '<i class="fa-solid fa-party-horn me-2 '+color +'"></i>';
+          var div = '<span class="text-md font-weight-bold text-dark">'+ icono +festividad+'</span>';
+          return div;
+        }
+      },{
+        title: " ",
+        align: "center",
+        width: 50,
+        formatter: function (value, row) {
+          
+
+          var botonEditarFestivo = '<li><a class="dropdown-item border-radius-md" href="/private/docLaruex/editar-festivo/'+ row.id + '/' +'" title="Editar festivo" data-toggle="modal" data-target="#modalEditarFestivo" onclick="$('+"'#formularioEditarFestivo').attr('action', '/private/docLaruex/editar-festivo/"+ row.id +"/');"+'">Editar Festivo</a></li>';
+
+          var botonEliminarFestivo = '<li><a class="dropdown-item border-radius-md" href="/private/docLaruex/eliminarEvento/' + row.id + '/' + '" title="Eliminar festivo" data-toggle="modal" data-target="#modalEliminarFestivo" onclick="$('+"'#formularioEliminarFestivo').attr('action', '/private/docLaruex/eliminar-festivo/"+ row.id +"/');"+'">Eliminar Festivo</a></li>';
+
+          var dropdownMenu ='<div class="dropdown float-lg-center "><a href="" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v text-secondary fa-lg"></i><ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">'+ botonEditarFestivo + botonEliminarFestivo +'</ul></a></div>';
+
+          return dropdownMenu;
+                  
+
+        },
+      },
+    ],
+    search: true,
+    // ordernar por fecha
+    sortName: "fecha_inicio",
+    sortOrder: "asc",
+    onPostBody: function() {
+      // deshabilitar el scroll automático
+      $(".fixed-table-body").css("overflow", "hidden");
+    },
+    
+    // obtener los valores de la row seleccionada en la tabla y mostrarlos en el modal
+    onClickRow: function(row, $element) {
+      // obtener los valores de la row seleccionada
+      var fecha = row.fecha_inicio;
+      var fecha_fin = row.fecha_fin;
+      var festividad = row.nombre;
+      var tipo = row.tipo_festividad__nombre;
+      var id = row.id;
+
+      var valorFestividad = row.tipo_festividad__id;
+
+      // generar texto que pregunte si está seguro de eliminar el festivo indicando la fecha y el nombre de la festividad
+      var texto = "¿Está seguro de eliminar el festivo " + festividad + " del " + fecha + "?";
+      $("#estasSeguro").text(texto);
+
+      // seleccionar la opcion del select que coincida con el valor de la festividad
+      $("#tipo_festividad_editar").val(valorFestividad);
+      // mostrar los valores en el modal
+      $("#fecha_inicio_editar").val(fecha);
+
+      $("#nombre_festividad_editar").val(festividad);
+      $("#tituloEditarFestivo").text("Editar festividad " + festividad);
+      $("#formularioEditarFestivo").attr("action", "/private/timetrackpro/editar-festivo/" + id + "/");
+      $("#formularioEliminarFestivo").attr("action", "/private/timetrackpro/eliminar-festivo/" + id + "/");
+    },
+
+
+  });
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,439 @@
+
+{% extends "base/base_timetrackpro.html" %}
+
+{% load static %}
+{% block imports %}
+<!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/timetrackpro-boostrap-table.css' %}" /> -->
+
+{% endblock %}
+{% block content %}
+
+{% if alerta.activa == True %}
+<div class="alert alert-{{alerta.tipo}} alert-dismissible fade show" role="alert">
+  <div>
+
+    {% if alerta.icono != ""%}
+    <i class="{{alerta.icono}} me-2"></i>
+    {% endif %}
+    {{alerta.mensaje}}
+  </div>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+    <strong >&times;</strong>
+  </button>
+
+</div> 
+{% endif %}
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header pb-0">
+          <h5>Permisos remunerados</h5>
+          
+            
+        </div>
+        <div class="card-body px-0 pt-0 pb-2">
+          <div class="table-responsive p-0 mx-4">
+            
+       <div id="toolbar">
+
+        <button class="botonLink" data-toggle="modal" data-target="#modalAgregarPermiso">
+          <div class="sign-Btn-link"><i class="fa-solid fa-plus fa-lg" style="color: #ffffff;"></i></div>
+          <div class="text text-sm">Agregar permiso</div>
+        </button>
+      </div>
+            <table id="tabla_permisos" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true"
+    data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true"
+    data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true"
+    data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar" data-row-style="rowStyle"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalAgregarPermiso" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalAgregarPermiso"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Agregar nuevo permiso vacacional</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioAgregarPermiso" action="{% url 'timetrackpro:agregar-permiso' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}         
+          <div class="row">
+            <div class="col-xl-4">
+              <label>Nombre</label>
+              <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Nombre en el dispositivo" aria-label="Nombre en el dispositivo" id="nombre_permiso" name="nombre_permiso" aria-describedby="text-addon">
+              </div>
+            </div>
+            <div class="col-xl-2">
+              <label>Duración en días</label>
+              <div class="mb-3">
+                <input type="number" class="form-control" placeholder="3" aria-label="Duración del permiso"
+                  id="duracion_permiso" name="duracion_permiso" min="1" aria-describedby="text-addon">
+              </div>
+            </div>
+            <div class="col-xl-3">
+              <label>Tipo de días</label>
+              <div class="mb-3">
+                <select class="form-control" aria-label="Nombre en el dispositivo" id="tipo_dias"
+                name="tipo_dias" aria-describedby="text-addon">
+                <option value="Naturales">Naturales</option>
+                <option value="Hábiles">Hábiles</option>
+              </select>
+              </div>
+            </div>
+            <div class="col-xl-3">
+              <label>Fecha límite solicitud</label>
+              <div class="mb-3">
+                <input type="date" class="form-control" aria-label="Nombre en el dispositivo" aria-describedby="text-addon" name="fecha_limite_solicitud" id="fecha_limite_solicitud">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-6">
+              <label>Periodo de antelación</label><textarea type="text" class="form-control" placeholder="Indique con palabras el perido con el que se puede solicitar" aria-label="Información sobre el periodo de antelación" id="periodo_antelacion" name="periodo_antelacion" aria-describedby="text-addon"></textarea>
+            </div>
+            <div class="col-xl-6" id="docNecesaria" hidden>
+              <label>Documentación a aportar</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control"
+                  placeholder="Documentación que debe aportar para justificar el permiso"
+                  aria-label="Documentación justificativa" id="documentacion_permiso" name="documentacion_permiso"
+                  aria-describedby="text-addon"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-9">
+              <label>Legislación aplicable</label>
+                <textarea type="text" class="form-control" placeholder="Legislación en la que se recoge el derecho a este permiso" aria-label="Legislacion aplicable al permiso" id="legilacion_aplicable" name="legilacion_aplicable" aria-describedby="text-addon"></textarea>
+            </div>
+            <div class="col-xl-3">
+              <label>¿Quién se beneficia?</label>
+              <div class="mb-3">
+                <div class="form-switch ps-1 my-2">
+                  <label>PAS</label>
+
+                  <input class="form-check-input ms-auto" type="checkbox" id="pas" name="pas" >
+                  <label class="text-muted">Si</label>
+                </div>
+                <div class="form-switch ps-1 my-2">
+                  <label>PDI</label>
+                  <input class="form-check-input ms-auto" type="checkbox" id="pdi" name="pdi" >
+                  <label class="text-muted">Si</label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-4">
+              <label>Bonificable por antigüedad</label>
+              <div class="mb-3">
+                <div class="form-switch ps-1 my-2">
+                  <input class="form-check-input ms-auto" type="checkbox" id="bonificable" name="bonificable">
+                  <label class="text-muted">Si</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-4">
+              <label>¿Es un permiso retribuido?</label>
+              <div class="mb-3">
+                <div class="form-switch ps-1 my-2">
+
+                  <input class="form-check-input ms-auto" type="checkbox" id="retribuido" name="retribuido">
+                  <label class="text-muted">Si</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-4">
+              <label>¿Se debe acreditar?</label>
+              <div class="mb-3">
+                <div class="form-switch ps-1 my-2">
+
+                  <input class="form-check-input ms-auto" type="checkbox" id="acreditable" name="acreditable">
+                  <label class="text-muted">Si</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-4" hidden>
+              <label>Año al que aplica</label>
+              <div class="mb-3">
+                <input type="number" class="form-control" placeholder="2023" min="2022" max="2050" id="year_permiso"
+                  name="year_permiso" aria-label="Año al que aplica"  aria-describedby="text-addon">
+              </div>
+            </div>
+          </div>
+          <div class="row" id="bonificaciones" hidden>
+            <div class="col-xl-3">
+              <label>Por 15 años</label>
+              <div class="mb-3">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_15_year"
+                  name="bonificacion_15_year" aria-label="Año al que aplica" aria-describedby="text-addon">
+              </div>
+            </div>
+            <div class="col-xl-3">
+              <label>Por 20 años</label>
+              <div class="mb-3">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_20_year"  name="bonificacion_20_year" aria-label="Año al que aplica" aria-describedby="text-addon">
+              </div>
+            </div>
+            <div class="col-xl-3">
+              <label>Por 25 años</label>
+              <div class="mb-3">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_25_year" name="bonificacion_25_year" aria-label="Año al que aplica" aria-describedby="text-addon">
+              </div>
+            </div>
+            <div class="col-xl-3">
+              <label>Por 30 años</label>
+              <div class="mb-3">
+                <input type="number" class="form-control" placeholder="1" min="0" max="2" id="bonificacion_30_year" name="bonificacion_30_year" aria-label="Año al que aplica" aria-describedby="text-addon">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary">Guardar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    $("#tabla_permisos").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-lista-permisos' year=year %}",
+    cache: false, 
+    columns: [
+      {
+        title: "Permiso",
+        field: "id",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var nombre = row.nombre;
+          var id_usuario = row.id;
+          var fechaLimite = row.fecha_maxima_solicitud;
+          var fecha = "Sin fecha límite"
+          const meses = {
+            "01": "Enero",
+            "02": "Febrero",
+            "03": "Marzo",
+            "04": "Abril",
+            "05": "Mayo",
+            "06": "Junio",
+            "07": "Julio",
+            "08": "Agosto",
+            "09": "Septiembre",
+            "10": "Octubre",
+            "11": "Noviembre",
+            "12": "Diciembre",
+          };
+
+          if(fechaLimite != null){
+            // formatear la fecha para que tenga el formarto dd/mm/yyyy
+            var fecha = fechaLimite.split("-");
+
+            var fecha = fecha[2]+" de "+meses[fecha[1]]+" de "+fecha[0];
+          }          
+          // dias de duracion
+          var bonificacion15 = '<p class="text-xs text-secondary mb-0"> 15 años: +'+ row.bonificacion_por_15_years +" dias"+'</p>';
+          var bonificacion20 = '<p class="text-xs text-secondary mb-0"> 20 años: +'+ row.bonificacion_por_20_years +" dias"+'</p>';
+          var bonificacion25 = '<p class="text-xs text-secondary mb-0"> 25 años: +'+ row.bonificacion_por_25_years +" dias"+'</p>';
+          var bonificacion30 = '<p class="text-xs text-secondary mb-0"> 20 años: +'+ row.bonificacion_por_30_years +" dias"+'</p>';
+          
+          var divDias = '<div class="col-10"><p class="text-xs text-secondary mb-0"> Bonificación por antigüedad</p>'+bonificacion15+bonificacion20+bonificacion25+bonificacion30+'</div>'
+          var bonificaciones = "";
+
+          if(row.bonificable_por_antiguedad == 1){
+           bonificaciones = '<div class="col-10"><p class="text-xs text-secondary mb-0"> Bonificación por antigüedad:</p>'+bonificacion15+bonificacion20+bonificacion25+bonificacion30+'</div>';
+          }else{
+            bonificaciones ="";
+          }
+          var divDatos = '<div class="col-10"><h6 class="mb-0 text-sm">'+ nombre +'</h6><p class="text-xs text-secondary mb-0"> Fecha límite: '+ fecha +'</p></div>';
+          
+          var div = '<div class="row d-flex align-items-center">'+ divDatos+ bonificaciones+'</div>';
+          return div;
+        }
+      },
+      {
+        
+        title: "Dias",
+        field: "duracion",
+        align: "left",
+        halign: "left",
+        formatter: function(value, row) {
+          var duracion = row.duracion;
+          var tipo = row.naturales_o_habiles;
+          var dias = '<div class="col-10"><h6 class="mb-0 text-sm">'+ duracion +" " + tipo +'</h6></div>';
+          return dias;
+        }
+      },
+      {
+        title: "¿Quién se beneficia?",
+        field: "",
+        align: "center",
+        halign:"center",
+        formatter: function(value, row) {
+          var pas = row.pas;
+          var pdi = row.pdi;
+
+          var divPAS = ""
+          var divPDI = ""
+
+          if (pas == 1){
+            divPAS = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PAS</span></div>';
+          }else{
+            divPAS = '<div><i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PAS</span></div>';
+          }
+          if (pdi == 1){
+            divPDI = '<div><i class="fa fa-check text-success" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PDI</span></div>';
+          }else{
+            divPDI = '<div><i class="fa fa-x text-danger" aria-hidden="true"></i><span class="text-secondary text-sm font-weight-bold"> PDI</span></div>';
+          }
+          var div = '<div class="ms-4">'+divPAS+divPDI+'</div>';
+          // var div = divA2+divDep+divLab;
+
+          return div;
+        }
+      },
+      {
+        title: "¿Requiere justificante?",
+        field: "acreditar",
+        align: "center",
+        formatter: function(value, row) {
+          var acreditable = row.acreditar;
+          var documentacion = row.doc_necesaria;
+          var div = "";
+          var divDocumentacion = "";
+         
+          if (acreditable == 1){
+            div = '<div><span class="badge badge-xs bg-gradient-warning">Si</span></div>';
+            divDocumentacion = '<div class="mt-2"><h6 class="text-secondary text-sm font-weight-bold text-wrap ">'+documentacion +'</h6></div>';
+          }else{
+            div = '<div><span class="badge badge-xs bg-gradient-dark">No</span></div>';
+          }
+          return div + divDocumentacion;
+        }
+      },
+      {        
+        title: "Legislación aplicable",
+        field: "legislacion_aplicable",
+        align: "center",
+        formatter: function(value, row) {
+          var legislacion = row.legislacion_aplicable;
+          var div = '<div  style="white-space: pre-line; overflow-wrap: break-word;" ><h6 class="text-secondary text-sm font-weight-bold ">'+ legislacion +'</h6></div>'
+          return div;
+        }
+      },{
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          // convertir a string el id para poder pasarlo como parametro en la url
+          var idPermiso = row.id.toString();
+          // construir la url 
+          var urlEditar = "{% url 'timetrackpro:ver-permiso' id='id' %}".replace('id', idPermiso);
+
+          var icono = '<a class="cursor-pointer" id="opcionesPermisos" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v text-secondary"></i></a>';
+          var verPermiso = '<li><a class="dropdown-item border-radius-md" href='+urlEditar+'>Editar Festivo</a></li>'; 
+          var eliminarPermiso = '<li><a class="dropdown-item border-radius-md" href="'+"{% url 'timetrackpro:solicitudes' %}"+'">Eliminar Permiso</a></li>'; 
+          var listaOpciones = '<ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="opcionesPermisos">'+verPermiso+eliminarPermiso+'</ul>';
+          var div = '<div class="dropdown">'+icono+listaOpciones+'</div>';
+          return div;
+        },
+      },{
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          var botonVer = '<a href="/private/timetrackpro/ver-permiso/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+          return botonVer;
+                  
+
+        },
+      }
+    ],
+    search: true,
+    sortName: "id",
+    sortOrder: "asc",
+  });
+
+
+  $(document).ready(function () {
+    $("#fecha_limite_solicitud").change(function () {
+      if ($("#fecha_limite_solicitud").val() == "") {
+        var d = new Date();
+        var n = d.getFullYear();
+        $("#year_permiso").val(n);
+      } else {
+        var d = new Date($("#fecha_limite_solicitud").val());
+        var n = d.getFullYear();
+        $("#year_permiso").val(n);
+      }
+    });
+  });
+
+  $(document).ready(function () {
+    $("#bonificable").click(function () {
+      if ($("#bonificable").is(':checked')) {
+        
+
+        $("#bonificaciones").attr("hidden", false);
+        $("#bonificacion_15_year").val(1);
+        $("#bonificacion_20_year").val(1);
+        $("#bonificacion_25_year").val(1);
+        $("#bonificacion_30_year").val(1);
+
+        $("#bonificacion_15_year").attr("required", true);
+        $("#bonificacion_20_year").attr("required", true);
+        $("#bonificacion_25_year").attr("required", true);
+        $("#bonificacion_30_year").attr("required", true);
+
+      } else {
+
+        $("#bonificaciones").attr("hidden", true);
+        $("#bonificacion_15_year").val(0);
+        $("#bonificacion_20_year").val(0);
+        $("#bonificacion_25_year").val(0);
+        $("#bonificacion_30_year").val(0);
+
+        $("#bonificacion_15_year").attr("required", false);
+        $("#bonificacion_20_year").attr("required", false);
+        $("#bonificacion_25_year").attr("required", false);
+        $("#bonificacion_30_year").attr("required", false);
+
+      }
+    });
+  });
+
+  $(document).ready(function () {
+    $("#acreditable").click(function () {
+      if ($("#acreditable").is(':checked')) {
+        $("#docNecesaria").removeAttr("hidden");
+        $("#documentacion_permiso").attr("required", true);
+      } else {
+        $("#docNecesaria").attr("hidden", true);
+        $("#documentacion_permiso").attr("required", false);
+      }
+    });
+  });
+</script>
+
+
+{% endblock %}

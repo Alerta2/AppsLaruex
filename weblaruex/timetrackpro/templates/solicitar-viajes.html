@@ -1,0 +1,576 @@
+
+{% extends "base/base_timetrackpro.html" %}
+{% load static %}
+{% block imports %}
+  <!-- fullcalendar-->
+<!-- <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.9/index.global.min.js'></script> -->
+<link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" />
+<script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar.js' %}"></script>
+<script src="{% static 'js/timetrackpro/fullcalendar/fullcalendar_es.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/calendario_mesual.css' %}" />
+  <!-- disponible para configuración servidor-->
+  <!-- <link rel="stylesheet" href="{% static 'css/timetrackpro/fullcalendar/fullcalendar.css' %}" /> -->
+{% endblock %}
+{% block content %}
+  <div class="row d-flex justify-content-center">
+    <div class="col-12 col-xl-5 ">
+        <div class="d-block shadow-xl border-radius-xl">
+          <div class="row ">
+            <div class="col m-3">
+
+              <div id="calendarioMensual">
+              </div>
+            </div>
+
+          </div>
+      </div>
+    </div>
+    <div class="col-12 col-xl-7">
+      <div class="pb-0 p-3 d-flex justify-content-end mb-4" style="background-color: transparent;">
+        <div class="row">
+          <div class="col">
+          <button class="botonLink" data-toggle="modal" data-target="#modalSolicitarViaje">    
+            
+            <div class="sign-Btn-link">
+              <i class="fa-solid fa-plus fa-lg " style="color: #ffffff;"></i>
+          </div>
+            <div class="text text-sm">Solicitar días</div>
+          </button>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="card mt-2">
+        <div class="card-header pb-0 p-3">
+          <div class="row">
+            <div class="col-md-8 d-flex align-items-center">
+              <div class="row">
+                <h5 class="mb-2">
+                  Viajes solicitados
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body pt-0 p-3" >
+          <div class="table-responsive ms-3 me-3">
+            <table  id="viajes" data-locale="es-ES" data-toggle="table" data-search="true" data-show-columns="true" data-show-columns-toggle-all="true" data-show-fullscreen="true" data-buttons="buttons" data-show-toggle="true" data-buttons-class="" data-show-export="true" data-export-types="['excel', 'pdf']" data-show-refresh="true" data-pagination="true" data-id-field="id" data-page-list="[10, 25, 50, 100, All]" data-toolbar="#toolbar"></table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div id="modalSolicitarViaje" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalSolicitarViaje"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Solicitar viaje</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioSolicitarViaje" action="{% url 'timetrackpro:solicitar-viaje' %}" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-6">
+              <label class="col-form-label">Fecha de inicio</label>
+                <input type="date" class="form-control" aria-label="Fecha inicial de las vacaciones"
+                  aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio">
+            </div>
+            
+            <div class="col-xl-6">
+              <label class="col-form-label">Fecha de fin</label>
+              <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
+                aria-describedby="text-addon" name="fecha_fin" id="fecha_fin">  
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col">
+              <label class="col-form-label">Lugar de viaje</label>
+                <input type="text" id="lugar" name="lugar" class="form-control" />
+            </div>
+          </div>
+
+          <div class="row mt-2">
+            <div class="col">
+              <label class="col-form-label">Indique el motivo del viaje</label>
+              <div class="mb-3">
+                <textarea type="text" class="form-control" placeholder="Indique cúal es el motivo del viaje." id="motivo" name="motivo" rows="3" aria-describedby="text-addon"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-2" id="selectorVehiculos" hidden>
+            <div class="col" >
+              <label class="text-sm">Seleccione el vehículo que desea reservar</label>
+              <select class="form-control" name="vehiculo" id="vehiculo">
+                
+              </select>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col d-flex justify-content-center">
+              <button type="button" class="btn bg-gradient-dark" onclick="obtenerVehiculosDisponibles()">obtener vehículos disponibles</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn btn-primary" id="guardarSolicitarViajes" disabled>Guardar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" >Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <! -- Modal Agregar ReservaVehiculo -->
+  <div id="modalAgregarViajesDesdeCalendario" tabindex="-1" role="dialog" class="modal fade modal-lg"
+    aria-labelledby="modalAgregarViajesDesdeCalendario" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <form id="formularioAgregarViajeCalendario" action="{% url 'timetrackpro:solicitar-viaje-calendario' %}" method="POST"
+      enctype="multipart/form-data">
+      {% csrf_token %}
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="tituloModalAgregarViajesDesdeCalendario"></h5>
+              <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close" onclick="forzarCierre()">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-xl-6">
+                  <label class="col-form-label">Fecha de inicio</label>
+                    <input type="date" class="form-control" aria-label="Fecha inicial de las vacaciones"
+                      aria-describedby="text-addon" name="fecha_inicio" id="fecha_inicio_calendario">
+                </div>
+                
+                <div class="col-xl-6">
+                  <label class="col-form-label">Fecha de fin</label>
+                  <input type="date" class="form-control" aria-label="Fecha final de las vacaciones"
+                    aria-describedby="text-addon" name="fecha_fin" id="fecha_fin_calendario">  
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col">
+                  <label class="col-form-label">Lugar de viaje</label>
+                    <input type="text" id="lugar_calendario" name="lugar" class="form-control" />
+                </div>
+              </div>
+    
+              <div class="row mt-2">
+                <div class="col">
+                  <label class="col-form-label">Indique el motivo del viaje</label>
+                  <div class="mb-3">
+                    <textarea type="text" class="form-control" placeholder="Indique cúal es el motivo del viaje." id="motivo_calendario" name="motivo" rows="3" aria-describedby="text-addon"></textarea>
+                  </div>
+                </div>
+              </div>
+    
+              <div class="row mt-2" id="selectorVehiculosCalendario" hidden>
+                <div class="col" >
+                  <label class="text-sm">Seleccione el vehículo que desea reservar</label>
+                  <select class="form-control" name="vehiculo" id="vehiculo_calendario">
+                    
+                  </select>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col d-flex justify-content-center">
+                  <button type="button" class="btn bg-gradient-dark" onclick="obtenerVehiculosDisponiblesCalendario()">obtener vehículos disponibles</button>
+    
+                </div>
+    
+              </div>
+            </div>
+
+            
+            <div class="modal-footer">
+              {% if user.is_authenticated %}
+              <button type="submit" value="submit" class="btn btn-primary">Guardar</button>
+              {% endif %}
+              <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="forzarCierre()">Cerrar</button>
+            </div>
+        </div>
+      
+      </form>
+    </div>
+  </div>
+
+  <div id="modalCambiarEstadoViaje" tabindex="-1" role="dialog" class="modal fade modal-lg" aria-labelledby="modalCambiarEstadoViaje"
+  aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modificar el estado de la solicitud</h5>
+          <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+        <form id="formularioCambiarEstadoViaje" action="/private/timetrackpro/cambiar-estado-viaje/0/" method="POST"
+          enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xl-8 mx-auto">
+              <p class="text-md text-italic text-dark font-weight-bold">Información de la solicitud:</p>
+              <p class="text-sm text-italic text-secondary font-weight-bold font-italic" id="infoModificarNombre"></p>
+              <p class="text-sm text-italic text-secondary font-weight-bold font-italic" id="infoModificarInicio"></p>
+              <p class="text-sm text-italic text-secondary font-weight-bold font-italic" id="infoModificarFin"></p>
+              <p class="text-sm text-italic text-secondary font-weight-bold font-italic" id="infoModificarLugar"></p>
+              <p class="text-sm text-italic text-secondary font-weight-bold font-italic">Motivo:</p>
+              <p class="text-sm text-italic text-secondary font-weight-bold font-italic" id="infoModificarMotivo"></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-8 mx-auto my-2" >
+              <label class="text-sm">Nuevo estado</label>
+              <select class="form-control" name="estado" id="estado" onchange="mostrarTextArea()">
+                
+                <option value="22">Pendiente</option>
+                <option value="24">Rechazado</option>
+                <option value="23">Aceptado</option>
+              </select>
+            </div>
+            
+          </div>
+          <div class="row" id="rowMotivo" >
+            <div class="col-xl-8 mx-auto my-2"  >
+              <label class="text-sm" id="labelMotivo">Motivo del cambio de estado </label>
+              <textarea type="text" class="form-control" placeholder="Indique el motivo por el que modifica el error" aria-label="Indique el motivo por el que se ha modificado el error" id="motivo_rechazo" name="motivo_rechazo" aria-describedby="text-addon"></textarea>
+
+            </div>
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          {% if user.is_authenticated  %}
+          <button type="submit" value="submit"  class="btn bg-gradient-primary" id="botonModificar" disabled>Modificar</button>
+          {% endif %}
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+<script>
+
+  document.querySelector("#fecha_fin").addEventListener("input", () => {
+    // compruebo si la fecha fin está rellena y el año empieza por 20*
+    
+    // obtengo la fecha de inicio
+    var fechaInicio = $('#fecha_inicio').val();
+    // obtengo la fecha de fin
+    var fechaFin = $('#fecha_fin').val(); 
+    var inputFechaFin = document.getElementById("fecha_fin");
+    if((fechaFin != "" && fechaInicio != "") && fechaFin.startsWith("20")){
+      // compruebo si la fecha de inicio es mayor que la fecha de fin
+      if(fechaInicio > fechaFin){
+        // muestro un mensaje de error
+        alert("La fecha de inicio no puede ser mayor que la fecha de fin");
+        // borro el valor del input
+        inputFechaFin.replace(fechaFin, "");
+      }
+    }
+  });
+  function obtenerVehiculosDisponibles(){
+    $.ajax({
+      url: "{% url 'timetrackpro:obtener-vehiculos-disponibles' %}",
+      type: 'POST',
+      dataType: 'html',
+      data: {
+        'fecha_inicio': $('#fecha_inicio').val(),
+        'fecha_fin': $('#fecha_fin').val(),
+      },
+      success: function(data) {
+
+          // comprobar si hay vehículos disponibles
+          if(data == ""){
+            alert("No hay vehículos disponibles para las fechas seleccionadas");
+            return;
+          }else{
+            // mostrar selector vehículos 
+            $('#vehiculo').html(data);
+
+            $('#selectorVehiculos').removeAttr('hidden');
+          }
+      },
+      error: function(xhr, status, error) {
+          // Manejar errores de la solicitud AJAX
+          console.error(error);
+      }
+  });
+  
+  }
+
+
+  function obtenerVehiculosDisponiblesCalendario(){
+
+    $.ajax({
+      url: "{% url 'timetrackpro:obtener-vehiculos-disponibles' %}",
+      type: 'POST',
+      dataType: 'html',
+      data: {
+        'fecha_inicio': $('#fecha_inicio_calendario').val(),
+        'fecha_fin': $('#fecha_fin_calendario').val(),
+      },
+      success: function(data) {
+          // Manejar la respuesta del servidor
+          $('#vehiculo_calendario').html(data);
+          // mostrar selector vehículos 
+          $('#selectorVehiculosCalendario').removeAttr('hidden');
+      },
+      error: function(xhr, status, error) {
+          // Manejar errores de la solicitud AJAX
+          console.error(error);
+      }
+  });
+  
+  }
+
+  mostrarTextArea();
+  function mostrarTextArea (){
+    if($('#estado').val() == 24){
+      
+      $('#botonModificar').attr('disabled', true);
+      $('#rowMotivo').show();
+      $('#motivo_rechazo').keyup(function(){
+      if($(this).val().length > 10)
+        $('#botonModificar').attr('disabled', false);
+    })
+    }else{
+      
+      $('#botonModificar').attr('disabled', false);
+      
+      $('#rowMotivo').hide();
+    }
+  }
+
+  // comprobar si el textarea tiena al menos 10 caracteres para habilitar el boton
+  $('#motivo').keyup(function(){
+    if($(this).val().length > 10)
+      $('#guardarSolicitarViajes').attr('disabled', false);
+  })
+  
+
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarDiv = document.getElementById('calendarioMensual');
+    var initialDate = '{{initialDate}}';
+    var calendar = new FullCalendar.Calendar(calendarDiv, {
+      initialDate: initialDate, // will be parsed as local
+      themeSystem: 'bootstrap5',
+      events: "{% url 'timetrackpro:datos-viajes-calendario' %}",      
+      eventTextColor: '#2f5d6e', // color del texto de los eventos
+      height: 550, // indico el maximo de alto que puede tener el calendario
+      locale: 'es', // el idioma del calendario
+      handleWindowResize: true, // si se puede redimensionar el calendario
+      initialView: 'dayGridMonth', // la vista inicial del calendario
+      buttonText: { // los textos de los botones
+        today: 'Hoy',
+        month: 'Mes',
+        day: 'Día',
+      }, 
+      headerToolbar: { // la barra superior donde se encuentra el titulo y los botones
+        left: 'prev,next',
+        center: 'title',
+        right:'today',
+      },
+      // Esta función se ejecutará cuando se haga clic en un día en el calendario         
+      dateClick: function(info) {
+        // se obtiene la fecha seleccionada
+        const meses = {
+            "01": "Enero",
+            "02": "Febrero",
+            "03": "Marzo",
+            "04": "Abril",
+            "05": "Mayo",
+            "06": "Junio",
+            "07": "Julio",
+            "08": "Agosto",
+            "09": "Septiembre",
+            "10": "Octubre",
+            "11": "Noviembre",
+            "12": "Diciembre",
+          };
+        // se obtiene la fecha seleccionada
+        var dia = info.dateStr.substring(8, 10);
+        dia = dia.replace(/^0+/, '');
+        var mes = meses[info.dateStr.substring(5, 7)];
+        var year = info.dateStr.substring(0, 4);
+
+        // se muestra el modal para agregar el festivo
+        var label = document.getElementById("tituloModalAgregarViajesDesdeCalendario");
+        label.innerHTML = "Solicitar viaje el día " + dia + " de " + mes + " del " + year;
+
+        var fechaInicio = document.getElementById("fecha_inicio_calendario");
+        fechaInicio.value = info.dateStr;
+
+        var fechaFin = document.getElementById("fecha_fin_calendario");
+        fechaFin.value = info.dateStr;
+        
+        // modifico el index del calendario
+        // se muestra el modal
+        $('#modalAgregarViajesDesdeCalendario').modal('show');
+        },
+    });
+    calendar.render(); // renderizo el calendario
+    calendar.updateSize(); // actualizo el tamaño del calendario
+  });
+
+  function mostrarInfoReserva(){ 
+
+    // obtengo los campos de fecha inicio y fin actual
+    var fechaInicioActual = document.getElementById("fechaActualInicio");
+    var fechaFinActual = document.getElementById("fechaActualFin");
+    var divFechaInicioActual = document.getElementById("divFechaInicioActual");
+    divFechaInicioActual.removeAttribute("hidden");
+    var divFechaFinActual = document.getElementById("divFechaFinActual");
+    divFechaFinActual.removeAttribute("hidden");
+
+    var diasActualesConsumidos = document.getElementById("divDiasActualesConsumidos");
+    divDiasActualesConsumidos.removeAttribute("hidden");
+    var diasConsumidosActuales = document.getElementById("dias_actuales_consumidos");
+
+    // se obtiene la lista de vacaciones
+    var mylist = JSON.parse(document.getElementById('listaAsuntos').textContent);
+
+    for (var i = 0; i < mylist.length; i++) {
+      if ( mylist[i].id == parseInt(idSelect)) {
+        fechaInicioActual.value = mylist[i].fecha_inicio;
+        fechaInicioActual.setAttribute("readonly", true);
+        fechaFinActual.value = mylist[i].fecha_fin;
+        fechaFinActual.setAttribute("readonly", true);
+        diasConsumidosActuales.value = mylist[i].dias_consumidos;
+        diasConsumidosActuales.setAttribute("readonly", true);
+        
+        console.log(mylist[i]);
+      }
+    }
+  }
+
+  // forzar cierre del modal
+  function forzarCierre(){
+    $('#modalAgregarViajesDesdeCalendario').modal('hide');
+  }
+  const mes = {
+    "01": "Ene",
+    "02": "Feb",
+    "03": "Mar",
+    "04": "Abr",
+    "05": "May",
+    "06": "Jun",
+    "07": "Jul",
+    "08": "Ago",
+    "09": "Sep",
+    "10": "Oct",
+    "11": "Nov",
+    "12": "Dic",
+  };
+  $("#viajes").bootstrapTable({
+    method: "get",
+    locale: navigator.language,
+    url: "{% url 'timetrackpro:datos-viajes' year=currentYear %}",
+    cache: false, 
+    columns: [
+      {
+        title: "Viaje",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+                  // obtengo la fecha de inicio 
+          var fechaInicial = row.fecha_inicio;
+          fechaInicial = fechaInicial.split("-")[2];
+          var fechaFinal = row.fecha_fin;
+          fechaFinal = fechaFinal.split("-")[2] + " de " + mes[fechaFinal.split("-")[1]] + " de " + fechaFinal.split("-")[0];
+          var empleado = '<h6 class="mb-0 text-sm">'+ row.solicitante__nombre + " " + row.solicitante__apellidos  + '</h6>';
+
+          var periodo = '<h6 class="mb-0 text-sm text-secondary">'+ fechaInicial + " al " + fechaFinal + '</h6>';
+          var lugar = '<h6 class="mb-0 text-sm text-secondary">'+ row.lugar  + '</h6>';
+          var div = '<div>'+ empleado +periodo + lugar+'</div>';
+          return div;
+        }
+      },  
+      {
+        title: "Motivo",
+        halign:"left",
+        sortable: true,
+        align: "left",
+        formatter: function(value, row) {
+          var motivo = row.motivo_viaje;
+      
+          var div = '<div><h6 class="mb-0 text-sm text-wrap">'+motivo+'</h6></div>';
+          return div;
+        }
+      },   
+      {
+        title: "Estado",
+        align: "center",
+        formatter: function(value, row) {
+          var estado = row.estado;
+          console.log(estado);
+          var div = '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
+          if (estado == 24)
+          var div = '<span class="badge badge-sm bg-gradient-danger">Rechazada</span>';
+          if (estado == 23)
+          var div = '<span class="badge badge-sm bg-gradient-success">Aceptado</span>';
+          if (estado == 22)
+          var div= '<span class="badge badge-sm bg-gradient-secondary">Pendiente</span>';
+
+          return div;
+        }
+      },
+      {
+        title: "",
+        field: "",
+        align: "center",
+        formatter: function (value, row) {
+          administrador = "{{administrador}}";
+          director = "{{director}}";
+
+          var botonCambiarEstado = '<a href="" title="Cambiar estado solicitud de viaje" data-toggle="modal" data-target="#modalCambiarEstadoViaje" onclick="$('+"'#formularioCambiarEstadoViaje').attr('action', '/private/timetrackpro/cambiar-estado-viaje/"+ row.id +"/');"+'" class="mx-1"><i class="fa-solid fa-flag"></i></a>';
+
+          var botonVer = '<a href="/private/timetrackpro/ver-viaje/' + row.id + '/" class="mx-1 text-sm" title="ver registro"><i class="fa-solid fa-arrow-right-to-bracket fa-lg entrar" ></i></a>';
+
+          if (administrador == "True" ||  director == "True" )
+            return botonVer + botonCambiarEstado;
+          else
+            return botonVer;     
+                  
+
+        },
+      },
+    ],
+    search: true,
+    // obtener los valores de la row seleccionada en la tabla y mostrarlos en el modal
+    onClickRow: function(row, $element) {
+      // obtener los valores de la row seleccionada
+      var estado = row.estado;
+      var nombre = "Nombre: " + row.solicitante__nombre +" "+ row.solicitante__apellidos;
+      var fecha_inicio = "Fecha inicio: " + row.fecha_inicio;
+      var fecha_fin = "Fecha fin: " + row.fecha_fin;
+      var lugar = "Lugar: " + row.lugar;
+      var motivo = row.motivo_viaje;
+
+      $("#infoModificarNombre").text(nombre);
+      $("#infoModificarInicio").text(fecha_inicio);
+      $("#infoModificarFin").text(fecha_fin);
+      $("#infoModificarLugar").text(lugar);
+      $("#infoModificarMotivo").text(motivo);
+
+      $("#estado").val(estado);
+    },
+  });
+  
+</script>
+
+{% endblock %}

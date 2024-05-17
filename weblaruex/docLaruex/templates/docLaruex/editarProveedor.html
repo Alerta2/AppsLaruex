@@ -10,6 +10,15 @@
     enctype="multipart/form-data">
     {% csrf_token %}
 
+
+    <div class="col-md-3 mt-4">
+      <label for="estadoProveedor" class="form-label">Estado</label>
+        <select class="form-select my-auto" id="estadoProveedor" name="estadoProveedor" >
+          <option value="0" {% if proveedor.baja == 0 %} selected {% endif %}>Activo</option>
+          <option value="1" {% if proveedor.baja == 1 %} selected {% endif %}>Baja</option>
+          </select>                  
+    </div>
+
     <!-- Multi Columns Form -->
       <div class="col-md-12">
         <label for="nuevoNombre" class="form-label">Nombre</label>
