@@ -1,10 +1,18 @@
 {% load static %}
-{% if perms.auth.muestras_vraex %}
+{% if perms.auth.gestion_muestras %}
     <li class="nav-item">
         <a class="nav-link" href="{% url 'structure:servicios' %}">HOME</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="{% url 'gestionmuestras:gestmuesOpciones' %}">Gestion Muestras</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'gestionmuestras:gestmuesConsultarEtiquetasSeleccionadas' %}">Imprimir codigos</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="" data-bs-toggle="modal" data-bs-target="#gestionTablasModal">
+            Gestion de tablas
+        </a>
     </li>
 
 <script>

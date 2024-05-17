@@ -9,6 +9,11 @@
 {% endblock %}
 
 {% block content %}
+
+
+
+
+
 <div class="pagetitle">
   <nav>
       <ol class="breadcrumb">
@@ -17,6 +22,94 @@
       </ol>
   </nav>
 </div>
+
+<!-- Modal parametros -->
+<div class="modal fade" id="modalParametroNuevo" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form id="formParametroNuevo">
+          {% csrf_token %}
+          <div class="modal-header">
+              <h5 class="modal-title">Agregar parámetro</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <input id="id_muestra" name="id_muestra" type="hidden" value="{{ muestra.identificador }}">
+              <label for="inputParametroAdicional" class="form-label">Parámetro adicional:</label>
+              <input id="inputParametroAdicional" list="parametroAdicional"  name="parametroAdicional" class="form-select">
+              <datalist id="parametroAdicional">
+                {% for p in parametros %}
+                  <option value="{{p.identificador}}">{{ p.nombre }}: {{ p.descripcion }}</option>
+                {% endfor %}
+              </datalist>
+              <label for="inputValorParametro" class="form-label">Valor:</label>
+              <input type="text" class="form-control" id="inputValorParametro" name="inputValorParametro" required>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Guardar</button>
+          </div>
+        </form>
+      </div>
+  </div>
+</div><!-- Modal parametros-->
+
+<!-- Modal hoja tipo -->
+<div class="modal fade" id="modalHojaTipo" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Seleccionar hoja tipo</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-12">
+                <select class="form-select" id="hojaTipo" name="hojaTipo">
+                  <option value="0">Seleccionar hoja tipo</option>
+                  {% for hoja in hojasTipo %}
+                    <option value="{{ hoja.identificador }}">{{ hoja.nombre_hoja }}. {{ hoja.descripcion_hoja}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <input type="hidden" id="input_id_alicuota" name="id_alicuota" value="">
+            </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button onclick="solicitarHojaTipo($('#hojaTipo').val(), {{ muestra.identificador }}, $('#input_id_alicuota').val())" class="btn btn-primary" data-bs-dismiss="modal">Obtener hoja</button>
+          </div>
+      </div>
+  </div>
+</div><!-- Modal hoja tipo-->
+
+<!-- Modal traspasar alicuota -->
+<div class="modal fade" id="modalTraspasar" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <form id="formTraspasar">
+          {% csrf_token %}
+          <div class="modal-header">
+              <h5 class="modal-title">Traspasar alicuota</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <input id="id_alicuota" name="id_alicuota" type="hidden" value="">
+              <select id="inputNuevoTecnico" name="inputNuevoTecnico" class="form-select">
+                {% for t in tecnicos %}
+                  <option value="{{t.identificador}}">{{ t.nombre }}</option>
+                {% endfor %}
+              </select>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Guardar</button>
+          </div>
+        </form>
+      </div>
+  </div>
+</div><!-- Modal parametros-->
+
 <!-- Info programa -->
 <section class="section dashboard">
     <!-- Info programa cards -->
@@ -72,6 +165,13 @@
                   <span class="text-success small pt-1 fw-bold">Muestra</span> <span class="text-muted small pt-2 ps-1">{{ muestra.identificador }}</span>
                 </div>
               </div>
+              <div class="d-flex align-items-center mt-5">
+                <a href="{% url 'gestionmuestras:gestmuesInsertarAlicuotas' muestra.identificador %}" class="card-icon rounded-circle d-flex align-items-center justify-content-center mr-1" data-toggle="tooltip" data-placement="bottom" title="Insertar alicuotas"><i class="fa-duotone fa-vials"></i></a>
+                <a href="" data-toggle="modal" data-target="#selectorEtiquetasModal" class="card-icon rounded-circle d-flex align-items-center justify-content-center mr-1"  data-placement="bottom" title="Crear códigos de barras" onclick="rellenarModalEtiquetas({{muestra.identificador}})"><i class="fa-solid fa-barcode-read"></i></a>
+                <a href="{% url 'gestionmuestras:gestmuesModificarMuestra' muestra.identificador %}" class="card-icon rounded-circle d-flex align-items-center justify-content-center mr-1" data-toggle="tooltip" data-placement="bottom" title="Modificar Muestra"><i class="fa-duotone fa-pen-to-square"></i></a>
+                <a href="" class="card-icon rounded-circle d-flex align-items-center justify-content-center mr-1" data-toggle="tooltip" data-placement="bottom" data-bs-toggle="modal" data-bs-target="#modalParametroNuevo" title="Agregar Parámetro"><i class="fal fa-indent"></i></a>
+                <a href="" class="card-icon rounded-circle d-flex align-items-center justify-content-center mr-1" data-toggle="tooltip" data-placement="bottom" data-bs-toggle="modal" data-bs-target="#modalHojaTipo" title="Obtener hoja tipo"><i class="fas fa-file-signature"></i></a>
+              </div>
               {% if informe %}
                 <h5 class="card-title">INFORME <span>| {{ informe.identificador }}_{{ informe.anio }}</span></h5>
               {% endif %}
@@ -88,27 +188,27 @@
                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                   <i class="fa-regular fa-calendar-arrow-down"></i>
                 </div>
-                <div class="">
-                  <h6>{{ muestra.fecha_hora_recogida|date:"d/m/y H:m" }}</h6>
-                  <span class="text-success small pt-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida inicial</span>
+                <div class="pl-2">
+                  <h6>{{ muestra.fecha_hora_recogida|date:"d/m/y H:i" }}</h6>
+                  <span class="text-success small pl-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida inicial</span>
                 </div>
               </div>
-              <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center my-3">
                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                   <i class="fa-regular fa-calendar-arrow-up"></i>
                 </div>
-                <div class="">
-                  <h6>{{ muestra.fecha_hora_recogida|date:"d/m/y H:m" }}</h6>
-                  <span class="text-success small pt-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida final</span>
+                <div class="pl-2">
+                  <h6>{{ muestra.fecha_hora_recogida_2|date:"d/m/y H:i" }}</h6>
+                  <span class="text-success small pl-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida final</span>
                 </div>
               </div>
               <div class="d-flex align-items-center">
                 <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
                   <i class="fa-regular fa-calendar-check"></i>
                 </div>
-                <div class="">
-                  <h6>{{ muestra.fecha_hora_recogida|date:"d/m/y H:m" }}</h6>
-                  <span class="text-success small pt-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida referencia</span>
+                <div class="pl-2">
+                  <h6>{{ muestra.fecha_hora_recogida_ref|date:"d/m/y H:i" }}</h6>
+                  <span class="text-success small pl-1 fw-bold">Fecha</span> <span class="text-muted small pt-2 ps-1">Recogida referencia</span>
                 </div>
               </div>
             </div>
@@ -125,7 +225,7 @@
                   <i class="fa-regular fa-calendar-clock"></i>
                 </div>
                 <div class="ps-3">
-                  <h6>{{ muestra.fecha_hora_recepcion|date:"d/m/y H:m" }}</h6>
+                  <h6>{{ muestra.fecha_hora_recepcion|date:"d/m/y H:i" }}</h6>
                   <span class="text-success small pt-1 fw-bold">MEMORIA</span> <span class="text-muted small pt-2 ps-1">{{ muestra.codigo_recogida.codigo_memoria.memoria }}</span>
                 </div>
               </div>
@@ -137,6 +237,14 @@
                 <div class="ps-3">
                   <h6>{{ muestra.referencia_cliente }}</h6>
                   <span class="text-success small pt-1 fw-bold">ESTADO</span> <span class="text-muted small pt-2 ps-1">{{ muestra.estado_de_muestra.descripcion }}</span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                  <i class="far fa-location-arrow"></i>
+                </div>
+                <div class="ps-3">
+                  <h6>{{ muestra.codigo_recogida.codigo_procedencia.nombre }}</h6>
                 </div>
               </div>
             </div>
@@ -164,6 +272,7 @@
         </div>
         <!-- End Card -->
     </div><!-- End Grid cards -->
+    <div id="parametrosMuestra" class="row"></div>
 </section>
 <!-- End Info programa -->
 <!-- Info programa -->
@@ -199,6 +308,7 @@
                           <th data-field="analista_tecnico__nombre" data-sortable="true">ANALISTA</th>
                           <th data-field="cantidad_muestra_analizada" data-sortable="true">CANTIDAD</th>
                           <th data-field="estado_alicuota__descripcion" data-sortable="true">ESTADO</th>
+                          <th class="text-center" data-field="medida" data-sortable="true">Medida</th>
                       </tr>
                   </thead>
               </table>
@@ -210,14 +320,90 @@
   </div><!-- End Grid cards -->
 </section>
 <!-- End Info programa -->
+
+<!-- modal informacion de tratamientos-->
+<div class="modal fade" id="modalTratamientosAlicuota" tabindex="-1" style="display: none;" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+    <div id="modalTratamientosAlicuotaContenido"></div>
+    </div>
+  </div>
+</div>
+<!-- fin modal informacion de tratamientos-->
+
+<!-- modal informacion de tratamientos-->
+<div class="modal fade" id="modalMedidasAlicuota" tabindex="-1" style="display: none;" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content">
+    <div id="modalMedidasAlicuotaContenido"></div>
+    </div>
+  </div>
+</div>
+<!-- fin modal informacion de tratamientos-->
+
+
 <script>
     $('#tableAlicuotas').bootstrapTable({
-        onClickRow: function (row, $element) {
-            // row: the record corresponding to the clicked row, 
-            // $element: the tr element.
-            // alert(row.identificador + " - " + row.codigo_recogida__codigo_csn__nombre + " - " + row.codigo_recogida__codigo_csn__nombre + " - " + row.codigo_recogida__codigo_procedencia__nombre + " - " + row.fecha_hora_recogida + " - " + row.fecha_hora_recepcion);
-            window.location.href = '/private/gestionmuestras/infoMuestra/'+row.identificador+'/';
-        },
+        columns: [{
+                title: 'ID',
+                sortable: 'true',
+                formatter: function (value, row) {
+                    return row.identificador + ' <i class="fa-regular fa-circle-info" data-bs-toggle="modal" data-bs-target="#modalTratamientosAlicuota" onclick="consultarInfoAlicuota(' + row.identificador + ')"></i>';
+                }
+            },{
+                title: 'DETERMINACIÓN',
+                sortable: 'true',
+                field: 'id_analiticas__nombre'
+            },{
+                title: 'FECHA ENTREGA',
+                field: 'fecha_hora_entrega',
+                sortable: "true"
+            },{
+                title: 'ANALISTA',
+                field: 'analista_tecnico__nombre',
+                sortable: "true"
+            },{
+                title: 'CANTIDAD',
+                field: 'cantidad_muestra_analizada',
+                sortable: "true"
+            },{
+                title: 'ESTADO',
+                field: 'estado_alicuota__descripcion',
+                sortable: "true"
+            },{
+                title: 'Medida',
+                formatter: function (value, row) {
+                    if (row.medida) {
+                    return '<i class="fas fa-check text-success"></i>';
+                    } else {
+                    return '<i class="fas fa-times text-danger"></i>';
+                    }
+
+                }
+            },{
+                title: 'Acciones',
+                formatter: function (value, row) {
+                  // si usuario es administrador
+                  let botones = '<div class="btn-group">';
+                  {% if perms.auth.insercion_muestras %}
+                    botones += '<a class="btn" onclick="duplicarAlicuota(' + row.identificador + ', '+ row.id_analiticas__identificador + ', '+ row.analista_tecnico__identificador + ', '+"'#tableAlicuotas'"+')" data-toggle="tooltip" data-placement="bottom" title="Duplicar alicuota"><i class="fa-solid fa-copy"></i></a>';
+                  {% endif %}
+                  
+                  // Futura hoja tipo para alicuota
+                  //botones += '<a onclick="console.log(12)" class="btn" data-toggle="tooltip" data-placement="bottom" data-bs-toggle="modal" data-bs-target="#modalHojaTipo" title="Obtener hoja tipo"><i class="fas fa-file-signature"></i></a>';
+                  botones += '<a class="btn" onclick="'+"$('#id_alicuota').val("+row.identificador+")"+'" data-bs-toggle="modal" data-bs-target="#modalTraspasar"><i class="fa-solid fa-exchange"></i></a>'
+                  
+                  {% if user.is_superuser %}
+                    botones += '<a class="btn" onclick="borrarAlicuota(' + row.identificador + ', '+"'#tableAlicuotas'"+')" data-toggle="tooltip" data-placement="bottom" title="Borrar alicuota"><i class="fa-solid fa-trash"></i></a>';
+                  {% endif %}
+                  botones += '</div>';
+                  return botones;
+                }
+            }],
+        locale: "es-ES",
+        search: true,
+        sortName: 'doc',
+        sortOrder: 'asc',
         exportDataType: "",
         exportTypes: ['pdf', 'xml', 'csv', 'json'],
     })
@@ -230,15 +416,77 @@
         return {
           btnAdd: {
             text: 'Add new row',
-            icon: 'fa-plus',
-            event: function () {
-              alert('Do some stuff to e.g. add a new row')
+            icon: 'fal fa-poll',
+            event: function () {              
+              $("#modalMedidasAlicuota").modal('show');
+              consultarInfoAlicuotaMuestras({{ muestra.identificador }});
             },
             attributes: {
-              title: 'Add a new row to the table'
+              title: 'Consultar medidas'
             }
           }
         }
+    }
+
+    // funcion para gestionar el envio de form con ajax
+    $('#formParametroNuevo').submit(function(e){
+        e.preventDefault();
+        var form = $(this);
+        var url = "{% url 'gestionmuestras:gestmuesInsertarParametro' %}";
+        var data = form.serialize();
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: data,
+            success: function(response){
+                if (response['status'] == 'ok'){
+                    crearAviso('ParametroCorrecto', 'Parámetro añadido correctamente');
+                    cargarParametros();
+                } else {
+                  crearAviso('errorParametro', 'Error al añadir el parámetro');
+                }
+            }
+        });
+    });
+
+    // funcion para gestionar el envio de form con ajax
+    $('#formTraspasar').submit(function(e){
+        e.preventDefault();
+        var form = $(this);
+        var url = "{% url 'gestionmuestras:gestmuesTraspasarAlicuota' %}";
+        var data = form.serialize();
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: data,
+            success: function(response){
+                if (response['status'] == 'ok'){
+                    crearAviso('Traspasado', 'Traspaso correcto de la alicuota');
+                    $('#tableAlicuotas').bootstrapTable('refresh');
+                } else {
+                  crearAviso('errorParametro', 'Error al añadir el parámetro');
+                }
+            }
+        });
+    });
+
+    function cargarParametros(){
+        var url = "/private/gestionmuestras/consultarParametrosMuestra/{{ muestra.identificador }}/";
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(response){
+              $('#parametrosMuestra').html(response);
+            }
+        });
+    }
+    cargarParametros();
+
+    function solicitarHojaTipo(valor, id_muestra){
+      // creo la url sumando /private/gestionmuestras/consultarHojaTipo/ + valor + / + muestra.identificador + /
+      var url = "/private/gestionmuestras/consultarHojaTipo/" + valor + "/" + id_muestra + "/";
+      // inicio la url en otra pestaña
+      window.open(url, '_blank');
     }
 </script>
 

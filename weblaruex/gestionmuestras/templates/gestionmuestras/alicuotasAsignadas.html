@@ -1,0 +1,202 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <div id="toolbar">
+            <div class="row">
+                <div class="col-lg-3 col-md-8 col-8">
+                    <label class="text-sm" >Antiguas</label>
+                    <select class="form-control" aria-label="Antiguas" id="Antiguas"
+                    name="antiguas" aria-describedby="text-addon">
+                        <option selected value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-8 col-8">
+                    <label class="text-sm" >Otros técnicos</label>
+                    <select class="form-control" aria-label="Tecnicos" id="Tecnicos"
+                    name="tecnicos" aria-describedby="text-addon">
+                        <option selected value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+                <div class="col-lg-1 col-md-4 col-4 my-auto">
+                    <button type="submit" value="submit" class="btn btn-outline-secondary w-100 mt-4 mb-0" onclick="filtrarTabla()">Filtrar</button> 
+                </div>
+            </div>
+
+        </div>
+        <table class="table"
+            id="table"
+            data-toggle="table"
+            data-pagination="true"
+            data-page-size="100"
+            data-height="800"
+            data-search="true"
+            data-show-columns="true"
+            data-show-refresh="true"
+            data-show-columns-toggle-all="true"
+            data-show-fullscreen="true"
+            data-buttons="buttons"
+            data-buttons-class="light"
+            data-show-export="true"
+            data-filter-control="true"
+            data-show-search-clear-button="true"
+            data-detail-view="true"
+            data-detail-formatter="detailFormatter"
+            data-url="{% url 'gestionmuestras:gestmuesAlicuotasAsignadasDatos' %}">
+            <thead></thead>
+        </table>
+    </div>
+    <!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+<script type="text/javascript">
+    // parametros de la tabla 'identificador', 'id_muestra_analitica', 'tratamiento__descripcion', 'cod_reducido', 'fecha_inicio', 'fecha_fin', 'paso_actual', 'analista__nombre', 'analista__usuario_django', 'propio'
+    $('#table').bootstrapTable({
+        columns: [
+            {
+                field: 'identificador',
+                title: 'Identificador',
+                sortable: true,
+                visible: false
+            },
+            {
+                field: 'id_muestra_analitica__id_historico_recogida__identificador',
+                title: 'Muestra',
+                sortable: true,
+            },
+            {
+                field: 'id_muestra_analitica',
+                title: 'Analitica',
+                sortable: true,
+                visible: false
+            },
+            {
+                field: 'cod_reducido',
+                title: 'Código reducido',
+                sortable: true,
+            },
+            {
+                field: 'tratamiento__descripcion',
+                title: 'Tratamiento',
+                sortable: true,
+            },
+            {
+                field: 'fecha_inicio',
+                title: 'Fecha inicio',
+                sortable: true,
+                formatter: function (value, row) {
+                    // if value is null, return '-'
+                    if (row.fecha_inicio == null) 
+                        return '-';
+                    else
+                        return moment(value).format('DD/MM/YYYY HH:mm');
+                }
+            },
+            {
+                field: 'fecha_fin',
+                title: 'Fecha fin',
+                sortable: true,
+                formatter: function (value, row) {
+                    // if value is null, return '-'
+                    if (row.fecha_fin == null) 
+                        return 'En proceso...';
+                    else
+                        return moment(value).format('DD/MM/YYYY HH:mm');
+                }
+            },
+            {
+                field: 'paso_actual',
+                title: 'Paso actual',
+                sortable: true,
+            },
+            {
+                field: 'analista__nombre',
+                title: 'Analista',
+                sortable: true,
+            },
+            {
+                field: 'analista__usuario_django',
+                title: 'Usuario',
+                sortable: true,
+                visible: false
+            },
+            {
+                field: 'propio',
+                title: 'Propio',
+                sortable: true,
+                visible: false
+            },
+            {
+                title: 'Acciones',
+                formatter: function (value, row) {
+                  // si usuario es administrador
+                  let botones = '<div class="btn-group">';
+                  {% if perms.auth.gestion_recolector %}
+                    //botones += '<a class="btn" onclick="" data-toggle="tooltip" data-placement="bottom" title="Recoger muestra"><i class="fad fa-hand-holding-box fa-2x" style="--fa-primary-color: #0400ff; --fa-secondary-color: #0400ff;"></i></a>';
+                  {% endif %}
+                  botones += '</div>';
+                  return botones;
+                }
+            }],
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+    })
+
+    function dateFormat(value, row, index) {
+        return moment(value).format('DD/MM/YYYY HH:mm');
+    }
+
+    function buttons () {
+        return {
+          btnAdd: {
+            text: 'Add new row',
+            icon: 'bi-plus',
+            event: function () {
+              alert('Do some stuff to e.g. add a new row')
+            },
+            attributes: {
+              title: 'Add a new row to the table'
+            }
+          }
+        }
+    }
+    function detailFormatter(index, row) {
+        var html = []
+        html.push('<p><b>Observacion general:</b> ' + row.n_recogida__observaciones + '</p>')
+        html.push('<p><b>Observacion particular:</b> ' + row.observaciones + '</p>')
+        if (row.conservacion != 'nan')
+            html.push('<p><b>Conservación:</b> ' + row.conservacion + '</p>')
+        if (row.nfiltro != 0)
+            html.push('<p><b>Nº Filtro:</b> ' + row.nfiltro + '</p>')
+        if (row.ibomba != 0)
+            html.push('<p><b>Bomba:</b> ' + row.ibomba + '</p>')
+        return html.join('')
+    }
+    function filtrarTabla() {
+        var urlEditar = "{% url 'gestionmuestras:gestmuesAlicuotasAsignadasDatos' antiguas='antiguas' tecnicos='tecnicos' %}".replace('antiguas', $('#Antiguas').val()).replace('tecnicos', $('#Tecnicos').val());
+        $("#table").bootstrapTable('refresh', {url: urlEditar});     
+    }
+</script>
+{% endblock %}

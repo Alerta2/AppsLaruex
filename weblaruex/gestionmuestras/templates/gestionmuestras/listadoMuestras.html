@@ -27,7 +27,6 @@
             data-pagination="true"
             data-page-size="25"
             data-height="800"
-            data-search="true"
             data-show-columns="true"
             data-show-refresh="true"
             data-show-columns-toggle-all="true"
@@ -35,19 +34,21 @@
             data-buttons="buttons"
             data-buttons-class="light"
             data-show-export="true"
+            data-filter-control="true"
+            data-show-search-clear-button="true"
             data-url="/private/gestionmuestras/listadoMuestrasDatos">
             <thead>
                 <tr>
-                    <th data-field="identificador" data-sortable="true">ID</th>
-                    <th data-field="codigo_recogida__codigo_csn__nombre" data-sortable="true">MUESTRA</th>
-                    <th data-field="cliente__nombre" data-sortable="true">CLIENTE</th>
-                    <th data-field="codigo_recogida__codigo_procedencia__nombre" data-sortable="true">PROCEDENCIA</th>
-                    <th data-field="fecha_hora_recogida" data-sortable="true" data-formatter="dateFormat">FECHA RECOGIDA</th>
-                    <th data-field="fecha_hora_recepcion" data-sortable="true" data-formatter="dateFormat">FECHA RECEPCION</th>
-                    <th data-field="referencia_cliente" data-sortable="true">REFERENCIA</th>
-                    <th data-field="estado_de_muestra__descripcion" data-sortable="true">ESTADO</th>
-                    <th data-field="recepcionado_por__nombre" data-sortable="true">RECEPCIONADO POR</th>
-                    <th data-field="codigo_recogida__codigo_memoria__memoria" data-sortable="true">MEMORIA</th>
+                    <th data-field="identificador" data-sortable="true" data-filter-control="input">ID</th>
+                    <th data-field="codigo_recogida__codigo_csn__nombre" data-sortable="true" data-filter-control="select">MUESTRA</th>
+                    <th data-field="cliente__nombre" data-sortable="true" data-filter-control="select">CLIENTE</th>
+                    <th data-field="codigo_recogida__codigo_procedencia__nombre" data-sortable="true" data-filter-control="select">PROCEDENCIA</th>
+                    <th data-field="fecha_hora_recogida" data-sortable="true" data-formatter="dateFormat" data-filter-control="input">FECHA RECOGIDA</th>
+                    <th data-field="fecha_hora_recepcion" data-sortable="true" data-formatter="dateFormat" data-filter-control="input">FECHA RECEPCION</th>
+                    <th data-field="referencia_cliente" data-sortable="true" data-filter-control="input">REFERENCIA</th>
+                    <th data-field="estado_de_muestra__descripcion" data-sortable="true" data-filter-control="select">ESTADO</th>
+                    <th data-field="recepcionado_por__nombre" data-sortable="true" data-filter-control="select">RECEPCIONADO POR</th>
+                    <th data-field="codigo_recogida__codigo_memoria__memoria" data-sortable="true" data-filter-control="select">MEMORIA</th>
                 </tr>
             </thead>
         </table>
@@ -56,24 +57,116 @@
 </section>
 <!-- End Info programa -->
 
+<!-- modal cambiar estado -->
+<!-- Modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cambiarEstadoModal" hidden></button>
+<div class="modal fade" id="cambiarEstadoModal" tabindex="-1" role="dialog" aria-labelledby="cambiarEstadoModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cambiarEstadoModalTitle">Seleccionar nuevo estado</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <p><n>Estado actual: </n> <i>Muestra Recepcionada</i></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="cambiarEstadoModal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+</div>
+<!-- fin modal cambiar estado -->
+
 <script>
+
     $('#table').bootstrapTable({
-        onClickRow: function (row, $element) {
-            window.location.href = '/private/gestionmuestras/infoMuestra/'+row.identificador+'/';
-        },
+        columns: [{
+                title: 'ID',
+                sortable: 'true',
+                field: 'identificador'
+            },{
+                title: 'MUESTRA',
+                field: 'codigo_recogida__codigo_csn__nombre',
+                sortable: "true"
+            },{
+                title: 'CLIENTE',
+                field: 'cliente__nombre',
+                sortable: "true"
+            },{
+                title: 'PROCEDENCIA',
+                field: 'codigo_recogida__codigo_procedencia__nombre',
+                sortable: "true"
+            },{
+                title: 'FECHA RECOGIDA',
+                sortable: "true",
+                formatter: function (value, row) {
+                    nuevaHora = new Date(value);
+                    nuevaHora.setHours(nuevaHora.getHours() - 2);
+                    return moment(nuevaHora).format('DD/MM/YYYY HH:mm');
+                }
+            },{
+                title: 'FECHA RECEPCION',
+                sortable: "true",
+                formatter: function (value, row) {
+                    nuevaHora = new Date(value);
+                    nuevaHora.setHours(nuevaHora.getHours() - 2);
+                    return moment(nuevaHora).format('DD/MM/YYYY HH:mm');
+                }
+            },{
+                title: 'REFERENCIA',
+                field: 'referencia_cliente',
+                sortable: "true"
+            },{
+                title: 'ESTADO',
+                field: 'estado_de_muestra__descripcion',
+                sortable: "true"
+            },{
+                title: 'RECEPCIONADO POR',
+                field: 'recepcionado_por__nombre',
+                sortable: "true"
+            },{
+                title: 'MEMORIA',
+                field: 'codigo_recogida__codigo_memoria__memoria',
+                sortable: "true"
+            },{
+                title: 'Acciones',
+                formatter: function (value, row) {
+                  // si usuario es administrador
+                  let botones = '<div class="btn-group">';
+                  botones += '<a class="btn" href="/private/gestionmuestras/infoMuestra/'+row.identificador+'/"><i class="fa-solid fa-arrow-right"></i></a>';
+                  botones += '<a class="btn" data-toggle="modal" data-target="#selectorEtiquetasModal" onclick="rellenarModalEtiquetas('+row.identificador+')"><i class="fa-solid fa-barcode-read"></i></a>';
+                  {% if user.is_superuser %}
+                    botones += '<a class="btn" ><i class="fa-solid fa-object-ungroup" onclick="cambiarEstadoMuestra('+row.identificador+')"></i></a>';
+                  {% endif %}
+                  botones += '</div>';
+                  return botones;
+                }
+            }],
+        locale: "es-ES",
+        sortName: 'doc',
+        sortOrder: 'asc',
         exportDataType: "",
         exportTypes: ['pdf', 'xml', 'csv', 'json'],
     })
+
+    function cambiarEstadoMuestra(idMuestra) {
+        $('#cambiarEstadoModal').modal('show');
+    }
 
     function dateFormat(value, row, index) {
         return moment(value).format('DD/MM/YYYY HH:mm');
     }
 
+
     function buttons () {
         return {
           btnAdd: {
             text: 'Add new row',
-            icon: 'fa-plus',
+            icon: 'bi-plus',
             event: function () {
               alert('Do some stuff to e.g. add a new row')
             },
@@ -84,5 +177,5 @@
         }
     }
     
-</script>>
+</script>
 {% endblock %}

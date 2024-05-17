@@ -34,6 +34,13 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Insertar nueva muestra</h5>
+            <!-- div para botones de ayuda alineados a la derecha-->
+            <div class="d-flex flex-row-reverse">
+                <!-- boton de carga de últimos valores insertados -->
+                <button type="button" class="btn btn-outline-primary mx-1" onclick="obtenerUltimaMuestra();setTimeout(function() {cargarParametros();}, 1000 );" data-toggle="tooltip" data-placement="top" title="Carga de valores de la última muestra insertada"><i class="fa-solid fa-cloud-arrow-down fa-xl"></i></button>
+            </div>
+            <!-- fin del div de botones de ayuda -->
+
             <!-- Multi Columns Form -->
             <form class="g-3" action="{% url 'gestionmuestras:gestmuesInsertarMuestra' %}" method="POST" enctype="multipart/form-data"> 
                 {% csrf_token %}
@@ -41,51 +48,57 @@
                     <div class="card-header my-4">Información muestra</div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputMemoria" class="form-label">Memoria</label>
-                        <select id="inputMemoria" name="memoria" class="form-select">
+                        <input id="inputMemoria" list="memorias" name="memoria" class="form-select">
+                        <datalist id="memorias">
                             {% for m in memorias %}
                                 <option>{{ m.memoria }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputCodigoCSN" class="form-label">Codigo CSN <i onclick="cargarParametros()" class="fa-solid fa-arrows-rotate"></i></label>
-                        <select id="inputCodigoCSN" onchange="cargarParametros()" name="codigoCSN" class="form-select">
+                        <input id="inputCodigoCSN" list="codigosCSN" onchange="cargarParametros()" name="codigoCSN" class="form-select">
+                        <datalist id="codigosCSN">
                             {% for c in codMuestras %}
                                 <option value="{{ c.tipo_id }}_{{ c.nombre }}">{{ c.nombre }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputFrecuencia" class="form-label">Frecuencia</label>
-                        <select id="inputFrecuencia" name="frecuencia" class="form-select">
+                        <input id="inputFrecuencia" list="frecuencias" name="frecuencia" class="form-select">
+                        <datalist id="frecuencias">
                             {% for f in frecuencias %}
                                 <option>{{ f.nombre }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputSuministrador" class="form-label">Suministrador</label>
-                        <select id="inputSuministrador" name="suministrador" class="form-select">
+                        <input id="inputSuministrador" list="suministradores" name="suministrador" class="form-select">
+                        <datalist id="suministradores">
                             {% for s in suministradores %}
                                 <option>{{ s.nombre }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputClientes" class="form-label">Clientes</label>
-                        <select id="inputClientes" name="cliente" class="form-select">
+                        <input id="inputClientes" list="clientes" name="cliente" class="form-select">
+                        <datalist id="clientes">
                             {% for c in clientes %}
                                 <option>{{ c.nombre }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputLocalizaciones" class="form-label">Localizacion</label>
-                        <select id="inputLocalizaciones" name="localizacion" class="form-select">
+                        <input id="inputLocalizaciones" list="localizaciones" name="localizacion" class="form-select" onchange="cargarComentarioRecogidaGeneral()">
+                        <datalist id="localizaciones">
                             {% for l in localizaciones %}
                                 <option>{{ l.nombre }}</option>
                             {% endfor %}
-                        </select>
+                        </datalist>
                     </div>
                     <div class="col-lg-3 col-md-4 col-xs-12">
                         <label for="inputReferencia" class="form-label">Referencia:</label>
@@ -97,13 +110,36 @@
                     <div class="col-lg-6 col-md-12">
                         <div class="row">
                             <div class="col-12">
+                                <label for="parametro_109" class="form-label">¿Proporcionan fecha de recogida?</label>
+                            </div>
+                            <div class="col-12">
+                                <select id="parametro_109" name="parametro_109" class="form-select">
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="parametro_110" class="form-label">¿Proporcionan hora de recogida?</label>
+                            </div>
+                            <div class="col-12">
+                                <select id="parametro_110" name="parametro_110" class="form-select">
+                                    <option value="si">Si</option>
+                                    <option value="no">No</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
                                 <label for="inputFechaRecogidaInicio" class="form-label">Fecha Recogida Inicio</label>
                             </div>
-                            <div class="col-6">
-                                <input type="date" id="fechaRecogidaInicio" name="fechaRecogidaInicio" class="form-control" required>
-                            </div>
-                            <div class="col-6">
-                                <input type="time" id="horaRecogidaInicio" name="horaRecogidaInicio" class="form-control" required>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecogidaInicio" name="fechaRecogidaInicio" class="form-control" required>
                             </div>
                         </div>
                     </div>
@@ -112,11 +148,8 @@
                             <div class="col-12">
                                 <label for="inputFechaRecogidaFin" class="form-label">Fecha Recogida Fin</label>
                             </div>
-                            <div class="col-6">
-                                <input type="date" id="fechaRecogidaFin" name="fechaRecogidaFin" class="form-control" required>
-                            </div>
-                            <div class="col-6">
-                                <input type="time" id="horaRecogidaFin" name="horaRecogidaFin" class="form-control" required>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecogidaFin" name="fechaRecogidaFin" class="form-control" required>
                             </div>
                         </div>
                     </div>               
@@ -125,11 +158,8 @@
                             <div class="col-12">
                                 <label for="inputFechaRecogidaReferencia" class="form-label">Fecha Recogida Referencia</label>
                             </div>
-                            <div class="col-6">
-                                <input type="date" id="fechaRecogidaReferencia" name="fechaRecogidaReferencia" class="form-control" readonly>
-                            </div>
-                            <div class="col-6">
-                                <input type="time" id="horaRecogidaReferencia" name="horaRecogidaReferencia" class="form-control" readonly>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecogidaReferencia" name="fechaRecogidaReferencia" class="form-control" readonly>
                             </div>
                         </div>
                     </div>
@@ -138,11 +168,8 @@
                             <div class="col-12">
                                 <label for="inputFechaRecepcion" class="form-label">Fecha Recepcion <i onclick="cargarFechaActual()" class="fa-solid fa-arrows-rotate"></i></label>
                             </div>
-                            <div class="col-6">
-                                <input type="date" id="fechaRecepcion" name="fechaRecepcion" class="form-control" required>
-                            </div>
-                            <div class="col-6">
-                                <input type="time" id="horaRecepcion" name="horaRecepcion" class="form-control" required>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecepcion" name="fechaRecepcion" class="form-control" required>
                             </div>
                         </div>
                     </div>
@@ -157,7 +184,13 @@
                         <div class="col-md-6 col-sm-12">
                             <label for="inputComentarioParticular" class="form-label">Comentario particular:</label>
                             <textarea rows="4" cols="50" type="text" id="inputComentarioParticular" name="inputComentarioParticular" class="form-control"></textarea>
-                        </div>
+                            <select id="textosPredefinidos" name="textos" class="form-select" onchange="copiarTexto()">
+                                <option value="">Selecciona un texto</option>
+                                {% for t in textos %}
+                                    <option value="{{ t.texto }}">{{ t.texto }}</option>
+                                {% endfor %}
+                            </select>
+                    </div>
                     </div>
                 </div>
                 <div class="row">
@@ -177,29 +210,31 @@
                             </div>
                         </div>
                     </button>
-                    <!-- Basic Modal -->
+                    <!-- Modal parametros -->
                     <div class="modal fade" id="modalParametroNuevo" tabindex="-1">
-                        <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Agregar parámetro</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <select id="inputParametroAdicional" name="inputParametroAdicional" class="form-select">
-                                    {% for p in parametros %}
-                                        <option>{{ p.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                <button type="button" class="btn btn-primary" onclick="agregarParametro()" data-bs-dismiss="modal">Cargar</button>
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Agregar parámetro</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <label for="inputParametroAdicional" class="form-label">Parámetro adicional:</label>
+                                    <select id="inputParametroAdicional" name="inputParametroAdicional" class="form-select">
+                                        {% for p in parametros %}
+                                            <option id="param_{{p.identificador}}" value="{{p.identificador}}" data-tipo="{{p.tipo}}">{{ p.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    <button type="button" class="btn btn-primary" onclick="agregarParametro()" data-bs-dismiss="modal">Cargar</button>
+                                </div>
                             </div>
                         </div>
-                        </div>
-                    </div><!-- End Basic Modal-->
+                    </div><!-- Modal parametros-->
                 </div>
+                <!--
                 <div class="row">
                     <div class="card-header my-4">Fotografía</div>
                     <button type="button" class="col-lg-2 col-md-3 col-xs-6" onclick="activar_webcam()">
@@ -220,6 +255,7 @@
                         </div>
                     </div>
                 </div>
+                -->
                 <div class="text-center">
                     <div class="card-header my-4"></div>
                     <button type="submit" class="btn btn-primary">Insertar</button>
@@ -232,25 +268,64 @@
 <!-- End Info programa -->
 
 <script>
-    $( "#horaRecogidaFin" ).bind("change paste keyup", function() {
-        var dateInicio = new Date($("#fechaRecogidaInicio").val() + " " + $("#horaRecogidaInicio").val());
-        var dateFin = new Date($("#fechaRecogidaFin").val() + " " + $("#horaRecogidaFin").val());
-        var dif = (((dateFin.getTime() - dateInicio.getTime())  / 1000) / 2)+3600;
-        dateInicio.setSeconds(dateInicio.getSeconds() + dif);
-        var isoString =  dateInicio.toISOString();
-        $("#fechaRecogidaReferencia").val(isoString.split("T")[0]);
-        $("#horaRecogidaReferencia").val(isoString.split("T")[1].split(":")[0]+":"+isoString.split("T")[1].split(":")[1]);
+    // Definir las opciones de formato
+    const opcionesFormato = {
+        timeZone: 'Europe/Madrid',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    };
+
+    $( "#fechaRecogidaInicio" ).bind("change paste keyup", function() {
+        const fecha1 = new Date($("#fechaRecogidaInicio").val());
+        console.log(fecha1);
+        const formatoFechaHora = fecha1.toLocaleString('es-ES', opcionesFormato);
+        const formatoFecha = formatoFechaHora.split('.').shift().replace(',','');
+        var formatoCorrecto = formatoFecha.replace(/[/]/g, '-').replace(/[\s]/g, 'T').slice(0, 16);
+        const fechaCorrecta = formatoCorrecto.slice(6,10)+"-"+formatoCorrecto.slice(3,5)+"-"+formatoCorrecto.slice(0,2)+"T"+formatoCorrecto.slice(11,13)+":"+formatoCorrecto.slice(14,16)
+        $("#fechaRecogidaFin").val(fechaCorrecta);
+        $("#fechaRecogidaReferencia").val(fechaCorrecta);
     });
+
+    $( "#fechaRecogidaFin" ).bind("change paste keyup", function() {
+        const fecha1 = new Date($("#fechaRecogidaInicio").val());
+        const fecha2 = new Date($("#fechaRecogidaFin").val());
+        
+        console.log(fecha1);
+        console.log(fecha2);
+        // Calcular la fecha media
+        const fechaMedia = new Date((fecha1.getTime() + fecha2.getTime()) / 2);
+        const formatoFechaHora = fechaMedia.toLocaleString('es-ES', opcionesFormato);
+        const formatoFecha = formatoFechaHora.split('.').shift().replace(',','');
+        var formatoCorrecto = formatoFecha.replace(/[/]/g, '-').replace(/[\s]/g, 'T').slice(0, 16);
+        const fechaCorrecta = formatoCorrecto.slice(6,10)+"-"+formatoCorrecto.slice(3,5)+"-"+formatoCorrecto.slice(0,2)+"T"+formatoCorrecto.slice(11,13)+":"+formatoCorrecto.slice(14,16)
+        $("#fechaRecogidaReferencia").val(fechaCorrecta);
+    });
+
+    // carga la fecha actual en el input de fecha de recepcion
     function cargarFechaActual(){
-        var fecha = new Date();
-        $("#fechaRecepcion").val(fecha.toISOString().split("T")[0]);
-        $("#horaRecepcion").val(fecha.toISOString().split("T")[1].split(":")[0]+":"+fecha.toISOString().split("T")[1].split(":")[1]);
+        const fechaActual = new Date();
+
+
+        // Formatear la fecha y hora actual con las opciones de formato
+        const formatoFechaHora = fechaActual.toLocaleString('es-ES', opcionesFormato);
+        const formatoFecha = formatoFechaHora.split('.').shift().replace(',','');
+        var formatoCorrecto = formatoFecha.replace(/[/]/g, '-').replace(/[\s]/g, 'T').slice(0, 16);
+        const fechaCorrecta = formatoCorrecto.slice(6,10)+"-"+formatoCorrecto.slice(3,5)+"-"+formatoCorrecto.slice(0,2)+"T"+formatoCorrecto.slice(11,13)+":"+formatoCorrecto.slice(14,16)
+
+        $("#fechaRecepcion").val(fechaCorrecta);
     }
+
+    // carga los parámetros cuando cambia el tipo de muestra medida
     function cargarParametros(){
-        $.ajax({
+        console.log("consultando");
+        $.ajax({  
             type: "GET",
             dataType: "json",
-            url:"/private/gestionmuestras/insertarMuestra/consultarParametrosTipo/"+$("#inputCodigoCSN option:selected").val().split("_")[0]+"/",
+            url:"/private/gestionmuestras/insertarMuestra/consultarParametrosTipo/"+$("#inputCodigoCSN").val().split("_")[0]+"/",
             success: function(data)
             {
                 $("#placeHolderParametrosRequerido").html("");
@@ -258,17 +333,90 @@
                     var valor = "";
                     if (data.parametros[i].valor_recomendado != null)
                         valor = data.parametros[i].valor_recomendado;
-                    $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'>"+data.parametros[i].parametro__descripcion+":</label><input type='text' id='"+data.parametros[i].parametro__nombre+"' name='"+data.parametros[i].parametro__nombre+"' value='"+valor+"' class='form-control'>");
+                    tipo = JSON.parse(data.parametros[i].parametro__tipo);
+                    
+                    if (tipo == null) {
+                        $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'><strong>"+data.parametros[i].parametro__nombre+"</strong>. "+data.parametros[i].parametro__descripcion+":</label><input type='text' id='"+data.parametros[i].parametro__nombre+"' name='parametro_"+data.parametros[i].parametro__identificador+"' value='"+valor+"' class='form-control' required>");
+                    } else if (tipo["tipo"] == "float") {
+                        $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'><strong>"+data.parametros[i].parametro__nombre+"</strong>. "+data.parametros[i].parametro__descripcion+":</label><input type='number' step='any' id='"+data.parametros[i].parametro__nombre+"' name='parametro_"+data.parametros[i].parametro__identificador+"' value='"+valor+"' class='form-control' min='0.0' step='0.01' required>");
+                    } else if (tipo["tipo"] == "select") {
+                        var opciones = tipo["valores"].split(",");
+                        var select = "<select id='"+data.parametros[i].parametro__nombre+"' name='parametro_"+data.parametros[i].parametro__identificador+"' class='form-select' required>";
+                        for (var j = 0; j < opciones.length; j++) {
+                            select += "<option>"+opciones[j]+"</option>";
+                        }
+                        select += "</select>";
+                        $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'><strong>"+data.parametros[i].parametro__nombre+"</strong>. "+data.parametros[i].parametro__descripcion+":</label>"+select+"</div>");
+                    } else if (tipo["tipo"] == "datetime") {
+                        $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'><strong>"+data.parametros[i].parametro__nombre+"</strong>. "+data.parametros[i].parametro__descripcion+":</label><input type='datetime-local' id='"+data.parametros[i].parametro__nombre+"' name='parametro_"+data.parametros[i].parametro__identificador+"' value='"+valor+"' class='form-control' required>");
+                    } else if (tipo["tipo"] == "int") {
+                        $("#placeHolderParametrosRequerido").append("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+data.parametros[i].parametro__nombre+"' class='form-label'><strong>"+data.parametros[i].parametro__nombre+"</strong>. "+data.parametros[i].parametro__descripcion+":</label><input type='number' id='"+data.parametros[i].parametro__nombre+"' name='parametro_"+data.parametros[i].parametro__identificador+"' value='"+valor+"' class='form-control' min='0' step='1' required>");
+                    }
                 }
             }
 
         });
     }
+    idtexto = 0;
+    // copia el texto seleccionado en el textarea de comentario particular
+    function copiarTexto(){
+        idtexto++;
+        $("#inputComentarioParticular").val($("#inputComentarioParticular").val()+idtexto+") "+$("#textosPredefinidos").val());
+    }
+    
+    // carga los parámetros cuando cambia el tipo de muestra medida
+    function cargarComentarioRecogidaGeneral(){
+
+        datos = {
+            "memoria": $("#inputMemoria").val(),
+            "codigoCSN": $("#inputCodigoCSN").val().split("_")[1],
+            "localizacion": $("#inputLocalizaciones").val(), 
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        }
+
+        $.ajax({  
+            type: "POST",
+            dataType: "json",
+            data: datos,
+            url:"/private/gestionmuestras/obtenerComentarioRecogidaGeneral/",
+            success: function(data)
+            {
+                $("#inputComentarioGeneral").val(data.comentario);
+            }
+
+        });
+    }
+
+    // agrega un parametro adicional
     function agregarParametro(){
+        console.log("#param_"+$("#inputParametroAdicional").val());
+        console.log($("#param_"+$("#inputParametroAdicional").val()).data("tipo"));
+        console.log($("#param_"+$("#inputParametroAdicional").val()).html());
+
         // deberia consultar el parametro en una funcion de view y devolver o bien un input o bien un select en funcion del tipo de parametro con un switch case. Despues hacer el replace con el placeholder detras
-        $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#inputParametroAdicional").val()+":</label><input type='text' id='"+$("#inputParametroAdicional").val()+"' name='"+$("#inputParametroAdicional").val()+"' class='form-control'></div><div id='placeHolderParametro' hidden></div>");
+        if ($("#param_"+$("#inputParametroAdicional").val()).data("tipo")["tipo"] == null){
+            $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#param_"+$("#inputParametroAdicional").val()).html()+":</label><input type='text' id='"+$("#inputParametroAdicional").val()+"' name='parametro_"+$("#param_"+$("#inputParametroAdicional").val()).val()+"' class='form-control'></div><div id='placeHolderParametro' hidden></div>");
+        } else if ($("#param_"+$("#inputParametroAdicional").val()).data("tipo")["tipo"] == "float") {
+            $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#param_"+$("#inputParametroAdicional").val()).html()+":</label><input type='number' step='any' id='"+$("#inputParametroAdicional").val()+"' name='parametro_"+$("#param_"+$("#inputParametroAdicional").val()).val()+"' class='form-control' min='0.0' step='0.01'></div><div id='placeHolderParametro' hidden></div>");
+        } else if ($("#param_"+$("#inputParametroAdicional").val()).data("tipo")["tipo"] == "select") {
+            var opciones = $("#param_"+$("#inputParametroAdicional").val()).data("tipo")["valores"].split(",");
+            var select = "<select id='"+$("#inputParametroAdicional").val()+"' name='parametro_"+$("#param_"+$("#inputParametroAdicional").val()).val()+"' class='form-select'>";
+            for (var j = 0; j < opciones.length; j++) {
+                select += "<option>"+opciones[j]+"</option>";
+            }
+            select += "</select>";
+            $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#param_"+$("#inputParametroAdicional").val()).html()+":</label>"+select+"</div><div id='placeHolderParametro' hidden></div>");
+        } else if ($("#param_"+$("#inputParametroAdicional").val()).data("tipo")["tipo"] == "datetime") {
+            $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#param_"+$("#inputParametroAdicional").val()).html()+":</label><input type='datetime-local' id='"+$("#inputParametroAdicional").val()+"' name='parametro_"+$("#param_"+$("#inputParametroAdicional").val()).val()+"' class='form-control'></div><div id='placeHolderParametro' hidden></div>");
+        } else if ($("#param_"+$("#inputParametroAdicional").val()).data("tipo")["tipo"] == "int") {
+            $("#placeHolderParametro").replaceWith("<div class='col-lg-2 col-md-3 col-xs-6'><label for='input"+$("#inputParametroAdicional").val()+"' class='form-label'>"+$("#param_"+$("#inputParametroAdicional").val()).html()+":</label><input type='number' id='"+$("#inputParametroAdicional").val()+"' name='parametro_"+$("#param_"+$("#inputParametroAdicional").val()).val()+"' class='form-control' min='0' step='1'></div><div id='placeHolderParametro' hidden></div>");
+        }
+            
+        
         $("#inputParametroAdicional").val($("#inputParametroAdicional option:first").val());
     }
+    
+    /***
     $(".camara").hide();
     function activar_webcam(){
         $("#logo_webcam").removeClass("fa-camera-web-slash");
@@ -283,6 +431,29 @@
         image.src = canvasElement.toDataURL("image/png");
         console.log(image.src);
         webcam.stop();
+    }
+    ***/
+    // obtengo la información de la última muestra insertada en el sistema
+    function obtenerUltimaMuestra(){
+        $.ajax({  
+            type: "GET",
+            dataType: "json",
+            url:"/private/gestionmuestras/obtenerValoresUltimaMuestra/",
+            success: function(data)
+            {
+                $("#inputMemoria").val(data.muestra.codigo_recogida__codigo_memoria__memoria);
+                $("#inputCodigoCSN").val(data.muestra.codigo_recogida__codigo_csn__tipo_id+"_"+data.muestra.codigo_recogida__codigo_csn__nombre);
+                $("#inputFrecuencia").val(data.muestra.codigo_recogida__frecuencia_de_recogida__nombre);
+                $("#inputSuministrador").val(data.muestra.suministrador__nombre);
+                $("#inputClientes").val(data.muestra.cliente__nombre);
+                $("#inputLocalizaciones").val(data.muestra.codigo_recogida__codigo_procedencia__nombre);
+                $("#inputComentarioGeneral").val(data.muestra.codigo_recogida__observaciones);
+                $("#inputFechaRecogidaInicio").val(data.muestra.fecha_hora_recogida);
+                $("#inputFechaRecogidaFin").val(data.muestra.fecha_hora_recogida_2);
+                $("#inputFechaRecogidaReferencia").val(data.muestra.fecha_hora_recogida_ref);
+            }
+
+        });
     }
 </script>
 {% endblock %}

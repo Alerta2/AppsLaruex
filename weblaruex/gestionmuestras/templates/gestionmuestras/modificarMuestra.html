@@ -1,0 +1,271 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+    button, input[type="submit"], input[type="reset"] {
+        background: none;
+        color: inherit;
+        border: none;
+        padding: 0;
+        font: inherit;
+        cursor: pointer;
+        outline: inherit;
+    }
+    .param-adicional div:hover{
+        background-color: #D7E9FC;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Modificando muestra {{ muestra.identificador }}</h5>
+
+
+            <!-- Multi Columns Form -->
+            <form class="g-3" action="{% url 'gestionmuestras:gestmuesModificarMuestra' muestra.identificador %}" method="POST" enctype="multipart/form-data"> 
+                {% csrf_token %}
+                <div class="row">
+                    <div class="card-header my-4">Información muestra</div>
+
+                    <div class="col-md-12 col-sm-12">
+                        <label for="inputMotivoModificacion" class="form-label">Motivo modificación:</label>
+                        <textarea rows="4" cols="50" id="inputMotivoModificacion" name="inputMotivoModificacion" class="form-control" required></textarea>
+                    </div>
+
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputMemoria" class="form-label">Memoria</label>
+                        <input id="inputMemoria" list="memorias" name="memoria" class="form-select">
+                        <datalist id="memorias">
+                            {% for m in memorias %}
+                                <option>{{ m.memoria }}</option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputCodigoCSN" class="form-label">Codigo CSN <i onclick="cargarParametros()" class="fa-solid fa-arrows-rotate"></i></label>
+                        <input id="inputCodigoCSN" list="codigosCSN" onchange="cargarParametros()" name="codigoCSN" class="form-select">
+                        <datalist id="codigosCSN">
+                            {% for c in codMuestras %}
+                                <option value="{{ c.tipo_id }}_{{ c.nombre }}">{{ c.nombre }}</option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputFrecuencia" class="form-label">Frecuencia</label>
+                        <input id="inputFrecuencia" list="frecuencias" name="frecuencia" class="form-select">
+                        <datalist id="frecuencias">
+                            {% for f in frecuencias %}
+                                <option>{{ f.nombre }}</option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputSuministrador" class="form-label">Suministrador</label>
+                        <input id="inputSuministrador" list="suministradores" name="suministrador" class="form-select">
+                        <datalist id="suministradores">
+                            {% for s in suministradores %}
+                                <option>{{ s.nombre }}</option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputClientes" class="form-label">Clientes</label>
+                        <input id="inputClientes" list="clientes" name="cliente" class="form-select">
+                        <datalist id="clientes">
+                            {% for c in clientes %}
+                                <option>{{ c.nombre }}</option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputLocalizaciones" class="form-label">Localizacion</label>
+                        <input id="inputLocalizaciones" list="localizaciones" name="localizacion" class="form-select" onchange="cargarComentarioRecogidaGeneral()">
+                        <datalist id="localizaciones">
+                            {% for l in localizaciones %}
+                                <option>{{ l.nombre }}</option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-xs-12">
+                        <label for="inputReferencia" class="form-label">Referencia:</label>
+                        <input type="text" id="referencia" name="referencia" class="form-control" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="card-header my-4">Información de fechas</div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="inputFechaRecogidaInicio" class="form-label">Fecha Recogida Inicio</label>
+                            </div>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecogidaInicio" name="fechaRecogidaInicio" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="inputFechaRecogidaFin" class="form-label">Fecha Recogida Fin</label>
+                            </div>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecogidaFin" name="fechaRecogidaFin" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>               
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="inputFechaRecogidaReferencia" class="form-label">Fecha Recogida Referencia</label>
+                            </div>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecogidaReferencia" name="fechaRecogidaReferencia" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-12">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="inputFechaRecepcion" class="form-label">Fecha Recepcion <i onclick="cargarFechaActual()" class="fa-solid fa-arrows-rotate"></i></label>
+                            </div>
+                            <div class="col-12">
+                                <input type="datetime-local" id="fechaRecepcion" name="fechaRecepcion" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="card-header my-4">Observaciones</div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <label for="inputComentarioGeneral" class="form-label">Comentario general:</label>
+                            <textarea rows="4" cols="50" id="inputComentarioGeneral" name="inputComentarioGeneral" class="form-control"></textarea>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <label for="inputComentarioParticular" class="form-label">Comentario particular:</label>
+                            <textarea rows="4" cols="50" type="text" id="inputComentarioParticular" name="inputComentarioParticular" class="form-control"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <div class="card-header my-4"></div>
+                    <button type="submit" class="btn btn-primary">Insertar</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
+                </div>
+            </form><!-- End Multi Columns Form -->
+        </div>
+    </div>
+</section>
+<!-- End Info programa -->
+
+<script>
+
+    // Definir las opciones de formato
+    const opcionesFormato = {
+        timeZone: 'Europe/Madrid',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    };
+
+    $( "#fechaRecogidaInicio" ).bind("change paste keyup", function() {
+        const fecha1 = new Date($("#fechaRecogidaInicio").val());
+        console.log(fecha1);
+        const formatoFechaHora = fecha1.toLocaleString('es-ES', opcionesFormato);
+        const formatoFecha = formatoFechaHora.split('.').shift().replace(',','');
+        var formatoCorrecto = formatoFecha.replace(/[/]/g, '-').replace(/[\s]/g, 'T').slice(0, 16);
+        const fechaCorrecta = formatoCorrecto.slice(6,10)+"-"+formatoCorrecto.slice(3,5)+"-"+formatoCorrecto.slice(0,2)+"T"+formatoCorrecto.slice(11,13)+":"+formatoCorrecto.slice(14,16)
+        $("#fechaRecogidaFin").val(fechaCorrecta);
+        $("#fechaRecogidaReferencia").val(fechaCorrecta);
+    });
+
+    $( "#fechaRecogidaFin" ).bind("change paste keyup", function() {
+        const fecha1 = new Date($("#fechaRecogidaInicio").val());
+        const fecha2 = new Date($("#fechaRecogidaFin").val());
+        
+        console.log(fecha1);
+        console.log(fecha2);
+        // Calcular la fecha media
+        const fechaMedia = new Date((fecha1.getTime() + fecha2.getTime()) / 2);
+        const formatoFechaHora = fechaMedia.toLocaleString('es-ES', opcionesFormato);
+        const formatoFecha = formatoFechaHora.split('.').shift().replace(',','');
+        var formatoCorrecto = formatoFecha.replace(/[/]/g, '-').replace(/[\s]/g, 'T').slice(0, 16);
+        const fechaCorrecta = formatoCorrecto.slice(6,10)+"-"+formatoCorrecto.slice(3,5)+"-"+formatoCorrecto.slice(0,2)+"T"+formatoCorrecto.slice(11,13)+":"+formatoCorrecto.slice(14,16)
+        $("#fechaRecogidaReferencia").val(fechaCorrecta);
+    });
+
+    // carga la fecha actual en el input de fecha de recepcion
+    function cargarFechaActual(){
+        const fechaActual = new Date();
+
+
+        // Formatear la fecha y hora actual con las opciones de formato
+        const formatoFechaHora = fechaActual.toLocaleString('es-ES', opcionesFormato);
+        const formatoFecha = formatoFechaHora.split('.').shift().replace(',','');
+        var formatoCorrecto = formatoFecha.replace(/[/]/g, '-').replace(/[\s]/g, 'T').slice(0, 16);
+        const fechaCorrecta = formatoCorrecto.slice(6,10)+"-"+formatoCorrecto.slice(3,5)+"-"+formatoCorrecto.slice(0,2)+"T"+formatoCorrecto.slice(11,13)+":"+formatoCorrecto.slice(14,16)
+
+        $("#fechaRecepcion").val(fechaCorrecta);
+    }
+
+    
+    // carga los parámetros cuando cambia el tipo de muestra medida
+    function cargarComentarioRecogidaGeneral(){
+
+        datos = {
+            "memoria": $("#inputMemoria").val(),
+            "codigoCSN": $("#inputCodigoCSN").val().split("_")[1],
+            "localizacion": $("#inputLocalizaciones").val(), 
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        }
+
+        $.ajax({  
+            type: "POST",
+            dataType: "json",
+            data: datos,
+            url:"/private/gestionmuestras/obtenerComentarioRecogidaGeneral/",
+            success: function(data)
+            {
+                $("#inputComentarioGeneral").val(data.comentario);
+            }
+
+        });
+    }
+
+    // configuro los valores ya existentes en muestra
+    $("#inputMemoria").val("{{ muestra.codigo_recogida.codigo_memoria.memoria }}");
+    $("#inputCodigoCSN").val("{{ muestra.codigo_recogida.codigo_csn.tipo.tipo_muestra_id }}_{{ muestra.codigo_recogida.codigo_csn.nombre }}");
+    $("#inputCodigoCSN option[value='{{ muestra.codigo_recogida.codigo_csn.tipo.tipo_muestra_id }}_{{ muestra.codigo_recogida.codigo_csn.nombre }}']").prop("selected", true).trigger("change");
+    $("#inputFrecuencia").val("{{ muestra.codigo_recogida.frecuencia_de_recogida.nombre }}");
+    $("#inputSuministrador").val("{{ muestra.suministrador.nombre }}");
+    $("#inputClientes").val("{{ muestra.cliente.nombre }}");
+    $("#inputLocalizaciones").val("{{ muestra.codigo_recogida.codigo_procedencia.nombre }}");
+    $("#referencia").val("{{ muestra.referencia_cliente }}");
+    $("#fechaRecogidaInicio").val("{{ muestra.fecha_hora_recogida|date:'Y-m-d' }}T{{ muestra.fecha_hora_recogida|date:'H:i' }}");
+    $("#fechaRecogidaFin").val("{{ muestra.fecha_hora_recogida_2|date:'Y-m-d' }}T{{ muestra.fecha_hora_recogida_2|date:'H:i' }}");
+    $("#fechaRecogidaReferencia").val("{{ muestra.fecha_hora_recogida_ref|date:'Y-m-d' }}T{{ muestra.fecha_hora_recogida_ref|date:'H:i' }}");
+    $("#fechaRecepcion").val("{{ muestra.fecha_hora_recepcion|date:'Y-m-d' }}T{{ muestra.fecha_hora_recepcion|date:'H:i' }}");
+    $("#inputComentarioGeneral").val("{{ muestra.codigo_recogida.observaciones|escapejs }}");
+    $("#inputComentarioParticular").val("{{ muestra.comentarios|escapejs }}");
+
+</script>
+{% endblock %}

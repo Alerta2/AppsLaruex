@@ -1,0 +1,44 @@
+{% if Error %}
+    <h2 style="color: orange;">No se han localizado nuevas medidas</h2>
+{% else %}
+    {% for medida in nuevasMedidas %}
+        <table class="border m-2">
+            <tr>
+                <th>Medida</th>
+                <th>Cod_reducido</th>
+                <th>Fecha</th>
+            </tr>
+            <tr>
+                <td>{{ medida.Medida }}</td>
+                <td>{{ medida.Cod_reducido }}</td>
+                <td>{{ medida.Fecha }}</td>
+            </tr>
+            <tr>
+                <th>Actividad</th>
+                <th>Incertidumbre</th>
+                <th>AMD</th>
+            </tr>
+            <tr>
+                <td>{{ medida.Actividad }}</td>
+                <td>{{ medida.Incertidumbre }}</td>
+                <td>{{ medida.AMD }}</td>
+            </tr>
+            <tr>
+                <th>Tiempo</th>
+                <th>Cantidad</th>
+                <th>Rendimiento</th>
+            </tr>
+            <tr>
+                <td>{{ medida.Tiempo }}</td>
+                <td>{{ medida.Cantidad }}</td>
+                <td>{{ medida.Rendimiento }}</td>
+            </tr>
+            <tr>
+                <th>Seleccionado</th>
+            </tr>
+            <tr>
+                <td>{{ medida.Seleccionado }}</td>
+            </tr>
+        </table>
+    {% endfor %}
+{% endif %}

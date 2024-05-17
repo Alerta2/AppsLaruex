@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoja Predefinida</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        @media print
+        {
+            @page
+            {
+                size: 210mm 297mm; /* landscape */
+                /* you can also specify margins here: */
+                margin: 250mm;
+                margin-right: 450mm; /* for compatibility with both A4 and Letter */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <img src='data:image/png;base64,{{ imagenMuestra }}' style="height: 128px; width: 128px" class="float-left"/>
+                <img src='data:image/png;base64,{{ imagen }}' style="height: 128px; width: 128px" class="float-right"/>
+            </div>
+        </div>
+        <h1>Información de la muestra</h1>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    <label for="tipo">Tipo:</label>
+                    <input type="text" class="form-control" id="tipo" value="{{ muestra.codigo_recogida.codigo_csn.nombre }}" readonly>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    <label for="identificador">Identificador:</label>
+                    <input type="text" class="form-control" id="identificador_muestra" value="{{ muestra.identificador }}" readonly>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    <label for="referencia">Referencia:</label>
+                    <input type="text" class="form-control" id="referencia" value="{{ muestra.referencia_cliente }}" readonly>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    <label for="referencia">Fecha Recepcion:</label>
+                    <input type="text" class="form-control" id="fecha_hora_recepcion" value="{{ muestra.fecha_hora_recepcion|date:'d/m/Y H:i' }}" readonly>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    <label for="referencia">Fecha Recogida inicial:</label>
+                    <input type="text" class="form-control" id="fecha_hora_recogida" value="{{ muestra.fecha_hora_recogida|date:'d/m/Y H:i' }}" readonly>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    <label for="referencia">Fecha Recogida final:</label>
+                    <input type="text" class="form-control" id="fecha_hora_recogida_2" value="{{ muestra.fecha_hora_recogida_2|date:'d/m/Y H:i' }}" readonly>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="form-group">
+                    <label for="referencia">Fecha Recogida referencia:</label>
+                    <input type="text" class="form-control" id="fecha_hora_recogida_ref" value="{{ muestra.fecha_hora_recogida_ref|date:'d/m/Y H:i' }}" readonly>
+                </div>
+            </div>
+        </div>
+
+        <h1>Muestra</h1>
+        <div class="row">
+            {% for muestra in parametrosMuestra %}
+                <div class="col-md-3 col-sm-6 col-xs-12">
+                    <div class="form-group h-100">
+                        <label for="peso-fresco" class="align-top">{{muestra.parametro.nombre}}{% if muestra.parametro.descripcion %} : {{muestra.parametro.descripcion}}{% endif%}</label>
+                        <input type="text" class="form-control align-bottom" id="muestra_{{muestra.parametro.identificador}}" {% if muestra.valor %}value="{{muestra.valor}}"{% endif%}>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        
+        <div class="row mb-2">
+            <div class="col-12"><i><small>* No hay valor para este parámetro</small></i></div>
+        </div>
+        {% if volAlicuotas %}
+            <h3>Analiticas a realizar</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Análitica</th>
+                        <th>Volumen</th>
+                        <th>Tratamiento</th>
+                        <th>Fecha</th>
+                        <th>Técnico</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alicuota in volAlicuotas %}
+                        <tr>
+                            <td>{{ alicuota.alicuota.id_analiticas.nombre }}</td>
+                            <td>{{ alicuota.alicuota.cantidad_muestra_analizada }}</td>
+                            <td>{{ alicuota.alicuota.identificador}} ({{ alicuota.tratamiento.cod_reducido }})</td>
+                            <td></td>
+                            <td>{{ alicuota.tratamiento.analista.nombre}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+       
+        {% if parametrosAlicuota  %}
+            <h1>Alicuota</h1>
+            <div class="row">
+                {% for alicuota in parametrosAlicuota %}
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label for="peso-fresco">({{alicuota.determinacion}}) {{alicuota.parametro.nombre}}{% if alicuota.parametro.descripcion %} : {{alicuota.parametro.descripcion}}{% endif%}</label>
+                            <input type="text" class="form-control" id="alicuota_{{muestra.parametro.identificador}}" {% if alicuota.valor %}value="{{alicuota.valor}}"{% endif%}>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+
+        <div class="row mt-2">
+            {% if alicuotasAsociadas %}
+                <div class="col-12">
+                    <p><b>Determinaciones</b>: {{alicuotasAsociadas|safe}}</p>
+                </div>
+            {% endif %}
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="observaciones">Observaciones:</label>
+                    <textarea class="form-control" id="observaciones" rows="3">{{ muestra.observaciones }}</textarea>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <img src='data:image/png;base64,{{ imagenMuestra }}' style="height: 128px; width: 128px" class="float-left"/>
+                <img src='data:image/png;base64,{{ imagen }}' style="height: 128px; width: 128px" class="float-right"/>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

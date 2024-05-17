@@ -1,0 +1,243 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+
+<!-- modal confirm delete cod muestra -->
+<div class="modal fade" id="modalConfirmDeleteCliente" tabindex="-1" aria-labelledby="modalConfirmDeleteClienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmDeleteClienteLabel">Eliminar Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea eliminar el cliente?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" onclick="confirmarBorrado()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal confirm delete cod muestra -->
+
+<!-- modal to add or edit a cod muestra -->
+<div class="modal fade" id="modalAddEditCliente" tabindex="-1" aria-labelledby="modalAddEditClienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAddEditClienteLabel">Nuevo Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="formModal" class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal to add or edit a cod muestra -->
+
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <table class="table"
+            id="table"
+            data-toggle="table"
+            data-pagination="true"
+            data-page-size="25"
+            data-height="800"
+            data-search="true"
+            data-show-columns="true"
+            data-show-refresh="true"
+            data-show-columns-toggle-all="true"
+            data-show-fullscreen="true"
+            data-buttons="buttons"
+            data-buttons-class="light"
+            data-show-export="true"
+            data-url="/private/gestionmuestras/gestionClientesDatos/">
+        </table>
+    </div>
+    <!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+<script>
+    // tabla para mostrar los clientes
+    // parámetros: identificador, nombre, descripcion, direccion, telefono, fax, email, persona_contacto, nif, idioma, password, informar 
+    // idioma, password e informar no se muestran en la tabla por defecto
+    $('#table').bootstrapTable({
+        columns: [
+            {
+                title: 'IDENTIFICADOR',	
+                sortable: 'true',
+                field: 'identificador',
+            },
+            {
+                title: 'NOMBRE',	
+                sortable: 'true',
+                field: 'nombre',
+            },
+            {
+                title: 'DESCRIPCIÓN',	
+                sortable: 'true',
+                field: 'descripcion',
+            },
+            {
+                title: 'DIRECCIÓN',	
+                sortable: 'true',
+                field: 'direccion',
+            },
+            {
+                title: 'TELÉFONO',	
+                sortable: 'true',
+                field: 'telefono',
+            },
+            {
+                title: 'FAX',	
+                sortable: 'true',
+                field: 'fax',
+                visible: false
+            },
+            {
+                title: 'EMAIL',	
+                sortable: 'true',
+                field: 'email',
+            },
+            {
+                title: 'PERSONA CONTACTO',	
+                sortable: 'true',
+                field: 'persona_contacto',
+                visible: false
+            },
+            {
+                title: 'NIF',	
+                sortable: 'true',
+                field: 'nif',
+            },
+            {
+                title: 'IDIOMA',	
+                sortable: 'true',
+                field: 'idioma',
+                visible: false
+            },
+            {
+                title: 'PASSWORD',	
+                sortable: 'true',
+                field: 'password',
+                visible: false
+            },
+            {
+                title: 'INFORMAR',	
+                sortable: 'true',
+                field: 'informar',
+                visible: false
+            }
+            ,{
+                title: 'Acciones',
+                formatter: function (value, row) {
+                  // si usuario es administrador
+                  let botones = '<div class="btn-group">';
+                  botones += '<a class="btn" onclick="editarCliente('+"'"+row.identificador+"'"+')"><i class="fa-solid fa-pen-to-square"></i></a>';
+                  
+                  {% if user.is_superuser %}
+                    botones += '<a class="btn" onclick="borrarCliente('+"'"+row.identificador+"'"+')"><i class="fa-solid fa-trash"></i></a>';
+                  {% endif %}
+                  botones += '</div>';
+                  return botones;
+                }
+            }],
+        locale: "es-ES",
+        search: true,
+        sortName: 'doc',
+        sortOrder: 'asc',
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+    })
+
+    function dateFormat(value, row, index) {
+        return moment(value).format('DD/MM/YYYY HH:mm');
+    }
+
+    function buttons () {
+        return {
+          btnAdd: {
+            text: 'Nuevo Cliente',
+            icon: 'bi-plus',
+            event: function () {
+                $.ajax({
+                url: '/private/gestionmuestras/gestionClientesNuevo/',
+                type: 'GET',
+                success: function(response){
+                    $('#formModal').html(response);
+                    $('#modalAddEditCliente').modal('show');
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+            },
+            attributes: {
+              title: 'Nuevo Cliente',
+            }
+          }
+        }
+    }
+    let codigoAuxiliar = "";
+    function borrarCliente(identificador){
+        codigoAuxiliar = identificador;
+        $('#modalConfirmDeleteCliente').modal('show');
+    }
+    function confirmarBorrado(){
+        $('#modalConfirmDeleteCliente').modal('hide');
+        $.ajax({
+            url: '/private/gestionmuestras/gestionClientesBorrar/',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}', 'identificador': codigoAuxiliar
+            },
+            success: function(response){
+                $('#table').bootstrapTable('refresh');
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    }
+    function editarCliente(identificador){
+        $.ajax({
+            url: '/private/gestionmuestras/gestionClientesEditar/',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}', 
+                'consulta': 1,
+                'identificador': identificador
+            },
+            success: function(response){
+                $('#formModal').html(response);
+                $('#modalAddEditCliente').modal('show');
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    }
+</script>
+{% endblock %}

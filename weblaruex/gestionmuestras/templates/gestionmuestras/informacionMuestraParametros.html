@@ -1,0 +1,10 @@
+{% for parametro in parametros %}
+  <div class="col-md-3 col-sm-4">
+    <div class="card info-card">
+      <div class="card-body">
+        <h5 class="card-title">{{ parametro.id_parametro_muestra.nombre }} <span>| {{ parametro.id_parametro_muestra.descripcion }}</span></h5>
+        <b>{{ parametro.valor }}</b> <button type="button" class="ml-3 my-auto btn btn-outline-primary" onclick="navigator.clipboard.writeText('{{parametro.valor}}');crearAviso('Copiado', 'Copiado en portapapeles el valor {{parametro.valor}}')">Copiar</button>
+      </div>
+    </div>
+  </div>
+{% endfor %}

@@ -168,7 +168,7 @@ class ValorMuestra(models.Model):
 
 
 class ValorMuestraCopumaVolatil(models.Model):
-    motivo_muestreo_codmuestreo = models.CharField(db_column='Motivo_Muestreo_CodMuestreo', primary_key=True, max_length=1)  # Field name made lowercase.
+    motivo_muestreo_codmuestreo = models.CharField(db_column='Motivo_Muestreo_CodMuestreo', max_length=1)  # Field name made lowercase.
     fecha_recogida_inicial = models.DateField(db_column='Fecha_recogida_inicial')  # Field name made lowercase.
     fecha_recogida_final = models.DateField(db_column='Fecha_recogida_final')  # Field name made lowercase.
     fecha_analisis = models.DateField(db_column='Fecha_analisis')  # Field name made lowercase.

@@ -1,0 +1,224 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+
+
+{% endblock %}
+
+{% block css %}
+    button, input[type="submit"], input[type="reset"] {
+        background: none;
+        color: inherit;
+        border: none;
+        padding: 0;
+        font: inherit;
+        cursor: pointer;
+        outline: inherit;
+    }
+    .param-adicional div:hover{
+        background-color: #D7E9FC;
+    }
+    .clickable {
+        display: block;
+        height: 100%;
+        width: 100%;
+        text-decoration: none;
+    }
+
+    details {
+        user-select: none;
+    }
+    details>summary span.icon {
+        width: 24px;
+        height: 24px;
+        transition: all 0.3s;
+        margin-left: auto;
+    }   
+    summary {
+        display: flex;
+        cursor: pointer;
+    }
+    summary::-webkit-details-marker {
+        display: none;
+    }
+{% endblock %}
+
+<!-- colores https://colorhunt.co/palette/0a26471442722052952c74b3 -->
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    {% regroup muestras by id_alicuota.id_historico_recogida.codigo_recogida.codigo_memoria as memorias %}
+    {% for memoria in memorias %}
+    <div class="card">
+        <div class="card-body">
+            <div class="content m-2">
+                <h2 class="text-center">{{memoria.grouper.memoria}}</h2>
+                <p class="text-center">Muestras de la memoria</p>
+
+                {% regroup memoria.list by id_alicuota.id_historico_recogida.codigo_recogida.codigo_csn as codigos_csn %}
+                {% for codigo_csn in codigos_csn %}
+                    <details class="my-2 border border-light">
+                        <summary style="color: #0A2647;" onclick="modificarIcono('icono_{{ codigo_csn.grouper.codigo }}')"><i id="icono_{{ codigo_csn.grouper.codigo }}" class="fa-sharp fa-solid fa-box-taped fa-xl my-auto"></i>&nbsp;<h3 class="mt-2">{{ codigo_csn.grouper.nombre }}</h3></summary>
+                        <p>
+                            <div class="accordion accordion-flush" id="accordion{{ codigo_csn.grouper.codigo }}">
+                                {% regroup codigo_csn.list by id_alicuota.id_historico_recogida.codigo_recogida as recogida_general %}
+                                {% for recogida in recogida_general %}
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="accordion-item">
+                                            <h4 class="accordion-header" id="heading{{ codigo_csn.grouper.codigo }}{{ recogida.grouper.codigo_procedencia.codigo }}">
+                                                <button class="accordion-button" style="color: #144272;" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ codigo_csn.grouper.codigo }}{{ recogida.grouper.codigo_procedencia.codigo }}" aria-expanded="true" aria-controls="collapse{{ codigo_csn.grouper.codigo }}{{ recogida.grouper.codigo_procedencia.codigo }}">
+                                                    <strong>{{ recogida.grouper.codigo_procedencia.nombre }}</strong>
+                                                </button>
+                                            </h4>
+                                            <div id="collapse{{ codigo_csn.grouper.codigo }}{{ recogida.grouper.codigo_procedencia.codigo }}" class="accordion-collapse collapse" aria-labelledby="heading{{ codigo_csn.grouper.codigo }}{{ recogida.grouper.codigo_procedencia.codigo }}" data-bs-parent="#accordion{{ codigo_csn.grouper.codigo }}">
+                                                <div class="accordion-body">
+                                                    <div class="accordion" id="accordion{{ codigo_csn.grouper.codigo }}{{ recogida.grouper.codigo_procedencia.codigo }}" style="border: #27374D; border-radius: 2px;">
+                                                        {% regroup recogida.list by id_alicuota.id_historico_recogida as historico_recogida %}
+                                                        {% for muestra in historico_recogida %}
+                                                            <form id="form{{muestra.grouper.identificador}}">
+                                                                {% csrf_token %}
+                                                                <div class="accordion-item">
+                                                                    <h5 class="accordion-header" id="header{{muestra.grouper.identificador}}">
+                                                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{muestra.grouper.identificador}}" aria-expanded="true" aria-controls="collapse{{muestra.grouper.identificador}}" style="color: #205295;">
+                                                                            <strong>Muestra:&nbsp;</strong>{{muestra.grouper.identificador}}
+                                                                            <input type="hidden" name="id_muestra" value="{{muestra.grouper.identificador}}">
+                                                                        </button>
+                                                                    </h5>              
+                                                                    <div id="collapse{{muestra.grouper.identificador}}" class="accordion-collapse collapse" aria-labelledby="heading{{muestra.grouper.identificador}}" data-bs-parent="#accordion{{ codigo_csn.grouper.codigo }}{{ recogida.grouper.codigo_procedencia.codigo }}">
+                                                                        <div class="accordion-body">
+                                                                            <strong>Fecha:</strong> {{muestra.grouper.fecha_hora_recogida}}
+                                                                            {% regroup muestra.list by id_analisis_medido as determinaciones %}
+                                                                            {% for determinacion in determinaciones %}
+            
+                                                                                <h5 class="text-center my-2" style="color: #2C74B3;"><strong>{{ determinacion.list.0.id_alicuota.id_analiticas.nombre }}: Determinación: [ {{determinacion.grouper.isotopo}} ]{% if determinacion.grouper.masa != -1 %} Isótopo[ {{determinacion.grouper.analisis}}-{{determinacion.grouper.masa}} ]{% endif %}</strong></h5>
+                                                                                
+                                                                                <table class="table table-hover">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th scope="col" class="text-center">#</th>
+                                                                                            <th scope="col" class="text-center">Alicuota</th>
+                                                                                            <th scope="col" class="text-center">Fecha de medida</th>
+                                                                                            <th scope="col" class="text-center">Equipo de medida</th>
+                                                                                            <th scope="col" class="text-center">Actividad</th>
+                                                                                            <th scope="col" class="text-center">Error</th>
+                                                                                            <th scope="col" class="text-center">AMD</th>
+                                                                                            <th scope="col" class="text-center">Tiempo de medida</th>
+                                                                                            <th scope="col" class="text-center">Rendimiento químico</th>
+                                                                                        </tr>
+                                                                                    </thead> 
+                                                                                    <tbody>
+                                                                                        {% for medida in determinacion.list %}
+                                                                                            <tr>
+                                                                                                <th scope="row"><input type="checkbox" id="{{medida.id}}" name="{{medida.id}}" {% if medida.validacion != 0 %}checked{% endif %}></th>
+                                                                                                <th scope="row" class="text-secondary text-center">{{ medida.id_alicuota.identificador }}&nbsp;<i class="fa-regular fa-circle-info" data-bs-toggle="modal" data-bs-target="#modalTratamientosAlicuota" onclick="consultarInfoAlicuota({{ medida.id_alicuota.identificador }})"></i></th>
+                                                                                                <th scope="row" class="text-secondary text-center">{{ medida.fecha_medida }}</th>
+                                                                                                <th scope="row" class="text-secondary text-center">{{ medida.equipo_medida }}</th>
+                                                                                                <th scope="row" class="text-secondary text-center">{{ medida.actividad }}</th>
+                                                                                                <th scope="row" class="text-secondary text-center">{{ medida.error }}</th>
+                                                                                                <th scope="row" class="text-secondary text-center">{{ medida.amd }}</th>
+                                                                                                <th scope="row" class="text-secondary text-center">{{ medida.tiempo_medida }}</th>
+                                                                                                <th scope="row" class="text-secondary text-center">{{ medida.rendimiento }}</th>
+                                                                                            </tr>
+                                                                                        {% endfor %}
+                                                                                    </tbody>
+                                                                                </table>
+            
+                                                                            {% endfor %}
+                                                                            <div class="text-center">
+                                                                                {{muestra.grouper.estado_muestra}}
+                                                                                {% if muestra.grouper.estado_muestra.identificador_estado < 4 %}
+                                                                                    <button type="submit" class="btn btn-primary">Verificar</button>
+                                                                                {% elif muestra.grouper.estado_muestra.identificador_estado == 4 %}
+                                                                                    <button type="submit" class="btn btn-primary">Finalizar</button>
+                                                                                {% elif muestra.grouper.estado_muestra.identificador_estado == 99 %}
+                                                                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                                                    Esta muestra fue cancelada. Compruebe el motivo y cambie el estado si es necesario
+                                                                                    </div>
+                                                                                {% else %}
+                                                                                    <button type="submit" class="btn btn-primary">Repetir informe</button>
+                                                                                {% endif %}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>                                  
+                                                                </div>
+                                                                
+                                                            </form>
+                                                            <script>
+                                                                $("#form{{muestra.grouper.identificador}}").submit(function(e) {
+                                                                    e.preventDefault(); 
+                                                                    $.ajax({
+                                                                        url: "/private/gestionmuestras/verificarMuestra/",
+                                                                        method : "POST",
+                                                                        data: $("#form{{muestra.grouper.identificador}}").serialize(),
+                                                                        dataType: "json",
+                                                                        success: function(data)
+                                                                        {
+                                                                            alert(data);
+                                                                        }
+                                                                    });
+                                                                });
+                                                            </script>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>                    
+                                {% endfor %}   
+                            </div> 
+                        </p>
+                    </details>         
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</section>
+<!-- End Info programa -->
+
+<!-- modal informacion de tratamientos-->
+<div class="modal fade" id="modalTratamientosAlicuota" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="modalTratamientosAlicuota_titulo" class="modal-title"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div id="modalTratamientosAlicuota_contenido" class="modal-body">
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- fin modal informacion de tratamientos-->
+
+
+<script>
+
+    function modificarIcono(icono){
+        if (document.getElementById(icono).classList.contains("fa-box-taped")){
+            document.getElementById(icono).classList.remove("fa-box-taped");
+            document.getElementById(icono).classList.add("fa-box-open-full");
+        }
+        else{
+            document.getElementById(icono).classList.remove("fa-box-open-full");
+            document.getElementById(icono).classList.add("fa-box-taped");
+        }
+    }
+
+
+    
+</script>
+{% endblock %}

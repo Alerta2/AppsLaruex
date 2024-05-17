@@ -1,0 +1,27 @@
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="gestionTablasModalLabel">Gestión de tablas</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>  
+        <div class="modal-body">
+            <div class="row row-cols-1 row-cols-md-3">
+                {% for boton in botones %}
+                    {% if boton.grupo == 1 %}
+                    <div  class="col mb-4">
+                        <button type="button" class="btn btn-primary h-100 w-100" onclick="window.open('{{boton.url}}', '_blank');">
+                            <i class="{{ boton.icono }} fa-2x"></i> <h4 class="m-auto">{{ boton.nombre }}</h4>
+                        </button>
+                    </div>
+                    {% elif boton.grupo == 2 and user.is_superuser %}
+                        <div  class="col mb-4">
+                            <button type="button" class="btn btn-primary h-100 w-100" onclick="window.open('{{boton.url}}', '_blank');">
+                                <i class="{{ boton.icono }} fa-2x"></i> <h4 class="m-auto">{{ boton.nombre }}</h4>
+                            </button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

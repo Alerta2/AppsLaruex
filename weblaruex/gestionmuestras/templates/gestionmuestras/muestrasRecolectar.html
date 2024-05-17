@@ -1,0 +1,206 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <div id="toolbar">
+            <div class="row">
+
+                <div class="col-lg-3 col-md-8 col-8">
+                    <label class="text-sm" >Mes</label>
+                    <select class="form-control" aria-label="Mes" id="mes"
+                    name="mes" aria-describedby="text-addon">
+                        <option value="-1" selected hidden>Mes actual</option>
+                        <option value="ENERO">Enero</option>
+                        <option value="FEBRERO">Febrero</option>
+                        <option value="MARZO">Marzo</option>
+                        <option value="ABRIL">Abril</option>
+                        <option value="MAYO">Mayo</option>
+                        <option value="JUNIO">Junio</option>
+                        <option value="JULIO">Julio</option>
+                        <option value="AGOSTO">Agosto</option>
+                        <option value="SEPTIEMBRE">Septiembre</option>
+                        <option value="OCTUBRE">Octubre</option>
+                        <option value="NOVIEMBRE">Noviembre</option>
+                        <option value="DICIEMBRE">Diciembre</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-8 col-8">
+                    <label class="text-sm" >Recogido</label>
+                    <select class="form-control" aria-label="Recogido" id="Recogido"
+                    name="recogido" aria-describedby="text-addon">
+                        <option selected value="-1">Todo</option>
+                        <option value="0">No</option>
+                        <option value="1">Sí</option>
+                    </select>
+                </div>
+                <div class="col-lg-1 col-md-4 col-4 my-auto">
+                    <button type="submit" value="submit" class="btn btn-outline-secondary w-100 mt-4 mb-0" onclick="actualizarTablaMes()">Filtrar</button> 
+                </div>
+            </div>
+
+        </div>
+        <table class="table"
+            id="table"
+            data-toggle="table"
+            data-pagination="true"
+            data-page-size="25"
+            data-height="800"
+            data-search="true"
+            data-show-columns="true"
+            data-show-refresh="true"
+            data-show-columns-toggle-all="true"
+            data-show-fullscreen="true"
+            data-buttons="buttons"
+            data-buttons-class="light"
+            data-show-export="true"
+            data-detail-view="true"
+            data-detail-formatter="detailFormatter"
+            data-url="{% url 'gestionmuestras:gestmuesConsultarMuestrasRecogerDatos' %}">
+            <thead>
+            </thead>
+        </table>
+    </div>
+    <!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+<script type="text/javascript">
+    // parametros de la tabla 'n_recogida__numero', 'n_recogida__csn__nombre', 'n_recogida__procedencia__nombre', 'n_recogida__memoria__descripcion', 'csn__nombre', 'recoge', 'n_recogida__suministra', 'suministra', 'observaciones', 'n_recogida__observaciones', 'recogido', 'fecha_recogida_inicial', 'fecha_recogida_final', 'fecha_recepcion', 'conservacion', 'nfiltro', 'ibomba', 'mes'
+    $('#table').bootstrapTable({
+        columns: [
+            
+            { 
+                sortable: true,
+                align: 'center',
+                formatter: function (value, row) {
+                    if (row.recogido == 0) {
+                        return '<i class="fa-solid fa-hourglass-start fa-xl" style="color:#FFA914"></i>';
+                    }
+                    else {
+                        return '<i class="fa-solid fa-box-check fa-xl" style="color:#039e00"></i>';
+                    }
+
+                }
+            },
+            {
+                field: 'n_recogida__numero', title: 'Nº Recogida', sortable: true
+            },
+            {field: 'n_recogida__csn__nombre', title: 'CSN', sortable: true},
+            {
+                field: 'n_recogida__procedencia__nombre', 
+                title: 'Procedencia', 
+                sortable: true,
+                formatter: function (value, row) {
+                    var procedencia = '<p>Procedencia: '+row.n_recogida__procedencia__nombre+'</p>'
+                    var suministra = '<p>Suministra: '+row.n_recogida__suministra+' / '+row.suministra+'</p>'
+                    return '<div class="row">'+procedencia+suministra+'</div>';
+                }
+            },
+            {field: 'n_recogida__memoria__memoria', title: 'Memoria', sortable: true},
+            {field: 'csn__nombre', title: 'CSN', sortable: true},
+            {field: 'recoge', title: 'Recoge', sortable: true},
+            {
+                title: 'Fecha Recogida ', 
+                sortable: true, 
+                align: 'center',
+                formatter: function (value, row) {
+                    // if value is null, return '-'
+                    fecha1 = "-"
+                    fecha2 = "-"
+                    if (row.fecha_recogida_inicial != null)
+                        fecha1 = moment(row.fecha_recogida_inicial).format('DD/MM/YYYY HH:mm');
+                    if (row.fecha_recogida_final != null) 
+                        fecha2 = moment(row.fecha_recogida_final).format('DD/MM/YYYY HH:mm');
+                    if (fecha1 == "-" && fecha2 == "-")
+                        return '-';
+                    else
+                        if (fecha1 == fecha2)
+                            return fecha1;
+                        else
+                            return 'I:' + fecha1 + '<br>F:' + fecha2;
+                }
+            },
+            {
+                field: 'fecha_recepcion', 
+                title: 'Fecha Recepción', 
+                sortable: true, 
+                formatter: function (value, row) {
+                    // if value is null, return '-'
+                    if (row.fecha_recepcion == null) 
+                        return '-';
+                    else
+                        return moment(value).format('DD/MM/YYYY HH:mm');
+                }
+            },
+            {field: 'mes', title: 'Mes', sortable: true},
+            {
+                title: 'Acciones',
+                formatter: function (value, row) {
+                  // si usuario es administrador
+                  let botones = '<div class="btn-group">';
+                  {% if perms.auth.gestion_recolector %}
+                    botones += '<a class="btn" onclick="" data-toggle="tooltip" data-placement="bottom" title="Recoger muestra"><i class="fad fa-hand-holding-box fa-2x" style="--fa-primary-color: #0400ff; --fa-secondary-color: #0400ff;"></i></a>';
+                  {% endif %}
+                  botones += '</div>';
+                  return botones;
+                }
+            }],
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+    })
+
+    function dateFormat(value, row, index) {
+        return moment(value).format('DD/MM/YYYY HH:mm');
+    }
+
+    function buttons () {
+        return {
+          btnAdd: {
+            text: 'Add new row',
+            icon: 'bi-plus',
+            event: function () {
+              alert('Do some stuff to e.g. add a new row')
+            },
+            attributes: {
+              title: 'Add a new row to the table'
+            }
+          }
+        }
+    }
+    function detailFormatter(index, row) {
+        var html = []
+        html.push('<p><b>Observacion general:</b> ' + row.n_recogida__observaciones + '</p>')
+        html.push('<p><b>Observacion particular:</b> ' + row.observaciones + '</p>')
+        if (row.conservacion != 'nan')
+            html.push('<p><b>Conservación:</b> ' + row.conservacion + '</p>')
+        if (row.nfiltro != 0)
+            html.push('<p><b>Nº Filtro:</b> ' + row.nfiltro + '</p>')
+        if (row.ibomba != 0)
+            html.push('<p><b>Bomba:</b> ' + row.ibomba + '</p>')
+        return html.join('')
+    }
+    function actualizarTablaMes() {
+        var urlEditar = "{% url 'gestionmuestras:gestmuesConsultarMuestrasRecogerDatos' mes='mes' recogido='recogido' %}".replace('mes', $('#mes').val()).replace('recogido', $('#Recogido').val());
+        $("#table").bootstrapTable('refresh', {url: urlEditar});
+    }
+</script>
+{% endblock %}

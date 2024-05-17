@@ -1,0 +1,46 @@
+
+<div class="modal-header">
+    <h5 id="modalTratamientosAlicuota_titulo" class="modal-title">Procesos de la alicuota {{id_alicuota}} en el LARUEX</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div id="modalTratamientosAlicuota_contenido" class="modal-body">
+    
+    {% if parametros|length == 0 %}
+        <div>No se han encontrado parametros asociados a esta alicuota</div><br
+    {% else %}
+    <h4>Parametros</h4>
+    <table class="table table-striped table-responsive">
+        <thead>
+            <tr><th scope="col">Parametro</th><th scope="col">Descripción</th><th scope="col">Valor</th><th scope="col">Copiar</th></tr>
+        </thead>
+        <tbody>
+            {% for p in parametros %}
+                <tr><td>{{p.id_parametro_analitica.nombre}}</td><td>{{p.id_parametro_analitica.descripcion}}</td><td>{{p.valor}}</td><td><button type="button" class="btn btn-outline-primary" onclick="navigator.clipboard.writeText('{{p.valor}}');crearAviso('Copiado', 'Copiado en portapapeles el valor {{p.valor}}')">Copiar</button></td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    <h4>Tratamientos</h4>
+    <table class="table table-striped table-responsive">
+        <thead>
+            <tr><th scope="col">Identificador</th><th scope="col">Codigo Reducido</th><th scope="col">Tratamiento</th><th scope="col">Fecha Inicio</th><th scope="col">Fecha Fin</th><th scope="col">Analista</th><th scope="col">Paso</th></tr>
+        </thead>
+        <tbody>
+            {% for t in tratamientos %}
+                <tr><th scope="row">{{t.identificador}}</th><td>{{t.cod_reducido}}</td><td>{{t.tratamiento__descripcion}}</td><td>{{t.fecha_inicio}}</td><td>{{t.fecha_fin}}</td><td>{{t.analista__nombre}}</td><td>{{t.paso_actual}}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h4>Medidas</h4>
+    <table class="table table-striped table-responsive">
+        <thead>
+            <tr><th scope="col">Codigo Reducido</th><th scope="col">Medida</th><th scope="col">Fecha</th><th scope="col">Actividad</th><th scope="col">Incertidumbre</th><th scope="col">AMD</th><th scope="col">Tiempo</th><th scope="col">Cantidad</th><th scope="col">Rendimiento</th><th scope="col">Seleccionado</th></tr>
+        </thead>
+        <tbody>
+            {% for m in medidas %}
+                <tr><td>{{m.cod_reducido}}</td><td>{{m.determinacion_medida__nombre_medida}}</td><td>{{m.fecha_analisis}}</td><td>{{m.actividad|floatformat:4}}</td><td>{{m.actividad_error|floatformat:4}}</td><td>{{m.amd|floatformat:4}}</td><td>{{m.tiempo_medida}}</td><td>{{m.cantidad|floatformat:4}}</td><td>{{m.rendimiento}}</td><td>{{m.seleccionado}}</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

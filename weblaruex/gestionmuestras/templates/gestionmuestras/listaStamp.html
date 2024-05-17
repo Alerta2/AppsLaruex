@@ -1,0 +1,164 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <table class="table"
+            id="table"
+            data-toggle="table"
+            data-pagination="true"
+            data-page-size="100"
+            data-height="800"
+            data-search="true"
+            data-show-columns="true"
+            data-show-refresh="true"
+            data-show-columns-toggle-all="true"
+            data-show-fullscreen="true"
+            data-buttons="buttons"
+            data-buttons-class="light"
+            data-show-export="true"
+            data-filter-control="true"
+            data-show-search-clear-button="true"
+            data-url="{% url 'gestionmuestras:stampDatos' %}">
+            <thead>
+                <th data-field="id">ID</th>
+                <th data-field="nombre">Nombre</th>
+                <th data-field="pais">País</th>
+                <th data-field="serie" data-sortable="true" data-filter-control="select">Serie</th>
+                <th data-field="anio" data-sortable="true" data-filter-control="select">Año</th>
+                <th data-field="denominacion">Denominación</th>
+                <th data-field="color">Color</th>
+                <th data-field="fecha_exacta">Fecha exacta</th>
+                <th data-field="fecha_modificacion">Fecha modificación</th>
+            </thead>
+        </table>
+    </div>
+    <!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+<script type="text/javascript">
+    // parametros de la tabla 'id', 'nombre', 'pais', 'serie', 'anio', 'denominacion', 'color', 'fecha_exacta
+    $('#table').bootstrapTable({
+        columns: [
+            {
+                field: 'id',
+                title: 'Identificador',
+                sortable: true,
+                visible: false
+            },
+            {
+                field: 'nombre',
+                title: 'Nombre',
+                sortable: true,
+            },
+            {
+                field: 'pais',
+                title: 'Pais',
+                sortable: true,
+            },
+            {
+                field: 'serie',
+                title: 'Serie',
+                sortable: true,
+            },
+            {
+                field: 'anio',
+                title: 'Año',
+                sortable: true,
+            },
+            {
+                field: 'denominacion',
+                title: 'Denominacion',
+                sortable: true,
+            },
+            {
+                field: 'color',
+                title: 'Color',
+                sortable: true,
+            },
+            {
+                field: 'fecha_exacta',
+                title: 'Fecha exacta',
+                sortable: true,
+                formatter: function (value, row) {
+                    // if value is null, return '-'
+                    if (row.fecha_exacta == null) 
+                        return '-';
+                    else
+                        return moment(value).format('DD/MM/YYYY HH:mm');
+                }
+            },
+            {
+                field: 'fecha_modificacion',
+                title: 'Fecha modificación',
+                sortable: true,
+                formatter: function (value, row) {
+                    // if value is null, return '-'
+                    if (row.fecha_modificacion == null) 
+                        return '-';
+                    else
+                        return moment(value).format('DD/MM/YYYY HH:mm');
+                }
+            },
+            {
+                title: 'Acciones',
+                formatter: function (value, row) {
+                  // si usuario es administrador
+                  let botones = '<div class="btn-group">';
+                    
+                    urlInforme = "{% url 'gestionmuestras:gestmuesGeneracionInforme' %}?muestra="+row.identificador;
+                    botones += '<a id="'+row.id+'" class="btn" onclick="verificar('+row.id+')" data-toggle="tooltip" data-placement="bottom" title="Verificar"><i class="far fa-thumbs-up"></i></a>';
+                    if (row.fecha_modificacion != null){
+                        botones = botones.replace('class="btn"', 'class="btn btn-success"');
+                    }
+                    botones += '</div>';
+                    return botones;
+                }
+            }],
+        exportDataType: "",
+        exportTypes: ['pdf', 'xml', 'csv', 'json'],
+    })
+
+    function dateFormat(value, row, index) {
+        return moment(value).format('DD/MM/YYYY HH:mm');
+    }
+
+    function buttons () {
+        return {
+        }
+    }
+    function verificar(id){
+        $.ajax({
+            url: "{% url 'gestionmuestras:stampVerificar' id=1 %}".replace('1', id),
+            method: "GET",
+            success: function(response) {
+                $("#"+id).addClass('btn-success');
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }
+</script>
+{% endblock %}

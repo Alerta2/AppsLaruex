@@ -1,0 +1,164 @@
+{% extends "base/base_gestmues.html" %}
+{% load static %}
+{% block title %}
+    Web LARUEX
+{% endblock %}
+{% block imports %}
+{% endblock %}
+
+{% block css %}
+    @media print
+    {
+        @page
+        {
+            size: 210mm 297mm; /* landscape */
+            /* you can also specify margins here: */
+            margin: 250mm;
+            margin-right: 450mm; /* for compatibility with both A4 and Letter */
+        }
+    }
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'gestionmuestras:gestmuesOpciones' %}">Home</a></li>
+        </ol>
+    </nav>
+</div>
+<!-- Info programa -->
+<section class="section dashboard">
+    <!-- Info programa cards -->
+    <div class="col-12" class="table-responsive">
+        <div id="toolbar" class="mb-4">
+            <form method="post" action="{% url 'gestionmuestras:gestmuesMuestrasRecepcionadas' %}">
+                {% csrf_token %}
+                <div class="row">     
+                    <div class="col-lg-3 col-md-8 col-8">
+                        <label class="text-sm">Memorias</label>
+                        <select class="form-control" aria-label="Memorias" id="Memorias" name="memorias" multiple>
+                            {% for memoria in memorias %}
+                                <option value="{{ memoria.codigo_memoria }}">{{ memoria.memoria }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-8 col-8">
+                        <label class="text-sm">Determinaciones</label>
+                        <select class="form-control" aria-label="Determinaciones" id="Determinaciones" name="determinaciones" multiple>
+                            {% for determinacion in determinaciones %}
+                                <option value="{{ determinacion.identificador }}">{{ determinacion.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-3 col-md-8 col-8">
+                        <label class="text-sm">Fecha inicio</label>
+                        <input type="date" class="form-control" id="fechaInicio" name="fechaInicio">
+                    </div>
+                    <div class="col-lg-3 col-md-8 col-8">
+                        <label class="text-sm">Fecha fin</label>
+                        <input type="date" class="form-control" id="fechaFin" name="fechaFin">
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-6 my-auto">
+                        <button type="submit" value="submit" class="btn btn-outline-secondary w-100 mt-4 mb-0" >Filtrar</button> 
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-6 my-auto">
+                        <div  class="btn btn-outline-secondary w-100 mt-4 mb-0" onclick="printTable()">Despejar impresión</div> 
+                    </div>
+                </div>
+            </form>
+        </div>
+        <table 
+            id="resultados" 
+            classes="table table-bordered table-hover table-responsive table-striped"	
+            data-toggle="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>FECHA EVENTO</th>
+                    <th>FECHA RECEPCION</th>
+                    <th>FECHA RECOGIDA</th>
+                    <th>CLIENTE</th>
+                    <th>TIPO EVENTO</th>
+                    <th>RECEPCIONADOR</th>
+                    <th style="max-width: 150px;">COMENTARIO</th>
+                    <th class="quitar">ACCION</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for muestra in muestras %}
+                <tr>
+                    <tr class="{{ muestra.muestra.muestra.identificador }}_{{ muestra.muestra.evento }}">
+                        <td>{{ muestra.muestra.muestra.identificador }}</td>
+                        <td>{{ muestra.muestra.fecha_evento|date:"d/m/Y H:i" }}</td>
+                        <td>{{ muestra.muestra.muestra.fecha_hora_recepcion|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            {% if muestra.muestra.muestra.fecha_hora_recogida == muestra.muestra.muestra.fecha_hora_recogida_ref %}
+                                {{ muestra.muestra.muestra.fecha_hora_recogida|date:"d/m/Y H:i" }}
+                            {% else %}
+                                <strong>I: </strong>{{ muestra.muestra.muestra.fecha_hora_recogida|date:"d/m/Y H:i" }} <br><strong>F: </strong>{{ muestra.muestra.muestra.fecha_hora_recogida_2|date:"d/m/Y H:i" }} <br><strong>R: </strong>{{ muestra.muestra.muestra.fecha_hora_recogida_ref|date:"d/m/Y H:i" }}
+                            {% endif %}
+                        </td>
+                        <td>{{ muestra.muestra.muestra.cliente.nombre }}</td>
+                        <td>{{ muestra.muestra.evento }}</td>
+                        <td>{{ muestra.muestra.muestra.recepcionado_por.nombre }}</td>
+                        <td style="max-width: 150px;">{{ muestra.muestra.comentario }}</td>
+                        <td class="quitar">
+                            <a class="btn" href="/private/gestionmuestras/infoMuestra/{{ muestra.muestra.muestra.identificador }}/" target="_blank"><i class="far fa-info"></i></a>
+                            <button class="btn" target="_blank" onclick="$('.{{ muestra.muestra.muestra.identificador }}_{{ muestra.muestra.evento }}').hide()"><i class="fas fa-eraser"></i></button>
+                        </td>
+                    </tr>
+                    {% if muestra.muestra.evento == 'Recepción' %}
+                        <tr class="{{ muestra.muestra.muestra.identificador }}_{{ muestra.muestra.evento }}">
+                            <td colspan="9">
+                                <button class="btn btn-link quitar" type="button" data-toggle="collapse" data-target="#collapse{{ muestra.muestra.id }}" aria-expanded="false" aria-controls="collapse{{ muestra.muestra.id }}">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <table class="table table-bordered collapse" id="collapse{{ muestra.muestra.id }}">
+                                    <thead>
+                                        <tr>
+                                            <th>DETERMINACION</th>
+                                            <th>ALICUOTAS</th>
+                                            <th>CODIGO REDUCIDO</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for alicuota in muestra.alicuotas %}
+                                        <tr>
+                                            <td>{{ alicuota.alicuota.id_analiticas.nombre }}</td>
+                                            <td>{{ alicuota.alicuota.identificador }}</td>
+                                            <td>{{ alicuota.tratamientos.0.cod_reducido }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    <td class="{{ muestra.muestra.muestra.identificador }}_{{ muestra.muestra.evento }}" colspan="9">
+                        <textarea class="form-control" name="comentario" rows="2" placeholder=""></textarea>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- End Grid cards -->
+</section>
+<!-- End Info programa -->
+
+<script type="text/javascript">
+    function printTable() {
+        $("header").hide();
+        $(".pagetitle").hide();
+        $("#toolbar").hide();
+
+        // set webpage size to A4
+        var style = document.createElement('style');
+        style.innerHTML = '@page { size: A4; margin: 0mm; }';
+        document.head.appendChild(style);
+        // fit table to new size
+        $("#resultados").css("width", "100%");
+    }
+</script>
+{% endblock %}
